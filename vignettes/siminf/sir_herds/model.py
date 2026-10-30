@@ -19,13 +19,14 @@ register = pd.DataFrame({
     'states': (events.event == 'enter').map({True:'S', False:None}),
 })
 
+S, I, R = ss.states('S I R')
 sir = ss.Disease(
-    infection = ss.transmission('S -> I', beta=ss.perday(0.16)),
-    recovery  = ss.progression('I -> R', rate=ss.perday(0.01)),
-    init      = dict(I=ss.by(herd=u0.I.values)),
+    infection = S >> I @ ss.perday(0.16) * I,
+    recovery  = I >> R @ ss.perday(0.01),
+    init_n    = dict(I=ss.by(herd=u0.I.values)),
 )
 size = u0[['S', 'I', 'R']].sum(axis=1)
-sir.stratify(herd=list(u0.node.astype(str)), kind='space', split=size/size.sum(), mobility=ss.Mobility(data=register))
+sir.stratify(herd=list(u0.node.astype(str)), kind='space', split=size/size.sum(), mobility=ss.geo.Mobility(data=register))
 sim = ss.Sim(sir, solver='gillespie', unit='day', start=0, stop=1460, total_pop=size.sum())
 
 if __name__ == '__main__':

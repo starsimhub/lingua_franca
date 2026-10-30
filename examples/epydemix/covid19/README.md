@@ -27,7 +27,7 @@ An age-structured SEIR with deaths, in the population of Massachusetts (7.0 mill
     - `abc_fit_deaths`, and `abc_<scenario>_deaths` for the scenarios `persistence`, `moderate`, and `high`: the mean and 5% to 95% range of the weekly deaths of the accepted particles, and of 100 projections from the posterior
     - `fixed_<scenario>_deaths`: weekly deaths from 200 runs at fixed parameter values (the posterior medians, rounded: `R0` 2.22, `Delta` 20, `I0` 4,260, `seasonality_min` 0.8), for each scenario; for `persistence` also `fixed_persistence_deaths_<group>` by age group, and the daily totals of `S`, `E`, `I`, `R`, `D` (the sum of `D0` to `D3`), and `D4` (the dead)
 - `reference/population.json`: the inputs that come from the data rather than the script (the size of each age group and the four contact matrices), the contact reduction in each scenario, the fixed parameter values, and the settings of the run
-- `reference/timing.json`: the time of one run of `simulate_wrapper()`, the function the calibration evaluates
+- `reference/timing.json`: the time of a first run and of a rerun of `simulate_wrapper()`, the function the calibration evaluates
 - `meta.yaml`: where it came from
 - `LICENSE`: the license of epydemix (GPL-3.0)
 

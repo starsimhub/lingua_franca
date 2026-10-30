@@ -14,7 +14,7 @@ Models are kept as close to their source form as possible, with each example acc
 - The original source code, with sufficient information to ensure reproducibility (`uv.lock` or equivalent)
 - Provenance: framework and version, origin (paper, repository, tutorial), and license
 - Expected outputs or reference results, where available, so translations can be checked
-- Two numbers the translation will be held to: the lines of model code (excluding imports, comments, blank lines, and plotting) and the wall-clock time for a reference run, with the machine it was measured on
+- Two numbers the translation will be held to: the lines of model code (excluding imports, comments, blank lines, and plotting) and the time for a first run and a rerun, with the machine they were measured on
 
 ## Selection criteria
 

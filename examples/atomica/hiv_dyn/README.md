@@ -22,7 +22,7 @@ It is chosen as Atomica's complex example because it is a demo its authors ship 
 - `original/sheets/`: every sheet of the three spreadsheets as CSV, written by `dump_sheets.py` (a cell holding a formula is written as its stored result)
 - `run.py`: runs the model and writes `reference/`; it calls `simulate.py` in the Atomica environment
 - `reference/results.csv`: for each of four runs (`baseline`, without programs, and `default_budget`, `doubled_budget`, and `zero_budget`) and each population (`females`, `males`): the compartments (`baseline_females_sus` and so on), the flows in people per year (`baseline_females_tx_to_vs`), the characteristics (`alive`, `all_people`, `all_dx`, `all_ever_linked`, `all_curr_linked`, `all_tx`, `all_vs`), and the parameters that vary (`acq_rate`, `test_yield`, `diag`, `link_time`, `initiate`, `loss`, `fail_rate`); and for each budget scenario, the coverage of each program (`default_budget_coverage_testing_clinics` and so on)
-- `reference/timing.json`: the time of one run without programs, with the spreadsheets already loaded, and of the three budget scenarios
+- `reference/timing.json`: the times of a first run without programs, including reading the spreadsheets, of a rerun, and of the three budget scenarios
 - `meta.yaml`: where it came from
 
 ## The model

@@ -16,7 +16,7 @@ A closed, stochastic, discrete-time SIR epidemic in 100 individuals over 100 day
 - `original/compart_SIR.yaml`, `original/IBM_SIR.yaml`, `original/hybrid_SIR.yaml`: the three models, unchanged, from `models/features/` in the source distribution of EMULSION 1.1.1
 - `run.py`: runs them and writes `reference/`
 - `reference/results.csv`: the mean and 5% to 95% range of 200 runs of each variant, at each of days 0 to 100 (`compartment_S`, `compartment_I`, `compartment_R`, `ibm_S`, `ibm_I`, `ibm_R`, `hybrid_S`, `hybrid_I`, `hybrid_R`)
-- `reference/timing.json`: the time of one run of the compartmental variant
+- `reference/timing.json`: the times of a first run and a rerun of the compartmental variant, each as a whole command
 - `meta.yaml`: where it came from
 - `LICENSE`, `NOTICE`: the upstream license (Apache-2.0) and its notice
 

@@ -4,7 +4,7 @@ increasingly severe states, each of which some people leave by recovering
 """
 import starsim as ss
 
-contacts = ss.timeseries({0: 1.0, 29: 0.55, 30: 0.1}) # Contacts fall by 90% during day 29, when they average 0.55
+contacts = ss.timeseries({0: 1.0, 29: 1.0, 30: 0.1}, mode='cosine') # Cut by 90% over day 29, as MEmilio's damping
 S, E, INS, ISy, ISev, ICr, R = ss.states(7)
 
 secir = ss.Disease(
@@ -15,7 +15,7 @@ secir = ss.Disease(
     critical  = ss.Transition(ISev, [ICr, R], dur=ss.days(12), p=[0.25, 0.75]),
     recovery  = ss.Transition(ICr, R, dur=ss.days(8), p=0.7),
     death     = ss.Transition(ICr, ss.null, dur=ss.days(8), p=0.3),
-    init      = dict(E=100, INS=50, ISy=50, ISev=20, ICr=10, R=10),
+    init_n    = dict(E=100, INS=50, ISy=50, ISev=20, ICr=10, R=10),
 )
 sim = ss.Sim(secir, total_pop=83_000, stop=ss.days(100))
 

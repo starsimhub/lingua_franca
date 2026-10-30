@@ -34,7 +34,6 @@ if __name__ == '__main__':
         rows += summarize(runs, key)
 
     tools.write_results(here, rows)
-    seconds = out['seconds']
-    what = f"Building and running the model once in Python (1,750,000 agents, 365 steps, on all cores), the median of {n_runs - 1} runs in one process after a first run of {out['first']:.1f} s that includes compiling"
-    tools.write_timing(here, seconds, what)
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.3f} s')
+    what = f"Building and running the model once in Python (1,750,000 agents, 365 steps, on all cores), not counting starting Python or importing. first is the first run, which includes compiling; rerun is the best of {n_runs - 1} more in the same process, each of which builds the model again, since a LASER model cannot be run twice"
+    tools.write_timing(here, out['rerun'], what, first=out['first'])
+    print(f"Wrote {len(rows)} rows; first run {out['first']:.3f} s, rerun {out['rerun']:.3f} s")

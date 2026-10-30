@@ -50,6 +50,7 @@ if __name__ == '__main__':
             rows += [dict(series=f'{name}_{key}', **row) for row in summarize(counts, key)]
 
     tools.write_results(here, rows)
-    seconds = tools.time_run(lambda: simulate(variants['compartment'], 1))
-    tools.write_timing(here, seconds, 'emulsion run compart_SIR.yaml --runs 1, as one command (about 0.7 s of it is starting Python and reading the model; EMULSION itself reports about 0.06 s for the simulation)')
-    print(f'Wrote {len(rows)} rows; one compartmental run takes {seconds:.3f} s')
+    rerun = tools.time_run(lambda: simulate(variants['compartment'], 1))
+    what = 'emulsion run compart_SIR.yaml --runs 1, as one command each time: EMULSION runs a model as a whole command, so first and rerun are the same command, and both include starting Python and reading the model (about 0.7 s; EMULSION itself reports about 0.06 s for the simulation)'
+    tools.write_timing(here, rerun, what)
+    print(f'Wrote {len(rows)} rows; a first compartmental run takes {tools.first_run["seconds"]:.3f} s, and a rerun {rerun:.3f} s')

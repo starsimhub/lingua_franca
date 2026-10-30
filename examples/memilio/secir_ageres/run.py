@@ -33,21 +33,27 @@ kept = dict()
 simulate = mod.simulate
 
 def wrapper(*args, **kwargs):
-    start = time.perf_counter()
     out = simulate(*args, **kwargs)
-    kept['seconds'] = time.perf_counter() - start
+    kept['args'] = kwargs # The example gives them by name
     kept['result'] = out
     return out
 
 mod.simulate = wrapper
+start = time.perf_counter()
 with contextlib.redirect_stdout(io.StringIO()):
     mod.run_ode_secir_ageres_simulation(show_plot=False)
+first = time.perf_counter() - start
+rerun = float('inf')
+for i in range(100): # The same model through the solver again
+    start = time.perf_counter()
+    simulate(**kept['args'])
+    rerun = min(rerun, time.perf_counter() - start)
 
 raw = kept['result']
 arr = interpolate_simulation_result(raw).as_ndarray()
 names = [name for name,state in sorted(InfectionState.__members__.items(), key=lambda item: int(item[1])) if name != 'Count']
 n = len(names)
-out = dict(time=arr[0].tolist(), steps=raw.get_num_time_points(), seconds=kept['seconds'], names=names)
+out = dict(time=arr[0].tolist(), steps=raw.get_num_time_points(), first=first, rerun=rerun, names=names)
 out['groups'] = [{name:arr[1 + g*n + i].tolist() for i,name in enumerate(names)} for g in range((arr.shape[0] - 1)//n)]
 print('RESULT ' + json.dumps(out))
 """
@@ -72,7 +78,6 @@ if __name__ == '__main__':
         rows += [dict(time=t, series=f'InfectedSymptoms_{g}', value=value) for t,value in zip(out['time'], group['InfectedSymptoms'])]
 
     tools.write_results(here, rows)
-    seconds = tools.time_run(simulate)
-    what = f'python ode_secir_ageres.py, as one command (nearly all of it is starting Python and importing; the call to simulate() itself takes about {out["seconds"]*1000:.2f} ms, for {out["steps"]} adaptive time points)'
-    tools.write_timing(here, seconds, what)
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.3f} s, of which the solver takes {out["seconds"]*1000:.2f} ms over {out["steps"]} time points')
+    what = f'first is one call of the example\'s run_ode_secir_ageres_simulation(), with its plot off, which builds the model, runs it ({out["steps"]} adaptive time points), and prints and sums the result, not counting starting Python or importing; rerun is the best of 100 more calls of simulate() on the same model'
+    tools.write_timing(here, out['rerun'], what, first=out['first'])
+    print(f'Wrote {len(rows)} rows; first run {out["first"]*1000:.2f} ms, rerun {out["rerun"]*1000:.3f} ms, over {out["steps"]} time points')

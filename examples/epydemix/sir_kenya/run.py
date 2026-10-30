@@ -27,6 +27,6 @@ if __name__ == '__main__':
     with open(os.path.join(here, 'reference', 'population.json'), 'w') as f:
         lines = [f'  {json.dumps(key)}: {json.dumps(val)}' for key,val in out['info'].items()] # One line per key
         f.write('{\n' + ',\n'.join(lines) + '\n}\n')
-    what = f'model.run_simulations(Nsim=1): one stochastic run of {out["info"]["n_steps"]} daily steps, in process, without the import or the data download (the 100 runs of the original take {out["many"]:.2f} s)'
-    tools.write_timing(here, out['one'], what)
-    print(f'Wrote {len(rows)} rows from {out["info"]["n_runs"]} runs; one run takes {out["one"]:.4f} s')
+    what = f'model.run_simulations(Nsim=1): one stochastic run of {out["info"]["n_steps"]} daily steps, in process, with the model already defined, and without the import or the data download. The first run is the first call in the process, and the rerun the best of 5 calls after it (the 100 runs of the original take {out["many"]:.2f} s)'
+    tools.write_timing(here, out['rerun'], what, first=out['first'])
+    print(f'Wrote {len(rows)} rows from {out["info"]["n_runs"]} runs; a first run takes {out["first"]:.4f} s, and a rerun {out["rerun"]:.4f} s')

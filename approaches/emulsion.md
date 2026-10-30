@@ -3,23 +3,24 @@
 |  |  |
 |---|---|
 | **Language** | YAML DSL; engine in Python |
-| **Paradigms** | Compartmental, individual-based (IBM), **hybrid**, and metapopulation — multi-level and multi-scale |
+| **Paradigms** | Compartmental, individual-based (IBM), **hybrid**, and metapopulation: multi-level and multi-scale |
 | **Specification style** | A single human-readable YAML document. No code required |
 | **Version reviewed** | 1.2.1 |
 | **License** | Apache-2.0 |
 | **Code** | <https://forgemia.inra.fr/dynamo/software/emulsion-public> |
 | **Docs** | Ships with the repository; quickstart and feature model libraries |
 | **Paper** | Picault et al. (2019), *PLOS Comp Biol* 15(9): e1007342, [10.1371/journal.pcbi.1007342](https://doi.org/10.1371/journal.pcbi.1007342) |
+| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/emulsion.html) |
 
 ## What it's for
 
-EMULSION is a modeling framework for veterinary and plant epidemiology in which **the model is a document**, not a program. Its stated motivation is explicitly about communication: models should be "explicit, intelligible and revisable" so that modelers can discuss them with biologists, veterinarians, and economists throughout the modeling process, rather than translating between a shared conceptual model and private code.
+EMULSION is a modeling framework for veterinary and plant epidemiology in which **the model is a document**, not a program. Its stated motivation is communication: models should be "explicit, intelligible and revisable", so that modelers can discuss them with biologists, veterinarians, and economists throughout the work.
 
-For this project, EMULSION is the most important framework in the review after camdl and Starsim, for one reason given below.
+For this project, it is the most important framework in the review after camdl and Starsim, for the reason below.
 
 ## The finding
 
-**EMULSION already does the thing this project is trying to do.** Compare two of its shipped example models:
+**EMULSION got there first.** Compare two of its example models:
 
 ```yaml
 # compart_SIR.yaml
@@ -45,9 +46,9 @@ levels:
     desc: 'level of the individuals'
 ```
 
-The rest of both files — the state machine, the transitions, the parameters, the initial conditions, the outputs — is identical. **A one-word change switches the model between a stochastic compartmental model and an individual-based model.** A third value, `hybrid`, gives a mixed formulation where some processes are tracked individually and others in aggregate.
+The rest of both files (the state machine, the transitions, the parameters, the initial conditions, the outputs) is identical. **A one-word change switches the model between a stochastic compartmental model and an individual-based model.** A third value, `hybrid`, gives a mixed formulation where some processes are tracked individually and others in aggregate.
 
-This is the paradigm-independence goal, shipped, in an Apache-2.0 package, published in 2019. Any design work on this project should start by understanding exactly what EMULSION can and cannot express under that switch, because that boundary is the real research question.
+This is the goal of paradigm independence, achieved in an Apache-2.0 package published in 2019. Design work here should start from what EMULSION can and cannot express under that switch, because that boundary is the real research question.
 
 ## How a model is specified
 
@@ -120,11 +121,11 @@ Every element carries a `desc:`, and parameters may carry a `source:` naming the
 |---|---|---|
 | Organization level | `levels:` with `aggregation_type` and `contains` | `compartment`, `IBM`, `hybrid`, `metapopulation`; levels nest (individual → herd → metapopulation) |
 | Process | `processes:` per level | Names the state machines (or grouped processes) that run at that level |
-| State machine | `state_machines:` | States and transitions — the core model structure |
+| State machine | `state_machines:` | States and transitions: the core model structure |
 | Transition | `{from:, to:, rate:}` or `{... proba:}` or `{... duration:}` | **Three ways to specify timing**, converted to the time step automatically |
 | Parameter | name with `value`, `desc`, `source` | `value` may be a number or an expression over other parameters and aggregates |
 | Aggregate | `total_I`, `total_population` | Automatically available names for state totals |
-| Prototype | `prototypes:` | Named bundles of initial attribute values — a template for creating individuals |
+| Prototype | `prototypes:` | Named bundles of initial attribute values: a template for creating individuals |
 | Initial condition | `initial_conditions:` | Prototype + amount, where amount is an expression |
 | Output | `outputs:` with `period` and `extra_vars` | Declarative |
 | Code add-on | optional Python module | The escape hatch for behavior the YAML cannot express |
@@ -135,41 +136,41 @@ Every element carries a `desc:`, and parameters may carry a `source:` naming the
 
 > Rates are automatically converted into probabilities w.r.t the duration of the time step (delta_t), assuming a classical exponential distribution of durations in the states.
 
-This is the same three-way distinction Starsim later encoded as `per` / `prob` / `dur`, expressed here as three alternative keys on a transition. It is not a type system — a rate is still a number and the unit lives in the `desc:` string — but the *distinction* is made in the model text, and the conversion is the engine's job rather than the modeler's.
+Starsim later encoded the same three-way distinction as `per` / `prob` / `dur`. Here they are three alternative keys on a transition. They are not types (a rate is still a number, and its unit is in the `desc:` string), but the *distinction* is in the model, and the engine does the conversion.
 
 ## Multi-level and multi-scale
 
-`levels` with `contains` builds a hierarchy: individuals inside herds inside a metapopulation, each with its own `aggregation_type` and its own processes. A herd-level process (culling, movement, testing) operates on herds; an individual-level process (infection, recovery) operates on individuals; the engine reconciles them.
+`levels` with `contains` builds a hierarchy: individuals inside herds inside a metapopulation, each with its own `aggregation_type` and processes. A herd-level process (culling, movement, testing) acts on herds, an individual-level process (infection, recovery) acts on individuals, and the engine reconciles them.
 
-This is a genuinely different structural idea from anything else in the review. Starsim, EpiModel, and epiworld all have one population level. epymorph has nodes and individuals-in-aggregate. EMULSION lets **each level independently choose its paradigm**, which is why the hybrid mode is possible at all.
+No other framework in the review does this. Starsim, EpiModel, and epiworld have one population level, and epymorph has nodes and aggregated individuals. EMULSION lets **each level choose its own paradigm**, which is what makes the hybrid mode possible.
 
 ## Strengths
 
-- **Paradigm as a declared property of a level.** `aggregation_type: compartment | IBM | hybrid` on an otherwise identical model. This is the review's existence proof for the project's central premise.
-- **The model is a document.** YAML, human-readable, diffable, version-controllable, and reviewable by non-programmers. Transitions are data; the state machine is data; initial conditions are data.
-- **Multi-level structure with per-level paradigm choice.** Individual → herd → metapopulation, each aggregated as appropriate.
-- **Three timing specifications per transition** — rate, probability, duration — with engine-side conversion.
-- **Documentation embedded**: `desc:` on everything, `source:` on parameters recording where a value came from.
-- **Prototypes** as named bundles of initial attributes — a clean way to say "create 100 healthy individuals and 1 infected one".
-- **Parameters as expressions** over other parameters and automatic aggregates (`total_I`, `total_population`), so the force of infection is a parameter definition rather than hidden engine behavior.
-- **State machines are diagrammable** — `fillcolor` on states is there because the engine draws the model.
+- **Paradigm as a declared property of a level.** `aggregation_type: compartment | IBM | hybrid` on an otherwise identical model. This proves in practice that the project's central idea can work.
+- **The model is a document.** YAML that people can read, compare between versions, and review without programming. Transitions, the state machine, and initial conditions are all data.
+- **Several levels, each with its own paradigm.** Individual → herd → metapopulation.
+- **Three ways to give timing on a transition**: rate, probability, or duration, converted by the engine.
+- **Documentation in the model**: `desc:` on everything, and `source:` on parameters recording where a value came from.
+- **Prototypes**: named bundles of initial attributes, a neat way to say "create 100 healthy individuals and 1 infected one".
+- **Parameters as expressions** over other parameters and automatic totals (`total_I`, `total_population`), so the force of infection is visible and not hidden in the engine.
+- **Models can be drawn**: `fillcolor` on states is there because the engine draws the model.
 - **A stated communication goal**, and a design that follows from it.
 
 ## Limitations
 
-- **YAML is a poor host for a language.** No syntax checking beyond schema validation, expressions embedded in strings (`value: 'transmission_I * total_I / total_population'`), no editor support, no type checking, and error messages that come from a YAML parser rather than a compiler. Everything camdl gets from having a real grammar, EMULSION gives up.
-- **No dimensional types.** A rate's units live in its `desc:` string.
-- **The force of infection is a hand-written expression.** `transmission_I * total_I / total_population` is correct here and is the modeler's responsibility; nothing checks it, and nothing knows that this transition is an infection rather than a progression. That is the same missing-`/N` class of bug camdl catches.
-- **Aggregate names are magic.** `total_I` and `total_population` appear without declaration.
-- **Code add-ons are the escape hatch**, and any model using them loses the "model is a document" property.
-- **Small community, hosted on INRAE's GitLab rather than GitHub**, primarily veterinary/plant epidemiology. Discoverability and adoption outside that community are limited.
-- **The paradigm switch has undocumented limits.** The shipped examples show `compartment`/`IBM`/`hybrid` on the same simple SIR. What happens when the model uses individual-level attributes that have no compartmental analogue is not stated in the material reviewed here, and is exactly the question this project needs answered.
+- **YAML makes checking hard.** Checks stop at the file format, expressions sit in strings (`value: 'transmission_I * total_I / total_population'`), there is no editor support or type checking, and errors come from a YAML parser. A dedicated language, like camdl's, avoids these at the cost of readers having to learn it.
+- **No dimensional types.** A rate's units are in its `desc:` string.
+- **The force of infection is written by hand.** `transmission_I * total_I / total_population` is correct here, but nothing checks it, and nothing knows that this transition is an infection. camdl catches this kind of missing-`/N` error.
+- **Totals appear without being declared**, such as `total_I` and `total_population`.
+- **Code add-ons handle what YAML cannot**, and a model using them is no longer only a document.
+- **Small community, on INRAE's GitLab**, mainly in veterinary and plant epidemiology, so it is less known outside that field.
+- **The paradigm switch has undocumented limits.** The examples show `compartment`/`IBM`/`hybrid` on the same simple SIR. What happens with individual attributes that have no compartmental counterpart is not stated in the material reviewed, and this project needs that answered.
 
 ## Implications for the lingua franca
 
-1. **Start by mapping EMULSION's paradigm-switch boundary.** This is a concrete, tractable piece of research: take the shipped feature models, push each one across `compartment` / `IBM` / `hybrid`, and record where the switch stops working and why. That boundary is the actual scope of the lingua franca's paradigm-independence claim, and someone has already built the apparatus for measuring it.
-2. **Paradigm belongs to a *level*, not to a model.** EMULSION's insight is that the choice is per-level and hierarchical: individuals may be aggregated while herds are explicit, or vice versa. That is more expressive than a single per-model paradigm flag and matches how hybrid models are actually built. The lingua franca should support declaring the aggregation level of each structural level.
-3. **Three timing forms per transition — rate, probability, duration — is the right user-facing vocabulary.** It matches how epidemiologists actually have their parameters (a hazard, a per-step probability, a mean duration), and it converts mechanically. Starsim's type hierarchy is the rigorous version of the same idea; EMULSION's is the readable version. The lingua franca wants both: `rate`/`prob`/`dur` as *typed* alternatives on a transition.
-4. **Embed provenance in the model.** `source:` on a parameter — "classical function assuming frequency dependence" — is a one-line field that answers the question every reviewer asks. Combined with camdl's `#'` doc comments and `@symbol` annotations, this suggests the language should have a standard place for *why this value*, not just *what value*.
-5. **Prototypes are a good initial-conditions primitive.** Naming a bundle of initial attribute values and then saying how many of each to create is cleaner than either a compartment vector (which cannot express correlated attributes) or per-agent initialization code.
-6. **Do not build on YAML.** EMULSION demonstrates the value of model-as-document and simultaneously demonstrates the cost of choosing a data format as the syntax. Expressions in strings, no type checking, and parser-level errors are exactly what a purpose-built grammar avoids. The lingua franca should be as readable as EMULSION's YAML and as checkable as camdl's DSL — which means its own grammar with a canonical data serialization underneath, not a data format used as a language.
+1. **Start by mapping where EMULSION's paradigm switch stops.** Take its feature models, try each under `compartment` / `IBM` / `hybrid`, and record where the switch stops working and why. That boundary shows how far paradigm independence can go, and EMULSION provides the means of measuring it.
+2. **Paradigm belongs to a *level*, not to a model.** The choice is per level and hierarchical: individuals may be aggregated while herds are explicit, or the reverse. That says more than one flag per model, and matches how hybrid models are built. The lingua franca should let each level declare how it is aggregated.
+3. **Rate, probability, and duration are the right three ways to give timing.** They match how epidemiologists hold their parameters (a hazard, a per-step probability, a mean duration), and they convert mechanically. Starsim's types are the rigorous form, and EMULSION's keys the readable one. The lingua franca wants both: `rate`/`prob`/`dur` as *typed* alternatives on a transition.
+4. **Keep sources in the model.** `source:` on a parameter ("classical function assuming frequency dependence") is one line that answers every reviewer's question. With camdl's `#'` comments and `@symbol` annotations, this suggests a standard place for *why this value*, as well as *what value*.
+5. **Prototypes are a good way to set initial conditions.** Naming a bundle of attributes and saying how many of each to create is neater than a compartment vector (which cannot express correlated attributes) or per-agent code.
+6. **Do not build on YAML.** EMULSION shows the value of a model as a document, and also the cost of using a data format as the language. The lingua franca should be as readable as EMULSION's YAML and as checkable as camdl, which means its own language with a standard data form underneath.

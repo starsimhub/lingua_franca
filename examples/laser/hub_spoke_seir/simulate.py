@@ -12,6 +12,9 @@ import os
 import sys
 import json
 import time
+import geopandas, shapely, laser.core, laser.generic # Imported here so that the time of the first run does not include importing them
+from laser.generic import SEIR
+from laser.core import distributions
 
 here = os.path.dirname(os.path.abspath(__file__))
 patches = ['Central City', 'Town 1', 'Interim 1a', 'Town 3'] # The hub, the seeded town, the patch next to the hub on that spoke, and a far town
@@ -53,5 +56,4 @@ if __name__ == '__main__':
         out, seconds = simulate(seed=1000*(i + 1)) # Spaced out, since LASER seeds thread j with seed + j
         runs.append(out)
         times.append(seconds)
-    seconds = sorted(times[1:])[(n_runs - 1)//2] if n_runs > 1 else times[0] # The first run includes compiling
-    json.dump(dict(runs=runs, seconds=seconds, first=times[0]), stdout)
+    json.dump(dict(runs=runs, rerun=min(times[1:]), first=times[0]), stdout) # The first run includes compiling

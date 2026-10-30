@@ -3,7 +3,7 @@
 |  |  |
 |---|---|
 | **Language** | Python |
-| **Paradigms** | Metapopulation ODE — a user-supplied subpopulation model broadcast across arbitrary dimensions |
+| **Paradigms** | Metapopulation ODE: a user-supplied subpopulation model broadcast across arbitrary dimensions |
 | **Specification style** | A Python function defining the subpopulation model, plus a declarative dimension specification |
 | **Version reviewed** | 0.x |
 | **License** | (see repository) |
@@ -13,9 +13,9 @@
 
 ## What it's for
 
-MetaCast takes one subpopulation model and "broadcasts" it across a metapopulation whose dimensions the user declares. Its premise is that stratification, metapopulation structure, and any other partition of the population are **the same operation** — a dimension the model is replicated over — and that the model author should write the within-group dynamics once.
+MetaCast takes one subpopulation model and "broadcasts" it across a metapopulation whose dimensions the user declares. Its premise is that stratification, metapopulation structure, and any other division of the population are **the same operation** (a dimension the model is repeated over), so the within-group dynamics need writing only once.
 
-It is a small package, and its contribution to this review is conceptual: it treats structure as a **dimension algebra** rather than as model content.
+It is a small package, and its contribution here is an idea: structure is **a set of dimensions**, separate from the model.
 
 ## How a model is specified
 
@@ -82,40 +82,40 @@ So "vaccination" is not a process in the model; it is a **transfer between coord
 
 ## The force-of-infection convention
 
-MetaCast's most opinionated design choice is that it **computes the force of infection for you** from a naming convention. Given prefixes `beta`, `rho`, and `N`, and a `foi_population_focus` setting (`None`, `'i'`, or `'j'`), it assembles
+MetaCast's boldest choice is to **compute the force of infection for you** from a naming convention. Given prefixes `beta`, `rho`, and `N`, and a `foi_population_focus` setting (`None`, `'i'`, or `'j'`), it builds
 
 λᵢ = Σⱼ ρᵢⱼ · βⱼ · Iⱼ / Nⱼ
 
-with the choice of denominator controlled by `foi_population_focus`. The subpopulation model receives `foi` as an argument and never computes it.
+with the denominator set by `foi_population_focus`. The subpopulation model receives `foi` as an argument and never computes it.
 
-This is the right instinct — force of infection between groups is exactly the part that gets written wrong, and factoring it out of the model is correct — implemented in the most fragile possible way, through string concatenation of parameter names (`'beta_[high,vaccinated]'`). The lesson is in the split, not the mechanism.
+The instinct is right: force of infection between groups is the part that most often goes wrong, so it belongs outside the model. The tradeoff is that it rests on building parameter names from strings (`'beta_[high,vaccinated]'`), which is easy to break.
 
-Also worth noting: `asymptomatic_transmission_modifier` applies automatically to any state in `infectious_states` but not in `symptomatic_states`. That is real epidemiological semantics encoded in a set relationship, which is the kind of thing a language should be able to say.
+Also, `asymptomatic_transmission_modifier` applies automatically to any state in `infectious_states` but not in `symptomatic_states`. This is real epidemiology held in a relationship between sets, and a language should be able to say it.
 
 ## Strengths
 
-- **Structure as a dimension algebra.** Age, space, risk, and vaccination status are all just dimensions; the model author writes within-group dynamics once. Conceptually the cleanest statement of the stratification problem in the review.
-- **Transfers between coordinates as a declarative form.** `{from_coordinates, to_coordinates, states, parameter}` expresses vaccination, aging, and migration in one vocabulary — and expresses them as *dimension movement*, not as model transitions.
-- **Force of infection factored out** of the subpopulation model and computed by the framework, with an explicit `foi_population_focus` choice for the denominator convention.
-- **Parameters explicitly classified** as universal or subpopulation-specific.
-- **Epidemiological set semantics**: `infected_states`, `infectious_states`, `symptomatic_states` as distinct declared sets, with the asymptomatic transmission modifier following from the difference.
-- **Discrete event queue** for scheduled population movements and parameter changes.
-- **Sensitivity analysis built in** (LHS + PRCC, parallelised).
+- **Structure as a set of dimensions.** Age, space, risk, and vaccination status are all dimensions, and within-group dynamics are written once. This is the neatest statement of the stratification problem in the review.
+- **Transfers between coordinates, as data.** `{from_coordinates, to_coordinates, states, parameter}` covers vaccination, aging, and migration in one form, as movement along a dimension.
+- **Force of infection handled by the framework**, with an explicit `foi_population_focus` for the denominator.
+- **Parameters classed** as universal or subpopulation-specific.
+- **Declared sets of states**: `infected_states`, `infectious_states`, and `symptomatic_states`, with the asymptomatic modifier following from the difference.
+- **An event queue** for scheduled population movements and parameter changes.
+- **Sensitivity analysis built in** (LHS + PRCC, in parallel).
 
 ## Limitations
 
-- **The subpopulation model is imperative NumPy index arithmetic.** `y_deltas[states_index['S']] += -infections` is not a specification; it is code, and it is code that indexes into a shared array. There is no transition object, nothing to introspect, and easy scope for sign errors.
-- **Positional magic in the state vector.** `y_deltas[-2]` and `y_deltas[-1]` are the observed-state accumulators, addressed by negative index with a comment explaining what they are.
-- **String-concatenated parameter names.** `parameters['p' + subpop_suffix]`, `'beta_[high,vaccinated]'`. Typos are runtime `KeyError`s, and nothing checks that the set of expected names was supplied.
-- **ODE only.** No stochastic or agent-based execution.
-- **Small and lightly adopted.** One demonstration notebook; a JOSS paper; limited independent use.
-- **No dimensional types**, no calendar dates, no observation model, no inference beyond sensitivity analysis.
-- **The force-of-infection convention is inflexible.** It handles the frequency-dependent multi-group case it was designed for; anything else means bypassing it.
+- **The subpopulation model is NumPy index arithmetic.** `y_deltas[states_index['S']] += -infections` is code indexing into a shared array. There is no transition object, and sign errors are easy to make.
+- **Results depend on position in the state vector.** `y_deltas[-2]` and `y_deltas[-1]` are the observed-state accumulators, with a comment to say so.
+- **Parameter names are built from strings.** `parameters['p' + subpop_suffix]`, `'beta_[high,vaccinated]'`. Typos are errors during the run, and nothing checks that all expected names were supplied.
+- **ODE only.** No stochastic or agent-based runs.
+- **Small, with few users.** One demonstration notebook, a JOSS paper, and limited independent use.
+- **No dimensional types**, calendar dates, observation model, or inference beyond sensitivity analysis.
+- **The force-of-infection convention is limited** to the frequency-dependent multi-group case it was designed for.
 
 ## Implications for the lingua franca
 
-1. **Take the framing: stratification, metapopulation, and multi-group structure are one operation.** MetaCast, summer2 (`stratify_with`), camdl (`dimensions` + `stratify`), and epymorph (`MultiStrataRUME`) are four attempts at the same thing, and MetaCast states the general case most plainly. The lingua franca should have **one dimension concept** covering age, space, risk, strain, and vaccination status — with, as summer2 and camdl both show, a way to mark which dimensions carry extra structure (aging flows, movement, residence times).
-2. **Transfers between coordinates deserve to be a declared form.** Vaccination as `{from: [high, unvaccinated], to: [high, vaccination_lag], states: all, rate: nu}` is a genuinely different and useful way of saying it: the individual does not change disease state, they change *dimension coordinate*. camdl's `transfer(from = S, to = V)` is close, but MetaCast's version generalizes across all states at once and across arbitrary dimensions. This is a strong candidate primitive for the intervention vocabulary.
-3. **Force of infection should be framework-computed and explicitly configured.** Factoring λ out of the model is right. Doing it through string-concatenated parameter names is not. The lingua franca needs an explicit, checked form: which states are infectious, which mixing structure applies, which denominator convention (`None` / `i` / `j`) is in force — with the convention named rather than assumed, because the three choices are genuinely different models and the difference is invisible in most frameworks.
-4. **Declare the epidemiological state sets.** `infected_states`, `infectious_states`, `symptomatic_states` as separate declared sets, with behavior following from their differences, is a small idea worth keeping. It is how a framework knows that "infected" and "infectious" are not the same claim — a distinction Starsim also makes (`infectious` defaults to an alias for `infected` and can differ) and most others elide.
-5. **This is the strongest argument against imperative subpopulation models.** MetaCast has the right decomposition and the wrong medium: the dimension algebra is declarative and checkable, while the model it broadcasts is index arithmetic. Put camdl's or epipack's transition objects inside MetaCast's dimension algebra and you have most of what this project needs.
+1. **Take the idea that stratification, metapopulation, and multi-group structure are one operation.** MetaCast, summer2 (`stratify_with`), camdl (`dimensions` + `stratify`), and epymorph (`MultiStrataRUME`) attempt the same thing, and MetaCast states the general case most plainly. The lingua franca should have **one concept of a dimension** for age, space, risk, strain, and vaccination status, with a way to mark dimensions that carry extra structure (aging flows, movement, residence times), as summer2 and camdl show.
+2. **Transfers between coordinates deserve a declared form.** Vaccination as `{from: [high, unvaccinated], to: [high, vaccination_lag], states: all, rate: nu}` is a useful way of saying it: the individual keeps their disease state and moves along a *dimension*. camdl's `transfer(from = S, to = V)` is close, but MetaCast's works across all states and any dimension at once. This is a strong candidate for the intervention vocabulary.
+3. **The framework should compute force of infection, with explicit settings.** Taking λ out of the model is right, and a checked form would be safer than strings. The language needs to say which states are infectious, which mixing applies, and which denominator (`None` / `i` / `j`) is used, because the three are different models, and in most frameworks the difference cannot be seen.
+4. **Declare sets of epidemiological states.** Separate `infected_states`, `infectious_states`, and `symptomatic_states` are a small idea worth keeping. They tell a framework that "infected" and "infectious" differ, as Starsim also allows (`infectious` defaults to `infected` but can differ) and most others do not.
+5. **Declared transitions would complete this design.** MetaCast's dimensions are declared and checkable, while the model it repeats is index arithmetic. Put camdl's or epipack's transition objects inside MetaCast's dimensions, and you have most of what this project needs.

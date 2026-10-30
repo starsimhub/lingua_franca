@@ -1,7 +1,8 @@
 {
-  "seconds": 2.3083,
-  "what": "Rscript with the original, as one command: starting R, loading SimInf and its 466,692 events, building the model, and one run of 1,600 nodes for 1,460 days on one thread (the run itself, `run(model)`, takes about 0.08 s)",
+  "first": 0.785,
+  "rerun": 0.245,
+  "what": "first: SIR() building the model, and its first run(model), of 1,600 nodes for 1,460 days on one thread, with R started, SimInf loaded, and the 466,692 events read. rerun: run(model) on the same model",
   "machine": "x86_64",
   "cpus": 20,
-  "system": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39"
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
 }

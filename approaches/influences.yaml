@@ -1,125 +1,155 @@
 # What the lingua franca owes to each framework, by area: a rough judgment from reading
-# best-practices/ and design/ against approaches/ (2026-10-15). Shares in each area add to 100.
+# best-practices/ and design/ against approaches/ (2026-10-30). Shares in each area add to 100.
 # "new" is what no framework did first; "other" is frameworks without a review here (named in the note).
 # A framework cited only as a counterexample, or for an approach that was rejected, gets nothing.
 # Drawn by influences.py on approaches/influences.qmd.
 
 Principles, defaults and errors:
-  shares: {camdl: 22, starsim: 18, atomica: 4, epidemics: 3, emulsion: 3, odin: 3, other: 8, new: 39}
+  shares: {camdl: 20, starsim: 20, atomica: 4, epidemics: 3, emulsion: 3, odin: 3, summer2: 1, epydemix: 1, other: 6, new: 39}
   notes:
-    camdl: error messages as part of the language (stable codes, naming the rule, quoting the expression, giving the fix)
-    starsim: plain Python and step() as first class, the ordered inspectable loop, define_pars name checking
+    camdl: error messages as part of the language (naming the rule, quoting the expression, giving the fix); always saying what a solver cannot run; documents shipped with the version
+    starsim: plain Python and step() as first class, the ordered inspectable loop, define_pars name checking, the one module lifecycle
     atomica: the benchmark that non-programmers can define a full model
     epidemics: trading flexibility for ease of use, aimed at practitioners
     emulsion: a model that can be discussed with non-modelers; exponential as the assumed dwell time
     odin: showing what was resolved, which motivates printing every guess
-    other: summer2's error on partial stratifications; Epydemix's AGENT.md; rustc/Elm-style diagnostics
-    new: guess the default and print it ([guessed] in describe()); approximate rather than refuse; one vocabulary at several lengths; the error-code catalog
+    summer2: the error on a partial stratification
+    epydemix: AGENT.md as a contract for AI tools
+    other: rustc/Elm-style diagnostics; Kendrick's separation of concerns
+    new: guess the default and print it ([guessed] in describe()); approximate rather than refuse, within a small declared subset; one vocabulary at several lengths; every core feature has to earn its place in the library; lines and time measured against each framework's own examples
 
 Model structure:
-  shares: {camdl: 20, starsim: 18, siminf: 8, epihiper: 7, emulsion: 4, memilio: 3, epipack: 3, atomica: 3, other: 9, new: 25}
+  shares: {camdl: 19, starsim: 19, siminf: 7, epihiper: 6, emulsion: 6, memilio: 3, epipack: 3, atomica: 3, odin: 2, epydemix: 2, eon: 1, metacast: 1, summer2: 1, tlo: 3, other: 2, new: 22}
   notes:
-    camdl: the model as data; named transitions with rates after '@'; incidence per transition; Erlang sub-stages
-    starsim: declared states on ss.Disease modules, init_prev, rel_sus/rel_trans, sample-and-schedule dwell times, automatic n_<state> results
-    siminf: arrow-string transitions; compartments versus continuous variables, the precedent for states that are counts
+    camdl: the model as data; named transitions with rates after '@'; rates written as the whole flow; incidence per transition; Erlang sub-stages
+    starsim: declared states on ss.Disease modules, init_prev, rel_sus/rel_trans, sample-and-schedule dwell times, automatic results, modules written as code (ss.Infection), ss.Pregnancy
+    siminf: rates written as the whole flow; compartments versus continuous variables, the precedent for states that are counts
     epihiper: a dwell-time distribution per transition; susceptibility and infectivity as properties of a state
-    emulsion: interchangeable rate, probability, and duration keys
+    emulsion: interchangeable rate, probability, and duration keys; minimum stays (after=) and litters
     memilio: LCT models as the precedent for Erlang staging
     epipack: ODEs derived from declared transitions (equations())
     atomica: the transition matrix as a tabular view of the model
-    other: MIRA (natural versus controlled conversions); sympy.symbols idiom for ss.states(); odin, EoN, MetaCast, summer2
-    new: one transition kind, typed by whether its rate mentions a state; the >> and @ spelling; weighted-destination branching; ss.null; names taken from variables
+    odin: delay() as the precedent for a fixed delay
+    epydemix: mediated transitions that imply the source and the total, as a bare state does
+    eon: spontaneous and contact-mediated processes as two kinds
+    metacast: infected and infectious states as distinct sets
+    summer2: named flows as the precedent for telling transitions apart by kind
+    tlo: LinearModel (regressions as rates, here ss.ppl expressions)
+    other: MIRA (natural versus controlled conversions); sympy.symbols idiom for ss.states(); epidemik's R0 from the structure
+    new: one transition kind, typed by whether its rate mentions a state; the >> and @ spelling; ss.null; names taken from variables; what counts as acquisition, derived; the first state, guessed; declared and coded parts in one class; events and clocks as expressions
 
 Time and units:
-  shares: {starsim: 60, camdl: 10, odin: 4, other: 8, new: 18}
+  shares: {starsim: 60, camdl: 11, odin: 4, epimodel: 3, siminf: 2, epiworld: 1, individual: 1, laser: 1, new: 17}
   notes:
-    starsim: the whole type system, unchanged (ss.dur, ss.per, ss.prob, ss.freq, dates, Timeline, per-module timesteps)
-    camdl: dimension checking of rate expressions when the model is built
+    starsim: the whole type system, unchanged (ss.dur, ss.per, ss.prob, ss.freq, dates, Timeline, per-module timesteps, the timing of a step)
+    camdl: dimension checking of rate expressions when the model is built, including what lands in a slot
     odin: transparency about the rate-to-probability conversion
-    other: time counted in steps when nothing has a unit (EpiModel, individual, LASER, epiworld, SimInf, ...)
-    new: bare numbers typed by their slot and given the sim's unit; the unit-inference rules; timesteps as the fallback
+    epimodel: time counted in steps when nothing has a unit
+    siminf: time counted in steps when nothing has a unit
+    epiworld: time counted in steps when nothing has a unit
+    individual: time counted in steps when nothing has a unit
+    laser: time counted in steps when nothing has a unit
+    new: bare numbers typed by their slot and given the sim's unit; the unit-inference rules; timesteps as the fallback; dwell times rounded to whole steps at random, keeping the mean
 
 Parameters and distributions:
-  shares: {starsim: 35, camdl: 15, epymorph: 13, epydemix: 4, atomica: 4, emulsion: 3, epipack: 3, odin: 3, other: 4, new: 16}
+  shares: {starsim: 40, camdl: 13, epymorph: 9, epydemix: 5, emulsion: 3, epipack: 3, odin: 3, flepimop: 2, metacast: 1, siminf: 1, other: 3, new: 17}
   notes:
-    starsim: define_pars-style declaration; slots taking a number, time type, distribution, or function; the distributions
-    camdl: bounds and priors on parameters; automatic log and logit fitting scales; factored run hashes
-    epymorph: requirements declared as data (ss.Requires); fetching data with a cache
+    starsim: define_pars-style declaration; slots taking a number, time type, distribution, or function; the distributions; how a value given for a distribution sets its main parameter
+    camdl: bounds and priors on parameters; automatic log and logit fitting scales
+    epymorph: fetching named data with a cache and its provenance; checked shapes
     epydemix: named data loaders (ss.people('Kenya'), ss.contacts())
-    atomica: a data-entry databook generated from the model (deferred)
     emulsion: the per-value source= provenance field
     epipack: a rate as an expression of time and state
     odin: interpolation modes for ss.timeseries
-    other: SimInf and MetaCast global versus per-group parameters; flepiMoP truncated normals
-    new: ss.by, one broadcasting per-group parameter; separate value and prior; functions tried under every solver
+    flepimop: truncated normals
+    metacast: global versus per-group parameters
+    siminf: global versus per-group parameters
+    other: published contact matrices and UN population data, bundled in starsim_data
+    new: ss.by, one broadcasting per-group parameter, over dimensions or over properties of people; separate value and prior; functions tried under every solver
 
 Stratification:
-  shares: {summer2: 30, camdl: 12, starsim: 10, metacast: 8, emod: 5, flepimop: 3, other: 8, new: 24}
+  shares: {summer2: 30, camdl: 12, starsim: 12, metacast: 8, emod: 4, flepimop: 3, epihiper: 1, other: 6, new: 24}
   notes:
     summer2: stratifying a finished model; per-level adjustments; generated aging flows; source-strata splits
     camdl: declared named dimensions and stratify(by=); checked errors for stratified coverage
-    starsim: dimensions as per-agent arrays on sim.people; strains as a second disease joined by connectors
+    starsim: dimensions as per-agent arrays on sim.people; results by group from modules written as code
     metacast: every partition, space included, as one operation; transfers between levels (ss.transfer)
     emod: Individual Properties as agent attributes that interventions target
     flepimop: compartments as a product of named axes
-    other: HPVsim (genotypes), tbsim (strains), MIRA, Kendrick, pandas (inplace)
-    new: agent properties and compartment axes as one declaration; sim-level versus disease-level stratification; results indexed by dimension
+    epihiper: traits as agent attributes that interventions target
+    other: MIRA, Kendrick, pandas (inplace); FPsim (parity, as a counter)
+    new: agent properties and compartment axes as one declaration; sim-level versus disease-level stratification; results indexed by dimension; counters; part of the model stratified (where=), with people outside it having no level
+
+Strains and immunity:
+  shares: {other: 38, starsim: 17, summer2: 12, flepimop: 3, epiworld: 3, new: 27}
+  notes:
+    other: HPVsim (genotypes with courses of their own, the immunity matrix and its sum rule, severity immunity); tbsim (sets of strains carried, resistance on treatment); Covasim (variants introduced on a date)
+    starsim: several diseases in one sim, each with its own states and random numbers; rel_sus and rel_trans; a disease written as code with strains
+    summer2: strain stratification that restructures the force of infection
+    flepimop: variants as a named axis
+    epiworld: things an agent carries that make it transmit, as a primitive
+    new: one concept, whether each state is shared or each strain's own; sets carried as levels of a dimension; one ss.immunity, by what protects; the same declaration under every solver, or a refusal that says why
 
 Geospatial and metapopulation:
-  shares: {epymorph: 22, laser: 15, siminf: 15, metacast: 8, starsim: 8, epydemix: 3, other: 9, new: 20}
+  shares: {epymorph: 21, laser: 17, siminf: 16, metacast: 7, starsim: 8, epydemix: 3, flepimop: 3, other: 8, new: 17}
   notes:
     epymorph: disease, movement, and geography as separate declarations; commuting versus migration; named geography sources
-    laser: named mobility generators (gravity and others); moving force of infection between patches
-    siminf: a movement register of dated transfer events; per-node data and environmental state
+    laser: named mobility generators (gravity, radiation); moving force of infection between patches (kind='force')
+    siminf: a movement register of dated transfer events, with moves between states; per-node data and environmental state; running each place on its own
     metacast: metapopulation as the same operation as stratification; per-subpopulation parameters
     starsim: patch as an agent property; MixingPool grouped by patch; bundled and fetched geodata
     epydemix: bundled populations and contact matrices for 400+ places
-    other: the standard time-share commuting formulation (Sattenspiel, Keeling and Rohani); MEmilio's in-transit question
-    new: space as an ordinary dimension that may have no movement; a pluggable geography protocol; geography in the run hash
+    flepimop: the visit form of movement, where visitors are exposed but expose no one (kind='visit')
+    other: the standard time-share commuting formulation; the textbook commuter model with finite return rates
+    new: space as an ordinary dimension that may have no movement; a pluggable geography source; contact matrices acting within each place under every solver
 
 Mixing and networks:
-  shares: {starsim: 40, epimodel: 15, metacast: 4, summer2: 3, camdl: 3, siminf: 3, epydemix: 3, other: 10, new: 19}
+  shares: {starsim: 38, epimodel: 19, siminf: 3, epydemix: 4, metacast: 2, summer2: 2, camdl: 2, other: 12, new: 18}
   notes:
-    starsim: networks and mixing pools behind networks=; layers; beta per network; the per-edge transmission probability
-    epimodel: networks specified by target statistics; net.check; partnerships kept separate from acts; match=
-    metacast: exposing the choice of denominator; relative infectiousness of states
-    summer2: frequency versus density dependence named explicitly
-    camdl: the library supplying /N
+    starsim: networks and mixing pools behind networks=; layers; beta per network; the per-edge transmission probability; ss.SexualNet
+    epimodel: networks specified by target statistics (ss.DegreeNet); concurrency and limits on partners; net.check; partnerships kept separate from acts; match=
     siminf: an environmental reservoir driving transmission
     epydemix: household, school, and work layers with bundled contact matrices
-    other: Prem and Mistry contact matrices; Covasim layers; Ross-Macdonald vectors; EpiHiper
-    new: a bare state means contact while I.n is a count; homogeneous mixing by default with the textbook beta; one force-of-infection formula
+    metacast: relative infectiousness of states
+    summer2: a mixing matrix over strata, required to be complete
+    camdl: the missing /N error, which the library supplying /N answers
+    other: the standard partner-change model of sexually transmitted infections; published age contact matrices; Covasim layers; the textbook vector model
+    new: a bare state means contact while I.n is a count; homogeneous mixing by default with the textbook beta; one force-of-infection formula; sides and named directions on a network
 
 Interactions and effects:
-  shares: {starsim: 35, vivarium: 25, epidemics: 7, epiworld: 3, individual: 3, other: 4, new: 23}
+  shares: {starsim: 35, vivarium: 25, epidemics: 6, epiworld: 3, individual: 3, memilio: 2, epydemix: 1, other: 1, new: 24}
   notes:
     starsim: one module abstraction; connectors and step() code; the ordered loop; deferred removal
     vivarium: value pipelines (a base value plus modifiers combined by a rule, restored automatically)
     epidemics: the combination rule as a stated modeling decision; add= as the alternative
     epiworld: tools as bundles of multiplicative effects
-    individual: resolving competing hazards jointly and deferring updates
-    other: EMOD waning; epymorph requirements; Epydemix contact reductions; Mesa
-    new: one-line ss.modify over any named quantity; reading the effective value and writing the base; track_writes
+    individual: resolving competing hazards jointly and deferring updates; set algebra behind conditions
+    memilio: a minimum stay once a measure is on, which became hold=
+    epydemix: dated contact reductions
+    other: Mesa (order of activation as a modeling decision)
+    new: one-line ss.modify over any named quantity; reading the base and current_value() for the value used; share= and route= for protection used in some acts; refusing at build time what nothing reads; diseases tracked jointly when a condition crosses them
 
 Interventions:
-  shares: {starsim: 35, emod: 15, atomica: 6, epihiper: 6, flepimop: 3, epimodel: 3, camdl: 3, epydemix: 2, individual: 2, other: 10, new: 15}
+  shares: {starsim: 33, emod: 17, atomica: 8, epihiper: 5, memilio: 3, epimodel: 3, flepimop: 2, camdl: 2, epydemix: 2, individual: 2, tlo: 3, other: 6, new: 14}
   notes:
-    starsim: the product and delivery split; eligibility as a function of the sim; routine versus campaign delivery
-    emod: efficacy kept separate from waning; efficacy by acquisition, transmission, and mortality; capacity; event-triggered delivery
-    atomica: a unit cost on each intervention
+    starsim: the product and delivery split; eligibility as a function of the sim; routine versus campaign delivery; screening, triage, and treatment as modules
+    emod: efficacy kept separate from waning; efficacy by acquisition, transmission, and mortality; capacity; deliveries triggered by events that others can listen for
+    atomica: a unit cost on each intervention; programs that move parameters by spending, and reallocating a budget between them (ss.fit.optimize)
     epihiper: triggers (close schools when cases pass a threshold)
-    flepimop: scenarios declared with the model
+    memilio: dampings on contacts; measures switched on by incidence in each place
     epimodel: the scenario table shape behind ss.change
-    camdl: named scenarios paired against a baseline with common random numbers
+    flepimop: a parameter, a time window, a scope, and a value as the shape of a change
+    camdl: scenarios paired against a baseline with common random numbers
     epydemix: dated contact reductions, which became ss.modify
     individual: set algebra for eligibility
-    other: Covasim's change_beta (ss.change); HPVsim's screen, triage, and treat cascade; MEmilio dampings
-    new: deliver= with a capacity cap; nested on_positive deliveries; coverage-then-capacity; the outcome, intervention, or state rule
+    tlo: care as a request that capacity can refuse
+    other: Covasim's change_beta (ss.change) and contact tracing; HPVsim's screen, triage, and treat cascade; malariasim's box-shaped waning and product coverage
+    new: deliver= with a capacity cap; steps as peers, triggered by events; a memory of every event (.ever, .count, .since); coverage-then-capacity; the outcome, intervention, or state rule
 
 Results and observation:
-  shares: {starsim: 25, flepimop: 15, atomica: 10, camdl: 8, summer2: 6, odin: 5, epydemix: 4, epimodel: 3, epidemics: 2, other: 7, new: 15}
+  shares: {starsim: 27, flepimop: 15, atomica: 9, camdl: 8, summer2: 6, odin: 5, epydemix: 4, epimodel: 3, epidemics: 2, other: 7, new: 14}
   notes:
-    starsim: declared results; automatic n_<state>; ss.Result; MultiSim; the infection log
+    starsim: declared results; automatic counts; ss.Result, with its kind and summary; MultiSim; the infection log
     flepimop: the ss.outcome cascade (probability-weighted flows with delays, chained)
     atomica: characteristics (named combinations of states with a denominator)
     camdl: incidence of a transition as a first-class flow; reporting declared with the model
@@ -128,87 +158,92 @@ Results and observation:
     epydemix: many runs as quantiles over trajectories
     epimodel: the transmission matrix, as an opt-in log
     epidemics: scenario-indexed tidy output
-    other: Covasim (data columns named like results and plotted against them)
-    new: results that know flow from stock; ratios summed as numerator and denominator; a stratified result as one result with dimensions
+    other: Covasim (data columns named like results and plotted against them); forecast hubs (to_hub)
+    new: results that know flow from stock, so resampling and comparing with data need no telling; ratios summed as numerator and denominator; a stratified result as one result with dimensions; a run dimension on the same result
 
 Randomness and reproducibility:
-  shares: {starsim: 55, camdl: 23, epidemics: 2, new: 20}
+  shares: {starsim: 70, camdl: 8, epidemics: 2, new: 20}
   notes:
-    starsim: per-distribution random number streams; common random numbers keyed on agent slots; version info saved with sims
-    camdl: factored run identity (model, parameter, config, scenario, and seed hashes); ss.diff; dt-convergence audit
+    starsim: per-distribution random number streams; common random numbers keyed on agent slots; version info saved with sims, which with the code is the record of a run
+    camdl: the dt-convergence audit (check_dt); paired scenarios
     epidemics: keeping seeds across scenarios
-    new: a common-random-numbers report in describe(); stream names from spec paths so every spelling draws the same numbers; check_runs
+    new: stream names from model paths so every spelling draws the same numbers; one draw from one uniform in every solver, so a stochastic compartmental run draws the same stepped or whole; a stated list of which modules keep common random numbers
 
 Calibration and inference:
-  shares: {camdl: 18, starsim: 12, odin: 7, summer2: 7, epydemix: 5, metacast: 5, siminf: 3, other: 12, new: 31}
+  shares: {camdl: 19, starsim: 14, odin: 8, summer2: 7, epydemix: 5, metacast: 5, siminf: 4, epiworld: 1, epymorph: 1, other: 10, new: 26}
   notes:
-    camdl: bounds on parameters; staged fitting with convergence gates; fit settings hashed apart from the model; model comparison
+    camdl: bounds on parameters; staged fitting with convergence gates; IF2; gradients for ODE models and NUTS; fit settings kept apart from the model; prediction checks
     starsim: the Optuna wrapper; evaluation with common random numbers; fit.sim
     odin: the likelihood beside its quantity; particle MCMC; wrapping inference engines rather than bundling them
     summer2: exact gradients through the ODE with JAX
-    epydemix: ABC-SMC as the default for stochastic compartmental models
+    epydemix: ABC-SMC for stochastic compartmental models
     metacast: Latin hypercube sampling and PRCC as sim.sensitivity()
     siminf: ABC and particle methods for stochastic models
-    other: Covasim (normalized absolute error, data matched by column name); epiworld; epymorph
-    new: the fitting method chosen from the model and printed; sim.calibrate() with nothing extra declared; detecting unidentifiable products
+    epiworld: likelihood-free fitting of agent-based models
+    epymorph: particle-filter fitting
+    other: Covasim (normalized absolute error, data matched by column name); pomp (iterated filtering); BlackJAX, SciPy, and Optuna as the engines
+    new: the fitting method chosen from the model and printed; sim.fit() with nothing extra declared; a posterior always asked for by name; detecting unidentifiable products; comparing models by held-out prediction, with one measure for all
 
-Model spec and interop:
-  shares: {camdl: 20, starsim: 15, emulsion: 4, epipack: 3, atomica: 3, siminf: 3, other: 16, new: 36}
+Model as code and interop:
+  shares: {starsim: 25, camdl: 6, emulsion: 5, memilio: 3, epipack: 2, atomica: 2, siminf: 2, other: 25, new: 30}
   notes:
-    camdl: a readable surface over a canonical JSON form; normalization; hashes from the spec
-    starsim: to_json; the typed value and distribution names; declared parameters and states
-    emulsion: the model as a document; its models as the main import test
-    epipack: spontaneous versus contact-mediated kinds
-    atomica: tabular export and a generated data-entry form (deferred)
+    starsim: the Python script as the model; a saved sim with its version; to_json for results
+    camdl: a flat list of named flows between the source and the run; saying what cannot be carried over
+    emulsion: its models as the main import test
+    memilio: its SBML reader, the one working format-to-framework importer in the review
+    epipack: spontaneous versus contact-mediated kinds, which sort a rate on import
+    atomica: named combinations of states, kept by name in the code an import writes
     siminf: variables that are not people
-    other: MIRA (import and export through one meta-model; SBML and Petri-net targets); SBML
-    new: a fixed-shape spec with explicit nulls; the list of guessed fields; functions stored by source; per-declaration lossy-export warnings; round trips
+    other: SBML (the import and export format, and why every export must list what it lost); MIRA (import through one meta-model)
+    new: one reader per framework, then one path through generated code that is the user's to keep; rules for sorting a general rate into a transition; an incomplete import that runs, lists what is missing, and hands it to an AI assistant; per-declaration lossy-export warnings; the vignette test
 
 Deterministic compartmental (ODE):
-  shares: {starsim: 20, epipack: 12, camdl: 10, summer2: 10, odin: 5, memilio: 4, atomica: 4, other: 5, new: 30}
+  shares: {starsim: 19, epipack: 12, camdl: 10, summer2: 10, odin: 8, memilio: 8, atomica: 3, other: 3, new: 27}
   notes:
-    starsim: the disease vocabulary and Sim API, now solved exactly
+    starsim: the disease vocabulary and Sim API, now solved exactly; kernels in Numba and Rust
     epipack: one model run as ODE or stochastic; printing the equations
     camdl: the same model text on ODE and stochastic backends; Erlang stages
-    summer2: the model compiled to JAX for speed and gradients
-    odin: generating the right-hand side from the model graph
-    memilio: LCT models as the precedent for Erlang stages
+    summer2: the model run in JAX for speed and gradients
+    odin: generating the right-hand side from the model graph; delay() and its comparison for fixed delays
+    memilio: LCT models as the precedent for Erlang stages; IDE models for dwell times as they are (solver='ide')
     atomica: the transition matrix view
-    other: MIRA, SimInf, EoN, the linear chain trick, SciPy
-    new: solver='auto' choosing ODE or agents and saying why; homogeneous mixing with no /N; automatic Erlang stages with approx=
+    other: MIRA; the linear chain trick; the renewal equation
+    new: solver='auto' choosing ODE or agents and saying why; homogeneous mixing with no /N; automatic Erlang stages with approx=; a conveyor of whole steps for a fixed delay; a branching process as a switch on the same model (branching=True)
 
 Stochastic compartmental:
-  shares: {camdl: 15, starsim: 15, epipack: 12, siminf: 12, memilio: 5, eon: 3, other: 10, new: 28}
+  shares: {camdl: 16, starsim: 16, siminf: 16, epipack: 11, odin: 3, eon: 3, other: 12, new: 23}
   notes:
     camdl: Gillespie, chain-binomial, and ODE from one text; runs paired with common random numbers
-    starsim: a sim is one trajectory and a MultiSim many; states and modifiers reused across solvers
+    starsim: a sim is one trajectory and a MultiSim many; states and modifiers reused across solvers; kernels in Numba and Rust
+    siminf: continuous time, run place by place; a reservoir coupled to discrete counts, as expected values; resampling onto an output grid
     epipack: time-varying rates in every mode, with thinning Gillespie
-    siminf: continuous time; a reservoir coupled to discrete counts; resampling onto an output grid
-    memilio: the SDE solver and its large-population caveat
+    odin: chain binomials in discrete time; many runs at once
     eon: Gillespie as the exact method, and its name
-    other: PyRoss (the Gillespie, tau-leaping, and Gaussian ladder); Catalyst.jl (per-reaction hybrids, deferred)
-    new: solver='stochastic' choosing a method and saying why; validity checks as warnings; extinction as a default output
+    other: PyRoss (Gillespie and tau-leaping side by side); Catalyst.jl (per-reaction hybrids, deferred); branching-process tools such as epichains
+    new: exact, tau-leaping, and chain-binomial solvers from one flat program, with the same draws in every kernel; validity checks as notes; depletion turned off for any declared model (branching=True)
 
 Agent-based:
-  shares: {starsim: 64, individual: 6, laser: 3, epiworld: 3, emod: 3, siminf: 3, other: 2, new: 16}
+  shares: {starsim: 64, individual: 6, laser: 4, epiworld: 3, emod: 3, siminf: 3, epihiper: 1, other: 1, new: 15}
   notes:
     starsim: the whole architecture (per-agent arrays, UIDs, one module abstraction, the ordered loop, select-thin-act, scheduled events, per-agent common random numbers)
     individual: select-thin-act as the core operation; scheduled targeted events
-    laser: queue-based scheduling; optional preallocation
+    laser: Numba for the loop at the heart of a step (ss.jit); queue-based scheduling; optional preallocation
     epiworld: multiplicative, non-overwriting modifiers
     emod: Individual Properties as the agent form of a dimension
     siminf: counts kept alongside individuals
-    other: Mesa AgentSet; EpiHiper set algebra
-    new: one declaration with an agent realization; every dimension as an agent property; count states inside an agent model; a joint draw for competing hazards
+    epihiper: set algebra over agents
+    other: Mesa AgentSet
+    new: one declaration with an agent realization; every dimension as an agent property; count states inside an agent model; a joint draw for competing hazards; half-step rates, so agents agree with compartments; agents made only for the infected in a branching process
 
 Solver choice and paradigm conversion:
-  shares: {emulsion: 12, starsim: 10, epipack: 10, camdl: 10, memilio: 8, summer2: 5, other: 9, new: 36}
+  shares: {emulsion: 12, starsim: 12, epipack: 10, camdl: 10, memilio: 10, summer2: 6, siminf: 1, other: 7, new: 32}
   notes:
     emulsion: switching paradigm with one word on the same model; its models as agreement tests
-    starsim: the agent solver and the Sim API that solver= hangs off
+    starsim: the agent solver and the Sim API that solver= hangs off; kernels in Numba and Rust, kept in step
     epipack: one process list run deterministically, stochastically, and on networks
     camdl: several backends from one text; always saying when something cannot run; dt-convergence audit
-    memilio: the four axes (aggregation, stochasticity, dwell time, space); Erlang stages as the dwell-time conversion
-    summer2: JAX as the path for large ODE models
-    other: SimInf; Catalyst.jl; MIRA and SBML; partner-change-rate approximations of networks
-    new: solver='auto' never approximating mixing or individuals; the standard approximation with a one-line note; solvers(); deriving rates from a network
+    memilio: the four axes (aggregation, stochasticity, dwell time, space); Erlang stages and IDE as the dwell-time conversions
+    summer2: JAX as the path for large ODE models and for gradients
+    siminf: one small vocabulary across compartmental and network forms
+    other: Catalyst.jl; MIRA and SBML; the partner-change approximation of networks
+    new: solver='auto' never approximating mixing or individuals; the standard approximation with a one-line note; describe() saying what can run and why; the engine chosen from the model's size alone, so a seed always gives the same run

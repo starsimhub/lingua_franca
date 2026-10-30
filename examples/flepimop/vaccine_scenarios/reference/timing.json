@@ -1,7 +1,8 @@
 {
-  "seconds": 95.8657,
-  "what": "flepimop simulate config_sample_2pop_vaccine_scenarios.yml --jobs 1, as one command: 3 scenarios of 10 runs each, with their outcomes (after the first, each run takes about 2.6 s); timed once, not as the median of several, since it takes about 90 s",
+  "first": 239.88153,
+  "rerun": 204.33516,
+  "what": "flepimop simulate config_sample_2pop_vaccine_scenarios.yml --jobs 1, as one command, which is the only way to run it: 3 scenarios of 10 runs each, with their outcomes (after the first, each run takes about 2.6 s). The rerun is the same command again, and each is timed once, since it takes about 90 s; both include starting Python and compiling",
   "machine": "x86_64",
   "cpus": 20,
-  "system": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39"
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
 }

@@ -1,7 +1,8 @@
 {
-  "seconds": 0.4673,
-  "what": "python ode_secir_ageres.py, as one command (nearly all of it is starting Python and importing; the call to simulate() itself takes about 0.11 ms, for 36 adaptive time points)",
+  "first": 0.00166,
+  "rerun": 0.00013,
+  "what": "first is one call of the example's run_ode_secir_ageres_simulation(), with its plot off, which builds the model, runs it (36 adaptive time points), and prints and sums the result, not counting starting Python or importing; rerun is the best of 100 more calls of simulate() on the same model",
   "machine": "x86_64",
   "cpus": 20,
-  "system": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39"
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
 }

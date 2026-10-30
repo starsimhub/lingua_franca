@@ -16,30 +16,28 @@ cascade = np.array([[28514100, 27395900], [3390000, 2540000], [2440800, 1676400]
 # Workaround: Atomica solves for the compartments from the cascade
 init = dict(zip(['sus', 'undx', 'dx', 'lost', 'linked', 'tx', 'vs'], -np.diff(cascade, axis=0, append=0)))
 births       = sex(287_992.41, 276_698.59)
-num_acq      = ss.par(sex(150_000, 110_000)) # Workaround: ss.par, so that dividing it by a count is an expression
-num_test     = ss.par(sex(6_400_000, 3_600_000))
-num_initiate = ss.par(sex(269_448, 179_632))
+num_acq      = sex(150_000, 110_000)
+num_test     = sex(6_400_000, 3_600_000)
+num_initiate = sex(269_448, 179_632)
 mort         = 0.015 # Background mortality, per year, as are all the rates
 
 # The progbook: each program's unit cost ($ a person), spending ($ a year), and who it reaches, in both sexes
 programs = ss.par(0, doc='Whether the programs set the parameters they affect')
 budget   = ss.par(1, doc='Spending, relative to the progbook')
 progs = dict(
-    clinics  = (5,    42e6,  [sus, undx]), # Testing
-    outreach = (10,   16e6,  [sus, undx]),
-    sameday  = (200,  60e6,  [dx, linked]), # Initiation counseling
-    classic  = (300,  45e6,  [dx, linked]),
-    tracing  = (60,   0.6e6, [tx, lost]), # Client tracing
-    advanced = (150,  0.6e6, [tx, lost]), # Adherence support
-    whatsapp = (0.05, 10e3,  [tx, lost]),
+    clinics  = (5,    42e6,  sus + undx), # Testing
+    outreach = (10,   16e6,  sus + undx),
+    sameday  = (200,  60e6,  dx + linked), # Initiation counseling
+    classic  = (300,  45e6,  dx + linked),
+    tracing  = (60,   0.6e6, tx + lost), # Client tracing
+    advanced = (150,  0.6e6, tx + lost), # Adherence support
+    whatsapp = (0.05, 10e3,  tx + lost),
 )
-# Workaround: what a program reaches is shared by everyone eligible in both sexes, but .n is the count in one's own sex
-everyone = lambda name, states: ss.par(lambda sim: sum(sim.diseases.hiv[s.name].n for s in states), name=name)
-cov = {k: np.minimum(budget*spend/cost/everyone(f'n_{k}', states), 1) for k,(cost,spend,states) in progs.items()}
+# What a program reaches is shared by everyone eligible in both sexes: .total, where .n is the count in one's own sex
+cov = {k: np.minimum(budget*spend/cost/eligible.total, 1) for k,(cost,spend,eligible) in progs.items()}
 
 # Under the programs, a parameter is its baseline plus each program's coverage times its effect (the test yield, which nothing uses then, is left out)
-# Workaround: the expression comes first, since ss.by + expression gives an ss.by of expressions, which cannot run
-outcome = lambda base, **effects: sum(cov[k]*sex(*np.subtract(v, base)) for k,v in effects.items()) + sex(*base)
+outcome = lambda base, **effects: sex(*base) + sum(cov[k]*(sex(*v) - sex(*base)) for k,v in effects.items())
 switch = lambda before, after: (1 - programs)*before + programs*after
 pos_test  = num_test*undx.n/(undx + sus).n
 acq       = num_acq/np.maximum(sus.n, num_acq)
@@ -66,7 +64,7 @@ hiv = ss.Disease(
     plhiv      = undx + dx + linked + tx + lost + vs,
     diagnosed  = dx + linked + tx + lost + vs,
     treated    = tx + vs,
-    init       = {k: sex(*v) for k,v in init.items()},
+    init_n     = {k: sex(*v) for k,v in init.items()},
 )
 hiv.stratify(sex=['females', 'males'], kind='space', split=cascade[0]) # A place, so that .n is the count in each sex
 # One step a year, in which Atomica moves at most everyone out of a compartment

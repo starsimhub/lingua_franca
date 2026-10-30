@@ -6,7 +6,7 @@ people who infect more once testing and tracing is overwhelmed
 import numpy as np
 import starsim as ss
 
-beta     = ss.seasonal(mean=0.05, amplitude=0.2, peak=-60/365) # Highest on 1 Jan; day 0 is 2 Mar
+beta     = ss.seasonal(mean=0.05, amplitude=0.2, peak=ss.days(-60)) # Highest on 1 Jan; day 0 is 2 Mar
 contacts = ss.timeseries({0: 1.0, 29: 1.0, 30: 0.3}, mode='cosine') # Cut by 70% over day 29, as MEmilio's damping
 S, E, INS, ISy, ISev, ICr, R = ss.states(7)
 excess = np.clip((0.91/2*INS.n - 35)/(5*35 - 35), 0, 1) # People becoming symptomatic each day, beyond the 35 that can be traced (to 5 times that)
@@ -20,10 +20,10 @@ secir = ss.Disease(
     critical  = ss.Transition(ISev, [ICr, R], dur=ss.days(9.5), p=[0.25, 0.75]),
     recovery  = ss.Transition(ICr, R, dur=ss.days(7.1), p=0.7),
     death     = ss.Transition(ICr, ss.null, dur=ss.days(7.1), p=0.3),
-    init      = dict(E=100, INS=50, ISy=50, ISev=20, ICr=10, R=10),
+    init_n    = dict(E=100, INS=50, ISy=50, ISev=20, ICr=10, R=10),
 )
 secir.stratify(age=['0', '1', '2']) # Three groups of equal size, each with a third of every state
-mixing = ss.contacts(age=np.full((3, 3), 10/3)) # 10 contacts a day, spread evenly over the groups
+mixing = ss.contacts(np.full((3, 3), 10/3)) # 10 contacts a day, spread evenly over the groups
 sim = ss.Sim(secir, networks=mixing, total_pop=10_000, stop=ss.days(50))
 
 if __name__ == '__main__':

@@ -46,9 +46,11 @@ if __name__ == '__main__':
     start = time.perf_counter()
     P = hiv_dyn.load()
     load = time.perf_counter() - start
-    rows = extract(P.run_sim(), 'baseline')
+    result = P.run_sim()
+    first = time.perf_counter() - start # Reading the spreadsheets and the first run
+    rows = extract(result, 'baseline')
     for result in P.run_scenarios():
         rows += extract(result, result.name.lower().replace(' ', '_'))
-    seconds = tools.time_run(P.run_sim)
+    rerun = tools.time_run(P.run_sim)
     scenarios = tools.time_run(P.run_scenarios)
-    print(json.dumps(dict(rows=rows, seconds=seconds, scenarios=scenarios, load=load, version=at.__version__)))
+    print(json.dumps(dict(rows=rows, first=first, rerun=rerun, scenarios=scenarios, load=load, version=at.__version__)))

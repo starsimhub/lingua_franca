@@ -21,24 +21,30 @@ n_runs = 200 # The model is stochastic
 seed = 1 # As in the vignette
 
 # The lines that compile and run the model are those of odin's "discrete" vignette (`odin::odin(path)`,
-# `$new()`, `set.seed(1)`, `$run(0:100)`); the rest repeats the run and writes one row per run and time,
-# with one column per variable and group (`S[1]` to `R[100]`)
+# `$new()`, `set.seed(1)`, `$run(0:100)`); the rest times them, repeats the run, and writes one row per
+# run and time, with one column per variable and group (`S[1]` to `R[100]`)
 driver = r'''
 args <- commandArgs(TRUE)
 n_runs <- as.integer(args[2])
 options(odin.verbose = FALSE)
+loadNamespace("odin") # Not counted
+now <- function() as.numeric(Sys.time()) # In finer steps than system.time(), for a run of 2 ms
 path_sir_model_s_a <- args[1]
-seconds_compile <- system.time(sir_s_a_generator <- odin::odin(path_sir_model_s_a))[["elapsed"]]
+start <- now()
+sir_s_a_generator <- odin::odin(path_sir_model_s_a)
 x <- sir_s_a_generator$new()
+seconds_compile <- now() - start
 set.seed(as.integer(args[4]))
 out <- NULL
 seconds <- numeric(0)
 for (i in seq_len(n_runs)) {
-    seconds <- c(seconds, system.time(x_res <- x$run(0:100))[["elapsed"]])
+    start <- now()
+    x_res <- x$run(0:100)
+    seconds <- c(seconds, now() - start)
     out <- rbind(out, cbind(run = i, x_res))
 }
 write.csv(out, args[3], row.names = FALSE)
-cat(sprintf("COMPILE %.6f\nSECONDS %.6f\n", seconds_compile, median(seconds)))
+cat(sprintf("FIRST %.6f\nRERUN %.6f\n", seconds_compile + seconds[1], min(seconds[-1])))
 '''
 
 
@@ -67,7 +73,7 @@ def summarize(samples):
 if __name__ == '__main__':
     runs, printed = simulate(n_runs)
     assert len({row['run'] for row in runs}) == n_runs
-    found = dict(line.split() for line in printed.splitlines() if line.split(' ')[0] in ['COMPILE', 'SECONDS'])
+    found = dict(line.split() for line in printed.splitlines() if line.split(' ')[0] in ['FIRST', 'RERUN'])
 
     rows = []
     for key in states:
@@ -93,7 +99,6 @@ if __name__ == '__main__':
             rows += [dict(series=f'{key}_{i}', **row) for row in summarize(one)]
 
     tools.write_results(here, rows)
-    seconds = tools.time_run(lambda: simulate(1))
-    inner, compile = float(found['SECONDS']), float(found['COMPILE'])
-    tools.write_timing(here, seconds, f'Rscript, as one command: starting R, generating and compiling the C code with odin::odin (about {compile:.1f} s), and one run of 100 groups for 100 steps (the run itself, `x$run(0:100)`, takes about {1000*inner:.1f} ms)')
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.3f} s as a command, {1000*inner:.2f} ms inside R')
+    first, rerun = float(found['FIRST']), float(found['RERUN'])
+    tools.write_timing(here, rerun, f'first is generating and compiling the C code with odin::odin, $new(), and one run of 100 groups for 100 steps, not counting starting R or loading odin; rerun is the best of {n_runs - 1} more calls of `x$run(0:100)` on the same model', first=first)
+    print(f'Wrote {len(rows)} rows; first run {first:.3f} s, rerun {1000*rerun:.2f} ms')

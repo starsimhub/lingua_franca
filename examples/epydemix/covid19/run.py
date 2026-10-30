@@ -30,6 +30,6 @@ if __name__ == '__main__':
         lines = [f'  {json.dumps(key)}: {json.dumps(val)}' for key,val in out['info'].items()] # One line per key
         f.write('{\n' + ',\n'.join(lines) + '\n}\n')
     abc = out['info']['abc']
-    what = f'simulate_wrapper(): one stochastic run of the 99 days of the calibration period, as the calibration evaluates it, in process (the reduced ABC-SMC, {abc["particles"]} particles for {abc["generations"]} generations, takes {abc["seconds"]:.0f} s)'
-    tools.write_timing(here, out['one'], what)
-    print(f'Wrote {len(rows)} rows; one run takes {out["one"]:.4f} s; the calibration took {abc["seconds"]:.0f} s')
+    what = f'simulate_wrapper(): one stochastic run of the 99 days of the calibration period, as the calibration evaluates it, in process, with the model already defined. The first run is the first call, and the rerun the best of 5 calls after the calibration (the reduced ABC-SMC, {abc["particles"]} particles for {abc["generations"]} generations, takes {abc["seconds"]:.0f} s)'
+    tools.write_timing(here, out['rerun'], what, first=out['first'])
+    print(f'Wrote {len(rows)} rows; a first run takes {out["first"]:.4f} s, and a rerun {out["rerun"]:.4f} s; the calibration took {abc["seconds"]:.0f} s')

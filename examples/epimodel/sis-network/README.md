@@ -17,7 +17,7 @@ A stochastic SIS epidemic among 500 people whose partnerships form and dissolve 
 - `reference.R`: runs the original, then repeats its simulation and writes the runs for `run.py`
 - `run.py`: runs `reference.R` and writes `reference/`
 - `reference/results.csv`: the mean and 5% to 95% range of 100 simulations at each time step (`s.num`, `i.num`, `si.flow`, `is.flow`, `edges`, `meandeg`, `concurrent`, `duration`, `prop.diss`)
-- `reference/timing.json`: the time of one simulation
+- `reference/timing.json`: the time of a first run and of a rerun
 - `meta.yaml`: where it came from
 - `LICENSE`: the upstream license (GPL-3)
 
@@ -57,7 +57,7 @@ The mean of `i.num` rises from 10 to an endemic level of about 227 of 500 (45%) 
 
 ## Timing
 
-One simulation (`netsim` with `nsims = 1`) takes about 4 seconds. About 90% of that is R code that keeps the history of every node's status and looks up the current partnerships in the dynamic network object at every step; simulating the 500 steps of the network takes about 0.4 seconds. Estimating the network (`netest`) takes about 0.7 seconds and is done once, and the diagnostics (`netdx`, 5 networks) about 1.5 seconds. `run.py` takes about three minutes on 10 cores.
+One simulation (`netsim` with `nsims = 1`) takes about 4 seconds. About 90% of that is R code that keeps the history of each person's status and looks up the current partnerships at every step; simulating the 500 steps of the network takes about 0.4 seconds. Estimating the network (`netest`) takes about 0.7 seconds and is done once, so a first run counts it and a rerun does not. The diagnostics (`netdx`, 5 networks) take about 1.5 seconds. `run.py` takes a few minutes on 2 cores.
 
 ## Lines of model code
 

@@ -15,8 +15,8 @@ import tools
 
 if __name__ == '__main__':
     out = json.loads(tools.run(['python', os.path.join(here, 'export.py')], 'summer2'))
-    rows, seconds, first = out['rows'], out['seconds'], out['first']
+    rows, rerun, first, first_model = out['rows'], out['rerun'], out['first'], out['first_model']
     tools.write_results(here, rows)
-    what = f'model.run() on a model that is already built and compiled (the last of the seven, with four derived outputs); importing summer2 and JAX, and building, compiling, and running all seven takes {first:.1f} s'
-    tools.write_timing(here, seconds, what)
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.4f} s (the first, with imports and compilation of all seven, {first:.1f} s)')
+    what = f'first: building, compiling with JAX, and running all seven models, as the original does to get all its outputs, in a fresh process, with summer2 and JAX already imported (the first model alone takes {first_model:.2f} s). rerun: model.run() on the last of the seven, already compiled, with four derived outputs'
+    tools.write_timing(here, rerun, what, first=first)
+    print(f'Wrote {len(rows)} rows; the first run of all seven takes {first:.2f} s, of the first model alone {first_model:.2f} s, a rerun {rerun:.4f} s')

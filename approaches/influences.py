@@ -17,7 +17,7 @@ names = dict( # How each framework's name is written, and its review in this fol
     atomica='Atomica', camdl='camdl', emod='EMOD', emulsion='EMULSION', eon='EoN', epidemics='epidemics',
     epihiper='EpiHiper', epimodel='EpiModel', epipack='epipack', epiworld='epiworld', epydemix='Epydemix',
     epymorph='epymorph', flepimop='flepiMoP', individual='individual', laser='LASER', memilio='MEmilio',
-    metacast='MetaCast', odin='odin', siminf='SimInf', starsim='Starsim', summer2='summer2', vivarium='Vivarium',
+    metacast='MetaCast', odin='odin', siminf='SimInf', starsim='Starsim', summer2='summer2', tlo='Thanzi la Onse', vivarium='Vivarium',
 )
 extras = dict(other='Other', new='New') # Not frameworks with a review: shown last, in gray
 

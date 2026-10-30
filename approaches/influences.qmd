@@ -6,7 +6,7 @@ What the lingua franca owes to each framework reviewed here: which framework's i
 
 ## Overall
 
-Each framework's share of the whole design, with each of the 17 areas below counted equally.
+Each framework's share of the whole design, with each of the 18 areas below counted equally.
 
 ```{python}
 #| echo: false

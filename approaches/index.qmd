@@ -2,14 +2,14 @@
 title: "Approaches"
 ---
 
-This section reviews 22 existing epi modeling frameworks, one document each on a shared template, plus brief notes on several more. It records how each one represents states, transitions, populations, networks, interventions, and time, and what the lingua franca should take or avoid. The reviews are the evidence for the rest of the project: [best-practices](../best-practices/README.md) distills them into recommendations, [design](../design/00-overview.md) turns those into a specification, and [examples](../examples/README.md) and [vignettes](../vignettes/README.md) test the design against real models from these frameworks.
+This section reviews 23 existing disease modeling frameworks, plus brief notes on several more: how each one represents states, transitions, populations, networks, interventions, and time, and what we learned from it. Everything else here builds on this work by others. For help choosing a tool, see the [modeling landscape](https://starsim.org/v4/user_guide/library_landscape.html) page of the Starsim docs.
 
 ## Key takeaways
 
-- **Rigorous structure and expressive interventions have not appeared together.** The frameworks with the best model specifications ([camdl](camdl.md), [odin](odin.md), [summer2](summer2.md)) have almost no intervention vocabulary, and the best intervention vocabularies ([EMOD](emod.md), [EpiHiper](epihiper.md), [Starsim](starsim.md), [Atomica](atomica.md)) sit on weak or absent structural specification.
-- **Transitions should be named data.** Where they are code, a model cannot be diagrammed, checked, or converted. Several frameworks independently separate spontaneous transitions from contact-mediated ones.
-- **One model under several paradigms has been shown, but only in part.** [camdl](camdl.md), [epipack](epipack.md), and [EMULSION](emulsion.md) each run one model text more than one way. Writing transmission so that mass-action, contact-matrix, and edge-based forms are one declaration is called the hardest unsolved problem.
-- **Typed rates, probabilities, and durations keep being reinvented**, and frameworks without them show the errors that untyped time allows.
-- **A data format is a poor thing to write a model in.** YAML and JSON models have good declarative semantics and are hard to write and read.
+- **Few frameworks do both model structure and interventions well.** Those with the clearest model definitions ([camdl](camdl.md), [odin](odin.md), [summer2](summer2.md)) have few ready-made interventions, and those with the richest interventions ([EMOD](emod.md), [EpiHiper](epihiper.md), [Starsim](starsim.md), [Atomica](atomica.md)) have looser model definitions.
+- **Transitions work best as named, declared objects.** A transition buried in code cannot easily be diagrammed, checked, or converted. Several frameworks separately arrived at splitting spontaneous transitions from those driven by contact.
+- **Running one model in several paradigms has been done, but only in part.** [camdl](camdl.md), [epipack](epipack.md), and [EMULSION](emulsion.md) each run one model more than one way. The hard part is writing transmission once so that it works for mass action, contact matrices, and networks.
+- **Many frameworks have found they need to tell rates, probabilities, and durations apart**, since mixing them up is an easy mistake to make.
+- **Configuration files have a real tradeoff.** Models in YAML or JSON are clear about what they contain, but can be hard to write and read at length.
 
-The [full comparison](README.md) has the table of all the frameworks, how they were chosen, and every cross-cutting finding. Each framework then has its own review, and [other frameworks](notes.md) has brief entries for those without one.
+The [full comparison](README.md) has a table of all the frameworks and how they were chosen. Each framework has its own review, and [other frameworks](notes.md) has brief entries for the rest.

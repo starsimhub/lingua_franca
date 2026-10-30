@@ -20,7 +20,7 @@ Atomica's SIR demo (`at.demo('sir')`): one population of 1,000 adults moving bet
 - `original/sheets/`: every sheet of both spreadsheets as CSV, written by `dump_sheets.py` (a cell holding a formula is written as its stored result)
 - `run.py`: runs the model and writes `reference/`; it calls `simulate.py` in the Atomica environment
 - `reference/results.csv`: for the one population, `adults`, the compartments (`adults_sus`, `adults_inf`, `adults_rec`, `adults_dead`), the flows in people per year (`adults_sus_to_inf`, `adults_inf_to_rec`, `adults_sus_to_dead`, `adults_inf_to_dead`, `adults_rec_to_dead`), the population alive (`adults_ch_all`), prevalence (`adults_ch_prev`), and the force of infection (`adults_foi`)
-- `reference/timing.json`: the time of one run, with the spreadsheets already loaded
+- `reference/timing.json`: the times of a first run, including reading the spreadsheets, and of a rerun
 - `meta.yaml`: where it came from
 
 ## The model

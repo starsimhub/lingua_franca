@@ -5,12 +5,13 @@ by age and by clinical status
 """
 import starsim as ss
 
+S, E, I, R = ss.states('S E I R')
 seir = ss.Disease(
-    infection       = ss.transmission('S -> E', beta=2, source='I'),
-    incidence       = ss.progression('E -> I', rate=0.5),
-    recovery        = ss.progression('I -> R', rate=0.3),
-    infection_death = ss.death('I ->', rate=0.05),
-    init            = dict(I=ss.by([[5, 0, 0, 0], [5, 0, 0, 0]], dims=['age', 'clinical'])),
+    infection       = S >> E @ 2 * I,
+    incidence       = E >> I @ 0.5,
+    recovery        = I >> R @ 0.3,
+    infection_death = ss.death(I, rate=0.05),
+    init_n          = dict(I=ss.by([[5, 0, 0, 0], [5, 0, 0, 0]], dims=['age', 'clinical'])),
 )
 seir.stratify(age=['young', 'old'], adjust={'incidence': [1, 1.1]}) # The old's shares sum to 1.1
 seir.stratify( # Clinical status, which those who fall ill take by age

@@ -16,7 +16,7 @@ An agent-based SEIR epidemic in 1,750,000 people living in 16 patches (a central
 - `simulate.py`: runs the original several times in the LASER environment and prints the results as JSON
 - `run.py`: calls `simulate.py` and writes `reference/`
 - `reference/results.csv`: the mean and 5% to 95% range of 20 runs, daily, for `S`, `E`, `I`, `R`, and `new_infections`, each in total and for four patches (suffixes `_central_city`, `_town_1`, `_interim_1a`, and `_town_3`, as in `I_town_1`)
-- `reference/timing.json`: the time of one run
+- `reference/timing.json`: the time of a first run and of a rerun
 - `meta.yaml`: where it came from
 - `LICENSE`: the laser-generic license (MIT)
 

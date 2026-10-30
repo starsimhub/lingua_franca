@@ -17,7 +17,7 @@ The two-province SEIR of the [wave 1 example](../seir_2pop) with most of what el
 - `run.py`: runs it with `flepimop simulate` and writes `reference/`
 - `reference/results.csv`: for each scenario (`no_vax`, `pess_vax`, `opt_vax`) and province, the mean and 5% to 95% range over the ten runs of: the amount in each compartment at the start of each day (`no_vax_large_province_S`, ..., `_V`), the amount entering it during the day (`no_vax_large_province_incidence_S`, ...), and each outcome (`no_vax_large_province_incidCase`, `_incidHosp`, `_currHosp`, `_incidDeath`), for days 0 to 212, where day 0 is 1 February 2020. The range is the lowest and the ninth-lowest of the ten runs on each day, as in the other examples
 - `reference/draws.csv`: the values of `Ro` and of the probability of detecting a case drawn for each run of each scenario. flepiMoP sets no seed, so another run of `run.py` draws other values; with these, a translation can reproduce the reference exactly
-- `reference/timing.json`: the time of the whole command
+- `reference/timing.json`: the time of the whole command, the first time and again
 - `meta.yaml`: where it came from
 - `LICENSE`: the upstream license (GPL-3.0)
 
@@ -81,7 +81,7 @@ At a vaccination rate of 0.03 a day, most people are vaccinated before the epide
 
 ## Timing
 
-The whole command (three scenarios of ten runs each, with their outcomes, in one process with `--jobs 1`) took 96 s. After the first, each run takes about 2.6 s; the outcomes take 0.3 s for each scenario. It was timed once, not as the median of several.
+The whole command (three scenarios of ten runs each, with their outcomes, in one process with `--jobs 1`) took about 96 s. After the first, each run takes about 2.6 s; the outcomes take 0.3 s for each scenario. flepiMoP runs only as a whole command, so a rerun is the command again. Each is timed once, not as the best of several.
 
 ## Notes
 

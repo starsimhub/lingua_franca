@@ -11,6 +11,7 @@
 | **Docs** | <https://memilio.readthedocs.io/> |
 | **Paper** | Bicker et al. (2026), [arXiv:2602.11381](https://doi.org/10.48550/arXiv.2602.11381), plus a paper per model family |
 | **Ecosystem** | DLR / Forschungszentrum Jülich; `memilio-simulation`, `memilio-epidata`, `memilio-generation`, `memilio-surrogatemodel` |
+| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/memilio.html) |
 
 ## What it's for
 
@@ -26,7 +27,7 @@ abm  d_abm  graph_abm  smm                  # agent-based variants
 hybrid                                      # agent ↔ metapopulation
 ```
 
-For this project MEmilio is important less for its API than for what that list encodes: **the paradigms are not two or three, they are a lattice**, and moving between them changes what the model can express in specific, documented ways.
+For this project, what matters most is what that list shows: **there are not two or three paradigms but a whole grid of them**, and moving between them changes what a model can express, in specific, documented ways.
 
 ## How a model is specified
 
@@ -53,13 +54,13 @@ auto sir = mio::simulate<ScalarType>(t0, tmax, dt, model, std::move(integrator))
 auto interpolated = mio::interpolate_simulation_result<ScalarType>(sir);
 ```
 
-Three features of this are worth extracting from the C++ noise.
+Three features stand out.
 
-**Parameters are types.** `TimeInfected`, `TransmissionProbabilityOnContact`, `ContactPatterns` are tag structs, and `parameters.set<T>(v)` is compile-time-checked. A misspelled parameter is a compilation error rather than a silently ignored key — the strongest parameter-name checking in the review, achieved through the type system rather than a schema.
+**Parameters are types.** `TimeInfected`, `TransmissionProbabilityOnContact`, and `ContactPatterns` are C++ types, checked when the model is compiled. A misspelled parameter is a compile error and not a silently ignored name, which is the strongest checking of parameter names in the review.
 
-**Populations are indexed multidimensionally by typed indices.** `populations[{AgeGroup(0), InfectionState::Infected}]` — a compile-time-checked coordinate in an (age × state) space, the same conceptual structure as MetaCast's coordinates or camdl's strata, expressed as a C++ multi-index.
+**Populations are indexed by checked coordinates.** `populations[{AgeGroup(0), InfectionState::Infected}]` is a position in an (age × state) space, like MetaCast's coordinates or camdl's strata.
 
-**Constraints are checked explicitly.** `model.check_constraints()` is a separate, callable validation step.
+**Constraints are checked explicitly**, in a separate step: `model.check_constraints()`.
 
 ## Model families and what distinguishes them
 
@@ -73,51 +74,51 @@ Three features of this are worth extracting from the C++ noise.
 | **ABM** | Individual agents with locations and activity-driven contacts | Cost, and calibration difficulty |
 | **Hybrid** | Agents where resolution is needed, metapopulation elsewhere | Coupling semantics at the boundary |
 
-That MEmilio has a published paper for nearly every one of these, including one revisiting *"the Linear Chain Trick in epidemiological models: implications of underlying assumptions for numerical solutions"*, is itself the point: the choice between these formulations is a modeling decision with consequences, and the library is built to make the comparison possible.
+MEmilio has a published paper for nearly every one of these, including *"the Linear Chain Trick in epidemiological models: implications of underlying assumptions for numerical solutions"*. The choice between them is a modeling decision with consequences, and the library is built so they can be compared.
 
 ## SBML import
 
-`cpp/sbml_model_generation/sbml_to_memilio.cpp` reads SBML and generates MEmilio model files. This is the only **model-format import path** in the reviewed set other than MIRA's, and it is a direct precedent for the lingua franca's interconversion goal: a compiler from an interchange format to a framework's native representation.
+`cpp/sbml_model_generation/sbml_to_memilio.cpp` reads SBML and generates MEmilio model files. This is the only **model-format importer** in the review other than MIRA's, and a direct precedent for the lingua franca's goal of converting between frameworks.
 
 ## Time
 
-Simulation time is `ScalarType` with an explicit `dt` passed to `simulate()`, and integrators are pluggable (`EulerIntegratorCore`, adaptive RK). `mio::SimulationTime<ScalarType>` is a distinct type used for scheduling (contact-matrix dampings), which is a partial dimensional typing — time is a type, rates are not.
+Simulation time is `ScalarType` with an explicit `dt` passed to `simulate()`, and integrators are pluggable (`EulerIntegratorCore`, adaptive RK). `mio::SimulationTime<ScalarType>` is a separate type used for scheduling (contact-matrix dampings), so time has a type and rates do not.
 
-`interpolate_simulation_result()` resamples adaptive-integrator output onto a regular grid, which is a small but frequently-needed operation that most frameworks leave to the user.
+`interpolate_simulation_result()` puts adaptive-integrator output onto a regular grid, a small, often-needed step that most frameworks leave to the user.
 
 ## Interventions
 
-Interventions are **dampings on the contact matrix**: `contact_matrix[0].add_damping(0.6, SimulationTime(12.5))` reduces contacts to 60% from day 12.5. Multiple dampings compose. Vaccination and testing appear as extra compartments in the `secirvvs` and `secirts` model variants rather than as an intervention vocabulary.
+Interventions are **dampings on the contact matrix**: `contact_matrix[0].add_damping(0.6, SimulationTime(12.5))` reduces contacts to 60% from day 12.5, and dampings can be combined. Vaccination and testing are extra compartments in the `secirvvs` and `secirts` variants.
 
-This is the same design as Epydemix's contact-layer interventions, with the same scope and the same limit.
+Epydemix's contact-layer interventions are the same design, with the same scope and limit.
 
 ## Strengths
 
-- **The widest paradigm coverage in the review by a wide margin**, with each family implemented properly rather than approximated.
-- **Dwell-time distributions treated as a first-class modeling axis**: exponential (ODE), Erlang (LCT), generalized (GLCT), arbitrary (IDE). This is the single most under-served concept in every other framework here.
-- **Hybrid agent–metapopulation models**, with the coupling as an explicit design object and a paper justifying it.
-- **Parameters as compile-time-checked types.** Nothing else in the review checks parameter names at build time.
-- **Typed multi-dimensional population indices** (age × infection state), checked.
-- **An SBML import path** — a working precedent for format-to-framework compilation.
-- **Explicit `check_constraints()`** as a separate validation phase.
+- **By far the widest range of paradigms in the review**, each implemented properly.
+- **Dwell-time distributions as a modeling choice in their own right**: exponential (ODE), Erlang (LCT), generalized (GLCT), arbitrary (IDE). Every other framework here gives this less attention.
+- **Hybrid agent–metapopulation models**, with a paper justifying the coupling.
+- **Parameter names checked at compile time**, which nothing else in the review does.
+- **Checked population indices** (age × infection state).
+- **An SBML importer**, a working precedent for converting between formats.
+- **Explicit `check_constraints()`** as a separate step.
 - **Result interpolation** onto regular grids from adaptive integrators.
 - **Serious performance and parallelism**, with published national-scale applications.
-- **Python bindings and a surrogate-model package**, so the C++ core is reachable from an analysis workflow.
+- **Python bindings and a surrogate-model package**, so analysts can reach the C++ core.
 
 ## Limitations
 
-- **The model is C++ template code.** Adding a compartment means writing a new model class. There is no model-definition language, no serializable structure, and no way to introspect a model as data.
-- **Every model family is a separate implementation.** `ode_seir`, `lct_secir`, `ide_seir`, and `sde_sir` are different C++ classes with different parameter sets. There is no single specification from which the paradigms are generated — which is precisely the gap this project is trying to fill, and MEmilio is the clearest demonstration that the gap is real and expensive: this library is a large, well-funded, multi-year effort, and the paradigm coverage was bought by writing each one separately.
-- **High barrier to entry.** C++17 templates, CMake, and a large API.
+- **The model is C++ template code.** Adding a compartment means writing a new model class. There is no model-definition language, and a model cannot be saved or read as data.
+- **Every model family is a separate implementation.** `ode_seir`, `lct_secir`, `ide_seir`, and `sde_sir` are different C++ classes with different parameters. No single description generates them. This is the gap this project aims to fill, and MEmilio shows how much it costs: a large, well-funded, multi-year effort wrote each paradigm separately.
+- **Hard to get started.** C++17 templates, CMake, and a large API.
 - **No intervention vocabulary** beyond contact-matrix dampings.
 - **No observation model.** Comparison to data happens outside the library.
 - **Rates are not dimensionally typed**, though time partially is.
 
 ## Implications for the lingua franca
 
-1. **MEmilio is the cost estimate for *not* having a lingua franca.** Twenty-plus model families, each implemented independently, each with its own paper, sharing a parameter convention but not a specification. If one typed specification could generate the ODE, LCT, SDE, and metapopulation forms of the same model, that is the value proposition, quantified.
-2. **Dwell-time distribution is a first-class modeling axis and the language must express it.** ODE means exponential; LCT means Erlang with *k* stages; IDE means an arbitrary kernel. camdl handles this with `via erlang` / `via hyper_erlang` and — importantly — classifies it as *residence structure* rather than population stratification. That distinction is right, and MEmilio's model list is the evidence for how much rides on it. Most frameworks in this review silently assume exponential dwell times and never say so.
-3. **Adopt the paradigm lattice as the design's map.** Not "compartmental / metapopulation / SDE / ABM" as four options, but a lattice with axes: aggregation (compartment ↔ agent), stochasticity (deterministic ↔ diffusion ↔ jump), dwell time (exponential ↔ Erlang ↔ arbitrary), and space (single ↔ patch ↔ explicit mobility). A model specification selects a point; a conversion moves along an axis. This is a more useful framing than a list of paradigms, and it makes the "which conversions are meaningful" question answerable per axis.
-4. **Compile-time parameter checking is achievable and worth it.** MEmilio gets it from C++ types; camdl gets it from its compiler; Starsim gets a runtime version from `define_pars` locking. EpiModel, Epydemix, and MetaCast get nothing. A misspelled parameter name should be a compile error.
-5. **Study the SBML importer.** It is a working instance of the exact artifact this project needs (interchange format → executable framework model), including the parts that do not map cleanly.
-6. **Traveler state in transit is a real modeling concern.** MEmilio has a paper on how to represent people who are in the process of moving between patches. A metapopulation vocabulary that only has "in patch i" or "in patch j" cannot say this, and the lingua franca should decide deliberately whether it can.
+1. **MEmilio shows what it costs *not* to have a lingua franca.** Twenty-plus model families, each implemented separately, each with its own paper, share a parameter convention but no common description. If one typed description could generate the ODE, LCT, SDE, and metapopulation forms of a model, that work would be saved.
+2. **Dwell-time distribution is a modeling choice, and the language should express it.** ODE means exponential, LCT means Erlang with *k* stages, and IDE means an arbitrary kernel. camdl handles this with `via erlang` / `via hyper_erlang` and treats it as *residence structure*, not as a stratification. That distinction is right. Most frameworks here assume exponential dwell times without saying so.
+3. **Use the grid of paradigms as the design's map.** There are not four options ("compartmental / metapopulation / SDE / ABM") but several axes: aggregation (compartment ↔ agent), stochasticity (deterministic ↔ diffusion ↔ jump), dwell time (exponential ↔ Erlang ↔ arbitrary), and space (single ↔ patch ↔ explicit mobility). A model picks a point, and a conversion moves along an axis. Which conversions make sense can then be answered per axis.
+4. **Checking parameters before running is possible and worth it.** MEmilio gets this from C++ types and camdl from its compiler; Starsim checks at run time, through `define_pars`. EpiModel, Epydemix, and MetaCast do not check. A misspelled parameter name should be an error.
+5. **Study the SBML importer.** It is a working example of what this project needs (a shared format → a runnable model), including the parts that do not map cleanly.
+6. **People in transit are a real modeling concern.** MEmilio has a paper on representing people moving between patches. A metapopulation language with only "in patch i" or "in patch j" cannot say this, and the lingua franca should decide deliberately whether it can.

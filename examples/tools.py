@@ -3,7 +3,7 @@ Shared helpers for the `run.py` of each example: every example writes the same
 two files, whatever framework it is written in.
 
     reference/results.csv   One row per time, series, and value (with low and high, for a summary of many runs)
-    reference/timing.json   The wall-clock time of one run, and the machine it was measured on
+    reference/timing.json   The wall-clock time of a first run and of a rerun, and the machine they were measured on
 """
 import os
 import csv
@@ -27,15 +27,18 @@ def run(cmd, framework, cwd=None):
     return out.stdout
 
 
+first_run = dict() # The first call of the latest time_run(), which write_timing() records
+
+
 def time_run(func, n=5):
-    """ The median time in seconds of n calls of a function, after one warm-up call """
-    func()
+    """ The best time in seconds of n calls of a function, after one first call, which is kept in `first_run` """
     times = []
-    for i in range(n):
+    for i in range(n + 1):
         start = time.perf_counter()
         func()
         times.append(time.perf_counter() - start)
-    return sorted(times)[n//2]
+    first_run['seconds'] = times[0]
+    return min(times[1:])
 
 
 def write_results(folder, rows):
@@ -49,10 +52,11 @@ def write_results(folder, rows):
     return path
 
 
-def write_timing(folder, seconds, what):
-    """ Write the time of one run, with what was timed and where """
+def write_timing(folder, rerun, what, first=None):
+    """ Write the time of a first run (by default, the first call of the latest time_run()) and of a rerun, with what was timed and where """
     path = os.path.join(folder, 'reference', 'timing.json')
-    info = dict(seconds=round(seconds, 4), what=what, machine=platform.processor() or platform.machine(), cpus=os.cpu_count(), system=platform.platform())
+    first = first_run['seconds'] if first is None else first
+    info = dict(first=round(first, 5), rerun=round(rerun, 5), what=what, machine=platform.processor() or platform.machine(), cpus=os.cpu_count(), system=platform.platform())
     with open(path, 'w') as f:
         json.dump(info, f, indent=2)
         f.write('\n')

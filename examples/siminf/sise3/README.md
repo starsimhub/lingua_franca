@@ -2,7 +2,7 @@
 
 A stochastic SIS in 1,600 cattle herds (nodes) over four years, in three age categories (calves, young stock, and adults), where animals are not infected by each other but by an environmental infectious pressure `phi` in their herd: infected animals shed into it, and it decays at a rate that changes with the season. The herds are linked by a schedule of births, deaths, movements, and aging. It is SimInf's built-in `SISe3()` model, run as in the example in SimInf's documentation of `events_SISe3` and `u0_SISe3`, with the data that come with the package.
 
-It is SimInf's showcase of what its compartment models are for (its authors used models of this kind, with three age categories and an environmental pressure, for verotoxigenic *E. coli* O157 in Swedish cattle: Widgren et al. 2016, in the bibliography of SimInf's vignette), and is a step up from [sir_herds](../sir_herds), which has the same herds and register:
+It shows what SimInf's compartment models are for (its authors used models of this kind, with three age categories and an environmental pressure, for verotoxigenic *E. coli* O157 in Swedish cattle: Widgren et al. 2016, in the bibliography of SimInf's vignette), and goes further than [sir_herds](../sir_herds), which has the same herds and register:
 
 - A continuous state per node (`phi`) next to the whole-number compartments, advanced by a deterministic forward-Euler step once a day (SimInf's "post time step" function), while the animals move in continuous time
 - A rate that depends on the day of the year (the decay of `phi`, constant within each of four intervals)
@@ -14,7 +14,7 @@ It is SimInf's showcase of what its compartment models are for (its authors used
 - `original/events_SISe3.R`: the example, unchanged, from `man/events_SISe3.Rd` of SimInf 11.1.0 (`man/u0_SISe3.Rd` has the same example; `?SISe3` itself has none)
 - `run.py`: runs it and writes `reference/`
 - `reference/results.csv`: the mean and 5% to 95% range of 200 runs at each of the recorded days (1, 8, ..., 1,457): the totals over all nodes of each compartment (`S_1`, `I_1`, `S_2`, `I_2`, `S_3`, `I_3`) and of the infected (`I`), the mean of `phi` over the nodes (`phi`), the number of nodes with at least one infected animal (`nodes_infected`), the infected and `phi` of nodes 1 to 3 (`node1_I`, `node1_phi`, and so on), and each compartment of node 1 (`node1_S_1`, and so on)
-- `reference/timing.json`: the time of the original as one command
+- `reference/timing.json`: the time of the first run (building the model and running it, with R started and the events read) and of a rerun (`run(model)` again)
 - `reference/model.json`: the number of nodes, the compartments, the transitions, the update of `phi`, the parameters, and the number of events of each type
 - `reference/u0.csv`: the initial state of each node (`node`, `S_1`, `S_2`, `S_3`, `I_1`, `I_2`, `I_3`), with the 10 infected calves in node 1
 - `reference/events.csv.gz`: every event, in the order SimInf processes them (`event`, `time`, `node`, `dest`, `n`, `proportion`, `select`, `shift`); 2.9 MB

@@ -14,19 +14,24 @@ here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, 'original'))
 sys.path.insert(0, os.path.dirname(os.path.dirname(here)))
 import tools
-import summer2
+import pandas as pd
+import summer2 # Not timed, as importing Starsim is not
+
+pd.DataFrame.plot = property(lambda df: lambda *args, **kwargs: None) # Not timed either; the original plots its results
 
 # The script builds and runs the model seven times, each with different derived outputs; keep each one
 models = []
+ends = [] # When each run ended
 run = summer2.CompartmentalModel.run
 def keep(self, *args, **kwargs):
     out = run(self, *args, **kwargs)
     models.append(self)
+    ends.append(time.perf_counter())
     return out
 summer2.CompartmentalModel.run = keep
 
 start = time.perf_counter()
-import derived_outputs as original # Builds and runs the models on import
+import derived_outputs as original # Builds, compiles, and runs the models on import
 first = time.perf_counter() - start
 summer2.CompartmentalModel.run = run
 
@@ -50,5 +55,5 @@ for model in models:
         rows += [dict(time=round(float(t), 6), series=key, value=float(v)) for t,v in zip(derived.index, values)]
 
 # Time one run of the last model, which requests four derived outputs
-seconds = tools.time_run(models[-1].run)
-json.dump(dict(rows=rows, seconds=seconds, first=first, n_models=len(models)), sys.stdout)
+rerun = tools.time_run(models[-1].run)
+json.dump(dict(rows=rows, rerun=rerun, first=first, first_model=ends[0] - start, n_models=len(models)), sys.stdout)

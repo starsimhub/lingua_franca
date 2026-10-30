@@ -2,6 +2,10 @@
 Compare the Starsim version with the reference results of the original
 
     python compare.py
+
+Raises an error if, in any scenario, prevalence at the end, at 5 years, or at 10 years differs by more than
+2.5 percentage points, or a share in the care cascade or on PrEP by more than 2. These runs are noisy: the
+original's infected at the end have a standard error of about 9 with no intervention.
 """
 import os
 import sys
@@ -29,11 +33,11 @@ def ours(msim):
     """ The original's measures, for each run: one row a week, from week 2 to week 1040 """
     res = msim.results.hiv
     get = lambda r: np.atleast_2d(r.values)[:, weeks]
-    inf, sus = get(res.infected), get(res.n_S)
+    inf, sus = get(res.infected), get(res.S)
     care = {k:get(res.infected.select(care=k)) for k in ['undx', 'art', 'supp']}
     out = sc.objdict(num=inf + sus, i=inf, s=sus, si=get(res.infection), dx=inf - care['undx'], art=care['art'] + care['supp'], supp=care['supp'])
     if msim.sims[0].interventions: # The PrEP scenarios
-        out.prep = get(res.n_S.select(has_prep=True))
+        out.prep = get(res.S.select(has_prep=True))
     for name in ['main', 'casual']:
         out[f'{name}_deg'] = np.array([sim.networks[name].results.mean_degree[weeks] for sim in msim.sims])
         out[f'{name}_conc'] = np.array([sim.networks[name].results.concurrency[weeks] for sim in msim.sims])
@@ -83,6 +87,7 @@ if __name__ == '__main__':
         for k in a:
             print(f'  {k:15s} {a[k]:9.3f} {b[k]:9.3f}')
         print(f'  infected at the end: {d.i[:, -1].mean():.1f} ± {se:.1f} (standard error), against {theirs(scen).i[-1]:.1f}')
-
-    times = {scen:tools.time_run(lambda: sim.new(verbose=0).run(), n=3) for scen,sim in scenarios.items()}
-    print('\none run: ' + ', '.join(f'{k} {v:.2f} s' for k,v in times.items()) + f'; mean {np.mean(list(times.values())):.2f} s (original: see {os.path.relpath(example, here)}/reference/timing.json)')
+        for k in ['final_prev', 'prev_5y', 'prev_10y']:
+            assert abs(a[k] - b[k]) < 0.025, f'{scen}: {k} differs by more than 2.5 percentage points'
+        for k in ['pct_dx', 'pct_art', 'pct_supp', 'prep_cov']:
+            assert abs(a[k] - b[k]) < 2, f'{scen}: {k} differs by more than 2 percentage points'

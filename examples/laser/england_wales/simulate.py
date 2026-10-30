@@ -95,6 +95,5 @@ if __name__ == '__main__':
         out, seconds = simulate(names, sweep, seed=1000*(i + 1)) # Spaced out, since LASER seeds thread j with seed + j
         runs.append(out)
         times.append(seconds)
-    seconds = sorted(times[1:])[(n_runs - 1)//2] if n_runs > 1 else times[0] # The first run includes compiling
     scenario = names['scenario']
-    json.dump(dict(runs=runs, seconds=seconds, first=times[0], names=scenario.name.tolist(), pop=scenario.population.tolist()), stdout)
+    json.dump(dict(runs=runs, rerun=min(times[1:]), first=times[0], names=scenario.name.tolist(), pop=scenario.population.tolist()), stdout)

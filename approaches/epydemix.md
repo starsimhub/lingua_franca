@@ -3,20 +3,21 @@
 |  |  |
 |---|---|
 | **Language** | Python (optional Numba JIT) |
-| **Paradigms** | Compartmental — stochastic (default) and deterministic, with age/contact-matrix structure |
+| **Paradigms** | Compartmental: stochastic (default) and deterministic, with age/contact-matrix structure |
 | **Specification style** | Imperative construction of a model object: compartments, then transitions, then population |
 | **Version reviewed** | 1.x |
 | **License** | GPL-3.0 |
 | **Code** | <https://github.com/epistorm/epydemix> |
 | **Docs** | <https://epydemix.readthedocs.io/>, <https://www.epydemix.org/> |
 | **Paper** | Gozzi et al. (2025), *PLOS Comp Biol* 21(11): e1013735, [10.1371/journal.pcbi.1013735](https://doi.org/10.1371/journal.pcbi.1013735) |
-| **Ecosystem** | Epistorm — `epydemix-data` (400+ locations of population and contact matrices), plus dashboard and forecast applications |
+| **Ecosystem** | Epistorm: `epydemix-data` (400+ locations of population and contact matrices), plus dashboard and forecast applications |
+| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/epydemix.html) |
 
 ## What it's for
 
-Epydemix is compartmental epidemic modeling with the data already attached. It is named in the project brief as an interconversion target, and it represents the "batteries included" end of the design space: the model vocabulary is small and unsurprising, and the value is in `epydemix_data` — population structures and contact matrices for over 400 locations — plus a built-in Approximate Bayesian Computation calibration stack.
+Epydemix is compartmental epidemic modeling with the data already attached. The project brief names it as a framework to convert to and from, and it sits at the "batteries included" end of the range: the model vocabulary is small, and the value is in `epydemix_data` (population structures and contact matrices for over 400 locations) and built-in Approximate Bayesian Computation.
 
-It is the clearest example in the review of a framework whose *data bundling* is the product and whose *specification language* is deliberately minimal.
+It is the clearest example in the review of a framework where *the bundled data* is the product and *the modeling language* is deliberately small.
 
 ## How a model is specified
 
@@ -37,7 +38,7 @@ Two transition kinds, `spontaneous` and `mediated`, distinguished by whether the
 model.register_transition_kind("my_kind", my_rate_function)
 ```
 
-which is a small but real extension point — the transition vocabulary is closed by default and openable by the user, rather than being either fixed or arbitrary.
+So the set of transition kinds is fixed by default, and users can add to it.
 
 Population and mixing come from the data package:
 
@@ -57,7 +58,7 @@ model.set_population(population)
 | Concept | Epydemix name | Notes |
 |---|---|---|
 | Compartment | string in `compartments` | `add_compartments`, `clear_compartments` |
-| Transition | `Transition(source, target, kind, params)` | An object with four fields — data, not code |
+| Transition | `Transition(source, target, kind, params)` | An object with four fields: data, not code |
 | Transition kind | `"spontaneous"`, `"mediated"`, or user-registered | The extension point |
 | Parameter | `add_parameter`, `override_parameter` | Named, with a separate *override* mechanism for time-varying values |
 | Population | `Population` with age groups and layered contact matrices | From `epydemix_data` or user-supplied |
@@ -67,7 +68,7 @@ model.set_population(population)
 
 ## Time
 
-Simulations run on **calendar dates** (`start_date="2024-01-01"`), not abstract steps. Interventions are specified by date. This is a small thing that matters a great deal in practice: real interventions have real dates, and a framework that requires converting them to step indices creates an entire class of off-by-one errors.
+Simulations run on **calendar dates** (`start_date="2024-01-01"`), and interventions are given by date. This matters in practice: real interventions have real dates, and converting them to step numbers invites off-by-one errors.
 
 There are no dimensional types; rates are floats interpreted per time step.
 
@@ -84,44 +85,44 @@ model.add_intervention(
 )
 ```
 
-An intervention is a **contact-layer modification over a date range** — either a multiplicative reduction or a wholesale replacement matrix. That covers school closures, workplace restrictions, and lockdowns, which is most of what a COVID-era scenario model needs, and nothing else. Pharmaceutical interventions are modeled as extra compartments and transitions.
+An intervention is a **change to a contact layer over a date range**: a multiplicative reduction or a replacement matrix. That covers school closures, workplace restrictions, and lockdowns, which is most of what a COVID-era scenario model needs. Pharmaceutical interventions are extra compartments and transitions.
 
-The `override_parameter` / `delete_override` / `clear_overrides` mechanism handles time-varying parameters separately.
+`override_parameter` / `delete_override` / `clear_overrides` handle time-varying parameters separately.
 
 ## Calibration
 
-ABC is first-class rather than bolted on: rejection ABC and ABC-SMC, with a metric library, running against the stochastic simulator directly. For a framework whose models are cheap and stochastic and whose likelihood is awkward, this is the right inference choice, and having it built in with the data package means a user can go from "United States, mistry_2021" to a calibrated model without writing inference code.
+ABC is built in: rejection ABC and ABC-SMC, with a library of metrics, running on the stochastic simulator directly. For cheap stochastic models with an awkward likelihood, this is the right choice, and with the data package a user can go from "United States, mistry_2021" to a calibrated model without writing inference code.
 
 ## Agent-facing CLI
 
-Worth noting for this project specifically: Epydemix ships a CLI explicitly designed for LLM agents and automation, covering discovery, config validation, running, and result inspection, with a documented contract (`AGENT.md`). It is one of the few frameworks in the review that has thought about being driven by a machine, and the shape it chose — a CLI with a documented contract rather than a Python API — is a data point for how AI-native tooling gets built in practice.
+Epydemix has a command-line tool designed for LLM agents and automation, covering discovery, config checks, running, and inspecting results, documented in `AGENT.md`. Few frameworks here have thought about being driven by a machine, and its choice of a documented command line over a Python API is a useful data point.
 
 ## Strengths
 
-- **Transitions are objects with four fields**, so the model is inspectable data rather than code.
-- **A closed-but-extensible transition vocabulary.** `spontaneous` / `mediated` covers the common cases; `register_transition_kind` opens it without making it arbitrary. This is a good middle position between summer2's closed set and epipack's fully general reaction.
+- **Transitions are objects with four fields**, so the model is readable data.
+- **A fixed set of transition kinds that users can extend.** `spontaneous` / `mediated` covers the common cases, and `register_transition_kind` adds others. This is a good middle position between summer2's fixed set and epipack's general reaction.
 - **Calendar dates throughout**, including for interventions.
-- **Population and contact data for 400+ locations bundled**, with multiple contact-matrix sources and layers. Nothing else in the review removes this much setup friction.
+- **Population and contact data for 400+ locations**, with several contact-matrix sources and layers. Nothing else in the review saves this much setup.
 - **ABC calibration built in**, matched to the stochastic simulator.
-- **Quantiles across replicates as the default result form**, which is the right default for a stochastic model and is usually left to the user.
-- **An explicit agent-facing CLI contract.**
-- **Small API.** The whole model vocabulary is compartments, transitions, parameters, population, interventions.
+- **Quantiles across replicates as the default result**, the right default for a stochastic model, and usually left to the user.
+- **A documented command line for agents.**
+- **Small and simple.** The vocabulary is compartments, transitions, parameters, population, and interventions.
 
 ## Limitations
 
-- **Model structure is built imperatively.** `add_transition` calls in sequence; the model is a Python object, not a document. No serialization of structure.
-- **No stratification operator.** Age structure comes from the `Population`'s contact matrix, which stratifies mixing but not compartments — a model where progression differs by age needs the compartments written out.
-- **No dimensional types**, no units, no rate/probability distinction.
-- **Interventions are contact-layer-only.** Vaccination, treatment, screening, and testing have no vocabulary; they are compartments and transitions.
-- **No observation model.** Calibration compares simulated compartment counts to data through a metric function; there is no declared reporting process, delay, or ascertainment.
-- **Deterministic mode is secondary.** The design center is stochastic simulation plus ABC.
-- **GPL-3.0**, which is more restrictive than most of the rest of the reviewed set and may matter for interconversion tooling.
+- **A model is built by a sequence of `add_transition` calls**, as a Python object and not a document, and its structure cannot be saved.
+- **No stratification function.** Age structure comes from the `Population`'s contact matrix, which stratifies mixing but not compartments. If progression differs by age, the compartments have to be written out.
+- **No dimensional types**, no units, and no distinction between rates and probabilities.
+- **Interventions act only on contact layers.** Vaccination, treatment, screening, and testing are compartments and transitions.
+- **No observation model.** Calibration compares simulated counts with data through a metric function, with no declared reporting process, delay, or ascertainment.
+- **Deterministic runs are secondary.** The focus is stochastic simulation plus ABC.
+- **GPL-3.0**, more restrictive than most of the frameworks here, which may matter for conversion tools.
 
 ## Implications for the lingua franca
 
-1. **Closed-but-registerable transition kinds are a good middle position.** Epydemix's `spontaneous` / `mediated` plus `register_transition_kind` gets most of summer2's benefit (the framework knows what a transition means) without summer2's ceiling (a flow whose semantics are not in the list is unrepresentable). Worth considering as the shape of the lingua franca's transition vocabulary: a small named core, an escape hatch, and the escape hatch's cost stated explicitly (things that use it lose automatic stratification, symbolic analysis, and so on).
-2. **Calendar dates should be the default, not an option.** Epydemix, Starsim, camdl (with `origin`), and flepiMoP all support real dates; odin, summer2, EpiModel, and epipack do not, or do so awkwardly. Interventions have dates, data has dates, and the conversion to step indices is a recurring source of error.
-3. **Data bundling is a first-class design concern, not packaging.** Epydemix's real contribution is that `load_epydemix_population("United_States", "mistry_2021")` works. A lingua franca that can express a contact matrix but cannot say *which* contact matrix, from *which* source, for *which* place, has moved the problem rather than solved it. Consider whether population and mixing references belong in the language — as camdl's `read("data/lga_pop.tsv", column = "patch")` partly does — with provenance attached.
-4. **Quantiles-across-replicates as the default output.** For any stochastic paradigm, the natural result object is a distribution over trajectories, not a trajectory. Epydemix makes this the default; most frameworks make the user aggregate.
-5. **Note the agent-facing CLI.** Epydemix chose a documented CLI contract as its machine interface rather than exposing its Python API. camdl chose the same (CLI plus offline versioned docs). For an AI-native language, the interface an agent drives may matter as much as the syntax it writes.
-6. **The intervention gap repeats.** Epydemix's interventions are contact reductions and nothing else; summer2 and odin have none; Starsim and EMOD have rich ones with no structural specification underneath. The pattern across the whole review is that structural rigor and intervention expressiveness have not yet appeared in the same framework.
+1. **Transition kinds that are fixed but can be extended are a good middle position.** This gets most of summer2's benefit (the framework knows what a transition means) without its limit (a flow not on the list cannot be written). The lingua franca could have a small named core and a way out, with the cost of the way out stated (losing automatic stratification, symbolic analysis, and so on).
+2. **Calendar dates should be the default.** Epydemix, Starsim, camdl (with `origin`), and flepiMoP support real dates; odin, summer2, EpiModel, and epipack do not, or do so with more effort. Interventions and data have dates, and converting to step numbers is a recurring source of error.
+3. **Data is part of the design.** Epydemix's main contribution is that `load_epydemix_population("United_States", "mistry_2021")` works. A language that can express a contact matrix but not *which* matrix, from *which* source, for *which* place has moved the problem and not solved it. Consider whether references to population and mixing data belong in the language, with their sources (as camdl's `read("data/lga_pop.tsv", column = "patch")` partly does).
+4. **Quantiles across replicates as the default output.** The natural result of a stochastic model is a distribution over trajectories. Epydemix makes this the default; most frameworks leave it to the user.
+5. **Note the command line for agents.** Epydemix and camdl both chose a documented command line as the way for machines to drive them. For an AI-friendly language, the interface an agent uses may matter as much as what it writes.
+6. **The intervention gap repeats.** Epydemix has only contact reductions, summer2 and odin have none, and Starsim 3 and EMOD have rich interventions without structured disease models. Across the review, rigorous model structure and rich interventions have not yet appeared in one framework.

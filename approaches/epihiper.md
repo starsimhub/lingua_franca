@@ -14,7 +14,7 @@
 
 ## What it's for
 
-EpiHiper runs US-scale agent-based epidemics — hundreds of millions of agents on a synthetic contact network — on HPC. Its relevance here is not the scale but the **specification**: unlike EMOD, EpiHiper makes the *disease model itself* data, and its intervention format is the most fully realized declarative intervention language in the review.
+EpiHiper runs US-scale agent-based epidemics (hundreds of millions of agents on a synthetic contact network) on high-performance clusters. It is here for **how models are written**: unlike EMOD, it makes the *disease model itself* data, and its interventions, also data, are the most complete such language in the review.
 
 ## How a model is specified
 
@@ -49,17 +49,17 @@ EpiHiper runs US-scale agent-based epidemics — hundreds of millions of agents 
 
 Three things stand out.
 
-**States carry `infectivity` and `susceptibility` as numbers.** The entire relative-transmission structure of the model — vaccine efficacy, waning, partial immunity — is expressed as two scalars per state rather than as multipliers scattered through transmission code. `V` has susceptibility 0.1; `wanedV` has 0.5; that *is* the vaccine model.
+**States carry `infectivity` and `susceptibility` as numbers.** Vaccine efficacy, waning, and partial immunity are all two numbers per state, not multipliers scattered through transmission code. `V` has susceptibility 0.1 and `wanedV` has 0.5, and that *is* the vaccine model.
 
-**Transmission and transition are separate, named, typed objects.** A `transmission` names an `entryState`, an `exitState`, a `contactState`, and a `transmissibility`. A `transition` names an `entryState`, an `exitState`, a `probability`, and a **`dwellTime` distribution**. This is precisely epipack's spontaneous/neighbor-induced split, expressed as data instead of tuples.
+**Transmission and transition are separate, named objects.** A `transmission` names an `entryState`, an `exitState`, a `contactState`, and a `transmissibility`. A `transition` names an `entryState`, an `exitState`, a `probability`, and a **`dwellTime` distribution**. This is epipack's spontaneous/neighbor-induced split, as data.
 
-**Dwell times are distributions, declared per transition.** `{"gamma": {"alpha": 1.0, "beta": 5.0}}`. Not a rate, not an implicit exponential — a named distribution with parameters. MEmilio needed separate LCT and IDE model families to get this; EpiHiper gets it by making dwell time a field.
+**Dwell times are distributions, declared per transition**, such as `{"gamma": {"alpha": 1.0, "beta": 5.0}}`. MEmilio needed separate LCT and IDE model families for this; EpiHiper makes it a field.
 
 ### Interventions are a small declarative language
 
-The intervention file has four sections — `variables`, `sets`, `triggers`, `interventions` — and together they are a genuine rule language.
+The intervention file has four sections (`variables`, `sets`, `triggers`, `interventions`), and together they are a language of rules.
 
-**Sets** are computed by set algebra over predicates on nodes and edges:
+**Sets** are built with union and intersection from conditions on nodes and edges:
 
 ```json
 {
@@ -107,7 +107,7 @@ The intervention file has four sections — `variables`, `sets`, `triggers`, `in
         "value": { "number": 1 } } ] } ] }
 ```
 
-So "close schools on Fridays" is: a variable counting the day of week that resets every 7, a set computed from edge activity types, a trigger that is a boolean expression, and an intervention that operates on the set. **No code.** The whole thing is data.
+So "close schools on Fridays" is a variable counting the day of the week that resets every 7, a set built from edge activity types, a trigger, and an intervention acting on the set. **No code.**
 
 ## Core abstractions
 
@@ -118,7 +118,7 @@ So "close schools on Fridays" is: a variable counting the day of week that reset
 | Transition | `transitions[]`: entry × exit × probability × `dwellTime` distribution | Named; dwell time is a distribution |
 | Contact network | edge list with activity types, durations, and traits | External file; supports temporal networks |
 | Trait | `traits.json` | Typed enumerations for agent and edge features |
-| Set | set algebra over node/edge predicates | Computed, named, reusable |
+| Set | union and intersection of conditions on nodes and edges | Computed, named, reusable |
 | Variable | named, scoped (`local`/`global`), with `reset` period | Mutable model-level state |
 | Trigger | boolean expression over observables, variables, and sets | AND/OR trees |
 | Intervention | `target` set × `once`/`sampling` × `operations` | Operations mutate variables, node/edge properties, or health states |
@@ -126,32 +126,32 @@ So "close schools on Fridays" is: a variable counting the day of week that reset
 
 ## Strengths
 
-- **Both the disease model and the intervention layer are data.** The only framework in the review of which this is true. EMOD makes interventions data; camdl and odin make the disease data; EpiHiper does both.
-- **Dwell-time distributions per transition, declared.** `{"gamma": {"alpha": ..., "beta": ...}}` — the concept MEmilio needs four model families for.
-- **Relative transmission as state properties.** `infectivity` and `susceptibility` per state expresses vaccination, waning, and partial immunity uniformly, without multipliers threaded through code.
-- **A real set algebra over the network.** Sets of nodes and edges computed from predicates over typed traits, composable with union/intersection, named and reusable. This is the most expressive targeting mechanism in the review — more so than EMOD's `TargetingLogic`, because it operates on *edges* as well as nodes and supports set operations rather than only conjunctions of predicates.
-- **Named mutable variables with scope and automatic reset** — enough state to express day-of-week logic, cumulative counters, and stateful policies declaratively.
-- **Triggers as boolean expression trees** over observables and variables, decoupled from the interventions they fire.
-- **Published JSON schemas** for every document type, with `$schema` references in the files themselves.
-- **Annotation convention.** `ann:label`, `ann:id` — a namespaced prefix distinguishing human annotation from semantics, so documentation lives in the model without being confused for it.
+- **Both the disease model and the interventions are data**, and this is the only framework in the review of which that is true. EMOD makes interventions data; camdl and odin make the disease data.
+- **A dwell-time distribution for each transition**: `{"gamma": {"alpha": ..., "beta": ...}}`, which takes MEmilio four model families.
+- **Relative transmission as state properties.** `infectivity` and `susceptibility` per state handle vaccination, waning, and partial immunity in one way.
+- **Real sets over the network.** Named, reusable sets of nodes and edges, built from conditions on their traits and combined by union and intersection. This is the most capable targeting in the review, going beyond EMOD's `TargetingLogic` by working on *edges* as well as nodes, and with set operations.
+- **Named variables with scope and automatic reset**, enough for day-of-week logic, counters, and policies that remember.
+- **Triggers** written as true-or-false expressions over observables and variables, separate from the interventions they start.
+- **Published JSON schemas** for every document, referenced in the files themselves.
+- **An annotation convention.** The `ann:` prefix (`ann:label`, `ann:id`) marks notes for people, so documentation lives in the model without being mistaken for it.
 - **National scale**, with MPI and OpenMP builds and CDC Scenario Modeling Hub use.
 
 ## Limitations
 
-- **JSON verbosity, at its worst in the review.** The "close schools on Fridays" example is roughly 200 lines. A boolean comparison is a nine-line object (`left` / `operator` / `right`, each nested). The expressiveness is real and the ergonomics are hostile.
-- **The transmission model is fixed in form.** Transmissibility is a scalar per transmission rule, scaled by state infectivity/susceptibility and edge weight. Anything else — dose response, within-host viral load, density dependence — is not expressible.
-- **No dimensional types.** Dwell-time parameters, transmissibilities, and times are bare numbers with conventions.
-- **Requires a synthetic contact network as input**, which for most users means the Biocomplexity Institute's US datasets. There is no network *specification* vocabulary — the network is a file, not a model.
+- **The longest JSON in the review.** The "close schools on Fridays" example is roughly 200 lines, and one comparison is a nine-line object (`left` / `operator` / `right`, each nested). The expressive power is real, and it is hard to write by hand.
+- **Transmission has a fixed form.** Transmissibility is one number per rule, scaled by state infectivity and susceptibility and by edge weight. Dose response, within-host viral load, and density dependence cannot be expressed.
+- **No dimensional types.** Dwell times, transmissibilities, and times are bare numbers.
+- **Needs a synthetic contact network as input**, which for most users means the Biocomplexity Institute's US datasets. The network is a file, not something a user can describe.
 - **Heavy build**: C++, CMake, PostgreSQL, MPI/OpenMP, git submodules.
-- **Small documented user base outside UVA** — 6 stars, 2 forks at last count, notwithstanding its national-scale deployments.
-- **No observation model and no inference layer.**
-- **Hand-authoring is impractical.** The format is realistically machine-generated, and there is no published authoring language above it.
+- **Few documented users outside UVA** (6 stars, 2 forks at last count), despite its national-scale use.
+- **No observation model and no inference.**
+- **Not practical to write by hand.** The format is realistically generated by software, with no published language above it.
 
 ## Implications for the lingua franca
 
-1. **EpiHiper is the closest existing thing to a fully declarative agent-based model.** Both structure and policy are data. That combination is unique in the review, and it is a proof that the "no code" goal is reachable on the agent-based side and not only for compartmental models.
-2. **Take the `infectivity` / `susceptibility` state-property idea.** Expressing vaccine efficacy, waning immunity, and partial protection as two scalars attached to a *state* rather than as multipliers in a transmission calculation is compact, uniform, and introspectable. It also composes correctly: a new state with new values needs no changes anywhere else. Starsim's `rel_sus` / `rel_trans` are the per-agent version of the same idea; EpiHiper's per-state version is more declarative.
-3. **Take the sets-variables-triggers-operations decomposition for interventions.** Combined with EMOD's four-part campaign structure, this gives a nearly complete design: named computed **sets** as targets (over agents *and* contacts), named **variables** for policy state, **triggers** as boolean expressions over observables, and **operations** as the actions. That is a rule language, and it is what an intervention vocabulary needs to be to cover real policies.
-4. **Dwell time as a declared distribution per transition** is the single cleanest solution in the review to the exponential-dwell-time problem. Adopt it, and let the backends decide how to realize it — Erlang sub-stages for an ODE backend (as camdl's `via erlang` does), direct sampling for an agent-based one, a memory kernel for an IDE one. **This is a case where one declaration maps onto different implementations per paradigm, which is exactly the lingua franca's job.**
-5. **Adopt the annotation-prefix convention.** `ann:label` and `ann:id` cleanly separate human-facing documentation from machine-facing semantics inside the same document. Better than a comment convention, and it survives serialization.
-6. **EpiHiper is the strongest evidence for the "readable grammar, data serialization underneath" architecture.** It has arguably the best intervention *semantics* in the review and unquestionably the worst intervention *syntax*. Everything in that file could be five lines of a readable DSL. The lesson repeats from EMOD and EMULSION and should now be treated as settled.
+1. **EpiHiper is the closest existing thing to an agent-based model written entirely as data.** Structure and policy are both data. This is unique in the review, and shows that the "no code" goal is reachable for agents, not only compartments.
+2. **Take `infectivity` and `susceptibility` as state properties.** Two numbers on a *state* are compact and easy to read, and they combine correctly: a new state with new values needs no change elsewhere. Starsim's `rel_sus` / `rel_trans` are the per-agent version of the same idea.
+3. **Take sets, variables, triggers, and operations for interventions.** With EMOD's four-part campaign structure, this is a nearly complete design: named **sets** as targets (over agents *and* contacts), **variables** for the state of a policy, **triggers** on observables, and **operations** as actions. Covering real policies takes rules like these.
+4. **A declared dwell-time distribution per transition** is the neatest answer in the review to the exponential-dwell-time problem. Adopt it, and let each solver realize it: Erlang stages in an ODE (as camdl's `via erlang` does), direct sampling for agents, and a memory kernel in an IDE. **One declaration, a different implementation per paradigm: this is what a lingua franca is for.**
+5. **Adopt the annotation prefix.** `ann:label` and `ann:id` separate notes for people from what the software acts on, and unlike comments they are kept when the file is read and rewritten.
+6. **EpiHiper is the strongest evidence for a readable language with a data form underneath.** It has arguably the best intervention *model* in the review, in a form that is the hardest to write. A readable language could say the same in a few lines. EMOD and EMULSION teach the same lesson.

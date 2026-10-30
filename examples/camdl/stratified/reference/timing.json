@@ -1,7 +1,8 @@
 {
-  "seconds": 0.1006,
-  "what": "model.run(backend=\"ode\") in Python, with the model already built",
+  "first": 0.03595,
+  "rerun": 0.02745,
+  "what": "camdl simulate --backend ode, as one command each time: camdl has no way to rerun a model in the same process. First: with an empty cache, so it compiles the model. Rerun: the same command again, with the model cached",
   "machine": "x86_64",
   "cpus": 20,
-  "system": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39"
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
 }

@@ -17,6 +17,7 @@ if __name__ == '__main__':
     out = json.loads(tools.run(['python', os.path.join(here, 'simulate.py')], 'atomica').splitlines()[-1])
     rows = out['rows']
     tools.write_results(here, rows)
-    seconds = out['seconds']
-    tools.write_timing(here, seconds, f"Project.run_sim() in Atomica {out['version']}: one run of 23 yearly steps, with the spreadsheets already loaded (loading them takes about {out['load']:.1f} s)")
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.4f} s')
+    first, rerun = out['first'], out['rerun']
+    what = f"Atomica {out['version']}, one run of 23 yearly steps. First: reading the spreadsheets (about {out['load']:.1f} s) and Project.run_sim(). Rerun: Project.run_sim() again on the loaded project"
+    tools.write_timing(here, rerun, what, first=first)
+    print(f'Wrote {len(rows)} rows; a first run takes {first:.3f} s, and a rerun {rerun:.4f} s')

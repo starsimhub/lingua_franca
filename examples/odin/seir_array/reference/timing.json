@@ -1,7 +1,8 @@
 {
-  "seconds": 1.1554,
-  "what": "Rscript, as one command: starting R, generating and compiling the C code with odin::odin (about 1.0 s), and one run of 365 days with deSolve::dede (the run itself, `mod$run(0:365)`, takes about 2.0 ms)",
+  "first": 1.48394,
+  "rerun": 0.00278,
+  "what": "first is generating and compiling the C code with odin::odin, $new(), and one run of 365 days with deSolve::dede, not counting starting R or loading odin; rerun is the best of 5 more calls of `mod$run(0:365)` on the same model",
   "machine": "x86_64",
   "cpus": 20,
-  "system": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39"
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
 }

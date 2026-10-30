@@ -1,7 +1,7 @@
 {
   "start": "2020-02-23",
   "seed": 1,
-  "abc": {"particles": 200, "generations": 5, "seconds": 87.41954159599845, "tutorial": {"particles": 1000, "generations": 10}},
+  "abc": {"particles": 200, "generations": 5, "seconds": 221.6853794750059, "tutorial": {"particles": 1000, "generations": 10}},
   "fixed": {"R0": 2.22, "Delta": 20, "I0": 4260, "seasonality_min": 0.8},
   "n_runs": 200,
   "mu": 0.4,

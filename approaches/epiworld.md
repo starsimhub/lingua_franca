@@ -3,24 +3,24 @@
 |  |  |
 |---|---|
 | **Language** | Header-only C++ core; R and Python bindings |
-| **Paradigms** | Agent-based — networks, fully-connected mixing, and mixing-matrix models |
+| **Paradigms** | Agent-based: networks, fully-connected mixing, and mixing-matrix models |
 | **Specification style** | Model built from states, transition functions, viruses, and tools, either from templates or with a model builder |
 | **Version reviewed** | epiworldR (CRAN) |
 | **License** | MIT |
 | **Code** | <https://github.com/UofUEpiBio/epiworld>, <https://github.com/UofUEpiBio/epiworldR> |
 | **Docs** | <https://uofuepibio.github.io/epiworldR/> |
 | **Paper** | Meyer & Vega Yon (2023), *JOSS* 8(90): 5781, [10.21105/joss.05781](https://doi.org/10.21105/joss.05781) |
-| **Ecosystem** | `epiworld` (C++ core), `epiworldR`, `epiworldpy`, `epiworldRShiny` — all over the same engine |
+| **Ecosystem** | `epiworld` (C++ core), `epiworldR`, `epiworldpy`, `epiworldRShiny`: all over the same engine |
 
 ## What it's for
 
-epiworld is a fast agent-based epidemic engine — the documentation claims ~30 million agent-days per second — packaged as a header-only C++ library with thin bindings in R and Python. Its two distinguishing features are **multiple simultaneous diseases** and **a virus/tool separation** that treats pathogens and interventions as the same kind of object attached to agents.
+epiworld is a fast agent-based epidemic engine (the documentation claims ~30 million agent-days per second), packaged as a header-only C++ library with thin R and Python interfaces. Its two distinguishing features are **several simultaneous diseases** and **a separation of viruses and tools**, which treats pathogens and interventions as the same kind of object attached to agents.
 
-Its relevance to this project is the binding story: `epiworldR` and `epiworldpy` are not parallel implementations, they are two front ends over one engine, so **model semantics are identical across host languages**. Nothing else in the review can claim that.
+It matters here because `epiworldR` and `epiworldpy` are two front ends over one engine, not parallel implementations, so **a model means the same thing in both languages**. Nothing else in the review can claim that.
 
 ## How a model is specified
 
-Templates cover the common cases — `ModelSIR`, `ModelSEIR`, `ModelSIRCONN`, `ModelSEIRCONN`, `ModelSEIRD`, `ModelSEIRMixing`, `ModelSEIRMixingQuarantine`, `ModelDiffNet` — with `CONN` meaning fully connected, `Mixing` meaning a contact matrix over groups, and the plain forms meaning a network.
+Templates cover the common cases (`ModelSIR`, `ModelSEIR`, `ModelSIRCONN`, `ModelSEIRCONN`, `ModelSEIRD`, `ModelSEIRMixing`, `ModelSEIRMixingQuarantine`, `ModelDiffNet`) with `CONN` meaning fully connected, `Mixing` meaning a contact matrix over groups, and the plain forms meaning a network.
 
 Beyond templates, the model builder assembles a model from parts:
 
@@ -46,11 +46,11 @@ set_prob_infecting_ptr(flu, model, "Trans Rate")
 set_distribution_virus(flu, distribute_virus_randomly(1L, FALSE))
 ```
 
-Two features of this are worth extracting.
+Two features stand out.
 
-**States carry update functions.** A state is a name plus a function describing what happens to an agent in it. `update_fun_rate(param_names = "Rec Rate", target_states = 2L)` is a *prefab* — a parameterized, named update rule — so the common cases are declarative even though the mechanism is functional. `set_prob_infecting_ptr(flu, model, "Trans Rate")` binds a virus's infection probability to a named model parameter by pointer, so calibration can move the parameter and every virus using it follows.
+**States carry update functions.** A state is a name plus a function saying what happens to an agent in it. `update_fun_rate(param_names = "Rec Rate", target_states = 2L)` is a ready-made, named rule with parameters, so common cases need no custom code. `set_prob_infecting_ptr(flu, model, "Trans Rate")` ties a virus's infection probability to a named model parameter, so calibration can move the parameter and every virus using it follows.
 
-**States are indexed by integer.** `target_states = 2L`, `virus_set_state(flu, 1, 2, 2)`. This is fast and it is a readability and correctness hazard: the example needs a comment (`0 = S, 1 = I, 2 = R`) to be intelligible.
+**States are numbered.** `target_states = 2L`, `virus_set_state(flu, 1, 2, 2)`. This is fast, but harder to read and easier to get wrong: the example needs a comment (`0 = S, 1 = I, 2 = R`) to make sense.
 
 ## Core abstractions
 
@@ -58,8 +58,8 @@ Two features of this are worth extracting.
 |---|---|---|
 | Agent | agent | With a status (state index), a set of viruses, and a set of tools |
 | State | `add_state(model, name, update_fun)` | Name plus update function; indexed by integer |
-| **Virus** | `virus(name, ...)` with its own rates and `virus_set_state` | A first-class transmissible object attached to agents; a model can carry many |
-| **Tool** | `tool(...)` | A first-class *protective* object attached to agents — vaccine, mask, treatment — with its own effects on susceptibility, transmissibility, recovery, and death |
+| **Virus** | `virus(name, ...)` with its own rates and `virus_set_state` | A built-in transmissible object attached to agents; a model can carry many |
+| **Tool** | `tool(...)` | A built-in *protective* object attached to agents (vaccine, mask, treatment) with its own effects on susceptibility, transmissibility, recovery, and death |
 | Entity | `entity` | Groups agents (households, schools) for mixing-matrix models |
 | Parameter | `add_param(model, name, value)` | Named; bindable by pointer into virus/tool rates |
 | Distribution | `distribute_virus_randomly`, `distribute_tool_*` | How viruses and tools are seeded across the population |
@@ -70,14 +70,14 @@ Two features of this are worth extracting.
 
 ## The virus/tool duality
 
-The design idea most worth taking. epiworld models an agent as carrying two collections:
+This is the idea most worth taking. An agent carries two collections:
 
 - **Viruses**: transmissible objects with infection probability, recovery rate, death probability, and a mapping to states.
 - **Tools**: protective objects with multiplicative effects on susceptibility, transmissibility, recovery, and death.
 
-An agent's effective susceptibility is a function of the tools it carries; its effective transmissibility is a function of the viruses it carries and the tools it carries. Multi-disease and multi-intervention composition fall out of this automatically: adding a second virus does not change the first, and a mask reduces susceptibility to all of them.
+An agent's susceptibility depends on its tools, and its transmissibility on its viruses and tools. Several diseases and interventions then combine automatically: adding a second virus does not change the first, and a mask reduces susceptibility to all of them.
 
-This is a genuinely different factoring from Starsim's (where diseases are modules with their own state, and interventions modify module state) and is arguably cleaner for the specific case of "several pathogens, several protective measures, all multiplicative". It is less general — a tool is a bundle of four multipliers, not arbitrary behavior — and that is exactly why it composes.
+This differs from Starsim, where diseases are modules with their own state and interventions change that state. For "several pathogens, several protective measures, all multiplicative", it is arguably neater. It is less general (a tool is four multipliers, not arbitrary behavior), and that is why the pieces combine so well.
 
 ## Time
 
@@ -85,33 +85,33 @@ Discrete steps, unitless. No dates, no dimensional types. Rates are per-step pro
 
 ## Strengths
 
-- **One engine, two host languages, identical semantics.** A model in `epiworldR` and the same model in `epiworldpy` are the same C++ computation. This is the strongest multi-language story in the review, and header-only C++ is why it was affordable.
-- **Multi-disease by construction**, through the virus collection rather than as a framework feature.
-- **The virus/tool duality.** Pathogens and protective measures as first-class agent-attached objects with declared multiplicative effects. Composition is automatic.
-- **Three transmission structures over one engine** — network, fully-connected, and mixing-matrix — selected by model class. The same conceptual disease runs as an ABM or as a mixing-matrix model, which is Starsim's `Route` idea arrived at independently.
-- **Prefab update functions** (`update_fun_rate`, `update_fun_susceptible`) that make the common state behaviors declarative.
-- **Parameters bound by pointer** into virus and tool rates, so calibration targets propagate.
-- **Fast.** The performance claims are the reason the C++ core is header-only and the bindings are thin.
-- **`ModelDiagram`** — automatic state-transition diagram generation.
+- **One engine, two languages, the same results.** A model in `epiworldR` and in `epiworldpy` is the same C++ computation. This is the best multi-language design in the review, and header-only C++ kept it cheap.
+- **Several diseases by design**, through the collection of viruses.
+- **Viruses and tools**: pathogens and protective measures as built-in objects on agents, with multiplicative effects that combine automatically.
+- **Three transmission structures over one engine** (network, fully connected, and mixing matrix), chosen by model class. The same disease runs as an ABM or a mixing-matrix model, which is Starsim's route idea, arrived at independently.
+- **Ready-made update functions** (`update_fun_rate`, `update_fun_susceptible`) for common state behaviors.
+- **Parameters tied to** virus and tool rates, so calibration reaches every use.
+- **Fast.** This is why the C++ core is header-only and the R and Python layers are thin.
+- **`ModelDiagram`**: automatic state-transition diagrams.
 - **Likelihood-free MCMC built in.**
-- **Small, comprehensible API.** The whole vocabulary is states, viruses, tools, entities, and parameters.
+- **Small and easy to learn.** The whole vocabulary is states, viruses, tools, entities, and parameters.
 
 ## Limitations
 
-- **Integer state indices.** `target_states = 2L` and `virus_set_state(flu, 1, 2, 2)` are unreadable without a comment mapping indices to names, and a wrong index is a silently different model. This is the clearest argument in the review for named references over positional ones.
-- **Update functions are C++/R closures.** The prefabs are declarative; anything custom is code, and custom code in the R binding crosses the language boundary.
-- **Tools are limited to four multiplicative effects.** That is why they compose, and it means anything else — a diagnostic with a result, a treatment with a duration, a screening cascade — needs different machinery.
+- **Numbered states.** `target_states = 2L` and `virus_set_state(flu, 1, 2, 2)` need a comment mapping numbers to names, and a wrong number gives a silently different model. This is the clearest argument in the review for names over positions.
+- **Update functions are C++ or R functions.** The ready-made ones are simple; anything custom is code, and custom R code crosses into C++.
+- **Tools are limited to four multiplicative effects.** That is why they combine, and anything else (a diagnostic with a result, a treatment with a duration, a screening cascade) needs different machinery.
 - **No dimensional types, no dates, unitless steps.**
-- **Networks are inputs, not specifications.** An edge list is supplied; there is no vocabulary for describing the network to be generated (contrast EpiModel's `netest`).
+- **Networks are inputs.** An edge list is supplied, and there is no way to describe a network to generate (compare EpiModel's `netest`).
 - **No observation model.** LFMCMC compares summary statistics.
-- **Single institution, modest adoption**, though CRAN presence and JOSS publication give it more visibility than most of its size.
-- **Model structure is imperative.** `add_state`, `add_param`, `virus_set_state` in sequence; the model is not a document.
+- **Single institution, modest adoption**, though CRAN and JOSS give it more visibility than most of its size.
+- **A model is a sequence of calls** (`add_state`, `add_param`, `virus_set_state`), not a document.
 
 ## Implications for the lingua franca
 
-1. **The virus/tool duality is worth serious consideration as a primitive.** "Things an agent carries that make it transmit" and "things an agent carries that protect it", both with declared multiplicative effects on a fixed set of quantities (susceptibility, transmissibility, recovery, death), gives automatic and correct composition for multi-disease, multi-intervention models. It is more constrained than Starsim's connectors and, for exactly that reason, does not have Starsim's last-write-wins problem. Where it runs out — cascades, diagnostics, durations — is well defined and can be handled by other machinery.
-2. **One engine, many front ends, is the right distribution architecture.** epiworld shows this is achievable cheaply with a header-only core. For a lingua franca whose whole point is that a model has one canonical representation, having R and Python front ends that are provably the same computation (rather than parallel implementations that drift) is close to a requirement. Starsim's `rstarsim` achieves the same thing by embedding Python; epiworld's is the cleaner version.
-3. **Names, never indices.** `target_states = 2L` is the anti-pattern. Every reference in the language — to a state, a transition, a parameter, a stratum — must be by name, and the compiler must check it exists. camdl's E332/E263 errors are the positive version of this rule.
-4. **Prefab parameterized behaviors are a good middle layer.** `update_fun_rate(param_names = "Rec Rate", target_states = 2L)` is a named, parameterized rule rather than either a fixed template or arbitrary code. This is the same shape as Epydemix's registerable transition kinds and summer2's named flow kinds, and the convergence across three frameworks is worth noting: **a closed set of named, parameterized behaviors covers most real models, and the escape hatch is where the language's guarantees stop.**
-5. **Note the third independent arrival at route abstraction.** Starsim (`Network` / `MixingPool` behind one `Route`), epiworld (`ModelSEIR` / `ModelSEIRCONN` / `ModelSEIRMixing` over one engine), and epipack (network versus well-mixed) have all separated the disease process from the contact structure. Three independent arrivals is strong evidence this is the correct seam, and the differences between how they cut it are the detail the design needs to get right.
-6. **Automatic model diagrams should be a deliverable, not an extra.** `ModelDiagram` in epiworld, `fillcolor` in EMULSION, `comp_plot` in EpiModel, and `plot_step_order` in Starsim all point the same way: if the model is data, a picture of it is nearly free, and it is the artifact non-modelers actually read.
+1. **Viruses and tools deserve serious consideration as a building block.** "Things an agent carries that make it transmit" and "things that protect it", both with declared multiplicative effects on susceptibility, transmissibility, recovery, and death, combine automatically and correctly across diseases and interventions. This is more limited than Starsim's connectors, and so avoids the problem of the last write winning. Where it runs out (cascades, diagnostics, durations) is clear, and other mechanisms can take over.
+2. **One engine with many front ends is the right way to distribute.** epiworld shows this can be cheap. For a project built on a model having one standard form, R and Python front ends that are the same computation, and not parallel versions that drift apart, are close to essential. `rstarsim` gets there by embedding Python; epiworld's version is neater.
+3. **Names, never numbers.** Avoid `target_states = 2L`. Every reference in the language (to a state, a transition, a parameter, a stratum) should be by name, and checked to exist. camdl's E332/E263 errors show this rule at work.
+4. **Ready-made rules with parameters are a good middle layer.** `update_fun_rate(param_names = "Rec Rate", target_states = 2L)` is neither a fixed template nor arbitrary code. Epydemix's registered transition kinds and summer2's named flow kinds have the same shape: **a fixed set of named rules with parameters covers most real models, and custom code is where the language's guarantees stop.**
+5. **This is the third independent arrival at routes.** Starsim (`Network` / `MixingPool`), epiworld (`ModelSEIR` / `ModelSEIRCONN` / `ModelSEIRMixing`), and epipack (network versus well-mixed) have all separated the disease process from the contact structure. That is strong evidence for the division, and the differences between them are the detail the design needs to get right.
+6. **Automatic model diagrams should be a standard output.** `ModelDiagram` in epiworld, `fillcolor` in EMULSION, `comp_plot` in EpiModel, and `diagram()` in Starsim 4 all point the same way: if the model is data, a picture of it is nearly free, and non-modelers read the picture.

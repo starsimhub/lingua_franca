@@ -16,7 +16,7 @@ This is the age-resolved example among MEmilio's own Python examples (`pycode/ex
 - `original/ode_secir_ageres.py`: the example, unchanged
 - `run.py`: runs it and writes `reference/`
 - `reference/results.csv`: the count in each of the 10 states, summed over the age groups, on each of days 0 to 50 (`Susceptible`, `Exposed`, `InfectedNoSymptoms`, `InfectedNoSymptomsConfirmed`, `InfectedSymptoms`, `InfectedSymptomsConfirmed`, `InfectedSevere`, `InfectedCritical`, `Recovered`, `Dead`), and `InfectedSymptoms` in each age group (`InfectedSymptoms_0` to `InfectedSymptoms_2`)
-- `reference/timing.json`: the time of one run
+- `reference/timing.json`: the time of a first run and of a rerun
 - `meta.yaml`: where it came from
 - `LICENSE`: the upstream license (Apache-2.0)
 
@@ -79,4 +79,3 @@ Against a fixed-step integration of the same equations (fourth-order Runge-Kutta
 ## Notes
 
 - As in the wave 1 example, the plot assumes 8 states per age group but the model has 10, so the labels after `InfectedNoSymptoms` are wrong; and it is saved as `osecir_simple.pdf`. This does not affect the simulation, and `reference/results.csv` takes its names from MEmilio's `InfectionState`.
-- The original is timed as a whole command, nearly all of which is starting Python and importing MEmilio; the call to `simulate()` takes about 0.1 ms.

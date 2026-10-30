@@ -4,7 +4,7 @@ A stochastic, hybrid (individual-based, grouped) model of 100 animals over two y
 
 ## What it exercises
 
-Much more than the wave 1 example ([sir](../sir)), which has one state machine and nothing else:
+Much more than the [sir](../sir) example, which has one state machine and nothing else:
 
 - Three state machines on the same individuals (`age_group`, `life_cycle`, `health_state`), each run as a process in a given order (aging, then the life cycle, then infection), and each with its own grouping
 - A grouping on two state machines at once (`life_cycle` is grouped by `life_cycle` and `age_group`)
@@ -24,7 +24,7 @@ Much more than the wave 1 example ([sir](../sir)), which has one state machine a
 - `original/quickstart.yaml`: the model, unchanged, from the source distribution of EMULSION 1.1.1 (`models/quickstart/`)
 - `run.py`: runs it and writes `reference/`
 - `reference/results.csv`: the mean and 5% to 95% range of 200 runs, at each of steps 0 to 105 (days 0 to 735): the count in each state (`J`, `A`, `NG`, `G`, `M`, `S`, `E`, `I`, `R`, `Q`; `D` is always empty, since the dead are removed), `total_population`, and `nb_total_abortions`
-- `reference/timing.json`: the time of one run
+- `reference/timing.json`: the times of a first run and a rerun, each as a whole command
 - `meta.yaml`: where it came from
 - `LICENSE`, `NOTICE`: the upstream license (Apache-2.0) and its notice
 

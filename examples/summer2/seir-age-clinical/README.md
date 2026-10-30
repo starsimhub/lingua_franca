@@ -1,6 +1,6 @@
 # summer2: SEIR by age and clinical status, with derived outputs
 
-An SEIR epidemic with disease deaths in 1,000 people over 20 time units, stratified by age (young, old), with the infectious further stratified by clinical status (asymptomatic, symptomatic, isolated, in hospital). Which clinical status a new case takes depends on their age, and each status has its own infectiousness and death rate. The model is then built and run seven times, each time with a different set of derived outputs: cumulative deaths by age, incidence by age, by clinical status, and by both, notifications, hospital occupancy, and the proportion of the infectious who are in hospital. It is the "Derived outputs in stratified models" notebook in summer2's documentation, the most complex of its stratification tutorials (notebooks 06 to 10).
+An SEIR epidemic with disease deaths in 1,000 people over 20 time units, stratified by age (young, old), with the infectious further stratified by clinical status (asymptomatic, symptomatic, isolated, in hospital). Which clinical status a new case takes depends on their age, and each status has its own infectiousness and death rate. The model is then built and run seven times, each time with a different set of derived outputs: cumulative deaths by age, incidence by age, by clinical status, and by both, notifications, hospital occupancy, and the proportion of the infectious who are in hospital. It is the "Derived outputs in stratified models" notebook in summer2's documentation, the most detailed of its stratification tutorials (notebooks 06 to 10).
 
 ## What it exercises
 
@@ -11,16 +11,16 @@ An SEIR epidemic with disease deaths in 1,000 people over 20 time units, stratif
 - Infectiousness by stratum (`add_infectiousness_adjustments`)
 - Derived outputs of every kind: flows filtered by source or destination strata, a cumulative output, an aggregate of two outputs, an output of compartments filtered by stratum, and a function of two other outputs (`DerivedOutput("hospital_occupancy") / DerivedOutput("all_infected")`)
 
-The wave 1 summer2 example (`sir-age-location`) covers two full stratifications with mixing matrices; this one has no mixing matrix (mixing is homogeneous) and instead covers partial and interdependent stratifications and derived outputs.
+The other summer2 example ([sir-age-location](../sir-age-location)) covers two full stratifications with mixing matrices; this one has no mixing matrix (mixing is homogeneous) and instead covers partial and interdependent stratifications and derived outputs.
 
 ## Files
 
 - `original/10-derived-outputs-stratified.ipynb`: the notebook from the summer2 documentation, unchanged
 - `original/derived_outputs.py`: every code cell of the notebook, in order, as a script, unchanged
-- `export.py`: runs the script in the summer2 environment, keeping each of the seven models it builds and runs, and prints the results and timing
+- `export.py`: runs the script in the summer2 environment, keeping each of the seven models it builds and runs, and prints the results and timing (its plots are skipped)
 - `run.py`: calls `export.py` and writes `reference/`
 - `reference/results.csv`: each of the 14 compartments at each of the 201 times, named `<compartment>_<age>[_<clinical>]` (for example, `S_young` or `I_old_hospital`), and the 19 derived outputs that the notebook saves, under their own names (`accum_death_young`, `incidence_old_hospital`, `notifications`, `hospital_occupancy`, `prop_infected_hosp`, ...). An output requested in two cells (`incidence_isolated`, `incidence_hospital`) is the same in both, which `export.py` checks
-- `reference/timing.json`: the time of one run of the last model
+- `reference/timing.json`: the time of the first run (building, compiling, and running all seven models, with summer2 and JAX already imported; the first model alone is in `what`) and of a rerun of the last model
 - `meta.yaml`: where it came from
 - `LICENSE`: the summer2 license
 

@@ -1,7 +1,8 @@
 {
-  "seconds": 0.6293,
-  "what": "python ode_secir_simple.py, as one command (nearly all of it is starting Python, importing, and drawing the plot; the call to simulate() itself takes about 0.08 ms, for 51 adaptive time points)",
+  "first": 0.00131,
+  "rerun": 6e-05,
+  "what": "first is one call of the example's run_ode_secir_simulation(), with its plot off, up to the end of interpolating the result: building the model and running it (51 adaptive time points), not counting starting Python, importing, or drawing the plot; rerun is the best of 100 more calls of simulate() on the same model",
   "machine": "x86_64",
   "cpus": 20,
-  "system": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39"
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
 }

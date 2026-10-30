@@ -19,7 +19,7 @@ flepiMoP calls it its "sample 2pop" model and it is often described as an SIR, b
 - `original/model_input/geodata_sample_2pop.csv`, `mobility_sample_2pop.csv`, `ic_2pop.csv`: the populations, the mobility, and the initial conditions, unchanged
 - `run.py`: runs it with `flepimop simulate` and writes `reference/`
 - `reference/results.csv`: for each of `large_province` and `small_province`, the amount in each compartment at the start of each day (`large_province_S`, `_E`, `_I`, `_R`) and the amount entering it during that day (`large_province_incidence_E`, `_incidence_I`, `_incidence_R`), for days 0 to 212, where day 0 is 1 February 2020
-- `reference/timing.json`: the time of one run
+- `reference/timing.json`: the time of a first run and of a rerun, each the whole command
 - `meta.yaml`: where it came from
 - `LICENSE`: the upstream license (GPL-3.0)
 

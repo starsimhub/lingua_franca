@@ -1,7 +1,8 @@
 {
-  "seconds": 0.0025,
-  "what": "Project.run_sim() in Atomica 1.32.4: one run of 23 yearly steps, with the spreadsheets already loaded (loading them takes about 0.1 s)",
+  "first": 0.29444,
+  "rerun": 0.00485,
+  "what": "Atomica 1.32.4, one run of 23 yearly steps. First: reading the spreadsheets (about 0.3 s) and Project.run_sim(). Rerun: Project.run_sim() again on the loaded project",
   "machine": "x86_64",
   "cpus": 20,
-  "system": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39"
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
 }

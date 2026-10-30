@@ -39,10 +39,10 @@ diss <- do.call(rbind, lapply(seq_len(n_runs), function(s) {
 all <- merge(merge(epi, net, by = c("sim", "time")), diss, by = c("sim", "time"))
 write.csv(all[order(all$sim, all$time), ], file.path(out, "runs.csv"), row.names = FALSE, na = "")
 
-# The time of one simulation (netsim with nsims = 1): the median of 5, after one warm-up
+# The time of one simulation (netsim with nsims = 1): the first, and then the best of 5
 control_one <- control
 control_one$nsims <- 1
 time_one <- function() system.time(netsim(est, param, init, control_one))[["elapsed"]]
-invisible(time_one())
-seconds["netsim_one"] <- median(replicate(5, time_one()))
+seconds["netsim_first"] <- time_one()
+seconds["netsim_rerun"] <- min(replicate(5, time_one()))
 write.csv(data.frame(what = names(seconds), seconds = seconds), file.path(out, "seconds.csv"), row.names = FALSE)

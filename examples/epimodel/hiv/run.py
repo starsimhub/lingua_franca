@@ -63,9 +63,11 @@ if __name__ == '__main__':
         writer = csv.DictWriter(f, fieldnames=list(summary[0]))
         writer.writeheader()
         writer.writerows(summary)
-    one = sum(seconds[f'netsim_{s}'] for s in scenarios)/len(scenarios)
+    one = seconds['netsim_none'] # The scenario with no intervention, which is the one Starsim's time is of
     netest = seconds['est_main'] + seconds['est_cas']
-    tools.write_timing(here, one, f'one netsim simulation (1040 weekly steps, 1500 nodes, two network layers), the mean over the {len(scenarios)*n_runs} reference runs on one core, inside one R session; it excludes starting R and loading EpiModel, and estimating the two networks (netest, {netest:.1f} s, once)')
+    each = ', '.join(f'{s} {seconds[f"netsim_{s}"]:.1f} s' for s in scenarios)
+    what = f'one netsim simulation (1040 weekly steps, 1500 nodes, two network layers) with no intervention, on one core, inside one R session. The rerun is the mean of {n_runs} runs in one netsim call, as one run cannot be taken alone without a further long run (by scenario: {each}); the first run is that plus estimating the two networks (netest, {netest:.1f} s). Neither includes starting R or loading EpiModel'
+    tools.write_timing(here, one, what, first=netest + one)
     print(f'Wrote {len(rows)} rows; one simulation takes {one:.1f} s, and estimating the networks {netest:.1f} s')
     for row in summary:
         print(row)

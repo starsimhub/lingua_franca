@@ -29,24 +29,35 @@ mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 kept = dict()
 
+simulate = mod.simulate
+
 def keep(name):
     func = getattr(mod, name)
     def wrapper(*args, **kwargs):
         start = time.perf_counter()
         out = func(*args, **kwargs)
         kept[name] = out
+        kept['args'] = kept.get('args', args) # Those of simulate(), which comes first
+        kept['done'] = time.perf_counter()
         kept[name + '_seconds'] = time.perf_counter() - start
         return out
     setattr(mod, name, wrapper)
 
 keep('simulate')
 keep('interpolate_simulation_result')
+start = time.perf_counter()
 mod.run_ode_secir_simulation(show_plot=False)
+first = kept['done'] - start # Up to the end of interpolating, which leaves out what the example does next: printing and drawing the plot
+rerun = float('inf')
+for i in range(100): # The same model through the solver again
+    start = time.perf_counter()
+    simulate(*kept['args'])
+    rerun = min(rerun, time.perf_counter() - start)
 
 arr = kept['interpolate_simulation_result'].as_ndarray()
 names = [name for name,state in sorted(InfectionState.__members__.items(), key=lambda item: int(item[1])) if name != 'Count']
 assert len(names) == arr.shape[0] - 1
-out = dict(time=arr[0].tolist(), steps=kept['simulate'].get_num_time_points(), seconds=kept['simulate_seconds'])
+out = dict(time=arr[0].tolist(), steps=kept['simulate'].get_num_time_points(), first=first, rerun=rerun)
 out['states'] = {name:arr[i + 1].tolist() for i,name in enumerate(names)}
 print('RESULT ' + json.dumps(out))
 """
@@ -67,7 +78,6 @@ if __name__ == '__main__':
         rows += [dict(time=t, series=name, value=value) for t,value in zip(out['time'], values)]
 
     tools.write_results(here, rows)
-    seconds = tools.time_run(simulate)
-    what = f'python ode_secir_simple.py, as one command (nearly all of it is starting Python, importing, and drawing the plot; the call to simulate() itself takes about {out["seconds"]*1000:.2f} ms, for {out["steps"]} adaptive time points)'
-    tools.write_timing(here, seconds, what)
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.3f} s, of which the solver takes {out["seconds"]*1000:.2f} ms')
+    what = f'first is one call of the example\'s run_ode_secir_simulation(), with its plot off, up to the end of interpolating the result: building the model and running it ({out["steps"]} adaptive time points), not counting starting Python, importing, or drawing the plot; rerun is the best of 100 more calls of simulate() on the same model'
+    tools.write_timing(here, out['rerun'], what, first=out['first'])
+    print(f'Wrote {len(rows)} rows; first run {out["first"]*1000:.2f} ms, rerun {out["rerun"]*1000:.3f} ms')

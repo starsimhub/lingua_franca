@@ -1,28 +1,28 @@
 # camdl SEIR by age and patch, in Starsim
 
-The translation of [examples/camdl/stratified](../../../examples/camdl/stratified), the first model of wave 3. The model is `model.py`; `compare.py` checks it against the original's reference results.
+The translation of [examples/camdl/stratified](../../../examples/camdl/stratified). The model is `model.py`; `compare.py` checks it against the original's reference results.
 
 ## Comparison
 
 | Measure | Original | Starsim | |
 |---|---|---|---|
-| Lines of model code | 35 | 15 | Three lines are over 100 characters, so count twice |
-| One ODE run | 0.10 s | 0.023 s | Both in Python, with the import excluded; the original's time excludes building the model and Starsim's includes it |
-| Results, ODE | | | **Agree.** The infectious in every cell within 0.24%, with and without vaccination |
-| Results, stochastic | | | **Agree in size, not quite in timing.** Peaks agree (970 against 969 adults in the south), but with a step of a day the south's epidemic rises about a day sooner (586 infectious adults on day 39, against 521). With a quarter-day step both move, and the gap shrinks from 65 to 17, so it is the difference between the two chain-binomial schemes at a coarse step |
+| Lines of model code | 47 | 16 | Long lines count twice |
+| One ODE run | 0.10 s | 0.023 s | The original is timed as a whole command (camdl has no way to rerun a model in the same process), and its first run includes building the model; Starsim's is in Python, without the import |
+| Results, ODE | | | **Agree.** The infectious in every cell within 0.4%, with and without vaccination (`compare.py` asks for 0.5%, since camdl writes whole numbers, which matters in the smallest cells), and the totals of `S`, `E`, and `R` within 0.1%, apart from the day of the vaccination (finding below) |
+| Results, stochastic | | | **Agree in size, not quite in timing.** The peak in every cell is within 2%, but with a step of a day the south's epidemic rises about a day sooner, so the mean of 200 runs differs by up to 7% of the peak on the way up (`compare.py` asks for 2% and 8%). The gap is about the two chain-binomial schemes at a coarse step: on 14 October it shrank from 7% to 2% with a quarter-day step |
 
-Measured on 14 October 2026 with Starsim 4.0.0 (the `v4` branch) on a 20-core x86-64 Linux machine.
+Measured on 30 October 2026 with Starsim 4.0.0 (the `v4` branch, commit a1e3faab) on a 20-core x86-64 Linux machine.
 
 ## What was declared and what was not
 
-Everything is declared: three transitions, two stratifications, the population by age and patch, a contact matrix, movement, and the vaccination as a delivery.
+Everything is declared: three transitions, two stratifications, the population by age and patch, a contact matrix, movement, and the vaccination as a one-off move.
 
 ## Findings
 
-- **Aging was off.** An age stratification is meant to make people age between its groups, but `use_aging` was set to off (because there were no births or deaths) before the stratification could turn it on, so no compartmental model aged. Fixed: an age stratification turns aging on unless the sim says otherwise. Children had 2% too many infections before the fix.
-- **No contact matrix within places.** A contact matrix by age in a model with places raised `E804`. It now acts within each place, with commuting, visiting, or a moving force of infection applied to each age group, under every compartmental solver. As agents, a contact matrix still mixes people across places.
-- **No population by two dimensions.** The original gives a population for each age group in each patch, which is not the product of a split by age and a split by patch. `split=` now takes an `ss.by` over several dimensions, and `ss.by` now has the forms the spec gives it (a product over several dimensions, or a table), plus an array with named axes (`ss.by([[3000, 1000], ...], dims=['age', 'patch'])`), which is how the original writes it. As agents, people's patch is drawn given their age.
-- **The sum of two stratified results was wrong by group.** `(n_S + n_I).select(patch='north')` gave `n_S` alone. Arithmetic now keeps the values by group only when it can (sums, differences, and scaling by a number), and otherwise `select()` says the result is not stratified.
-- **A condition on age needed a people object** (fixed). `where=(ss.People.age < 5) & seir.S` now works before there is a sim; this version first had to write `ss.People(1).age`.
-- **Moving people between states once.** The original moves 60% of susceptible children to `R` on day 20. Here they are given a fully effective vaccine, so they stay in `S` but cannot be infected. The infections are the same, but the counts in `S` and `R` differ.
-- **Results of many runs were not kept by group.** `sim.run(n_runs=200)` returned only totals. It now keeps the values of each group (unless they would take more than 500 MB), and `msim.results.seir.n_I.select(age='0-4', patch='north')` works as it does for one run.
+- **Aging has to be asked for.** With no births or deaths, Starsim leaves people in their age group and says so in a note, so this model gives `use_aging=True`. Without it, children have 2% too many infections. The original ages people because it says so in its transitions.
+- **A move between states (fixed).** The original moves 60% of susceptible children to `R` on day 20. This version once gave them a fully effective vaccine, which left them in `S`. `ss.vaccinate(move=seir.S >> seir.R, ...)` now says what the original says, and `S` and `R` agree.
+- **The day a move shows.** camdl's count on day 20 is after the move, and Starsim's is before it: its move is at the start of the step from day 20 to 21, so it shows on day 21. The two agree from then on. This is why `compare.py` leaves out that row for `S`, `E`, and `R`.
+- **Whole days have to be asked for.** Starsim's chain binomial takes smaller steps by default. Against the original's whole days that gives a peak about 4 days sooner, so `compare.py` gives `substeps=1`.
+- **The contact matrix is not reciprocal.** Starsim gives a note that the original's matrix has different contacts in the two directions for this population, and uses it as given, as camdl does.
+- **Contacts within places, and populations by two dimensions (fixed).** A contact matrix by age now acts within each place, and `split=` takes an `ss.by` over several dimensions, written as the original writes it. As agents, a contact matrix still mixes people across places.
+- **Results by group (fixed).** Sums of stratified results keep their groups where they can, and many runs keep the values of each group (unless they would take more than 500 MB).

@@ -20,21 +20,27 @@ ages = ['0-1', '1-5', '5-15', '15-30', '30+']
 stop = 365 # Days, as in the deSolve version the odin tests compare it with (`t = c(0, 365)`)
 
 # The lines that compile and run the model are those of odin's tests (`odin::odin(path)`, `$new()`, `$run(t)`);
-# the rest times the run and writes one row per day, with one column per variable and age group (`S[1]` to `R[5]`)
+# the rest times them and writes one row per day, with one column per variable and age group (`S[1]` to `R[5]`)
 driver = r'''
 args <- commandArgs(TRUE)
 options(odin.verbose = FALSE)
+loadNamespace("odin") # Not counted
+now <- function() as.numeric(Sys.time()) # In finer steps than system.time(), for a run of 2 ms
 path <- args[1]
-seconds_compile <- system.time(gen <- odin::odin(path))[["elapsed"]]
-mod <- gen$new()
 t <- 0:as.integer(args[3])
+start <- now()
+gen <- odin::odin(path)
+mod <- gen$new()
 y <- mod$run(t)
+first <- now() - start
 seconds <- numeric(0)
 for (i in 1:5) {
-    seconds <- c(seconds, system.time(mod$run(t))[["elapsed"]])
+    start <- now()
+    mod$run(t)
+    seconds <- c(seconds, now() - start)
 }
 write.csv(y, args[2], row.names = FALSE)
-cat(sprintf("COMPILE %.6f\nSECONDS %.6f\n", seconds_compile, median(seconds)))
+cat(sprintf("FIRST %.6f\nRERUN %.6f\n", first, min(seconds)))
 '''
 
 
@@ -52,7 +58,7 @@ def simulate():
 
 if __name__ == '__main__':
     out, printed = simulate()
-    found = dict(line.split() for line in printed.splitlines() if line.split(' ')[0] in ['COMPILE', 'SECONDS'])
+    found = dict(line.split() for line in printed.splitlines() if line.split(' ')[0] in ['FIRST', 'RERUN'])
 
     rows = []
     for key in states:
@@ -61,7 +67,6 @@ if __name__ == '__main__':
         rows += [dict(time=row['t'], series=key, value=sum(row[f'{key}[{i+1}]'] for i in range(len(ages)))) for row in out]
 
     tools.write_results(here, rows)
-    seconds = tools.time_run(lambda: simulate())
-    inner, compile = float(found['SECONDS']), float(found['COMPILE'])
-    tools.write_timing(here, seconds, f'Rscript, as one command: starting R, generating and compiling the C code with odin::odin (about {compile:.1f} s), and one run of 365 days with deSolve::dede (the run itself, `mod$run(0:365)`, takes about {1000*inner:.1f} ms)')
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.3f} s as a command, {1000*inner:.2f} ms inside R')
+    first, rerun = float(found['FIRST']), float(found['RERUN'])
+    tools.write_timing(here, rerun, f'first is generating and compiling the C code with odin::odin, $new(), and one run of 365 days with deSolve::dede, not counting starting R or loading odin; rerun is the best of 5 more calls of `mod$run(0:365)` on the same model', first=first)
+    print(f'Wrote {len(rows)} rows; first run {first:.3f} s, rerun {1000*rerun:.2f} ms')

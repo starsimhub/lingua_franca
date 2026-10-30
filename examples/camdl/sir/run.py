@@ -64,6 +64,9 @@ if __name__ == '__main__':
     rows += [dict(series='stochastic_cases', **row) for row in summarize(obs, 'cases', time='time')]
 
     tools.write_results(here, rows)
-    seconds = tools.time_run(lambda: simulate('--backend', 'ode'))
-    tools.write_timing(here, seconds, 'camdl simulate --backend ode, as one command (the model is already compiled and cached)')
-    print(f'Wrote {len(rows)} rows; one ODE run takes {seconds:.3f} s')
+    with tempfile.TemporaryDirectory() as tmp: # An empty cache, so that the first run compiles the model
+        os.environ['XDG_CACHE_HOME'] = tmp
+        rerun = tools.time_run(lambda: simulate('--backend', 'ode'))
+    what = 'camdl simulate --backend ode, as one command each time: camdl has no way to rerun a model in the same process. First: with an empty cache, so it compiles the model. Rerun: the same command again, with the model cached'
+    tools.write_timing(here, rerun, what)
+    print(f'Wrote {len(rows)} rows; a first ODE run takes {tools.first_run["seconds"]:.3f} s, and a rerun {rerun:.3f} s')

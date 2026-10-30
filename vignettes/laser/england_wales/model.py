@@ -30,46 +30,29 @@ beta = ss.timeseries({14*i: ss.perday(3.865332*s) for i,s in enumerate(season)},
 
 # Deaths: the age pyramid is the stable one for the birth rate, and the age at death is drawn from it
 r = 365*((1 + cbr/1000)**(1/365) - 1)
-pyramid = np.exp(-r*np.arange(89))
-cum = np.append(0, pyramid.cumsum()) # Deaths before each year of age
-
-def lifespan(sim):
-    """ Workaround for LASER's estimator: each person's age at death is drawn once (at the start, or at birth), given their age """
-    ppl = sim.people
-    uids = ppl.auids[np.isnan(ppl.ti_dead[ppl.auids])]
-    age = ppl.age[uids]
-    year = np.floor(age).astype(int)
-    died = np.searchsorted(cum, cum[year] + np.random.rand(len(uids))*(cum[-1] - cum[year]), side='right') - 1 # The year of age at death
-    start = np.where(died > year, 0, age - year)
-    ppl.ti_dead[uids] = sim.ti + np.round((died + start + np.random.rand(len(uids))*(1 - start) - age)*365)
-
-def importation(sim):
-    """ Workaround: three people, chosen at random from all the susceptible, become infectious every 30 days for 10 years """
-    ti, m = sim.ti, sim.diseases.measles
-    if 0 < ti < 10*365 and ti % 30 == 0:
-        uids = ss.uids(np.random.choice(m.S.uids, 3, replace=False))
-        m.S[uids] = False
-        m.I[uids] = True
-        m.ti_I[uids] = ti + 2 # From the next step, for ~8 days rather than the others' 7, as in the original
+ages = np.arange(89)
+pyramid = np.exp(-r*ages)
 
 S, E, I, R = ss.states(4)
 measles = ss.Disease(
-    infection = ss.transmission('S -> E', beta=beta, source='I'),
-    onset     = ss.progression('E -> I', dur=ss.normal(8, 2, unit='days')), # The original's infectious-period distribution, which its transmission is given for the latent period (its gamma is used only for people exposed at the start, of whom there are none)
-    recovery  = ss.progression('I -> R', dur=ss.normal(7, 2, unit='days')), # 8 in the original, which loses a day, see README
-    births    = ss.birth('-> S', rate=ss.peryear(r)),
-    init      = dict(I=ss.by(patch=[3]*len(pop)), R=0.95),
-    importation = importation,
-    lifespan    = lifespan,
+    infection = S >> E @ beta * I,
+    onset     = E >> I @ ss.normal(8, 2, unit='days'), # The original's infectious-period distribution, which its transmission is given for the latent period (its gamma is used only for people exposed at the start, of whom there are none)
+    recovery  = I >> R @ ss.normal(7, 2, unit='days'), # 8 in the original, which loses a day, see README
+    births    = ss.birth(S, rate=ss.peryear(r)),
+    deaths    = ss.death(lifetable=ss.lifetable(ages, pyramid)),
+    init      = dict(R=0.95),
+    init_n    = dict(I=ss.by(patch=[3]*len(pop))),
 )
-towns = ss.geo(names=names, pop=pop, distances=distances)
+towns = ss.geo.geography(names=names, pop=pop, distances=distances)
 with np.errstate(divide='ignore'):
     gravity = pop**0.251464/distances**1.563193 # LASER's gravity model, with a=0
 np.fill_diagonal(gravity, 0)
-gravity *= 0.044565/gravity.sum(axis=1).mean() # Workaround: scaled so that the mean share exported is 0.0446,
+gravity *= 0.044565/gravity.sum(axis=1).mean() # Scaled so that the mean share exported is 0.0446,
 gravity *= np.minimum(1, 0.2/gravity.sum(axis=1))[:, None] # and no place exports more than 0.2
-measles.stratify(patch=towns, mobility=ss.Mobility(matrix=gravity, kind='force'))
-sim = ss.Sim(measles, people=ss.People(int(pop.sum()), age_data=np.array([np.arange(89), pyramid]).T), unit='day', stop=years*365)
+measles.stratify(patch=towns, mobility=ss.geo.Mobility(matrix=gravity, kind='force'))
+importation = ss.Delivery(move=S >> I, capacity=3, start=ss.days(30), interval=ss.days(30)) # 3 people every 30 days, chosen from everyone susceptible
+people = ss.People(int(pop.sum()), age_data=np.array([ages, pyramid]).T)
+sim = ss.Sim(measles, people=people, interventions=importation, unit='day', stop=years*365)
 
 if __name__ == '__main__':
     sim.run()

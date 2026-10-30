@@ -33,9 +33,9 @@ def start():
 
 def as_states():
     """ The same model with the clinical statuses as four states, started as the stratified model is, as a check of the stratification """
-    S, E, Ia, Is, Ii, Ih, R = ss.states(7)
+    S, E, Ia, Is, Ii, Ih, R = ss.states('S E Ia Is Ii Ih R')
     starts = start()
-    init = {names[c]:ss.by(age=[starts[i, j]/500 for i in range(len(ages))]) for j,c in enumerate(clinical)} # As fractions of each age group
+    init = {names[c]:ss.by(age=[starts[i, j] for i in range(len(ages))]) for j,c in enumerate(clinical)} # As counts in each age group
     seir = ss.Disease(
         infection  = S >> E @ 2 * (0.5*Ia + Is + 0.2*Ii + 0.1*Ih),
         a          = E >> Ia @ 0.5 * ss.by(age=[0.4, 0.3]),
@@ -45,7 +45,7 @@ def as_states():
         recovery   = Ia + Is + Ii + Ih >> R @ 0.3,
         death      = Is + Ii >> ss.null @ 0.05,
         hosp_death = Ih >> ss.null @ 0.1,
-        init       = init,
+        init_n     = init,
         name       = 'seir',
     )
     return ss.Sim(seir.stratify(age=ages), total_pop=1000, dt=0.1, stop=20, verbose=0).run().results.seir
@@ -58,14 +58,14 @@ if __name__ == '__main__':
     ours = dict()
     for age in ages:
         for state in 'SER':
-            ours[f'{state}_{age}'] = res[f'n_{state}'].select(age=age).values # A stock at index k is the number at the original's time k
+            ours[f'{state}_{age}'] = res[state].select(age=age).values # A stock at index k is the number at the original's time k
         for name in clinical:
-            ours[f'I_{age}_{name}'] = res.n_I.select(age=age, clinical=name).values
+            ours[f'I_{age}_{name}'] = res.I.select(age=age, clinical=name).values
     stocks = {k:np.abs(v - ref[k]).max() for k,v in ours.items()}
 
     # The derived outputs: summer2's flows are rates, and its cumulative deaths sum those rates without multiplying by the step, so are 10 times the deaths
-    hosp = res.n_I.select(clinical='hospital').values
-    outputs = dict(hospital_occupancy=hosp, prop_infected_hosp=hosp/res.n_I.values, notifications=flow(res.incidence.select(clinical=['isolated', 'hospital']).values))
+    hosp = res.I.select(clinical='hospital').values
+    outputs = dict(hospital_occupancy=hosp, prop_infected_hosp=hosp/res.I.values, notifications=flow(res.incidence.select(clinical=['isolated', 'hospital']).values))
     for age in ages:
         outputs[f'accum_death_{age}'] = res.infection_death.cum.select(age=age).values / 0.1
         outputs[f'incidence_{age}'] = flow(res.incidence.select(age=age).values)
@@ -80,18 +80,21 @@ if __name__ == '__main__':
         print(f'largest difference in any {label}: {d[worst]:.3g}{unit} ({worst})')
     end = {k:abs(v[-1] - ref[k][-1])/abs(ref[k][-1]) for k,v in (ours | outputs).items()}
     print(f'largest difference at time 20: {max(end.values()):.1%} ({max(end, key=end.get)})')
+    assert max(stocks.values()) < 0.0006 and max(rel.values()) < 6e-5, 'The ODE no longer agrees with the original'
     print(f'starting in I: {start().sum(axis=0).round(2)}; the original starts everyone asymptomatic')
 
     # The stratification against the same model as four states, from the same start
     states = as_states()
-    check = max(np.abs(res.n_I.select(age=a, clinical=c).values - states[f'n_{names[c]}'].select(age=a).values).max() for a in ages for c in clinical)
+    check = max(np.abs(res.I.select(age=a, clinical=c).values - states[names[c]].select(age=a).values).max() for a in ages for c in clinical)
     print(f'stratified against four states, from the same start: {check:.2g} people')
+    assert check < 1e-10, f'The stratified model and the four states differ by {check:.2g} people'
 
-    for solver in ['binomial', 'abm']:
-        runs = sim.new(verbose=0, solver=solver, **(dict(n_agents=1000) if solver == 'abm' else {})).run(n_runs=100).results.seir
-        print(f'{solver}: recovered at the end {runs.n_R.values.mean(axis=0)[-1]:.0f} (ODE {res.n_R[-1]:.0f})')
-
-    def run():
-        ss.Sim(sim.inputs, verbose=0).run()
-    built = sim.new(verbose=0).run()
-    print(f'one ODE run: {tools.time_run(run):.3f} s, or {tools.time_run(built.restart):.5f} s for a run of a sim that is already built')
+    # The stochastic runs: the epidemic is still rising at time 20, and a mean over runs that take off at different times lags the ODE, so the end of the epidemic is the fair check
+    long = sim.new(verbose=0, stop=100).run().results.seir.R[-1]
+    for solver,n_runs in [('binomial', 100), ('abm', 20)]:
+        pars = dict(n_agents=1000) if solver == 'abm' else {}
+        at_20 = ss.parallel(sim.new(verbose=0, solver=solver, **pars), n_runs=100, parallel=False).results.seir.R.values[:, -1]
+        at_100 = ss.parallel(sim.new(verbose=0, solver=solver, stop=100, **pars), n_runs=n_runs, parallel=False).results.seir.R.values[:, -1]
+        print(f'{solver}: recovered at time 20 {at_20.mean():.0f} ± {at_20.std()/10:.0f} (ODE {res.R[-1]:.0f}); at time 100 {at_100.mean():.0f} (ODE {long:.0f})')
+        assert abs(at_100.mean()/long - 1) < 0.01, f'{solver} ends with {at_100.mean():.0f} recovered, the ODE {long:.0f}'
+        assert at_20.min() > 0 and abs(at_20.mean()/res.R[-1] - 1) < 0.1, f'{solver} has {at_20.mean():.0f} recovered at time 20, the ODE {res.R[-1]:.0f}'

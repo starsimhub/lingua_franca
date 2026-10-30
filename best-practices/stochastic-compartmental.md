@@ -1,6 +1,6 @@
 # Stochastic compartmental
 
-Gillespie (exact, in continuous time, with tau-leaping for a run of too many events) and chain-binomial (in discrete time). One model, several ways of being random.
+Gillespie (exact, in continuous time), tau-leaping (close to exact, for a run of many events), and chain-binomial (in discrete time). One model, several ways of being random.
 
 ## Recommendation
 
@@ -9,13 +9,13 @@ Gillespie (exact, in continuous time, with tau-leaping for a run of too many eve
 3. **Name the approximation.** Gillespie, tau-leaping, and chain-binomial are different models with different validity conditions, and the result should say which one produced it.
 4. **One sim is one trajectory; the distribution comes from many runs**, and running many is one call.
 5. **Quantities that are not people are states too.** An environmental reservoir or a vector population is a state holding a count, with its own transitions, and disease rates may use that count directly.
-6. **Extinction is the reason this paradigm exists**; make it visible (`msim.extinction()` says how often each disease died out over many runs).
+6. **Extinction is the main reason to use this paradigm**; make it visible (`msim.plot(lines=True)` shows every run, and a run with `branching=True` gives the share that died out, `msim.branching.p_extinct`).
 
 ## Why
 
 ### One model, several stochastic methods, already demonstrated
 
-[camdl](../approaches/camdl.md) runs the same model text on Gillespie SSA (exact continuous-time), chain-binomial (Euler-multinomial discrete-time), and ODE. [epipack](../approaches/epipack.md) runs the same process tuples deterministically and stochastically, including "a correct inhomogeneous-Poisson Gillespie implementation" for time-varying rates — "a real capability that most frameworks skip or approximate". [odin](../approaches/odin.md) shares `initial()` between `deriv()` and `update()`.
+[camdl](../approaches/camdl.md) runs the same model text on Gillespie SSA (exact continuous-time), chain-binomial (Euler-multinomial discrete-time), and ODE. [epipack](../approaches/epipack.md) runs the same processes deterministically and stochastically, including "a correct inhomogeneous-Poisson Gillespie implementation" for time-varying rates, "a real capability that most frameworks skip or approximate". [odin](../approaches/odin.md) shares `initial()` between `deriv()` and `update()`.
 
 [PyRoss](../approaches/notes.md#pyross) is the sharpest evidence for the *ladder* rather than the binary: it implements Gillespie, tau-leaping, and Gaussian/van Kampen approximations of the same model side by side. [MEmilio](../approaches/memilio.md) has a whole `sde_*` family alongside its `ode_*` family, separately implemented.
 
@@ -35,13 +35,12 @@ Gillespie's method is exact, and its cost grows with the number of events. Tau-l
 
 ## The specification
 
-[12-backends.md](../design/12-backends.md) specifies the solvers (`'auto'`, `'ode'`, `'binomial'`, `'gillespie'`, and `'abm'`), how `'gillespie'` switches to tau-leaping for a run of too many events (with a note; `approx=False` keeps it exact), how a value that varies in time is followed within a step, Erlang stages for dwell times, and the notes on small counts, possible extinction, and large steps. States that hold a count (a reservoir, a vector population) are in [03-states-and-transitions.md](../design/03-states-and-transitions.md), and many runs, with `msim.extinction()`, in [09-results.md](../design/09-results.md).
+[12-backends.md](../design/12-backends.md) specifies the solvers (`'auto'`, `'ode'`, `'ide'`, `'binomial'`, `'gillespie'`, `'tau'`, and `'abm'`), how a value that varies in time is followed within a step, Erlang stages for dwell times, and the notes on small counts, possible extinction, and large steps. States that hold a count (a reservoir, a vector population) are in [03-states-and-transitions.md](../design/03-states-and-transitions.md), and many runs in [09-results.md](../design/09-results.md). The docs show how to use these in [Solvers and backends](https://starsim.org/v4/user_guide/running_solvers.html) and [Branching and rescaling](https://starsim.org/v4/user_guide/running_branching.html).
 
 ## Trade-offs
 
-- **Exact Gillespie simulation does not scale**, and the crossover to tau-leaping is population- and rate-dependent. Automatic selection with a printed reason is better than a documentation footnote, and worse than the user understanding it. Both should be possible.
-- **Automatic method selection can be actively misleading** if the user is asking an extinction question and gets tau-leaping. `solver='gillespie'` switches only when an ODE run gives more than about a million events, which only large populations reach (extinction questions arise when counts are small), and it says so; `approx=False` keeps the exact method however long it takes.
-- **A reservoir with very large counts would make exact Gillespie simulation expensive.** Bacteria in water are shed and decay in numbers far larger than the number of infections, and simulating each one as an event is wasted effort. A state that is not people is advanced as its expected value by the stochastic solvers, between the events of the people, and its flows are not counted as events when `solver='gillespie'` decides whether to take tau leaps.
+- **Exact Gillespie simulation does not scale**, and the point at which tau-leaping pays off depends on the population and the rates. So the choice is the user's: `solver='gillespie'` stays exact however many events a run takes, and `solver='tau'` takes leaps. An extinction question suits the exact solver, since it arises when counts are small and events are few.
+- **A reservoir with very large counts would make exact Gillespie simulation expensive.** Bacteria in water are shed and decay in numbers far larger than the number of infections, and simulating each one as an event would be wasteful. A state that is not people holds a plain number and is not stepped event by event.
 - **Count-based rates are literal.** `beta * W.n / (W.n + K)` is used exactly as written, so the library cannot check that it is a sensible force of infection or adjust it for mixing. That is the intent, and it means the user owns the formula.
 - **Continuous-time methods make "results at time t" a resampling question.** [MEmilio](../approaches/memilio.md)'s `interpolate_simulation_result()` and SimInf's `tspan` both handle this and most frameworks leave it to the user. Here every solver reports its results at the sim's time points.
 
@@ -53,7 +52,7 @@ Gillespie's method is exact, and its cost grows with the number of events. Tau-l
 - **A separate kind of continuous state for environmental quantities** (SimInf's `v`). Ordinary states holding counts, with count-based rates, cover the same cases with no new concept.
 - **A stochastic sim that is many trajectories.** A sim is one run; `ss.parallel(sim, n_runs=500)` is many.
 - **The diffusion approximation as the default stochastic solver.** It fails at small counts, which is where stochasticity matters. (The `'sde'` solver has since been removed altogether.)
-- **Requiring the user to choose.** Choose, print, allow override — the same policy as [calibration](calibration.md).
+- **Requiring the user to choose.** `solver='auto'` chooses and prints the choice, and any solver can be asked for by name, the same policy as [calibration](calibration.md). (A stochastic solver is always asked for by name.)
 
 ## Open questions
 

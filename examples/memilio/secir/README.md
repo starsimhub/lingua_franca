@@ -16,7 +16,7 @@ A deterministic COVID-19-type epidemic in one region and one age group of 83,000
 - `original/ode_secir_simple.py`: the example, unchanged
 - `run.py`: runs it and writes `reference/`
 - `reference/results.csv`: the count in each of the 10 states on each of days 0 to 100 (`Susceptible`, `Exposed`, `InfectedNoSymptoms`, `InfectedNoSymptomsConfirmed`, `InfectedSymptoms`, `InfectedSymptomsConfirmed`, `InfectedSevere`, `InfectedCritical`, `Recovered`, `Dead`)
-- `reference/timing.json`: the time of one run
+- `reference/timing.json`: the time of a first run and of a rerun
 - `meta.yaml`: where it came from
 - `LICENSE`: the upstream license (Apache-2.0)
 

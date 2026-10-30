@@ -9,13 +9,15 @@ The design is tested on models that other people wrote. [Examples](README.md) ar
 A model should never be easier to write without the lingua franca than with it. So each vignette is held to two numbers from its original:
 
 - **No more lines of model code**, not counting imports, comments, blank lines, and plotting.
-- **No more compute time**, measured on the same machine.
+- **No more time for a rerun**, measured on the same machine: running the same model again once it is set up, as in a parameter scan or a calibration. First-run times are shown as well, but don't count toward the mark. A first run includes setup that happens once, so a small model can take tens of milliseconds even when its reruns are much faster.
 
-It must also give the same results, within a stated tolerance. A vignette that misses any of these is not a failed vignette: it is a finding for the [design](../design/index.qmd).
+Results should also agree, within a stated tolerance. Missing any of these doesn't fail the vignette: it is a gap, written up in the vignette for the [design](../design/index.qmd) to address. Times are not always like for like: some originals can only be timed as a whole command, and each vignette's notes say where that is the case.
 
 ## Where each model stands
 
 The model names link to the [side-by-side comparison](../webapp/index.qmd), which shows the original code next to the Starsim version.
+
+**Note: timings have not been updated with the current version.**
 
 ::: {.scorecard}
 ```{python}
@@ -27,8 +29,12 @@ print(build.scorecard())
 ```
 :::
 
+To regenerate these results, see [about the vignettes](../vignettes/README.md).
+
 ## What is in each folder
 
 Each example has the original source, where it came from and its license, reference results from running it, and its line count and run time. Each vignette has the Starsim model, a script that checks it against the reference results, and notes on what was awkward or could not be expressed.
+
+## How the examples were chosen
 
 The examples are chosen to span frameworks and paradigms, and each framework's own showcase models are preferred over ones written for this project. They are brought in as a build set and held-out waves, described in [about the examples](README.md).

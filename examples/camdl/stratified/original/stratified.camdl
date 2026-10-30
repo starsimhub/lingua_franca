@@ -1,0 +1,61 @@
+#' An SEIR by age and patch. People mix by an age contact matrix within their own patch, age
+#' between three age groups, and move between the patches. 60% of susceptible children can be
+#' vaccinated (moved to R) on day 20: switch this on with `--enable vaccinate`.
+
+time_unit = 'days
+
+compartments { S, E, I, R }
+
+dimensions {
+  age   = [child, adult, elder]
+  patch = [north, south]
+}
+
+stratify(by = age)
+stratify(by = patch)
+
+parameters {
+  beta  : rate
+  gamma : rate
+  move  : rate
+}
+
+tables {
+  contacts : age × age   = [[12.0, 4.0, 1.0],
+                            [ 4.0, 8.0, 2.0],
+                            [ 1.0, 2.0, 3.0]]
+  pop      : age × patch = [[3000.0, 1000.0],
+                            [5000.0, 2000.0],
+                            [2000.0,  500.0]]
+  stay     : age         = [1826.2125, 16435.9125, 10957.275]   # days spent in each age group: 5, 45, and 30 years of 365.2425 days
+}
+
+let N[a in age, p in patch] = S[a, p] + E[a, p] + I[a, p] + R[a, p]
+
+transitions {
+  infection[a in age, p in patch] : S[a, p] --> E[a, p]
+    @ beta * sum(b in age, contacts[a, b] * I[b, p] / N[b, p]) * S[a, p]
+  onset[a in age, p in patch]     : E[a, p] --> I[a, p]  @ 0.2 'per_day * E[a, p]   # 5 days, on average
+  recovery[a in age, p in patch]  : I[a, p] --> R[a, p]  @ gamma * I[a, p]
+
+  # Everyone ages and moves, whatever their infection state
+  aging[c in compartments, (a, a_next) in consecutive(age), p in patch] : c[a, p] --> c[a_next, p]
+    @ (1 / stay[a]) * c[a, p]
+  moving[c in compartments, a in age, p in patch, q in patch] : c[a, p] --> c[a, q]
+    @ move * c[a, p]
+    where p != q
+}
+
+interventions {
+  vaccinate[p in patch] : transfer(fraction = 0.6, from = S[child, p], to = R[child, p]) at [20]
+}
+
+init {
+  S[a in age, p in patch] = pop[a, p]
+  I[child, north]         = 10
+}
+
+simulate {
+  from = 0 'days
+  to   = 150 'days
+}

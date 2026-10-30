@@ -1,6 +1,6 @@
 # camdl: SEIR by age and patch
 
-An SEIR in 13,510 people in two patches over 150 days, written in pycamdl, camdl's Python front end. People mix by an age contact matrix within their own patch, age between three age groups, and move between the patches; 60% of susceptible children can be vaccinated (moved to `R`) on day 20.
+An SEIR in 13,510 people in two patches over 150 days, in camdl's own language. People mix by an age contact matrix within their own patch, age between three age groups, and move between the patches; 60% of susceptible children can be vaccinated (moved to `R`) on day 20.
 
 ## What it exercises
 
@@ -13,13 +13,13 @@ An SEIR in 13,510 people in two patches over 150 days, written in pycamdl, camdl
 
 ## Files
 
-- `original/stratified.py`: the model, unchanged
-- `stratified.camdl`: the same model in camdl's own language, without the vaccination, for Starsim's tests: camdl's ODE run of it agrees with the pycamdl original's to camdl's rounding (it writes whole numbers), and so does the model Starsim imports from it (to 1e-9 against the original)
+- `original/stratified.camdl`: the model, including the vaccination, with `--enable vaccinate` to switch it on. It was written for this project from an example in pycamdl, camdl's Python front end, and agrees with that version to within 0.1%: camdl's output is rounded to whole numbers
+- `stratified.camdl`: the same model without the vaccination, for Starsim's tests
 - `run.py`: runs it and writes `reference/`
 - `reference/results.csv`: the infectious in each of the six cells (`I_child_north` and so on) and the totals of `S`, `E`, `I`, and `R`, from the ODE (`ode_novax_...`, `ode_vax_...`) and as the mean and 5% to 95% range of 200 chain-binomial runs (`stochastic_novax_...`, `stochastic_vax_...`), without and with the vaccination
-- `reference/timing.json`: the time of one ODE run
+- `reference/timing.json`: the times of a first ODE run, including building the model, and of a rerun
 - `meta.yaml`: where it came from
 
 ## Lines of model code
 
-35, counting every line of `stratified.py` that is not blank, a comment, an import, or the plotting under `if __name__ == '__main__'`, with the one line over 100 characters counted twice.
+47, counting every line of `original/stratified.camdl` that is not blank or a comment, with the two lines over 100 characters counted twice.

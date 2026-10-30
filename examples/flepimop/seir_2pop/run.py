@@ -10,6 +10,7 @@ import csv
 import sys
 import glob
 import shutil
+import time
 import tempfile
 import datetime
 
@@ -35,7 +36,9 @@ def simulate():
 
 
 if __name__ == '__main__':
+    t0 = time.perf_counter()
     out = simulate()
+    first = time.perf_counter() - t0
     rows = []
     for subpop in subpops:
         for kind in ['prevalence', 'incidence']:
@@ -49,6 +52,7 @@ if __name__ == '__main__':
                         rows.append(dict(time=day, series=series, value=float(row[subpop])))
 
     tools.write_results(here, rows)
-    seconds = tools.time_run(simulate)
-    tools.write_timing(here, seconds, 'flepimop simulate config_sample_2pop.yml, as one command (nearly all of it is starting Python and compiling the integrator with Numba, which is done again on every run)')
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.3f} s')
+    rerun = tools.time_run(simulate)
+    what = 'flepimop simulate config_sample_2pop.yml, as one command, which is the only way to run it: the first run is the first call, and the rerun is the same command again, the best of 5. Both include starting Python and compiling the integrator with Numba, which is nearly all of the time and is done again on every run'
+    tools.write_timing(here, rerun, what, first=first)
+    print(f'Wrote {len(rows)} rows; a first run takes {first:.3f} s, and a rerun {rerun:.3f} s')

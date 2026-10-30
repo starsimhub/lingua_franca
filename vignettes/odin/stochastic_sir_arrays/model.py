@@ -4,12 +4,13 @@ The odin stochastic SIR with arrays (examples/odin/stochastic_sir_arrays), in St
 """
 import starsim as ss
 
+S, I, R = ss.states(3)
 sir = ss.Disease(
-    infection = ss.transmission('S -> I', beta=0.2),
-    recovery  = ss.progression('I -> R', rate=0.1),
-    init      = dict(I=1),
+    infection = S >> I @ 0.2 * I,
+    recovery  = I >> R @ 0.1,
+    init_n    = dict(I=1),
 )
-sim = ss.Sim(sir, total_pop=1001, stop=100, solver='binomial')
+sim = ss.Sim(sir, total_pop=1001, stop=100, solver='binomial', substeps=1) # One draw a step, as in the original
 
 if __name__ == '__main__':
     msim = sim.run(n_runs=100)

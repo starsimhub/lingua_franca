@@ -3,13 +3,12 @@ Compare the Starsim version with the reference results of the original
 
     python compare.py [n_runs]
 
-Each agent-based run takes about three minutes, so the default is three runs.
+Each agent-based run takes about a minute, so the default is three runs.
 """
 import os
 import csv
 import sys
 import numpy as np
-import sciris as sc
 
 here = os.path.dirname(os.path.abspath(__file__))
 root = os.path.dirname(os.path.dirname(os.path.dirname(here)))
@@ -32,14 +31,13 @@ def weekly(vals):
 
 def run(seed):
     """ One run of the Starsim version, as the same series as the reference """
-    np.random.seed(seed) # For the two workarounds, which draw from NumPy
     s = sim.new(rand_seed=seed, verbose=0).run()
     res = s.results.measles
-    out = dict(new_infections=weekly(res.infection.values), births=weekly(res.births.values), deaths=weekly(s.results.new_deaths.values))
+    out = dict(new_infections=weekly(res.infection.values), births=weekly(res.births.values), deaths=weekly(res.deaths.values))
     for place in places:
         out[f'new_infections_{place.lower()}'] = weekly(res.infection.select(patch=place).values)
     for key in 'SEIR': # A stock at index k is the number on day k, in both (day 0 is the start)
-        out[key] = res[f'n_{key}'].values
+        out[key] = res[key].values
     by_place = np.array([weekly(res.infection.select(patch=name).values) for name in names])
     out['prop_zero'] = (by_place[:, by_place.shape[1]//2:] == 0).mean(axis=1)
     return out
@@ -53,11 +51,7 @@ def yearly(weeks):
 
 if __name__ == '__main__':
     n_runs = int(sys.argv[1]) if len(sys.argv) > 1 else 3
-    runs, times = [], []
-    for seed in range(n_runs):
-        T = sc.timer()
-        runs.append(run(seed))
-        times.append(T.toc(f'Run {seed + 1} of {n_runs}', output=True))
+    runs = [run(seed) for seed in range(n_runs)]
     mean = {key:np.mean([r[key] for r in runs], axis=0) for key in runs[0]}
     print(f'\n{len(names)} places, {pop.sum():,.0f} people, {years} years; Starsim: mean of {n_runs} runs; original: mean of 50 runs')
     N = lambda d: sum(np.array(d[k]) for k in 'SEIR') # noqa: E731
@@ -72,4 +66,14 @@ if __name__ == '__main__':
     ours, theirs = mean['prop_zero'], np.array(ref['prop_zero'][1])
     print(f'  share of weeks with no infections in the second half, by place: mean {ours.mean():.3f} (original {theirs.mean():.3f}), correlation {np.corrcoef(ours, theirs)[0, 1]:.3f}, largest difference {np.abs(ours - theirs).max():.3f}')
     print(f'  weekly infections, correlation of the means: {np.corrcoef(mean["new_infections"], ref["new_infections"][1])[0, 1]:.3f}; susceptible at the end {mean["S"][n_days]:,.0f} ({ref["S"][1][n_days]:,.0f})')
-    print(f'one agent-based run, building included: {np.median(times):.1f} s (original: see {os.path.relpath(example, here)}/reference/timing.json)')
+
+    # The tolerances, for three runs. Deaths in the first year are not among them: see finding 1 in the README
+    total = mean['new_infections'].sum()/np.sum(ref['new_infections'][1])
+    assert abs(total - 1) <= 0.05, f'Infections differ by {total - 1:+.1%}'
+    for p in places:
+        key = f'new_infections_{p.lower()}'
+        ratio = mean[key].sum()/np.sum(ref[key][1])
+        assert abs(ratio - 1) <= 0.2, f'Infections in {p} differ by {ratio - 1:+.1%}'
+    end = N(mean)[n_days]/theirs_N[n_days]
+    assert abs(end - 1) <= 0.02, f'People at the end differ by {end - 1:+.1%}'
+    assert abs(ours.mean() - theirs.mean()) <= 0.03 and np.corrcoef(ours, theirs)[0, 1] >= 0.95, 'The share of weeks with no infections differs'

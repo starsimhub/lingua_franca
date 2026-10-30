@@ -58,6 +58,11 @@ calibrate = epydemix.calibration.ABCSampler.calibrate
 timing = dict()
 def smaller(self, strategy='smc', **kwargs):
     kwargs.update(num_particles=n_particles, num_generations=n_generations)
+    state = np.random.get_state() # A first run, timed at the values of the rerun below, which leaves the random numbers of the calibration as they were
+    start = time.perf_counter()
+    self.simulation_function(dict(self.parameters, R0=2.22, Delta=20, I0=4260, seasonality_min=0.8))
+    timing['first'] = time.perf_counter() - start
+    np.random.set_state(state)
     start = time.perf_counter()
     out = calibrate(self, strategy=strategy, **kwargs)
     timing['calibration'] = time.perf_counter() - start
@@ -132,7 +137,7 @@ if __name__ == '__main__':
     model.add_parameter('r', scope['contact_reductions']['r'].values)
     pars = dict(scope['parameters'], **fixed)
     pars.update(end_date=cal_dates[-1])
-    one = tools.time_run(lambda: wrapper(dict(pars)))
+    rerun = tools.time_run(lambda: wrapper(dict(pars)))
 
     pop = model.population
     info = dict(
@@ -151,4 +156,4 @@ if __name__ == '__main__':
         dates    = [str(d)[:10] for d in projection.date.values],
         data     = dict(date=[str(d)[:10] for d in all_dates], deaths=[int(v) for v in epi_data.data]),
     )
-    print(json.dumps(dict(rows=rows, one=one, info=info)))
+    print(json.dumps(dict(rows=rows, first=timing['first'], rerun=rerun, info=info)))

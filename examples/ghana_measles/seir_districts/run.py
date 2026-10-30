@@ -43,6 +43,7 @@ if __name__ == '__main__':
     by_region = [sim.results.infections.loc['2020':].T.groupby(regions).sum().sum(axis=1).to_frame('infections_2020_2025').T for sim in sims] # Infections from 2020 on, in each region
     rows += summarize(by_region, 'region') # Series region_<name>, at the single time "infections_2020_2025"
     tools.write_results(here, rows)
-    seconds = tools.time_run(lambda: gm.Sim(data.districts).run())
-    tools.write_timing(here, seconds, 'gm.Sim(data.districts).run(), with the data already loaded')
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.2f} s')
+    rerun = tools.time_run(lambda: gm.Sim(data.districts).run())
+    what = 'gm.Sim(data.districts).run(), with the data already loaded. The model has no separate rerun, so first and rerun are the same: each builds the sim and runs it'
+    tools.write_timing(here, rerun, what)
+    print(f'Wrote {len(rows)} rows; a first run takes {tools.first_run["seconds"]:.2f} s, and a rerun {rerun:.2f} s')

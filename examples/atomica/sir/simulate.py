@@ -41,5 +41,6 @@ if __name__ == '__main__':
     P = sir.load()
     load = time.perf_counter() - start
     result = P.run_sim()
-    seconds = tools.time_run(P.run_sim)
-    print(json.dumps(dict(rows=extract(result), seconds=seconds, load=load, version=at.__version__)))
+    first = time.perf_counter() - start # Reading the spreadsheets and the first run
+    rerun = tools.time_run(P.run_sim)
+    print(json.dumps(dict(rows=extract(result), first=first, rerun=rerun, load=load, version=at.__version__)))

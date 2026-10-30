@@ -47,6 +47,7 @@ if __name__ == '__main__':
     for key in keys:
         rows += [dict(series=key, **row) for row in summarize(counts, key)]
     tools.write_results(here, rows)
-    seconds = tools.time_run(lambda: simulate(1))
-    tools.write_timing(here, seconds, 'emulsion run quickstart.yaml --runs 1, as one command (about 0.7 s of it is starting Python and reading the model)')
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.3f} s')
+    rerun = tools.time_run(lambda: simulate(1))
+    what = 'emulsion run quickstart.yaml --runs 1, as one command each time: EMULSION runs a model as a whole command, so first and rerun are the same command, and both include starting Python and reading the model (about 0.7 s)'
+    tools.write_timing(here, rerun, what)
+    print(f'Wrote {len(rows)} rows; a first run takes {tools.first_run["seconds"]:.3f} s, and a rerun {rerun:.3f} s')

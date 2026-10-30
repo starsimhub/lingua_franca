@@ -9,6 +9,7 @@ The original script sets no seed, so `run_simulations` is wrapped here to pass o
 import os
 import sys
 import json
+import time
 import contextlib
 import matplotlib
 matplotlib.use('Agg') # The original script plots
@@ -22,9 +23,14 @@ import tools
 seed = 1
 original = os.path.join(here, 'original', 'sir_kenya.py')
 
-# Give run_simulations a seed unless the caller sets one
+# Give run_simulations a seed unless the caller sets one; before the first call, time one run as a first run (with a seed, so this does not change the results)
 run_simulations = epydemix.EpiModel.run_simulations
+timing = dict()
 def seeded(self, *args, rng=seed, **kwargs):
+    if 'first' not in timing:
+        start = time.perf_counter()
+        run_simulations(self, *args, rng=rng, **dict(kwargs, Nsim=1))
+        timing['first'] = time.perf_counter() - start
     return run_simulations(self, *args, rng=rng, **kwargs)
 epydemix.EpiModel.run_simulations = seeded
 
@@ -58,7 +64,7 @@ if __name__ == '__main__':
 
     # Time one simulation, and the 100 of the original
     kw = dict(start_date='2019-12-01', end_date='2020-04-01', percentage_in_agents=10/model.population.Nk.sum())
-    one = tools.time_run(lambda: model.run_simulations(Nsim=1, **kw))
+    rerun = tools.time_run(lambda: model.run_simulations(Nsim=1, **kw))
     many = tools.time_run(lambda: model.run_simulations(Nsim=100, **kw), n=3)
 
     info = dict(
@@ -72,4 +78,4 @@ if __name__ == '__main__':
         initial = {key:[int(v) for v in val] for key,val in initial.items()},
         contacts = {key:np.round(val, 6).tolist() for key,val in pop.contact_matrices.items()},
     )
-    print(json.dumps(dict(rows=rows, one=one, many=many, info=info)))
+    print(json.dumps(dict(rows=rows, first=timing['first'], rerun=rerun, many=many, info=info)))

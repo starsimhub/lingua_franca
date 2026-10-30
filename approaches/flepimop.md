@@ -3,7 +3,7 @@
 |  |  |
 |---|---|
 | **Language** | Python (simulation) and R (inference and post-processing) |
-| **Paradigms** | Metapopulation compartmental — deterministic (RK4) or stochastic, with a full inference and forecasting pipeline |
+| **Paradigms** | Metapopulation compartmental: deterministic (RK4) or stochastic, with a full inference and forecasting pipeline |
 | **Specification style** | **One YAML configuration** spanning compartments, transitions, seeding, modifiers, outcomes, and fitting |
 | **Version reviewed** | current `main` |
 | **License** | (see repository) |
@@ -11,10 +11,11 @@
 | **Docs** | `documentation/` in the repository |
 | **Paper** | — |
 | **Users** | Johns Hopkins IDD; US COVID-19 and influenza Scenario Modeling Hub submissions |
+| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/flepimop.html) |
 
 ## What it's for
 
-flepiMoP (FLexible EPIdemic MOdeling Pipeline) is the production pipeline behind a large share of US COVID-19 and influenza scenario-hub output. It is not primarily a modeling *framework* — it is a **configuration language for a modeling pipeline**, and that is precisely why it belongs in this review: it is the most complete example of an entire modeling workflow, from model structure through interventions to likelihood and inference, expressed as a single declarative document.
+flepiMoP (FLexible EPIdemic MOdeling Pipeline) is the production pipeline behind a large share of US COVID-19 and influenza scenario-hub output. It is less a modeling *framework* than a **configuration language for a modeling pipeline**. That is why it is in this review: it is the most complete example of a whole modeling workflow, from model structure through interventions to likelihood and inference, written as one document.
 
 ## How a model is specified
 
@@ -76,7 +77,7 @@ compartments:
   variant: ["wild", "alpha", "delta"]
 ```
 
-and transitions are written over axis *lists*, so `source: [["S"], ["unvaccinated", "first_dose"], ["wild"]]` names a set of compartments rather than one. This is the MetaCast dimension algebra and the camdl `dimensions` block, expressed in YAML — stratification is declared, not written out.
+and transitions are written over axis *lists*, so `source: [["S"], ["unvaccinated", "first_dose"], ["wild"]]` names a set of compartments rather than one. This is the MetaCast dimension algebra and the camdl `dimensions` block, expressed in YAML: stratification is declared, not written out.
 
 ### The transition form is unusually explicit
 
@@ -90,7 +91,7 @@ and transitions are written over axis *lists*, so `source: [["S"], ["unvaccinate
 
 A transition is a rate **times a product of compartment terms raised to exponents**. `proportional_to: [["S"], ["I"]]` with exponents `[1, 1]` gives `Ro * gamma * S * I` (frequency-normalized by the pipeline). Setting an exponent to a parameter name gives density-dependent or sub-exponential mixing.
 
-This is more structured than an arbitrary rate expression and less structured than summer2's named flow kinds: the *form* of the rate is fixed (a coefficient times a product of powers of compartments), so the pipeline can reason about it, while the coefficient stays an expression. It is a genuinely interesting middle position, and it is the form that makes automatic stratification over the compartment axes tractable.
+This is more structured than a free rate expression and less structured than summer2's named flow kinds. The *form* of the rate is fixed (a coefficient times a product of powers of compartments), so the pipeline can work with it, while the coefficient stays an expression. This form is what makes automatic stratification over the axes practical.
 
 ### Modifiers are the intervention grammar
 
@@ -119,7 +120,7 @@ seir_modifiers:
 
 A modifier names a **parameter**, a **date range**, a **subpopulation set**, and a **value**. `StackedModifier` composes them. `scenarios:` names which combinations to run. Modifier values can be given distributions, in which case they become fitted quantities.
 
-This is EpiModel's tabular scenario grammar generalized: parameter × time window × spatial scope × value, with composition and with a scenario set declared in the same file.
+This generalizes EpiModel's scenario tables: parameter × time window × place × value, with modifiers that combine, and the set of scenarios in the same file.
 
 ### Outcomes are a declarative observation model
 
@@ -142,9 +143,9 @@ outcomes:
       delay:       {value: 14}
 ```
 
-This is the best thing in flepiMoP. An observed outcome is declared as **source × probability × delay × duration**, and outcomes can **chain**: `incidDeath` takes `incidHosp` as its source rather than the infection state. So the whole surveillance cascade — infections → cases → hospitalizations → deaths, each with its own ascertainment probability and reporting delay — is a dozen lines of declaration, and `duration` with a `name` automatically produces the prevalence series (`currHosp`) alongside the incidence one.
+This is flepiMoP's best idea. An observed outcome is **source × probability × delay × duration**, and outcomes can **chain**: `incidDeath` takes `incidHosp` as its source. So the whole surveillance cascade (infections → cases → hospitalizations → deaths, each with its own ascertainment probability and reporting delay) takes a dozen lines, and `duration` with a `name` also gives the prevalence series (`currHosp`).
 
-`outcome_modifiers` then apply the same modifier grammar to outcome parameters, so "case ascertainment was lower before June 2020" is `parameter: incidCase::probability` over a date range.
+`outcome_modifiers` then apply the same modifiers to outcome parameters, so "case ascertainment was lower before June 2020" is `parameter: incidCase::probability` over a date range.
 
 ## Core abstractions
 
@@ -154,7 +155,7 @@ This is the best thing in flepiMoP. An observed outcome is declared as **source 
 | Transition | source × destination × rate × `proportional_to` × `proportion_exponent` | Structured rate form |
 | Subpopulation | `geodata` + `mobility` CSVs | Metapopulation from data files |
 | Seeding | `initial_conditions` / `seeding` with named methods | Including importation draws |
-| Modifier | parameter × date range × subpop × value; `StackedModifier` | The intervention grammar |
+| Modifier | parameter × date range × subpop × value; `StackedModifier` | How interventions are written |
 | Scenario | named list of modifiers | Declared in the config |
 | Outcome | source × probability × delay × duration, chainable | The observation model |
 | Inference | `inference:` block with data, likelihoods, and priors | Distributions on parameters and modifier values |
@@ -162,31 +163,31 @@ This is the best thing in flepiMoP. An observed outcome is declared as **source 
 
 ## Strengths
 
-- **The entire workflow is one document**: structure, geography, seeding, interventions, observation model, scenarios, priors, and fitting. Nothing else in the review has this scope in a single declarative artifact.
-- **The outcomes block.** Source × probability × delay × duration, chainable, with automatic prevalence series from `duration`. The clearest treatment of the reporting cascade anywhere here.
-- **The modifier grammar.** Parameter × time × space × value, composable via stacking, with named scenarios and fittable values — one mechanism serving interventions, time-varying parameters, and inference targets.
-- **Compartments as a Cartesian product of named axes**, with transitions written over axis sublists, so stratification is declarative.
-- **A structured rate form** (`rate` × ∏ `proportional_to`^`proportion_exponent`) that is analyzable without being closed.
+- **The entire workflow is one document**: structure, geography, seeding, interventions, observation model, scenarios, priors, and fitting. Nothing else in the review covers all this in one file.
+- **The outcomes block.** Source × probability × delay × duration, chainable, with prevalence series from `duration`. The clearest treatment of the reporting cascade here.
+- **Modifiers.** Parameter × time × place × value, combined by stacking, with named scenarios and fittable values: one mechanism for interventions, time-varying parameters, and inference targets.
+- **Compartments as a Cartesian product of named axes**, with transitions written over parts of the axes, so a stratification is one line.
+- **A structured rate form** (`rate` × ∏ `proportional_to`^`proportion_exponent`) that software can analyze, without limiting rates to a fixed list of kinds.
 - **Calendar dates throughout.**
 - **Production-proven at national scale**, in a setting where the model is rebuilt weekly against new data.
 - **Deterministic and stochastic from the same configuration**, selected by the integration method.
 
 ## Limitations
 
-- **YAML, again, with the same consequences**: expressions in strings (`rate: ["Ro * gamma"]`), no type checking, no editor support, deep nesting, and errors surfacing from the pipeline rather than a parser.
-- **`proportional_to` / `proportion_exponent` is opaque.** Getting frequency- versus density-dependence right through parallel lists of compartment sets and exponent strings is error-prone, and the meaning is not evident from the notation.
-- **Configurations are large.** A production scenario-hub config runs to hundreds of lines across included partials, and the partial-file mechanism (`*_part.yml`) is convention rather than language.
+- **YAML, with the usual tradeoffs**: expressions in strings (`rate: ["Ro * gamma"]`), no type checking, no editor support, deep nesting, and errors that come from the pipeline, not from a check of the file.
+- **`proportional_to` / `proportion_exponent` is hard to read.** Getting frequency- versus density-dependence right through parallel lists of compartments and exponents is error-prone, and the notation does not make the meaning clear.
+- **Configurations are large.** A scenario-hub config runs to hundreds of lines across included files, and splitting files (`*_part.yml`) is a convention, not part of the language.
 - **Two languages.** Python simulates, R infers; a user needs both toolchains.
 - **Compartmental metapopulation only.** No agents, no networks.
 - **No dimensional types.** `rate: ["Ro * gamma"]` is a string; `delay: {value: 5}` is 5 of something.
-- **Heavy operational footprint** — batch scripts, cluster configuration, and a build system, reflecting its origin as a pipeline rather than a library.
-- **Documentation is oriented to hub participants**, and the configuration reference is spread across the repository.
+- **A lot to set up**: batch scripts, cluster configuration, and a build system, as it began as a pipeline and not a library.
+- **Documentation is aimed at hub participants**, and the configuration reference is spread across the repository.
 
 ## Implications for the lingua franca
 
-1. **Adopt the outcomes block, close to as-is.** Source × probability × delay × duration, chainable, is the observation model that most epidemiological data actually requires, and flepiMoP's version handles the cascade and the incidence/prevalence duality in one declaration. Combined with camdl's `observations` block (which supplies the likelihood, `~ neg_binomial(...)`, and multiple streams), this is close to a complete design: **flepiMoP declares how the latent process becomes an observed quantity; camdl declares how that quantity relates to the data.** Both halves are needed.
-2. **Adopt the modifier grammar as the time-varying-parameter and scenario mechanism.** Parameter × time window × spatial or population scope × value, with stacking, with named scenario sets, and with values that may be distributions and therefore fitted. This single mechanism covers what EpiModel's scenario table does, what Epydemix's and MEmilio's contact dampings do, and what most "intervention" needs in a compartmental model amount to. It does *not* cover EMOD-style targeted individual interventions — those need the eligibility predicate — and the design should be explicit that these are two different layers.
-3. **The scenario set belongs in the model file.** `scenarios: [Ro_lockdown, Ro_all]` declares what to run. camdl does this with named scenarios; flepiMoP does it with modifier composition. Either way, the set of counterfactuals is part of the artifact rather than a shell script, which is what makes a scenario comparison reproducible.
-4. **Consider a structured rate form.** flepiMoP's coefficient × ∏ compartment^exponent is analyzable — you can tell frequency-dependence from density-dependence by inspection, and you can stratify automatically — without closing the vocabulary. It sits between summer2's named flow kinds and epipack's free reaction. Whether the lingua franca wants this middle position, or wants named kinds over a free form, is a real design decision that this comparison sharpens.
-5. **One document for the whole workflow is the right ambition.** flepiMoP demonstrates that structure, geography, interventions, observation, scenarios, and inference *can* live in one declarative artifact, and that doing so is what makes a weekly-rebuilt production model tractable. camdl splits this across `.camdl` and `fit.toml` deliberately, to keep structural identity separate from fitting configuration. Both are defensible; the lingua franca needs to decide where the seam goes, and flepiMoP is the evidence that putting it too far toward "the pipeline is a script" costs reproducibility.
-6. **And YAML, for the fourth time in this review, is the wrong surface.** EMULSION, EMOD, EpiHiper, flepiMoP: four frameworks with good declarative semantics and four instances of the same ergonomic problem. This should now be treated as a settled finding rather than a repeated observation.
+1. **Adopt the outcomes block, nearly as it is.** Source × probability × delay × duration, chainable, is the observation model most epidemiological data needs, and it handles the cascade and both incidence and prevalence in one declaration. With camdl's `observations` block (which supplies the likelihood, `~ neg_binomial(...)`, and multiple data streams), this is close to a complete design: **flepiMoP says how the hidden process becomes an observed quantity; camdl says how that quantity relates to the data.** Both halves are needed.
+2. **Adopt modifiers for time-varying parameters and scenarios.** Parameter × time window × place or population × value, with stacking, named scenario sets, and values that may be distributions and so fitted. This one mechanism covers EpiModel's scenario table, the contact dampings of Epydemix and MEmilio, and most of what a compartmental model needs from an intervention. It does *not* cover EMOD-style targeted individual interventions, which need an eligibility condition, and the design should treat these as two layers.
+3. **The scenario set belongs in the model file.** `scenarios: [Ro_lockdown, Ro_all]` says what to run. camdl uses named scenarios, and flepiMoP combines modifiers. Either way, the counterfactuals are part of the model and not a shell script, which makes a scenario comparison reproducible.
+4. **Consider a structured rate form.** flepiMoP's coefficient × ∏ compartment^exponent shows frequency- or density-dependence at a glance and can be stratified automatically, without a fixed list of rate kinds. It sits between summer2's named flow kinds and epipack's free reactions. Whether to take this middle position is a real design decision.
+5. **One document for the whole workflow is the right ambition.** flepiMoP shows that structure, geography, interventions, observation, scenarios, and inference *can* live in one file, and that this makes a model rebuilt weekly manageable. camdl deliberately splits this across `.camdl` and `fit.toml`, to keep the model separate from its fitting settings. Both are reasonable. The lingua franca needs to choose, and flepiMoP is evidence that leaving too much to scripts costs reproducibility.
+6. **YAML, for the fourth time in this review, shows the same tradeoff.** EMULSION, EMOD, EpiHiper, and flepiMoP all have sound ideas in a format that is hard to write by hand. This is a settled finding.

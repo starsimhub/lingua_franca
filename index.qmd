@@ -6,7 +6,7 @@ toc: false
 
 ## Where the ideas come from
 
-What the design owes to each framework reviewed in [approaches](approaches/README.md), area by area: each row adds to 100%, **New** is what no framework did first, and **Other** is frameworks without a review here. Hover over a cell for what was taken; [influences](approaches/influences.qmd) has the overall shares and how the numbers were made.
+What the design owes to each framework reviewed in [approaches](approaches/README.md), area by area. Each row adds to 100%. **New** is what no framework did first, and **Other** is frameworks without a review here. These are rough judgments, not measurements. Hover over a cell to see what was taken; [influences](approaches/influences.qmd) has the overall shares and how they were estimated.
 
 ::: {.column-page}
 ```{python}
@@ -20,7 +20,9 @@ print(influences.heatmap(folder='approaches/'))
 
 ## Does it pass its own test?
 
-Each translation is held to two numbers from its original: no more lines of model code, and no more compute time. This is where each model stands; the model names link to the side-by-side comparison.
+Each model below was written by the authors of another framework, usually to show that framework at its best. We translate it into Starsim and hold the translation to two numbers from the original: no more lines of model code, and no more time to run it again once it is set up. Where Starsim falls short, that is a gap for us to close. The model names link to the side-by-side code, and [examples](examples/index.qmd) has the details.
+
+**Note: timings have not been updated with the current version.**
 
 ::: {.scorecard}
 ```{python}

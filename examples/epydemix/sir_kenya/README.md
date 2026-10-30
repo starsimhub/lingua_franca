@@ -17,7 +17,7 @@ A stochastic SIR epidemic in the population of Kenya (55.9 million people in fiv
 - `run.py`: calls `simulate.py` and writes `reference/`
 - `reference/results.csv`: the mean and the 5% to 95% range of 100 runs (seed 1), for each compartment (`Susceptible_<group>`, `Infected_<group>`, `Recovered_<group>`) and each daily flow (`new_Susceptible_to_Infected_<group>`, `new_Infected_to_Recovered_<group>`), where `<group>` is `0-4`, `5-19`, `20-49`, `50-64`, `65+`, or `total`
 - `reference/population.json`: the inputs that come from the data rather than the script: the size of each age group, the four contact matrices, and the initial state
-- `reference/timing.json`: the time of one stochastic run
+- `reference/timing.json`: the time of a first run and of a rerun of one stochastic run
 - `meta.yaml`: where it came from
 - `LICENSE`: the license of epydemix (GPL-3.0)
 

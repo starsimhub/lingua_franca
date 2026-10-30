@@ -6,7 +6,6 @@ Compare the Starsim version with the reference results of the original
 import os
 import sys
 import numpy as np
-import starsim as ss
 
 here = os.path.dirname(os.path.abspath(__file__))
 root = os.path.dirname(os.path.dirname(os.path.dirname(here)))
@@ -17,6 +16,7 @@ from model import sim, scenarios
 ref = tools.read_results(os.path.join(root, 'examples', 'atomica', 'hiv_dyn'))
 comps = ['sus', 'undx', 'dx', 'linked', 'tx', 'lost', 'vs', 'dead_hiv', 'dead_other']
 cascade = dict(plhiv='all_people', diagnosed='all_dx', treated='all_tx')
+tolerance = 1e-12 # Of the largest value in each series
 
 
 def worst(res, scen):
@@ -25,7 +25,7 @@ def worst(res, scen):
     out = {}
     for comp in comps:
         for sex in ['females', 'males']:
-            ours, theirs = res[f'n_{comp}'].select(sex=sex).values, np.array(ref[f'{scen}_{sex}_{comp}'][1])
+            ours, theirs = res[comp].select(sex=sex).values, np.array(ref[f'{scen}_{sex}_{comp}'][1])
             out[f'{sex}_{comp}'] = np.abs(ours - theirs).max()/theirs.max()
     for ours,theirs in cascade.items():
         for sex in ['females', 'males']:
@@ -39,9 +39,6 @@ if __name__ == '__main__':
         res = sim.new(verbose=0, pars=pars).run().results.hiv
         diffs = worst(res, scen)
         key = max(diffs, key=diffs.get)
-        vs = {sex: (res.n_vs.select(sex=sex)[-1], ref[f'{scen}_{sex}_vs'][1][-1]) for sex in ['females', 'males']}
+        vs = {sex: (res.vs.select(sex=sex)[-1], ref[f'{scen}_{sex}_vs'][1][-1]) for sex in ['females', 'males']}
         print(f'{scen:15s} largest difference {diffs[key]:.2g} ({key}); virally suppressed in 2035: ' + ', '.join(f'{k} {a:,.0f} (original {b:,.0f})' for k,(a,b) in vs.items()))
-
-    def run(pars={}):
-        ss.Sim(sim.new(pars=pars).inputs, verbose=0).run()
-    print(f'one run: {tools.time_run(run):.3f} s without programs, {tools.time_run(lambda: run(scenarios["default_budget"])):.3f} s with them')
+        assert diffs[key] < tolerance, f'{scen}: {key} differs by {diffs[key]:.2g}'

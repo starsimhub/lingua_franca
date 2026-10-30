@@ -23,16 +23,16 @@ if __name__ == '__main__':
     for state in 'SIR':
         for age in ['young', 'old']:
             for location in ['urban', 'rural']:
-                ours = res[f'n_{state}'].select(age=age, location=location).values # A stock at index k is the number at time k, in both
+                ours = res[state].select(age=age, location=location).values # A stock at index k is the number at time k, in both
                 theirs = np.array(ref[f'{state}_{age}_{location}'][1])
                 worst = max(worst, np.abs(ours - theirs).max())
     print(f'largest difference in any compartment: {worst:.3g} people (of 1,000)')
+    assert worst < 0.08, f'The compartments differ by {worst:.3g} people'
 
+    ode = res.R[-1] # At the stop
     for solver in ['binomial', 'abm']:
-        runs = sim.new(verbose=0, solver=solver, **(dict(n_agents=1000) if solver == 'abm' else {})).run(n_runs=100).results.sir
-        ode = res.n_R[-1] # At the stop
-        print(f'{solver}: recovered at the end {runs.n_R.values.mean(axis=0)[-1]:.0f} (ODE {ode:.0f})')
-
-    def run():
-        ss.Sim(sim.inputs, verbose=0).run()
-    print(f'one ODE run: {tools.time_run(run):.3f} s')
+        run = sim.new(verbose=0, solver=solver, **(dict(n_agents=1000) if solver == 'abm' else {}))
+        runs = ss.parallel(run, n_runs=100, parallel=False).results.sir
+        recovered = runs.R.values.mean(axis=0)[-1]
+        print(f'{solver}: recovered at the end {recovered:.0f} (ODE {ode:.0f})')
+        assert abs(recovered/ode - 1) < 0.01, f'{solver} gives {recovered:.0f} recovered, the ODE {ode:.0f}'

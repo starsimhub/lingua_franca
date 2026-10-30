@@ -3,19 +3,20 @@
 |  |  |
 |---|---|
 | **Language** | camdl DSL; compiler in OCaml, runtime in Rust |
-| **Paradigms** | Compartmental — ODE (RK4, adaptive RK4(5)), chain-binomial (Euler-multinomial), Gillespie SSA |
+| **Paradigms** | Compartmental: ODE (RK4, adaptive RK4(5)), chain-binomial (Euler-multinomial), Gillespie SSA |
 | **Specification style** | Standalone typed DSL with a compiler, flat JSON IR, layered TOML configuration |
 | **Version reviewed** | 0.1.0-alpha plus unreleased changes (pre-0.2.0) |
 | **License** | MIT |
 | **Code** | <https://github.com/vsbuffalo/camdl> |
 | **Docs** | Ships offline: `camdl docs <topic>`; `docs/camdl-language-spec.md` |
-| **Paper** | — (alpha) |
+| **Paper** |: (alpha) |
+| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/camdl.html) |
 
 ## What it's for
 
-camdl is a domain-specific language, simulation runtime, and inference stack for compartmental infectious disease models, developed at IDM. Its premise is that a compartmental model is a *program* with a type system: compartments are counts, rates are time⁻¹, probabilities are dimensionless, and a rate expression that does not typecheck is a modeling error the compiler should reject rather than a wrong answer the simulator should produce.
+camdl is a modeling language, simulator, and inference toolkit for compartmental infectious disease models, developed at IDM. Its premise is that a model has types: compartments are counts, rates are time⁻¹, and probabilities have no units. A rate with the wrong dimensions is a modeling error, which camdl rejects before running, and not a wrong answer.
 
-It is the single most directly relevant framework in this review, because it is an existing attempt at most of what the lingua franca is trying to be — a rigorous, checkable, AI-friendly text representation with multiple execution backends from one source — and because it is close enough to home that its design decisions can be interrogated rather than inferred.
+It is the most relevant framework in this review, because it already attempts most of what the lingua franca wants to be (a rigorous, checkable, AI-friendly text form that runs on several solvers), and because it comes from IDM, so its decisions could be discussed directly.
 
 ## How a model is specified
 
@@ -52,9 +53,9 @@ simulate {
 }
 ```
 
-The syntax conventions are deliberate and consistent: `:` is a structural definition, `=` a value binding, `@` a rate expression, `-->` a flow, `#'` a doc comment that attaches to the declaration below it and surfaces later in `camdl fit summary`.
+The notation is consistent: `:` defines structure, `=` gives a value, `@` gives a rate, `-->` is a flow, and `#'` is a comment that attaches to the declaration below it and appears later in `camdl fit summary`.
 
-`camdl check sir.camdl` compiles and dimension-checks; every other command does the same automatically. Dropping the `/ N` produces:
+`camdl check sir.camdl` compiles the model and checks its dimensions, as every other command does automatically. Dropping the `/ N` gives:
 
 ```text
 error[E300]: transition 'infection' rate has wrong dimension
@@ -63,17 +64,17 @@ error[E300]: transition 'infection' rate has wrong dimension
 
 ### Values live outside the model
 
-The design decision most worth flagging: **parameter values are never declared in the `parameters` block**. That block carries names, kinds, dimensions, and optional priors only. Values come from a `params.toml`, a CLI `--param`, or — the one in-file route — a named scenario's `set = { ... }`. The precedence chain is fixed and documented.
+A notable decision: **parameter values are never set in the `parameters` block**. That block holds names, kinds, dimensions, and optional priors. Values come from a `params.toml`, a command-line `--param`, or (the one route in the file) a named scenario's `set = { ... }`, in a fixed, documented order of precedence.
 
-The consequence is that a model's *structural identity* is separable from its *values*, and camdl enforces this through a factored run identity: model hash, config hash, params hash, scenario hash, and seed, with fits carrying a separate identity of their own. A reviewer asking "is this a structural change or a parameter sweep?" reads the level hashes rather than diffing files. That is a reproducibility mechanism the lingua franca should copy outright.
+So a model's *structure* is separate from its *values*. camdl enforces this by giving each run a separate fingerprint (a hash) for the model, config, parameters, and scenario, plus the seed, and fits have their own. A reviewer asking "did the structure change, or only the parameters?" compares the fingerprints. The lingua franca should copy this way of supporting reproducibility.
 
 ## Core abstractions
 
 | Concept | camdl name | Notes |
 |---|---|---|
 | State | `compartments { S, I, R }` | Counts, dimension P |
-| Transition | `name : SRC --> DST @ rate` | Named, first-class, data in the IR. Also inflow (no source) and outflow (no destination) |
-| Rate | `@ expr` | Always a **total propensity**, never per-capita — the compiler never silently multiplies by a population |
+| Transition | `name : SRC --> DST @ rate` | Named, built-in, data in the IR. Also inflow (no source) and outflow (no destination) |
+| Rate | `@ expr` | Always a **total propensity**, never per-capita: the compiler never silently multiplies by a population |
 | Parameter | `name : kind in [lo, hi] ~ prior` | Kinds: `rate`, `probability`, `count`, `real`, `positive`, `instant`, `duration` |
 | Derived quantity | `let N = S + I + R` | Named bindings, expanded at compile time |
 | Stratification | `dimensions { age = [child, adult] }` + `stratify(by = age)` | Applies to all compartments by default; `only = [R]` for partial |
@@ -89,17 +90,17 @@ The consequence is that a model's *structural identity* is separable from its *v
 
 `time_unit = 'days` sets the base unit; literals carry units (`120 'days`, `2 'years`); `origin` enables calendar dates. Dimensions are real types: `rate` is time⁻¹, compartments are counts, and every rate expression is checked to have dimension P·T⁻¹.
 
-This is the same conclusion Starsim reached from the opposite direction — Starsim built a `dur`/`per`/`prob`/`freq` class hierarchy inside Python; camdl built dimensional types into a compiler. **Two independent IDM designs converging on dimensional typing is the strongest single piece of evidence in this review.**
+Starsim reached the same conclusion from the other direction, with `dur`/`per`/`prob`/`freq` classes in Python. **Two separate IDM designs arriving at dimensional typing is strong evidence for it.**
 
-The typing also does work beyond error-catching: because parameters are typed, the inference stack transforms them automatically — probabilities fit on a logit scale, rates on a log scale — without the user specifying it.
+Types also do more than catch errors: the inference tools transform parameters automatically (probabilities fit on a logit scale, rates on a log scale).
 
 ## Stochasticity and reproducibility
 
-Three forward backends: Gillespie SSA (exact continuous-time), chain-binomial (Euler-multinomial discrete-time), ODE. **The same model text runs on all three.** Extra-demographic noise via `overdispersed()`; deterministic flows within a stochastic model via `deterministic()`.
+Three solvers: Gillespie (exact continuous time), chain binomial (Euler-multinomial discrete time), and ODE. **The same model runs on all three.** `overdispersed()` adds extra-demographic noise, and `deterministic()` gives deterministic flows within a stochastic model.
 
-Runs are content-addressed by their exact inputs, so an identical re-run is a cache hit rather than a recomputation, and results cannot be silently overwritten. Paired scenarios share random numbers, so a counterfactual differs only where the intervention does — the same common-random-numbers idea as Starsim, achieved at the run level rather than the agent level.
+Runs are stored by their exact inputs, so an identical re-run comes from the cache, and results cannot be silently overwritten. Paired scenarios share random numbers, as in Starsim, but at the level of the run and not the agent.
 
-A Richardson dt-convergence audit distinguishes "it ran" from "it converged", and fits ship convergence gates. These are diagnostics almost nothing else in the review offers.
+A Richardson dt-convergence check tells "it ran" from "it converged", and fits have convergence gates. Almost nothing else in the review offers these diagnostics.
 
 ## Observations and inference
 
@@ -124,13 +125,13 @@ observations {
 }
 ```
 
-Two things here are genuinely distinctive. First, **multiple observation streams** — clinical incidence *and* environmental surveillance — are ordinary, not a special case. Second, `incidence(transition)` names a *transition*, not a compartment: the flow through a named edge is a first-class observable. That only works because transitions are named objects, which is the recurring argument of this whole review.
+Two things stand out. **Multiple observation streams** (clinical incidence *and* environmental surveillance) are normal, not a special case. And `incidence(transition)` names a *transition*, not a compartment, so the flow through a named edge can be observed directly. That works only because transitions are named objects, a recurring argument in this review.
 
-Indexing a projection selects one cell and never marginalises; a partial index is a compile error rather than a silent sum.
+Indexing a projection selects one cell and never sums over the others; a partial index is an error.
 
-Inference: IF2 (maximum likelihood via iterated filtering), PGAS + NUTS (Bayesian posterior), PMMH, bootstrap particle filter, profile likelihood. The compiler emits **analytic gradients by source-to-source symbolic differentiation** of rate expressions, so NUTS gets exact ∇log ℒ without an autodiff tape. Every backend × method combination either works and is tested, or fails through a capability check that names the limitation — no silent gaps.
+Inference: IF2 (maximum likelihood via iterated filtering), PGAS + NUTS (Bayesian posterior), PMMH, bootstrap particle filter, and profile likelihood. **Gradients are derived symbolically** from the rate expressions, so NUTS gets exact ∇log ℒ. Every solver × method combination either works and is tested, or fails with a check that names the limitation.
 
-Fitting is configured in a `fit.toml` that declares one method, so "IF2 to find the mode, then PGAS to characterize the posterior around it" is two declared files, the second starting from the first's result, rather than a script. (Earlier versions had named stages within one file; these are now refused at load.)
+A `fit.toml` file declares one fitting method, so "IF2 to find the mode, then PGAS for the posterior around it" is two files, the second starting from the first's result. (Earlier versions had named stages within one file.)
 
 ## Interventions
 
@@ -150,40 +151,40 @@ interventions {
 }
 ```
 
-`transfer` is atomic — `delta = floor(source * fraction)` computed from pre-intervention state, then applied as a single move. Interventions are **inactive by default** and enabled by scenario or CLI, which makes the baseline unambiguous.
+`transfer` happens all at once: `delta = floor(source * fraction)` is worked out from the state before the intervention, then applied as one move. Interventions are **off by default** and switched on by scenario or command line, which makes the baseline clear.
 
-The stratification interaction is where the design has clearly been fought over, and the error messages record the fights: a bare stratified `transfer` fans out cell-for-cell but only when both endpoints declare the same dimensions in the same order (E237); `count` on a bare stratified transfer is rejected because it would multiply the intended total by the number of cells (E238); a bare endpoint inside an indexed family is rejected because realized coverage would be `1 − (1 − f)^P` rather than `f` (E239). Each of these is a real modeling bug that other frameworks silently commit.
+Stratification is the hard part, and the error messages record what was learned. A plain stratified `transfer` is applied cell by cell, but only when both ends have the same dimensions in the same order (E237). `count` on such a transfer is rejected, as it would multiply the intended total by the number of cells (E238). A plain endpoint inside an indexed family is rejected, because the coverage reached would be `1 − (1 − f)^P` and not `f` (E239). Each is a real modeling error that is easy to miss elsewhere.
 
 ## Strengths
 
-- **Dimensional types with compile-time checking.** The missing-`/N` bug is a compile error with a source location. For a tool informing public-health decisions, that is the whole argument.
-- **Named, first-class transitions as data.** Everything downstream — `incidence(transition)` as an observable, symbolic differentiation, the flat IR, diagrams — follows from this one choice.
-- **One model text, three backends.** ODE, chain-binomial, and Gillespie from the same source, with a capability check rather than a silent gap.
-- **The observation model is part of the model**, declaratively, with multiple streams.
-- **Structural identity separated from values**, enforced by factored run hashes.
-- **Content-addressed, cached, provenanced runs**; paired scenarios with common random numbers.
-- **Analytic gradients from the compiler** — no autodiff tape, no finite differences.
-- **Convergence is a checked claim**, not an assumption: dt-convergence audits, particle-filter health (ESS, τ²), prequential scoring, convergence gates on each fit.
-- **Error messages as documentation.** E237/E238/E239 encode hard-won modeling knowledge in a form the user meets exactly when it matters. This is a model for how the lingua franca should teach.
-- **Explicitly designed for agents**: doc-tested documentation shipped inside the binary (`camdl docs`), version-matched so it cannot go stale, plus an `AGENTS.md` briefing.
+- **Dimensions checked before running.** The missing-`/N` bug is an error with a line number. For a tool informing public health decisions, that matters most.
+- **Named, built-in transitions as data.** `incidence(transition)`, symbolic differentiation, and diagrams all follow from this choice.
+- **One model, three solvers**: ODE, chain binomial, and Gillespie, with a named error where something is not supported.
+- **The observation model is part of the model**, with multiple streams.
+- **Structure separated from values**, enforced by separate run fingerprints.
+- **Runs stored by their inputs, cached, with a full record**; paired scenarios with common random numbers.
+- **Exact gradients**, derived symbolically.
+- **Convergence is checked, not assumed**: dt-convergence checks, particle-filter health (ESS, τ²), prequential scoring, and gates on each fit.
+- **Error messages as documentation.** E237/E238/E239 hold hard-won modeling knowledge, and the user meets it exactly when it matters. The lingua franca should teach this way.
+- **Designed for AI agents**: tested documentation inside the program (`camdl docs`), matched to the version so that it cannot go stale, plus an `AGENTS.md` briefing.
 
 ## Limitations
 
-- **Compartmental only.** No agents, no networks, no individual heterogeneity beyond what stratification expresses. The paradigm range this project needs is wider than camdl's by construction.
-- **No population structure beyond strata and patches.** Contact matrices and metapopulation coupling are supported; individual contact networks, partnerships, and durable relationships are not expressible.
-- **Alpha, and a two-language toolchain.** OCaml frontend plus Rust backend means installation is heavier than `pip install`, and the public surface is still moving.
-- **Small user base.** The design decisions are good but have been stress-tested by a handful of projects, not by a field.
-- **Verbosity is the cost of explicitness.** "No hidden multiplication, no auto-localization" means the user writes `* Pop` factors and full index specifications by hand. That is the right trade for correctness and a real trade against approachability.
-- **No auto-localization cuts both ways.** After stratification, bare names mean global totals, and the stratification sugar mechanically rewrites global formulas into per-stratum ones. This is clean, but it means the user has to hold two readings of the same name.
-- **Positional indexing is unsafe when dimensions share level names.** The compiler checks that a level belongs to the dimension in that slot, but does not track which dimension an index *variable* was bound to, so `I[r, a]` with the bindings crossed compiles silently. The spec documents this and recommends named indexing; it is a residual hole in an otherwise complete type story.
+- **Compartmental only.** No agents, no networks, and no individual heterogeneity beyond stratification. This project needs a wider range.
+- **No population structure beyond strata and patches.** Contact matrices and metapopulation coupling are supported; individual contact networks and lasting partnerships are not.
+- **Alpha, and two languages.** An OCaml front end and Rust back end mean a heavier install than `pip install`, and the interface is still changing.
+- **Small user base.** The decisions are good, but a handful of projects have tested them, not a whole field.
+- **Being explicit makes models longer.** With no hidden multiplication, the user writes `* Pop` factors and full indices by hand. That is the right trade for correctness, at some cost in approachability.
+- **Bare names change meaning.** After stratification, bare names mean global totals, and stratification rewrites global formulas into per-stratum ones. The user has to hold two readings of one name.
+- **Indexing by position is unsafe when dimensions share level names.** camdl checks that a level belongs to the dimension in that slot, but not which dimension an index *variable* came from, so `I[r, a]` with the two crossed passes silently. The spec documents this and recommends named indexing.
 
 ## Implications for the lingua franca
 
-1. **camdl's core is the target, and should be adopted rather than reinvented.** Dimensional types, named transitions as data, total-propensity rate expressions, values outside the model, factored run identity, declarative observations. The design question for this project is not whether to do these things but how to extend them past the compartmental boundary.
-2. **The extension problem is the whole problem.** camdl demonstrates that a typed compartmental DSL with multiple backends works. What it does not demonstrate is how the same text also runs as an agent-based model on a contact network. That is where `epipack`, `Emulsion`, and `Catalyst.jl` become the relevant evidence, and where the lingua franca has to make its own contribution.
-3. **Steal the observation block wholesale.** `columns` / `projected` / `~ distribution`, with multiple named streams and `incidence(transition)` as a projection, is the best treatment of the observation process in the review — better than flepiMoP's (which is delay-frame-specific) and far better than the frameworks that have none.
-4. **Steal the factored run identity.** Model / config / params / scenario / seed as separately hashed levels (with a further identity for fits) solves a problem every framework in this review has and none of the others addresses: telling structural changes from value changes across a large set of runs.
-5. **Adopt the "capability check, never a silent gap" rule.** Where a paradigm × feature combination is not supported, the language should say so by name at compile time. A lingua franca that spans paradigms will have many such combinations, and this is the only honest way to handle them.
-6. **Treat error messages as part of the language.** E237/E238/E239 are the design's accumulated knowledge about stratified coverage, delivered at the point of the mistake. A language whose stated goal is deterministic translation from prose needs this even more than camdl does, because the author may be an AI that will otherwise confidently produce the `1 − (1 − f)^P` bug.
-7. **Close the positional-indexing hole.** In a language with more dimension types than camdl (agents, networks, strata, time), tracking which dimension an index variable was bound to is worth the implementation cost.
-8. **Ship the docs in the binary.** Version-matched, doc-tested, offline documentation that an agent can read without network access is a small feature with a large effect on whether generated models are correct.
+1. **Adopt camdl's core and do not reinvent it.** Dimensional types, named transitions as data, rates as total flows, values outside the model, separate run fingerprints, and declared observations. The question for this project is how to extend these beyond compartmental models.
+2. **That extension is the hard part.** camdl shows that a typed compartmental language on several solvers works. It does not show how the same text runs as agents on a contact network. There `epipack`, `Emulsion`, and `Catalyst.jl` are the evidence, and the lingua franca has to make its own contribution.
+3. **Take the observation block as a whole.** `columns` / `projected` / `~ distribution`, with multiple named streams and `incidence(transition)`, is the best treatment of observation in the review, and more general than flepiMoP's delay-based form.
+4. **Take the separate run fingerprints.** Model / config / params / scenario / seed, hashed separately (and fits too), tell structural changes from value changes across a large set of runs. No other framework here addresses this.
+5. **Adopt "a named error, never a silent gap".** Where a paradigm and a feature do not work together, the language should say so by name before running. A language spanning paradigms will have many such cases.
+6. **Treat error messages as part of the language.** E237/E238/E239 deliver what was learned about stratified coverage at the point of the mistake. This matters even more when the author may be an AI that would otherwise confidently write the `1 − (1 − f)^P` bug.
+7. **Fix indexing by position.** With more kinds of dimension than camdl (agents, networks, strata, time), tracking which dimension an index variable belongs to is worth the work.
+8. **Put the docs in the program.** Tested, version-matched documentation that an agent can read offline is a small feature with a large effect on whether generated models are correct.

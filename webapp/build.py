@@ -5,6 +5,7 @@ show it call these functions as they are rendered, so nothing here is saved to a
 
     comparison()    Every model: the original and the Starsim version side by side (webapp/index.qmd)
     scorecard()     One row per model: lines of code, run time, and agreement (index.qmd, examples/index.qmd)
+    kernel_table()  One row per model: its times under each kernel set, once `scorecard.py` has measured them
 
 To see what either one writes:
 
@@ -172,9 +173,9 @@ def numbers(text):
     return [float(value.replace(',', ''))/(1000 if unit == 'ms' else 1) for value, unit in matches]
 
 
-def mark(original, starsim):
-    """ A cell with the original's number above Starsim's, marked for the stylesheet as meeting its target (no more than the original) or not; it uses the original's first number and Starsim's last, which is the repeated run where there is one """
-    target = 'pass' if numbers(starsim)[-1] <= numbers(original)[0] else 'fail'
+def mark(original, starsim, index=0):
+    """ A cell with the original's number above Starsim's, marked for the stylesheet as meeting its target (no more than the original) or not; it uses Starsim's last number, which is the rerun, against the original's at `index` """
+    target = 'pass' if numbers(starsim)[-1] <= numbers(original)[index] else 'fail'
     return f'Original: {original}<br>[Starsim: {starsim}]{{.{target}}}'
 
 
@@ -186,7 +187,7 @@ def scorecard_row(model):
         return f'| {link} | {model.meta.language} | *Not written yet* | | |'
     lines, time = rows[0], rows[1]
     results = '; '.join(row[3] for row in rows[2:])
-    return f'| {link} | {model.meta.language} | {mark(lines[1], lines[2])} | {mark(time[1], time[2])} | {results} |'
+    return f'| {link} | {model.meta.language} | {mark(lines[1], lines[2])} | {mark(time[1], time[2], index=-1)} | {results} |'
 
 
 def load_models():
@@ -208,6 +209,23 @@ def scorecard():
         '| Model | Language | Lines | Time | Results |',
         '|---|---|---|---|---|',
     ] + [scorecard_row(model) for model in load_models()]
+    return '\n'.join(out)
+
+
+def kernel_table():
+    """ The times of each model under each kernel set, from `vignettes/timings.json`, written by `scorecard.py` """
+    info = sc.loadjson(root / 'vignettes' / 'timings.json')
+    sets = info['kernels']
+    names = dict(rust='Rust', numba='Numba', jax='JAX', **{'jax-gpu':'JAX on a GPU'})
+    out = ['| Model | ' + ' | '.join(f'{names[key]}: first | {names[key]}: rerun' for key in sets) + ' |', '|---|' + '---|---|'*len(sets)]
+    for name, model in info['models'].items():
+        cells = []
+        for key in sets:
+            time = model['kernels'].get(key, {})
+            bold = '**' if key == model['fastest'] else ''
+            cells += [f'{time["first"]:.2g}', f'{bold}{time["rerun"]:.2g}{bold}'] if 'rerun' in time else ['', '']
+        out += [f'| {name} | ' + ' | '.join(cells) + ' |']
+    out += ['', f'Measured on {info["date"]} with Starsim {info["starsim"]["version"]} (commit `{info["starsim"]["commit"]}`) on a {info["cpus"]}-core Linux machine, using each set of kernels\' default threads. Compiling the Numba kernels, needed once per install, took {info["numba_compile"]:.0f} s; the Rust kernels are built when Starsim is installed.']
     return '\n'.join(out)
 
 

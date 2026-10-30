@@ -13,7 +13,7 @@ infection = S >> I @ beta * I
 recovery  = I >> R @ gamma
 cases     = ss.outcome(rho * infection, likelihood=ss.nbinom(n=k)) # Compared with weekly data as its total over each week
 
-sir = ss.Disease(infection, recovery, cases, init=dict(I=10))
+sir = ss.Disease(infection, recovery, cases, init_n=dict(I=10))
 sim = ss.Sim(sir, total_pop=10_000, unit='day', stop=ss.weeks(12))
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ A stochastic SIR epidemic in 1,600 cattle herds (nodes) over four years, where t
 - `original/events_SIR.R`: the example, unchanged, from `man/events_SIR.Rd` of SimInf 11.1.0
 - `run.py`: runs it and writes `reference/`
 - `reference/results.csv`: the mean and 5% to 95% range of 200 runs at each of days 1 to 1,460: the totals over all nodes (`S`, `I`, `R`), the number of nodes with at least one infected animal (`nodes_infected`), and three nodes on their own (`node1_S`, `node1_I`, `node1_R`, and the same for `node2` and `node3`)
-- `reference/timing.json`: the time of the original as one command
+- `reference/timing.json`: the time of the first run (building the model and running it, with R started and the events read) and of a rerun (`run(model)` again)
 - `reference/model.json`: the number of nodes, the transitions, the parameters, and the number of events of each type
 - `reference/u0.csv`: the initial state of each node (`node`, `S`, `I`, `R`)
 - `reference/events.csv.gz`: every event, in the order SimInf processes them (`event`, `time`, `node`, `dest`, `n`, `proportion`, `select`, `shift`); 1.7 MB, or 12 MB unpacked

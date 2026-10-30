@@ -30,14 +30,21 @@ library(SimInf)
 args <- commandArgs(TRUE)
 n_runs <- as.integer(args[2])
 nodes <- as.integer(strsplit(args[4], ",")[[1]])
+u0_SISe3 <- SimInf::u0_SISe3 # Read the data before the original, so that reading it is not timed, as in Starsim
+events_SISe3 <- SimInf::events_SISe3
 pdf(NULL) # The original plots
-for (expr in parse(args[1])) eval(expr)
+first <- 0
+for (expr in parse(args[1])) {
+    seconds <- system.time(eval(expr))[["elapsed"]]
+    target <- if (identical(expr[[1]], as.name("<-"))) expr[[2]]
+    if (identical(target, as.name("model")) || identical(target, as.name("result"))) first <- first + seconds # Building the model and its first run
+}
 
 comps <- c("S_1", "I_1", "S_2", "I_2", "S_3", "I_3")
 out <- NULL
-seconds <- numeric(0)
+reruns <- numeric(0)
 for (i in seq_len(n_runs)) {
-    if (i > 1) seconds <- c(seconds, system.time(result <- run(model))[["elapsed"]])
+    if (i > 1) reruns <- c(reruns, system.time(result <- run(model))[["elapsed"]])
     U <- trajectory(result, format = "matrix") # One row per node and compartment, one column per time
     V <- trajectory(result, compartments = "phi", format = "matrix") # One row per node
     n <- nrow(U)/6
@@ -57,7 +64,7 @@ for (i in seq_len(n_runs)) {
     out <- rbind(out, df)
 }
 write.csv(out, args[3], row.names = FALSE, quote = FALSE)
-if (n_runs > 1) cat(sprintf("SECONDS %.6f\n", median(seconds)))
+if (n_runs > 1) cat(sprintf("FIRST %.6f\nRERUN %.6f\n", first, min(reruns[1:min(5, n_runs - 1)])))
 
 if (length(args) > 4) {
     ref <- args[5]
@@ -120,7 +127,7 @@ def describe(printed):
     lines = [line.split() for line in printed.splitlines()]
     gdata = {line[1]:float(line[2]) for line in lines if line and line[0] == 'GDATA'}
     ldata = {line[1]:int(float(line[2])) for line in lines if line and line[0] == 'LDATA'}
-    seconds = [float(line[1]) for line in lines if line and line[0] == 'SECONDS'][0]
+    first, rerun = [[float(line[1]) for line in lines if line and line[0] == key][0] for key in ['FIRST', 'RERUN']]
     with open(os.path.join(reference, 'u0.csv')) as f:
         u0 = list(csv.DictReader(f))
     with open(os.path.join(reference, 'events_summary.csv')) as f:
@@ -143,20 +150,20 @@ def describe(printed):
     with open(os.path.join(reference, 'model.json'), 'w') as f:
         json.dump(info, f, indent=2)
         f.write('\n')
-    return seconds
+    return first, rerun
 
 
 if __name__ == '__main__':
     os.makedirs(reference, exist_ok=True)
     runs, printed = simulate(n_runs, export=True)
     assert len({row['run'] for row in runs}) == n_runs
-    inner = describe(printed)
+    first, rerun = describe(printed)
 
     rows = []
     for key in series:
         rows += [dict(series=key, **row) for row in summarize(runs, key)]
     tools.write_results(here, rows)
 
-    seconds = tools.time_run(lambda: simulate(1))
-    tools.write_timing(here, seconds, f'Rscript with the original, as one command: starting R, loading SimInf and its 783,773 events, building the model, and one run of 1,600 nodes for 1,460 days on one thread (the run itself, `run(model)`, takes about {inner:.2f} s)')
-    print(f'Wrote {len(rows)} rows; one run takes {seconds:.3f} s as a command, {inner:.3f} s inside R')
+    what = f'first: SISe3() building the model, and its first run(model), of 1,600 nodes for 1,460 days on one thread, with R started, SimInf loaded, and the 783,773 events read. rerun: run(model) on the same model'
+    tools.write_timing(here, rerun, what, first=first)
+    print(f'Wrote {len(rows)} rows; the first run takes {first:.3f} s, a rerun {rerun:.3f} s')

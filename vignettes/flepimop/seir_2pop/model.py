@@ -8,15 +8,16 @@ pop     = dict(large_province=9000, small_province=1000)
 commute = [[0, 100/9000], [20/1000, 0]] # The share of each province's residents who travel to the other
 gamma   = 1/5
 
+S, E, I, R = ss.states('S E I R')
 seir = ss.Disease(
-    infection = ss.transmission('S -> E', beta=2.5*gamma, source='I'),
-    onset     = ss.progression('E -> I', rate=1/4),
-    recovery  = ss.progression('I -> R', rate=gamma),
-    init      = dict(E=ss.by(patch=[5, 0])),
+    infection = ss.Transition(S, E, rate=2.5*gamma * I),
+    onset     = ss.Transition(E, I, rate=1/4),
+    recovery  = ss.Transition(I, R, rate=gamma),
+    init_n    = dict(E=ss.by(patch=[5, 0])),
 )
 away = [[0.5*share for share in row] for row in commute] # Travelers are away for half the day
-seir.stratify(patch=list(pop.keys()), split=list(pop.values()), mobility=ss.Mobility(matrix=away, kind='visit'))
-sim = ss.Sim(seir, total_pop=sum(pop.values()), start='2020-02-01', stop='2020-08-31')
+seir.stratify(patch=list(pop.keys()), split=list(pop.values()), mobility=ss.geo.Mobility(matrix=away, kind='visit'))
+sim = ss.Sim(seir, total_pop=sum(pop.values()), start='2020-02-01', stop='2020-08-31', substeps=1) # One RK4 step a day, as in the original
 
 if __name__ == '__main__':
     sim.run()

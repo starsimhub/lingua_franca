@@ -2,7 +2,9 @@
 
 A proposed specification for costs and health economic outcomes in Starsim v4: where costs attach to a model, how DALYs and QALYs are computed, how results are discounted, and how scenarios become cost-effectiveness results.
 
-> **Note:** This is a proposal drawn from the review in this folder. It is not yet part of the [design](../design/README.md), and nothing here has been decided. It is written in the design's style (MUST, SHOULD, and MAY where a requirement is real; code against `import starsim as ss`) so that it can be moved there if accepted.
+> **Note:** This is a proposal drawn from the review in this folder. It is not part of the [design](../design/README.md), and nothing here has been decided. It is written in the design's style (MUST, SHOULD, and MAY where a requirement is real; code against `import starsim as ss`) so that it can be moved there if accepted.
+>
+> **What exists today.** Starsim v4 has `cost=` on products, and a smaller version of this idea in its library: `ssl.Costs` (costs per event and fixed costs), `ssl.DALYs`, `ssl.ICER`, and `ssl.discount()`, shown in [Costs](https://starsim.org/v4/user_guide/interventions_costs.html). None of `ss.Economics`, `ss.dalys`, `ss.qalys`, `sims.cea()`, or `draws=` exists; parameter draws today are `ss.parallel(..., priors=True)`. The code below is a sketch of what could come next, and only its use of existing names has been checked against v4.
 
 Justified by the review in this folder: [README.md](README.md) for the main findings, [metrics.md](metrics.md) for definitions and formulas, and [cea-software.md](cea-software.md#cross-cutting-patterns) for the API patterns.
 
@@ -28,15 +30,15 @@ import starsim as ss
 
 # --- the disease, as in the design --------------------------------------------
 S, I, R = ss.states(3)
-infection = S >> I @ 0.2 * I
+infection = S >> I @ ss.perday(0.2) * I
 recovery  = I >> R @ ss.days(10)
-death     = I >> ss.null @ ss.peryear(0.05)
+death     = I >> ss.null @ ss.perday(0.0001)
 hosp      = ss.outcome(0.08 * infection, delay=ss.days(4), duration=ss.days(6))
 flu = ss.Disease(infection, recovery, death, hosp)
 
 # --- an intervention, with a cost per dose -------------------------------------
 vaccine = ss.Vaccine(efficacy=0.6, waning=ss.years(1), cost=ss.par(3.50, source='UNICEF supply catalogue 2025'))
-vx = ss.vaccinate(vaccine, coverage=0.5, years=[2026, 2027, 2028], eligible=ppl.age >= 65)
+vx = ss.vaccinate(vaccine, coverage=0.5, at=[2026, 2027, 2028], where=ss.ppl.age >= 65)
 
 # --- the economics: what is costed, and how health is valued -------------------
 c_hosp = ss.par(1800, prior=ss.gamma(mean=1800, std=400), source='National tariff 2024, DRG 112')
@@ -80,7 +82,7 @@ These are the same weighted sums that results and outcomes already use ([09-resu
 
 **Products keep `cost=`.** A product's `cost=` is per delivery, as now. Every delivery whose product has a cost contributes a category named after the delivery (`vx` above), so the dose cost in the example is counted without being written again. The extra `delivery` cost is there because the cost of giving a dose (staff time, transport) is often costed separately from the dose itself.
 
-**A number times a state is an error.** It has no meaning without a time unit: 250 per what? `E1701 CostNeedsRate` says so and suggests `ss.peryear(250) * I`. A rate times a flow is an error for the same reason in reverse (`E102 WrongDimension`, which exists already).
+**A number times a state is an error.** It has no meaning without a time unit: 250 per what? `CostNeedsRate` says so and suggests `ss.peryear(250) * I`. A rate times a flow is an error for the same reason in reverse (`WrongDimension`, which exists already).
 
 **Fixed and one-off costs.** A rate on its own is a cost that accrues whether or not anything happens: `ss.peryear(400_000)` is 400,000 a year, spread over the steps. It takes the forms a parameter takes ([04-parameters.md](../design/04-parameters.md#the-ladder)), so a fixed cost that changes in time is `ss.timeseries({2026: 400_000, 2029: 150_000})` inside the rate. A dict of times to amounts is paid at those times: `{2026: 1_500_000}` is paid at the first time point in 2026.
 
@@ -111,7 +113,7 @@ econ = ss.Economics(costs=dict(schooling=lambda sim: ss.peryear(8e9) * closure.a
 ss.Economics(
     costs        = None,    # dict: category -> a cost (above)
     effects      = None,    # an effect recipe (ss.dalys, ss.qalys) or a dict of them
-    currency     = None,    # a currency code, for labels and the model spec
+    currency     = None,    # a currency code, for labels
     price_year   = None,    # the year the unit costs are expressed in
     perspectives = None,    # dict: perspective -> the cost categories it sums; default one perspective, 'total'
     base_year    = None,    # the year discounting starts from; default the start of the sim
@@ -121,7 +123,7 @@ ss.Economics(
 `ss.Economics` is an analyzer: a module that reads the sim and changes nothing in it ([01-objects.md](../design/01-objects.md)). It is passed with `analyzers=`, its results live under its name (`sim.results.econ`), and it runs under every solver. A sim MAY have more than one, for two analyses that should not be mixed (a health-sector CEA and a macroeconomic one).
 
 - **`costs`** maps a category name to a cost. Categories are kept apart in the results, so the same run can produce a program budget, a CEA total, and a table of costs by type.
-- **`currency` and `price_year`** are labels. The library does not convert currencies or inflate prices, because the right way to do so depends on the analysis ([metrics.md](metrics.md#currency-year-inflation-ppp-and-exchange-rates)); unit costs are given in one currency and price year, and the source of each is on its `ss.par`. Both are printed by `describe()` and on every cost plot, and saved in the model spec. Without them, `describe()` notes that costs are unlabeled.
+- **`currency` and `price_year`** are labels. The library does not convert currencies or inflate prices, because the right way to do so depends on the analysis ([metrics.md](metrics.md#currency-year-inflation-ppp-and-exchange-rates)); unit costs are given in one currency and price year, and the source of each is on its `ss.par`. Both are printed by `describe()` and on every cost plot. Without them, `describe()` notes that costs are unlabeled.
 - **`perspectives`** names sums of categories: `perspectives=dict(health_system=['hospital', 'illness', 'vx', 'delivery', 'program'], societal='all')`. Financial versus economic cost (donated drugs, volunteer time) is another pair of perspectives, not a separate tag. Every perspective is a result (`sim.results.econ.health_system`); the default single perspective is `total`.
 - **`base_year`** is the time from which discounting counts (the year of introduction, in tbvax). It does not change any undiscounted result.
 
@@ -138,7 +140,7 @@ c_test = ss.par(4.00, prior=ss.gamma(mean=4.00, std=0.80), source='WHO-CHOICE 20
 - **Values kept outside the model.** Unit costs come from a table as other parameters do, with `ss.Sim(pars='costs_kenya.csv')`. A file with columns for name, value, prior, and source is the `treasure` and TB-Speed pattern: every unit cost editable, documented, and versioned, with defaults.
 - **`ss.by`** gives costs that vary by stratum (`ss.by(age=[12, 25])` for a pediatric and an adult dose), and `ss.timeseries` gives costs that change in time (a drug that comes off patent).
 
-A cost amount MUST NOT be a distribution over agents (variation between people) unless it is used inside a function; a unit cost is one number that is uncertain, not a number that differs per person. `ss.gamma(...)` given directly as an amount raises `E1702 CostIsDistribution`, which suggests `ss.par(value, prior=...)`.
+A cost amount MUST NOT be a distribution over agents (variation between people) unless it is used inside a function; a unit cost is one number that is uncertain, not a number that differs per person. `ss.gamma(...)` given directly as an amount raises `CostIsDistribution`, which suggests `ss.par(value, prior=...)`.
 
 ## Health effects
 
@@ -295,12 +297,12 @@ ce.evsi(study=trial, n=[100, 500, 2000])           # one value per sample size
 ce.evpi(population=2e6, years=10)                  # population value: per person, times the discounted number of people affected
 ```
 
-- **The input is net benefit by draw and scenario**, at the thresholds given to `sims.cea()` (or `threshold=` here, which overrides them). In a stochastic model, net benefit is first averaged over the runs within each draw. Without that, chance would look like uncertainty that information could remove, and the values would be too high. With one run per draw, `W1705 VOINoisy` says so.
+- **The input is net benefit by draw and scenario**, at the thresholds given to `sims.cea()` (or `threshold=` here, which overrides them). In a stochastic model, net benefit is first averaged over the runs within each draw. Without that, chance would look like uncertainty that information could remove, and the values would be too high. With one run per draw, `VOINoisy` says so.
 - **`evpi()`** is the mean over draws of the best scenario's net benefit, minus the best mean net benefit. It is exact given the draws.
-- **`evppi(pars=)`** regresses each scenario's net benefit on the named parameters over the draws, and uses the fitted values in place of the inner expectation ([Strong, Oakley and Brennan 2014](https://doi.org/10.1177/0272989X13505910)). `method='gam'` (a generalized additive model, the default for up to four parameters) or `method='gp'` (a Gaussian process, the default above four) is chosen and printed. `pars=` takes names of drawn parameters, as listed in `ce.to_df()`; a parameter that was not drawn has no uncertainty and raises `E1706 NotDrawn`.
+- **`evppi(pars=)`** regresses each scenario's net benefit on the named parameters over the draws, and uses the fitted values in place of the inner expectation ([Strong, Oakley and Brennan 2014](https://doi.org/10.1177/0272989X13505910)). `method='gam'` (a generalized additive model, the default for up to four parameters) or `method='gp'` (a Gaussian process, the default above four) is chosen and printed. `pars=` takes names of drawn parameters, as listed in `ce.to_df()`; a parameter that was not drawn has no uncertainty and raises `NotDrawn`.
 - **`evsi(study=, n=)`** needs a model of the proposed study: a function that takes one draw's parameters and a sample size and returns the summary statistics the study would report (a trial's observed efficacy, a survey's prevalence). Net benefit is regressed on the simulated statistics, as for EVPPI ([Strong et al. 2015](https://doi.org/10.1177/0272989X15575286)). The study function is the user's, because no library can know what study is proposed; for the two standard cases, `study='binomial'` and `study='normal'` with `pars=` take the place of a function, as voi's built-in designs do.
 - **Results are values at each threshold**, with `.plot()` drawing EVPI against willingness to pay, EVPPI as a bar per parameter or group, and EVSI against sample size. They are in the same units as net benefit (money, or health with `effect=`'s units for net health benefit).
-- **Accuracy is reported.** Each EVPPI and EVSI carries the standard error of its regression estimate, and `W1706 FewDraws` notes when there are too few draws for the number of parameters (fewer than about 500 for a GAM, or fewer than 100 per parameter for a Gaussian process).
+- **Accuracy is reported.** Each EVPPI and EVSI carries the standard error of its regression estimate, and `FewDraws` notes when there are too few draws for the number of parameters (fewer than about 500 for a GAM, or fewer than 100 per parameter for a Gaussian process).
 
 The regressions use outside packages, as an optional extra (`pip install starsim[econ]`): `pygam` for the GAM and `scikit-learn` for the Gaussian process. Calling a VOI method without them raises an `ImportError` that names the extra.
 
@@ -325,33 +327,33 @@ sims.to_df(format='vimc')    # the same, with VIMC's column names (year, age, co
 | Cost per event | the flow times the amount, by stratum | the same, from the counted events |
 | Cost or weight per time in a state | integrated exactly (ODE, Gillespie) or by the trapezoid (discrete solvers) | the trapezoid of the counts, or the person's own time in the state when the step is finer than the stay |
 | Fixed and one-off costs | the same | the same |
-| Cost by history (a function) | works if the function uses only what groups have; otherwise stops with `E804 CapabilityError`, naming what it asked for | works |
+| Cost by history (a function) | works if the function uses only what groups have; otherwise stops with `CapabilityError`, naming what it asked for | works |
 | YLL | deaths by age group, at the mean age within the group; needs the model stratified by age | each death at its exact age |
 | Comorbidity | per compartment; independence across diseases (printed) | per person |
 | Capacity cost | the capacity result times the rate | the same |
 
 Under `solver='auto'`, an economics module never makes a model agent-based except through a function that needs agents, and then `describe()` says which function.
 
-A YLL needs an age at death. A compartmental model with no age stratification and a life table raises `E1703 NoAgeAtDeath`, suggesting `sim.stratify(age=[...])` or a fixed life expectancy per death (`life_table=ss.years(30)`, the remaining years assumed for every death).
+A YLL needs an age at death. A compartmental model with no age stratification and a life table raises `NoAgeAtDeath`, suggesting `sim.stratify(age=[...])` or a fixed life expectancy per death (`life_table=ss.years(30)`, the remaining years assumed for every death).
 
 ## Errors and notes
 
-Proposed codes, in a 17xx family:
+Proposed errors and notes:
 
-| Code | Name | Level | When |
-|---|---|---|---|
-| `E1701` | `CostNeedsRate` | error | A number times a state (or an outcome's count) in a cost or effect. Suggests a rate: `ss.peryear(250) * I` |
-| `E1702` | `CostIsDistribution` | error | A distribution given directly as a cost amount. Suggests `ss.par(value, prior=...)` for uncertainty, or a function for costs that vary by person |
-| `E1703` | `NoAgeAtDeath` | error | YLL from a life table in a compartmental model without an age stratification |
-| `E1704` | `UnknownCategory` | error | A perspective names a cost category that does not exist. Lists the categories |
-| `E1705` | `UnpairedScenarios` | error | `sims.cea()` on scenarios that do not share draws or runs (different `n_runs`, or run separately). Says to run them together with `ss.parallel` |
-| `W1701` | `CostsUnlabeled` | note | `ss.Economics` has costs but no `currency` or `price_year` |
-| `W1702` | `FlatBaselineUtility` | note | QALYs with a baseline utility of 1.0 at every age |
-| `W1703` | `CRNWeak` | note | `sims.cea()` on a compartmental stochastic run, where pairing is per run and not per person ([11-random.md](../design/11-random.md#common-random-numbers)), or on scenarios whose populations have diverged by more than half (from `sim.crn_report()`) |
-| `W1704` | `HorizonTruncates` | note | `horizon=` is earlier than the end of the sim, or YLL counts life beyond the horizon while QALYs do not |
-| `E1706` | `NotDrawn` | error | `evppi()` or `evsi()` names a parameter that was not drawn in the PSA. Lists the drawn ones |
-| `W1705` | `VOINoisy` | note | Value of information from a stochastic model with one run per draw, so chance is counted as uncertainty. Suggests `n_runs=` |
-| `W1706` | `FewDraws` | note | Too few draws for the regression behind `evppi()` or `evsi()` to be reliable, given the number of parameters |
+| Name | Level | When |
+|---|---|---|
+| `CostNeedsRate` | error | A number times a state (or an outcome's count) in a cost or effect. Suggests a rate: `ss.peryear(250) * I` |
+| `CostIsDistribution` | error | A distribution given directly as a cost amount. Suggests `ss.par(value, prior=...)` for uncertainty, or a function for costs that vary by person |
+| `NoAgeAtDeath` | error | YLL from a life table in a compartmental model without an age stratification |
+| `UnknownCategory` | error | A perspective names a cost category that does not exist. Lists the categories |
+| `UnpairedScenarios` | error | `sims.cea()` on scenarios that do not share draws or runs (different `n_runs`, or run separately). Says to run them together with `ss.parallel` |
+| `CostsUnlabeled` | note | `ss.Economics` has costs but no `currency` or `price_year` |
+| `FlatBaselineUtility` | note | QALYs with a baseline utility of 1.0 at every age |
+| `CRNWeak` | note | `sims.cea()` on a compartmental stochastic run, where pairing is per run and not per person ([11-random.md](../design/11-random.md#common-random-numbers)), or on scenarios whose populations have diverged by more than half |
+| `HorizonTruncates` | note | `horizon=` is earlier than the end of the sim, or YLL counts life beyond the horizon while QALYs do not |
+| `NotDrawn` | error | `evppi()` or `evsi()` names a parameter that was not drawn in the PSA. Lists the drawn ones |
+| `VOINoisy` | note | Value of information from a stochastic model with one run per draw, so chance is counted as uncertainty. Suggests `n_runs=` |
+| `FewDraws` | note | Too few draws for the regression behind `evppi()` or `evsi()` to be reliable, given the number of parameters |
 
 ## What this adds to the vocabulary
 

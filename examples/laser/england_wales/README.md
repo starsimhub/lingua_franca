@@ -18,7 +18,7 @@ The reference here runs the model with the best of those parameter sets, as the 
 
 ## Scaling down
 
-The full model has 30.2 million agents. One run of 40 years would take about ten minutes in LASER (at a tenth of the size it takes 71 s), and Starsim cannot run it as agents in a reasonable time (0.33 s a step at a tenth of the size, so 80 minutes for 40 years). Every population cannot simply be divided by the same factor, because the smallest place (777 people) must hold 3 infectious people and 95% immune ones, so a tenth is the most it allows, and 3 million agents is still too many. The reference therefore keeps every place within 100 km of Norwich (53 places, 667,864 people, from Saxmundham with 1,356 to Norwich with 101,600), at their real sizes, for 10 years (the years of importation). Distances are those between these places; the gravity model is scaled over them; and the crude birth rate is still the mean over all 954 places, as in the notebook. The same subset is used by the translation.
+The full model has 30.2 million agents. One run of 40 years would take about ten minutes in LASER (at a tenth of the size it takes 71 s), which is more than a comparison of many runs can afford. Every population cannot simply be divided by the same factor, because the smallest place (777 people) has to hold 3 infectious people and 95% immune ones, so a tenth is the most it allows, and 3 million agents is still too many. The reference therefore keeps every place within 100 km of Norwich (53 places, 667,864 people, from Saxmundham with 1,356 to Norwich with 101,600), at their real sizes, for 10 years (the years of importation). Distances are those between these places; the gravity model is scaled over them; and the crude birth rate is still the mean over all 954 places, as in the notebook. The same subset is used by the translation.
 
 ## Files
 
@@ -26,7 +26,7 @@ The full model has 30.2 million agents. One run of 40 years would take about ten
 - `simulate.py`: runs the model cells of the notebook several times in the LASER environment and prints the results as JSON
 - `run.py`: calls `simulate.py` and writes `reference/`
 - `reference/results.csv`: the mean and 5% to 95% range of 50 runs, of the daily totals of `S`, `E`, `I`, and `R` (time in days, from 0 to 3,650) and of the infections imported (`imports`, days 0 to 3,649); the weekly totals of births, deaths, and infections (time is the first day of the week, for 521 weeks), in total (`new_infections`) and in seven places (`new_infections_norwich`, `_cambridge`, `_colchester`, `_kings.lynn`, `_ely`, `_thetford`, and `_southwold`, from largest to smallest); the infections in each year of 52 weeks (`yearly_infections`, time is the year) and over the whole run (`total_infections`, at time 0); and `prop_zero`, the share of the weeks in the second half of the run (weeks 260 to 520) with no infections in each place, where time is the place's index (the 53 places in alphabetical order, as in the data)
-- `reference/timing.json`: the time of one run
+- `reference/timing.json`: the time of a first run and of a rerun
 - `meta.yaml`: where it came from
 - `LICENSE`: the laser-generic license (MIT)
 

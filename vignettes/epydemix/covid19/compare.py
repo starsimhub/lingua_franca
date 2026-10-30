@@ -3,8 +3,10 @@ Compare the Starsim version with the reference results of the original
 
     python compare.py
 
-Takes about a minute. The runs with a reopening scenario are run one by one, since many runs of a
-sim with a modifier would otherwise be spread over processes.
+Takes a few minutes. Raises an error if, at fixed values, weekly deaths differ by more than 3% of their
+peak, or deaths by 2 August by more than 3%; or if a parameter's posterior mean falls outside the
+original's 5% to 95% range, or projected peak weekly deaths differ by more than 10%. Everything is
+run one at a time rather than across processes.
 """
 import os
 import sys
@@ -24,6 +26,9 @@ ref = tools.read_results(example)
 table = sc.dataframe.read_csv(os.path.join(example, 'reference', 'results.csv')).set_index('series')
 n_runs = data['n_runs']
 scenarios = ['persistence', 'moderate', 'high']
+end = '2020-08-03' # To the end of 2 August, the original's last day
+tol_fixed = 0.03 # Of the peak of weekly deaths, and of total deaths
+tol_proj = 0.1 # Of the peak of projected weekly deaths: each side's posterior is a small sample
 
 
 def weekly(daily, times):
@@ -32,53 +37,51 @@ def weekly(daily, times):
 
 
 def show(label, ours, key):
-    """ The peaks and when they come, and the largest difference from the original's mean, as a share of its peak """
+    """ The peaks and when they come, and the largest difference from the original's mean, as a share of its peak, which is returned """
     times, theirs = ref[key]
     theirs = np.array(theirs)
     n = min(len(ours), len(theirs))
     diff = np.abs(ours[:n] - theirs[:n]).max()/theirs.max()
     print(f'{label:30s} peak {ours.max():9,.0f} on day {times[ours.argmax()]:3.0f} (original {theirs.max():9,.0f} on day {times[theirs.argmax()]:3.0f}); largest difference {diff:.1%} of the peak')
-    return
+    return diff
 
 
-def runs(scenario, n, pars=None):
-    """ A function giving a result of n runs of a scenario, with a row for each run """
-    sim = model.sim.new(verbose=0, pars=pars, interventions=model.reopening.get(scenario), stop='2020-08-03') # To the end of 2 August, the original's last day
-    if scenario == 'persistence': # Nothing but compartments: all the runs in one call to the kernel
-        res = sim.run(n_runs=n).results.covid
-        return lambda key, **kw: res[key].select(**kw).values if kw else res[key].values
-    sims = [sim.new(verbose=0, rand_seed=i + 1).run() for i in range(n)]
-    return lambda key, **kw: np.array([s.results.covid[key].select(**kw).values if kw else s.results.covid[key].values for s in sims])
+def fixed_runs(scenario):
+    """ Runs of a scenario at the fixed values, which are the model's defaults """
+    return ss.parallel(model.sim.new(verbose=0, interventions=model.reopening.get(scenario), stop=end), n_runs=n_runs, parallel=False).results.covid
 
 
 if __name__ == '__main__':
     print(f'At fixed values ({data["fixed"]}), the mean of {n_runs} runs:')
     times = ref['fixed_persistence_deaths'][0]
     for scenario in scenarios:
-        get = runs(scenario, n_runs)
-        show(f'{scenario}: weekly deaths', weekly(get('deaths'), times).mean(axis=0), f'fixed_{scenario}_deaths')
+        res = fixed_runs(scenario)
+        diff = show(f'{scenario}: weekly deaths', weekly(np.asarray(res.deaths.values), times).mean(axis=0), f'fixed_{scenario}_deaths')
+        assert diff < tol_fixed, f'Weekly deaths in {scenario} differ by more than {tol_fixed:.0%} of the peak'
         if scenario == 'persistence':
             for group in data['groups']:
-                show(f'  deaths {group}', weekly(get('deaths', age=group), times).mean(axis=0), f'fixed_{scenario}_deaths_{group}')
-            for name,state in dict(E='n_E', I='n_I', R='n_R', D='n_D').items(): # The original's day k is at the end of that day, ours at index k (index 0 is the start)
-                show(f'  {name}', get(state).mean(axis=0)[1:], f'fixed_{scenario}_{name}')
-            print(f'  total deaths by 2 August: {get("cum_deaths")[:, -1].mean():,.0f} (original {ref[f"fixed_{scenario}_D4"][1][-1]:,.0f})')
+                show(f'  deaths {group}', weekly(np.asarray(res.deaths.select(age=group).values), times).mean(axis=0), f'fixed_{scenario}_deaths_{group}')
+            series = {name:res[name].mean().values for name in 'EIR'} | dict(D=sum(res[f'D{i}'].mean().values for i in range(4)))
+            for name,vals in series.items(): # The original's day k is at the end of that day, ours at index k (index 0 is the start)
+                show(f'  {name}', vals[1:], f'fixed_{scenario}_{name}')
+            total, theirs = res.Dead.mean().values[-1], ref[f'fixed_{scenario}_D4'][1][-1]
+            print(f'  total deaths by 2 August: {total:,.0f} (original {theirs:,.0f})')
+            assert abs(total/theirs - 1) < tol_fixed, f'Total deaths differ by more than {tol_fixed:.0%}'
 
-    print('\nCalibration to the weekly deaths up to 31 May:')
-    fit = model.sim.new(stop='2020-05-31', verbose=0).calibrate(trials=1000, n_runs=5, rand_seed=1, verbose=False)
+    abc = data['abc']
+    print(f'\nABC-SMC to the weekly deaths up to 31 May, as in the original: {abc["particles"]} particles for {abc["generations"]} generations')
+    fit = model.sim.new(verbose=0).fit(method='abc-smc', particles=abc['particles'], generations=abc['generations'], rand_seed=1, verbose=0)
     for par,name in dict(R0='R0', Delta='Delta', I0='I0', seasonality_min='smin').items():
         row = table.loc[f'posterior_{par}']
-        ours = f'{getattr(fit.pars[name], "value", fit.pars[name]):.4g}' if name in fit.pars else 'not fitted'
-        print(f'  {par:16s} Starsim {ours:>10s}; original posterior mean {row.value:.4g} (5% to 95%: {row.low:.4g} to {row.high:.4g})')
-    weeks, observed = ref['data_deaths']
-    abc = np.array(ref['abc_fit_deaths'][1])
-    print(f'  mean absolute error over the mean of the data: Starsim {fit.mismatch:.3f} (mean of 5 runs); original {np.abs(abc - observed[:len(abc)]).sum()/np.sum(observed[:len(abc)]):.3f} (the mean of its accepted runs)')
-    print('Projections from the fitted values (Starsim, mean of 100 runs) and from the posterior (original, mean of 100 runs):')
-    for scenario in scenarios:
-        get = runs(scenario, 100, pars=fit.pars)
-        show(f'  {scenario}: weekly deaths', weekly(get('deaths'), times).mean(axis=0), f'abc_{scenario}_deaths')
-
-    def run():
-        ss.Sim(model.sim.new(stop='2020-05-31').inputs, verbose=0).run()
-    built = model.sim.new(stop='2020-05-31', verbose=0).init()
-    print(f'\none run of the calibration period: {tools.time_run(run):.3f} s, or {tools.time_run(lambda: built.restart(rand_seed=2).run()):.4f} s restarted')
+        vals = fit.samples[name]
+        print(f'  {par:16s} Starsim mean {vals.mean():.4g} (5% to 95%: {vals.quantile(0.05):.4g} to {vals.quantile(0.95):.4g}); original {row.value:.4g} ({row.low:.4g} to {row.high:.4g})')
+        assert row.low <= vals.mean() <= row.high, f'The posterior mean of {par} is outside the original\'s 5% to 95% range'
+    print('Projections from the posterior (mean of 100 draws, in both):')
+    draws = fit.samples.sample(n=100, replace=len(fit.samples) < 100, random_state=1)[list(fit.table['par'])]
+    sims = [fit.sim.new(label=k, pars=dict(fit.pars), interventions=model.reopening.get(k), stop=end, verbose=0) for k in scenarios]
+    msim = ss.parallel(*sims, priors=draws, parallel=False) # What fit.project() does, one at a time
+    for i,scenario in enumerate(scenarios):
+        ours = weekly(np.array([s.results.covid.deaths.values for s in msim.sims if s.label == scenario]), times).mean(axis=0)
+        show(f'  {scenario}: weekly deaths', ours, f'abc_{scenario}_deaths')
+        peak = np.max(ref[f'abc_{scenario}_deaths'][1])
+        assert abs(ours.max()/peak - 1) < tol_proj, f'Peak weekly deaths in {scenario} differ by more than {tol_proj:.0%}'

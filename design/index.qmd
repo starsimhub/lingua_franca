@@ -2,7 +2,7 @@
 title: "Design"
 ---
 
-This section is the specification of the language: the objects a model is made of, how a model is run, fitted, and saved, what the library says when something is wrong, and the tests that hold the design to its claims. It is the third link in the project's chain: [approaches](../approaches/README.md) reviews what existing frameworks do, [best-practices](../best-practices/README.md) takes a position on what they should do, the design says what this language is, and the [examples](../examples/README.md) and [vignettes](../vignettes/README.md) test it by translating other frameworks' models into it. Code is written against Starsim (`import starsim as ss`).
+This section is the specification of Starsim v4: what a model is made of, how it is run and fitted, and what the library says when something is wrong. It turns the [best practices](../best-practices/README.md) into definite decisions. To learn to use Starsim, start with the [docs](https://starsim.org/v4/) instead.
 
 ## The language in one example
 
@@ -17,18 +17,18 @@ S, I, R = ss.states(3)                      # named from the variables they are 
 # --- the disease: transitions, written like the equations ------------------
 infection = S >> I @ beta * I               # "S goes to I at rate beta times I"
 recovery  = I >> R @ dur                    # a duration after @ is a mean dwell time
-cases     = ss.outcome(0.5 * infection, delay=ss.days(5), every=ss.weeks(1))   # half of infections are reported, 5 days later, totaled by week
+cases     = ss.outcome(0.5 * infection, delay=ss.days(5))   # half of infections are reported, 5 days later; weekly data is compared with the total over each week
 sir = ss.Disease(infection, recovery, cases, init_prev=0.01)  # names come from the variable names
 
 # --- a sim: age groups, the mixing that goes with them, and data attached to results by name
 kw  = dict(stratify=dict(age=[0, 15, 65]), networks=ss.contacts('Kenya'), total_pop=50e6, start='2020-01-01', stop='2021-01-01')
 sim = ss.Sim(sir, data='weekly_cases.csv', **kw)     # the file has a column called 'cases'
-sim.describe()                              # the resolved model, with every guessed default marked
-sim.run()                                   # prints the unit (days, from the dates) and "solver: ode (every part has a compartmental form)"
+sim.describe()                              # the resolved model, with every guessed default marked (it initializes the sim quietly)
+sim.run()                                   # prints what is run and how (here as an ODE), R0, and any notes
 sim.plot()                                  # results, with the data drawn over 'cases'
 
 # --- calibration: fit what has bounds to what has data ---------------------
-fit = sim.calibrate()
+fit = sim.fit()
 
 # --- an intervention, and scenarios ----------------------------------------
 masks = ss.modify(sir.pars.beta, multiply=0.6, start='2020-03-15')
@@ -39,7 +39,7 @@ sims  = ss.parallel(
 sims.plot()                                 # ss.parallel runs the sims
 
 # --- chance: a sim is one run; many runs are a MultiSim --------------------
-msim = ss.parallel(ss.Sim(sir, solver='stochastic', **kw), n_runs=100)
+msim = ss.parallel(ss.Sim(sir, solver='tau', **kw), n_runs=100)
 msim.plot()                                 # the median and an interval
 ```
 
@@ -48,14 +48,14 @@ This is the opening example of [00-overview.md](00-overview.md). An SIR is writt
 ## The main ideas
 
 - **A model is states, transitions, and parameters.** A disease is an `ss.Disease` holding `ss.State` objects and the transitions between them, inside an `ss.Sim` that adds people, mixing, a timeline, and a solver ([01-objects.md](01-objects.md)).
-- **One transition class, three spellings.** `ss.Transition` can be written with arrow strings (`ss.transmission('S -> I', beta=0.05)`), with operators (`S >> I @ beta * I`), or explicitly, and all three build the same model; its kind, contact-mediated or spontaneous, follows from whether its rate mentions a bare state ([03-states-and-transitions.md](03-states-and-transitions.md)).
+- **One transition class.** `S >> I @ beta * I` and `ss.Transition(S, I, rate=beta * I)` build the same thing; whether it is driven by contact or spontaneous follows from whether its rate mentions a bare state ([03-states-and-transitions.md](03-states-and-transitions.md)).
 - **A bare state in a rate means contact.** `beta * I` is exposure to people in `I` through whatever mixing the sim has, so the same disease runs with homogeneous mixing, a contact matrix, or a network, while `I.n` is the plain count used for reservoirs and vectors ([06-routes.md](06-routes.md)).
 - **Bare numbers work in every slot.** Starsim's time types are kept, a bare number takes its type from its slot and its unit from the sim, and when nothing in the model has a unit, time is counted in timesteps ([02-types.md](02-types.md)).
 - **Stratification is one operation.** `stratify` splits a finished model by age, space, risk, or strain, in place by default, and `ss.transfer` moves people between levels ([05-dimensions.md](05-dimensions.md)).
 - **Interactions and interventions are small.** `ss.modify` multiplies, adds to, or sets a named quantity while a condition holds without overwriting its base value, and anything else is Python in a module's `step()` ([07-effects.md](07-effects.md)); an intervention is a product or a change to a quantity, plus a delivery ([08-interventions.md](08-interventions.md)).
 - **The solver is chosen for you and can be changed.** `solver='auto'` runs the model as an ODE if every part has a compartmental form and as agents otherwise, and prints the choice; asking for another solver uses the standard approximation where one exists and says so in one line ([12-backends.md](12-backends.md)).
 - **Results are automatic, and data attaches by name.** Every state gets a count and every named transition a flow, extra results such as `ss.outcome` are declared with the model, and a data column is matched to the result of the same name ([09-results.md](09-results.md)).
-- **Calibration is one call.** `sim.calibrate()` fits every parameter that has `bounds` to every result that has data, with no likelihood required and the fitting method chosen from the model and printed ([13-inference.md](13-inference.md)).
-- **The model is data, and defaults are printed.** At `sim.init()` the resolved model is written out as the model spec, a JSON document that is saved, hashed, compared, and exported ([14-model-spec.md](14-model-spec.md)); the library prefers guessing a default and marking it `[guessed]` in `describe()` to raising an error ([15-errors.md](15-errors.md)).
+- **Calibration is one call.** `sim.fit()` fits every parameter that has `bounds` to every result that has data, with no likelihood required and the fitting method chosen from the model and printed ([13-inference.md](13-inference.md)).
+- **The model can be inspected, and defaults are printed.** The model is the code that declares it, and it can be read back, compared, and exported ([14-model-spec.md](14-model-spec.md)); the library prefers guessing a default and marking it `[guessed]` in `describe()` to raising an error ([15-errors.md](15-errors.md)).
 
 The [reading guide](README.md) lists every document and the claims the specification makes; [19-open-questions.md](19-open-questions.md) has what is unsettled.

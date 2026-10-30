@@ -14,35 +14,17 @@ sys.path.insert(0, os.path.join(root, 'examples'))
 import tools
 from model import sim
 
-example = os.path.join(root, 'examples', 'emulsion', 'quickstart')
-ref = tools.read_results(example)
-states = dict(growth='J A', life='NG G', health='M S E I R Q')
-n_runs = 200
+ref = tools.read_results(os.path.join(root, 'examples', 'emulsion', 'quickstart'))
+modules = dict(life='NG G', growth='J A', health='M S E I R Q')
+n_runs = 50
+tolerance = 13 # Animals, in any count at any step, for the mean of the runs: wide, to hold a known miss in place (finding 1 in the README)
 window = ss.timeseries({'2021-01-01': 0, '2021-03-19': 1, '2021-08-21': 0, '2022-03-18': 1, '2022-08-20': 0}) # The quarantine as EMULSION applies it: see the README
 
 
-class counts(ss.Analyzer):
-    """ The number in each of EMULSION's states among the living at the end of each step, after the step's deaths and births (see the README for why not the results) """
-    def init_pre(self, sim):
-        super().init_pre(sim)
-        self.rows = []
-
-    def step(self):
-        sim = self.sim
-        alive = sim.people.alive.uids
-        row = {state:sim.diseases[mod][state][alive].sum() for mod,names in states.items() for state in names.split()}
-        row.update(total_population=len(alive), nb_total_abortions=sim.diseases.life.nb_abortions[alive].sum())
-        self.rows.append(row)
-
-
 def run_many(**kwargs):
-    """ Run the sim many times, one at a time; the analyzer's row k is the state after k steps (row 0 is the start), as is EMULSION's row k """
-    out = {key:[] for key in ref}
-    for seed in range(n_runs):
-        rows = sim.new(verbose=0, rand_seed=seed, analyzers=counts(), **kwargs).run().analyzers[0].rows
-        for key in ref:
-            out[key].append([row[key] for row in rows][:len(ref[key][1])])
-    return {key:np.array(val) for key,val in out.items()}
+    """ The mean over the runs of each count; a stock at index k is the state after k steps, as is EMULSION's row k """
+    res = ss.parallel(sim.new(verbose=0, **kwargs), n_runs=n_runs, n_cpus=2).results
+    return {state:np.asarray(res[mod][state].values).mean(axis=0) for mod,names in modules.items() for state in names.split()}
 
 
 if __name__ == '__main__':
@@ -50,11 +32,9 @@ if __name__ == '__main__':
     for label,kwargs in [('as written', {}), ('with the quarantine as EMULSION applies it', dict(pars=dict(quarantine=window)))]:
         print(label)
         res = run_many(**kwargs)
-        for key,vals in res.items():
-            ours, theirs = vals.mean(axis=0), np.array(ref[key][1])
+        res['total_population'] = res['J'] + res['A']
+        for key,ours in res.items():
+            theirs = np.array(ref[key][1])
             k = np.abs(ours - theirs).argmax()
             print(f'  {key:18s} {ours[k] - theirs[k]:+18.2f} {k:6d}   ' + '   '.join(f'{ours[i]:6.1f} {theirs[i]:6.1f}' for i in [13, 53, 105]))
-
-    def run():
-        ss.Sim(sim.inputs, verbose=0).run()
-    print(f'one run: {tools.time_run(run):.3f} s (original: see {os.path.relpath(example, here)}/reference/timing.json)')
+            assert abs(ours[k] - theirs[k]) < tolerance, f'{label}: {key} differs by {ours[k] - theirs[k]:.1f} animals at step {k}'

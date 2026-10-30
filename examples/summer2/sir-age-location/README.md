@@ -14,10 +14,10 @@ An SIR epidemic with disease deaths in 1,000 people over 20 time units, stratifi
 
 - `original/09-mixing-matrices.ipynb`: the notebook from the summer2 documentation, unchanged
 - `original/mixing_matrices.py`: the first and fifth code cells of the notebook as a script, unchanged apart from one added line (`import numpy as np`, which the notebook has in a cell that is not used here)
-- `export.py`: runs the script in the summer2 environment and prints the results and timing
+- `export.py`: runs the script in the summer2 environment and prints the results and timing (its plot is skipped)
 - `run.py`: calls `export.py` and writes `reference/`
 - `reference/results.csv`: each of the 12 compartments at each of the 201 times, named `<compartment>_<age>_<location>` (for example, `S_young_urban`)
-- `reference/timing.json`: the time of one run
+- `reference/timing.json`: the time of the first run (building, compiling, and running the model, with summer2 and JAX already imported) and of a rerun of the compiled model
 - `meta.yaml`: where it came from
 - `LICENSE`: the summer2 license
 

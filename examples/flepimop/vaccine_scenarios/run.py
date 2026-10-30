@@ -3,7 +3,7 @@ Run the original flepiMoP configuration and write its reference results, the val
 
     python run.py
 
-Needs the flepimop environment (see `_envs/flepimop`). It takes about a minute and a half.
+Needs the flepimop environment (see `_envs/flepimop`). It takes about three minutes.
 """
 import os
 import csv
@@ -79,7 +79,10 @@ def simulate():
 if __name__ == '__main__':
     t0 = time.perf_counter()
     series, draws = simulate()
-    seconds = time.perf_counter() - t0
+    first = time.perf_counter() - t0
+    t0 = time.perf_counter()
+    simulate()
+    rerun = time.perf_counter() - t0
     rows = []
     for (scen,name),arr in series.items():
         ordered = np.sort(arr, axis=0)
@@ -91,5 +94,6 @@ if __name__ == '__main__':
         writer = csv.DictWriter(f, fieldnames=['scenario', 'slot', 'Ro', 'p_case'])
         writer.writeheader()
         writer.writerows(draws)
-    tools.write_timing(here, seconds, f'flepimop simulate {config} --jobs 1, as one command: 3 scenarios of 10 runs each, with their outcomes (after the first, each run takes about 2.6 s); timed once, not as the median of several, since it takes about 90 s')
-    print(f'Wrote {len(rows)} rows and {len(draws)} draws; the whole command takes {seconds:.1f} s')
+    what = f'flepimop simulate {config} --jobs 1, as one command, which is the only way to run it: 3 scenarios of 10 runs each, with their outcomes (after the first, each run takes about 2.6 s). The rerun is the same command again, and each is timed once, since it takes about 90 s; both include starting Python and compiling'
+    tools.write_timing(here, rerun, what, first=first)
+    print(f'Wrote {len(rows)} rows and {len(draws)} draws; the whole command takes {first:.1f} s, and {rerun:.1f} s again')

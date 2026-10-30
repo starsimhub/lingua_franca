@@ -20,7 +20,7 @@ odin's other examples are a logistic curve, the Lorenz attractor, a Lotka–Volt
 - `original/seir_array_odin.R`: the model, unchanged, from `tests/testthat/examples/` of odin 1.2.7
 - `run.py`: compiles and runs it as odin's tests do, and writes `reference/`
 - `reference/results.csv`: `S`, `E`, `I`, and `R` in each age group (`I_0-1`, `I_1-5`, and so on) and in total, on each day from 0 to 365
-- `reference/timing.json`: the time to compile and run the model once, as one command
+- `reference/timing.json`: the time of a first run, with compiling, and of a rerun of the compiled model
 - `meta.yaml`: where it came from
 - `LICENSE`: the upstream license (MIT)
 

@@ -13,9 +13,13 @@ here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, 'original'))
 sys.path.insert(0, os.path.dirname(os.path.dirname(here)))
 import tools
+import pandas as pd
+import summer2 # Not timed, as importing Starsim is not
+
+pd.DataFrame.plot = property(lambda df: lambda *args, **kwargs: None) # Not timed either; the original plots its results
 
 start = time.perf_counter()
-import mixing_matrices as original # Builds and runs the model on import
+import mixing_matrices as original # Builds, compiles, and runs the model on import
 first = time.perf_counter() - start
 
 model = original.model
@@ -30,5 +34,5 @@ derived = model.get_derived_outputs_df()
 for key in derived.columns:
     rows += [dict(time=round(float(t), 6), series=key, value=float(v)) for t,v in derived[key].items()]
 
-seconds = tools.time_run(model.run)
-json.dump(dict(rows=rows, seconds=seconds, first=first), sys.stdout)
+rerun = tools.time_run(model.run)
+json.dump(dict(rows=rows, rerun=rerun, first=first), sys.stdout)

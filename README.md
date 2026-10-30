@@ -1,6 +1,6 @@
 # A lingua franca for epi modeling
 
-**Version:** 1.5 | **Date:** 2026.10.22 | **Status:** Alpha version near completion
+**Version:** 1.6 | **Date:** 2026.10.30 | **Status:** Beta version being tested
 
 ## Introduction
 
@@ -25,7 +25,7 @@ Why do we need a lingua franca? What's wrong with existing modeling frameworks? 
 
 ## Standing on the shoulders of giants
 
-We have been using AI tools to summarize and evaluate the existing disease modeling landscape. Because of this, the lingua franca owes its existence to the many years (and hundreds of thousands of hours) of human contributors; see [Influences][approaches/influences.qmd] for where we have incorporated ideas from other models. We can be (somewhat) confident that a lingua franca based on existing models can do *at least as well* as them in terms of performance and brevity. While AI is not always very creative, it is the perfect tool for this task: it can impartially review all existing models, see who did it best, and at minimum copy that implementation (and improve upon it where possible). 
+We have been using AI tools to summarize and evaluate the existing disease modeling landscape. Because of this, the lingua franca owes its existence to the many years (and hundreds of thousands of hours) of human contributors; see [Influences](approaches/influences.qmd) for where we have incorporated ideas from other models. We can be (somewhat) confident that a lingua franca based on existing models can do *at least as well* as them in terms of performance and brevity. While AI is not always very creative, it is the perfect tool for this task: it can impartially review all existing models, see who did it best, and at minimum copy that implementation (and improve upon it where possible). 
 
 Because of this, we acknowledge our indebtedness to the broader disease modeling community, and inclusiveness is one of our core principles. (More bluntly: we do not want to be the AI jerks who steal other people's work and pass it off as our own.) We are in the process of reaching out to authors of the disease modeling frameworks we borrowed from, but please [get in touch](mailto:info@starsim.org) if we haven't written to you yet!
 
@@ -45,7 +45,7 @@ The lingua franca was built up in stages:
 | 4 | [Examples](examples/) | Other frameworks' own example models, and their translations into Starsim v4 |
 | 5 | [Compare](webapp/) | A tool for comparing example models between the original source and the lingua franca |
 
-The [status page](admin/implementation.md) tracks how much has been implemented so far.
+The [status page](admin/implementation.md) tracks how much has been implemented so far. This site explains how and why the design came about; to use Starsim v4, see its [documentation](https://starsim.org/v4/).
 
 ## AI disclaimer
 

@@ -18,7 +18,7 @@ In this model the arrays hold 100 independent copies of the same epidemic, which
 - `original/discrete_stochastic_sir_arrays.R`: the model, unchanged, from `inst/examples/` of odin 1.2.7
 - `run.py`: compiles and runs it as the vignette does, and writes `reference/`
 - `reference/results.csv`: the mean and 5% to 95% range at each of steps 0 to 100, from 200 runs: one group (`S`, `I`, `R`, over all 100 groups of all 200 runs, so 20,000 samples), the total over the 100 groups (`S_total`, `I_total`, `R_total`, 200 samples), and groups 1, 2, and 100 on their own (`S_1`, `I_1`, `R_1`, and so on, 200 samples each)
-- `reference/timing.json`: the time to compile and run the model once, as one command
+- `reference/timing.json`: the time of a first run, with compiling, and of a rerun of the compiled model
 - `meta.yaml`: where it came from
 - `LICENSE`: the upstream license (MIT)
 

@@ -13,9 +13,9 @@
 
 ## What it's for
 
-EoN is the software companion to a textbook. It does two things: it simulates SIS and SIR (and more general) processes on networks, and it implements **the analytic approximations to those same processes** — the mean-field, pairwise, and effective-degree closures that the book derives.
+EoN is the software companion to a textbook. It simulates SIS, SIR, and more general processes on networks, and it implements **the analytic approximations to those same processes** (the mean-field, pairwise, and effective-degree closures that the book derives).
 
-That second half is why it is in this review. EoN is the only package here that ships, side by side, a stochastic network simulation *and* a graded family of ODE approximations to it. The paradigm-conversion question this project has to answer — when is a compartmental model a valid summary of an agent-based one? — is a question EoN's API answers empirically, by letting you run both.
+That second half is why it is in this review. EoN is the only package here with both a stochastic network simulation *and* a graded family of ODE approximations to it. This project has to ask when a compartmental model is a valid summary of an agent-based one, and EoN lets you find out by running both.
 
 ## How a model is specified
 
@@ -47,9 +47,9 @@ t, D = EoN.Gillespie_simple_contagion(G, H, J, IC, return_statuses=('S','E','I',
 
 `H` is the spontaneous-transition graph; `J` is the neighbor-induced-transition graph, whose nodes are *pairs* of statuses so that `('I','S') → ('I','I')` reads as "an infectious–susceptible edge turns the susceptible one infectious".
 
-**The model is literally a graph.** Not a graph metaphor — a `networkx.DiGraph` you can traverse, draw, and edit programmatically. This is transitions-as-data taken about as far as it goes, and it is worth noting that the representation the textbook uses for exposition (Fig 4.3 of the book, cited in the docstring) is the same object the code executes.
+**The model is literally a graph**: a `networkx.DiGraph` you can walk through, draw, and edit in code. This takes transitions as data about as far as it goes, and the figure the textbook uses to explain a model (Fig 4.3, cited in the docstring) is the same object the code runs.
 
-Rates can be modified per node or per edge, in two ways: a `weight_label` naming an attribute in `G` that multiplies the rate, or a `rate_function(G, u)` / `rate_function(G, source, target)` computing a scale factor from the network. The docstring is explicit that the rate function may not depend on node *statuses*, because it must be computable once at the start — a stated, checkable restriction that keeps the Gillespie implementation correct.
+Rates can vary per node or per edge, through a `weight_label` naming an attribute in `G` that multiplies the rate, or a `rate_function(G, u)` / `rate_function(G, source, target)` that works out a scale factor from the network. The rate function may not depend on node *statuses*, because it is computed once at the start. This stated restriction keeps the Gillespie implementation correct.
 
 ## The analytic hierarchy
 
@@ -57,7 +57,7 @@ The `EoN.analytic` module implements, for both SIS and SIR:
 
 | Approximation | What it tracks |
 |---|---|
-| `*_individual_based` | One equation per node — exact-ish, N equations |
+| `*_individual_based` | One equation per node: exact-ish, N equations |
 | `*_pair_based` | Node and edge pair probabilities |
 | `*_homogeneous_pairwise` | Pair counts, homogeneous degree |
 | `*_heterogeneous_pairwise` | Pair counts by degree class |
@@ -71,40 +71,40 @@ The `EoN.analytic` module implements, for both SIS and SIR:
 
 Each also has a `*_from_graph` variant that extracts the required moments (degree distribution, `Nk`, `NkNl`) from an actual network. So the workflow is: build a network, run the exact simulation, and run any approximation *parameterized from that same network*, then compare.
 
-This is a **conversion ladder made executable**. Every step down it is an explicit closure assumption, and the package lets you measure what each assumption costs on your network.
+This is a **ladder of conversions that you can run**. Each step down is an explicit closure assumption, and you can measure what it costs on your network.
 
-Supporting machinery: `get_Pk`, `get_PGF`, `get_PGFPrime`, `get_PGFDPrime` (degree distribution and its probability generating function), and `estimate_R0(G, tau, gamma)`.
+Supporting tools: `get_Pk`, `get_PGF`, `get_PGFPrime`, `get_PGFDPrime` (degree distribution and its probability generating function), and `estimate_R0(G, tau, gamma)`.
 
 ## Time
 
-Continuous time throughout — Gillespie and the fast event-driven algorithms for simulation, `scipy.integrate.odeint` for the analytics. No timestep, so no rate-to-probability conversion. Rates are per-unit-time floats; no units.
+Continuous time throughout: Gillespie and the fast event-driven algorithms for simulation, `scipy.integrate.odeint` for the analytics. No timestep, so no rate-to-probability conversion. Rates are per-unit-time floats; no units.
 
 ## Strengths
 
-- **The model is a pair of directed graphs.** Fully introspectable, drawable, and programmatically constructible — and it is the same representation the textbook uses to explain the model.
-- **The spontaneous / neighbor-induced split.** Two transition kinds, cleanly separated, covering SIS, SIR, SEIR, SIRS, competing and cooperating pathogens, and complex multi-status processes. Exactly epipack's and EpiHiper's split, arrived at independently.
-- **The analytic hierarchy, executable and parameterizable from a real network.** Nothing else in the review lets you quantify the cost of a closure assumption.
-- **Conditional / cascading transmission** — `Gillespie_complex_contagion` and the conditional link transmission facility, which is how contact tracing gets expressed.
-- **Per-node and per-edge rate heterogeneity**, by attribute weight or by a rate function, with a stated restriction (no status dependence) that preserves algorithmic correctness.
-- **Fast event-driven algorithms** (`fast_SIR`, `fast_SIS`) that are orders of magnitude quicker than the general Gillespie implementation, with the docstrings saying so plainly.
+- **The model is a pair of directed graphs** that can be read, drawn, and built in code, and that the textbook uses to explain the model.
+- **The spontaneous / neighbor-induced split.** Two kinds of transition, covering SIS, SIR, SEIR, SIRS, competing and cooperating pathogens, and complex multi-status processes. epipack and EpiHiper arrived at the same split independently.
+- **The analytic hierarchy, which runs and can be parameterized from a real network.** Nothing else in the review lets you quantify the cost of a closure assumption.
+- **Conditional / cascading transmission**: `Gillespie_complex_contagion` and conditional link transmission, which is how contact tracing is written.
+- **Per-node and per-edge rate heterogeneity**, by attribute weight or by a rate function, with no dependence on status so that the algorithm stays correct.
+- **Fast event-driven algorithms** (`fast_SIR`, `fast_SIS`), orders of magnitude quicker than the general Gillespie implementation.
 - **`estimate_R0` and PGF machinery** for network-theoretic quantities.
 - **Textbook provenance.** The algorithms are the published ones, with errata tracked.
 
 ## Limitations
 
 - **No stratification, no demographics, no interventions.** Rates can vary by node attribute; there is no vocabulary for age structure, births, deaths, vaccination, or treatment.
-- **Networks are inputs.** EoN consumes a NetworkX graph; it has no network-specification vocabulary and no dynamic-network model beyond the temporal-network simulation entry points.
-- **The two-graph specification is idiosyncratic.** Encoding "an I–S edge infects the S" as an edge from the tuple-node `('I','S')` to `('I','I')` is precise and takes real explaining, and the docstring runs to hundreds of lines because of it.
-- **Only the second node in a pair may change status**, which is stated but limits the process class.
+- **Networks are inputs.** EoN takes a NetworkX graph. It has no way to describe a network to generate, and no dynamic-network model beyond its temporal-network simulations.
+- **The two-graph form takes learning.** Writing "an I–S edge infects the S" as an edge from the pair `('I','S')` to `('I','I')` is precise but needs explaining, and the docstring runs to hundreds of lines.
+- **Only the second node in a pair may change status**, which is stated but limits what can be modeled.
 - **No dimensional types, no dates, no observation model, no inference.**
-- **The analytic and simulation halves have different interfaces.** `Gillespie_simple_contagion(G, H, J, ...)` versus `SIR_heterogeneous_pairwise(Sk0, Ik0, ...)`. The approximations are only implemented for SIS and SIR, not for an arbitrary `H`/`J` process — so the conversion ladder exists for the standard models only.
-- **Maintenance is intermittent** — a five-year gap between 1.1 and 1.2 — though 1.92 (2026) is recent.
+- **The analytic and simulation halves have different interfaces.** `Gillespie_simple_contagion(G, H, J, ...)` versus `SIR_heterogeneous_pairwise(Sk0, Ik0, ...)`. The approximations are only implemented for SIS and SIR, not for an arbitrary `H`/`J` process, so the conversion ladder exists for the standard models only.
+- **Maintenance is intermittent**: a five-year gap between 1.1 and 1.2, though 1.92 (2026) is recent.
 
 ## Implications for the lingua franca
 
-1. **EoN is the reference for what paradigm conversion actually costs.** The project's interconversion goal implicitly claims that a compartmental rendering of an agent-based model is meaningful. EoN's analytic hierarchy is a decade of mathematics saying *when*: mean-field ignores correlations, pairwise closes at pairs, effective-degree tracks susceptible-neighbor counts, and each is right under different network conditions. **The lingua franca should not present network → compartmental conversion as a single operation.** It is a choice of closure, and the choice should be named in the output the way `SIR_heterogeneous_pairwise` names it.
-2. **The `H` / `J` split is the third independent arrival at spontaneous-versus-induced transitions.** EoN's two graphs, epipack's 3-tuples versus 5-tuples, and EpiHiper's `transitions` versus `transmissions` are the same distinction. Together with the fact that each framework needed it, this looks like a genuine primitive: **a transition is either autonomous or contact-mediated, and the two have different mathematics.** The lingua franca should make the distinction structural rather than leaving it implicit in whether a rate expression happens to reference another compartment.
-3. **Take the rate-modifier restriction seriously.** EoN allows per-node and per-edge rate scaling but forbids it depending on node status, because that would break the event-driven algorithm's precomputation. This is a good example of a **backend capability constraint surfacing in the specification**: some rate expressions are simulable by some algorithms and not others. camdl's capability-check discipline is the general form; EoN shows a concrete instance.
-4. **Deriving R₀ from the model plus the network should be a language feature.** `estimate_R0(G, tau, gamma)` and epipack's `get_eigenvalues_at_disease_free_state()` are two routes to the same quantity from two paradigms. If the IR is symbolic and the contact structure is declared, the lingua franca can offer this generally — and R₀ is the number the audience actually asks for.
-5. **The graph representation is the natural IR for the disease process.** EoN executes a `DiGraph`; MIRA's `TemplateModel` is a graph; Atomica's transition matrix is an adjacency matrix; EpiHiper's states-and-transitions JSON is an edge list. Whatever the surface syntax, **the disease model is a labeled directed graph over states**, and the design should say so explicitly.
-6. **Note that the ladder only exists for standard models.** EoN's approximations cover SIS and SIR, not arbitrary `H`/`J` processes, because each closure has to be derived. That is a real warning about the cost of general paradigm conversion: it is a mathematical derivation per model class, not a compiler pass. Where the lingua franca cannot derive the conversion, it should refuse rather than approximate silently.
+1. **EoN is the reference for what paradigm conversion costs.** Converting between paradigms assumes that a compartmental version of an agent-based model means something. EoN's analytic hierarchy is a decade of mathematics saying *when*: mean-field ignores correlations, pairwise closes at pairs, effective-degree tracks susceptible-neighbor counts, and each is right under different network conditions. **The lingua franca should not present network → compartmental conversion as one operation.** It is a choice of closure, and the output should name it, as `SIR_heterogeneous_pairwise` does.
+2. **The `H` / `J` split is the third independent arrival at spontaneous versus induced transitions**, with epipack's 3-tuples versus 5-tuples and EpiHiper's `transitions` versus `transmissions`. Each framework needed it, so it looks basic: **a transition is either spontaneous or contact-mediated, and the two have different mathematics.** The lingua franca should build this in, and not leave it to whether a rate mentions another compartment.
+3. **Take the rate-modifier restriction seriously.** EoN allows scaling rates per node and per edge but not by node status, as that would break the event-driven algorithm's precomputation. This is a good example of **a solver's limit showing up in the model description**: some rates can be simulated by some algorithms and not others. camdl's capability checks are the general form.
+4. **R₀ from the model plus the network should be a language feature.** `estimate_R0(G, tau, gamma)` and epipack's `get_eigenvalues_at_disease_free_state()` reach the same quantity in two paradigms. If the model is symbolic and the contact structure is declared, the lingua franca can offer this generally, and R₀ is the number the audience asks for.
+5. **A graph is the natural internal form for the disease process.** EoN runs a `DiGraph`, MIRA's `TemplateModel` is a graph, Atomica's transition matrix is an adjacency matrix, and EpiHiper's JSON is an edge list. However it is written, **the disease model is a labeled directed graph over states**, and the design should say so.
+6. **The ladder exists only for standard models.** EoN's approximations cover SIS and SIR, not any `H`/`J` process, because each closure has to be derived. So general paradigm conversion takes a mathematical derivation per class of model, not an automatic step. Where the lingua franca cannot derive a conversion, it should refuse and not approximate silently.

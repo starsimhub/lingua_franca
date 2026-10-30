@@ -1,9 +1,9 @@
 framework: camdl
 model: stratified
-version: pycamdl 0.0.1 (camdl 0.1.0+e8219d1c)
-source: pycamdl/examples/stratified.py in a local checkout of https://github.com/vsbuffalo/camdl
-commit: e8219d1c (pycamdl is not yet committed upstream)
+version: 0.1.0+e8219d1c
+source: written for this project from the stratified example in pycamdl, camdl's Python front end, in a local checkout of https://github.com/vsbuffalo/camdl
+commit: e8219d1c
 license: MIT
-language: Python (pycamdl)
-env: none; pycamdl needs only NumPy, SciPy, pandas, and Matplotlib, and is found next to this repository (or by setting PYCAMDL)
-lines: 35
+language: camdl
+env: _envs/camdl
+lines: 47

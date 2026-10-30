@@ -21,7 +21,7 @@ Beyond the wave 1 example ([sis-network](../sis-network)):
 - `run.py`: runs `reference.R` and writes `reference/`
 - `reference/results.csv`: for each scenario (`none`, `cascade`, `prep`, `both`), the mean and 5% to 95% range of 10 simulations at each week of `num`, `s.num`, `i.num`, `si.flow`, `acute.num`, `chronic.num`, `aids.num`, `dx.num`, `art.num` (on ART, suppressed or not), `supp.num`, `prep.num`, `prep.indic.num`, `dep.flow`, `aids.dep.flow`, `arr.flow`, and the partnerships and people with two or more partners in each layer (`main.edges`, `main.concurrent`, `cas.edges`, `cas.concurrent`). Series from the user's modules have no value in week 1, since the modules first run in week 2
 - `reference/summary.csv`: the original's own summary table, from these runs
-- `reference/timing.json`: the time of one simulation
+- `reference/timing.json`: the time of a first run and of a rerun
 - `meta.yaml`: where it came from
 - `LICENSE`: the Gallery's license (MIT)
 
@@ -48,7 +48,7 @@ The networks keep close to their targets as the population changes: over the sec
 
 ## Timing
 
-One simulation takes 54 seconds (the mean over the 40 reference runs, on one core), and estimating the two networks 1.2 seconds, once.
+One simulation takes about 54 seconds on one core, and estimating the two networks 1.2 seconds, once. A rerun is the mean of the 10 runs with no intervention, and a first run adds the estimation.
 
 ## Lines of model code
 
