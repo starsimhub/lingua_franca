@@ -472,7 +472,7 @@ The work from [the review's plan](../review_oct17/implementation.md), by phase. 
 
 ### Extending a model with code (2026-10-25)
 
-From [spec_gaps_response.md](https://github.com/starsimhub/starsim/blob/v4/v4_design/oct24/spec_gaps_response.md), on He et al. (2010):
+From `spec_gaps_response.md` (of October 24, no longer kept), on He et al. (2010):
 
 - [x] Being written as code is no longer a reason for agents: a module needs them only if it keeps a value for each person, says `compartmental = False`, or is an individual-level network, `ss.Births` or `ss.Deaths`. A sim with nothing that needs agents has none, declared model or not; `people.alive.sum()` there is the number of people, as with agents, and asking which people (`.uids`) raises, saying what to use (12-backends.md).
 - [x] The loop leaves out calls that do nothing (a module's inherited `start_step()` without random numbers, `finish_step()` and `update_results()`, and the people's deaths in a run without agents); a sim of one coded module spends about 0.02 s of a 21-year daily run in Starsim, 8% of the run with its step compiled (10-execution.md). `DateArray.years` works out whole-second dates at once.

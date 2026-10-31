@@ -56,6 +56,18 @@ The site's source is in `docs/`, and is built with `quarto render docs`. `script
 
 The [status page](docs/admin/implementation.md) tracks how much has been implemented so far. This site explains how and why the design came about; to use Starsim v4, see its [documentation](https://starsim.org/v4/).
 
+## The design record
+
+This repo is the design record of Starsim v4, which moved here from the `v4_design/` folder of the Starsim repo on 2026-10-31; older text that mentions `v4_design/` means this record. What governs, and what is current:
+
+1. [Constitution](docs/admin/constitution.md): the principles every choice is checked against.
+2. [Targets](tests/reviews/targets.md): what v4 has to achieve, model by model.
+3. [Design](docs/design/): the spec, kept in line with the code.
+4. The working plan, now [docs/admin/oct31/plan.md](docs/admin/oct31/plan.md).
+5. [Deferred](docs/admin/deferred.md): what was set aside, and "Won't do", what was decided against. What is done is recorded in each plan.
+
+Starsim's code, tests, and user docs stay in the [Starsim repo](https://github.com/starsimhub/starsim/tree/v4). The dated folders of older plans and reviews (e.g. `v4_design/oct17/`) are not kept in either repo: the ones in git are at [this commit](https://github.com/starsimhub/starsim/tree/77adec1df60be8ebd30d6d65bd5c7cb2abafdbfb/v4_design) of Starsim, and links to them from [deferred.md](docs/admin/deferred.md) and elsewhere are left as a record.
+
 ## AI disclaimer
 
 AI tools (mostly Claude) were used to summarize information, compare and assess frameworks, extract code examples, and create translations. Assessments and design decisions are owned by the humans.

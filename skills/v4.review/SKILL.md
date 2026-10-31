@@ -11,7 +11,7 @@ Checks the "Starsim-family models" targets in `tests/reviews/targets.md` for thi
 
 ## The models
 
-| Model | Repo | Starsim 3 version | v4 version | Earlier reviews (in `v4_design/`) | Compartmental goal |
+| Model | Repo | Starsim 3 version | v4 version | Earlier reviews (in the old `v4_design/`: see the top-level README) | Compartmental goal |
 |---|---|---|---|---|---|
 | covasim | `/home/cliffk/idm/covasim` | `main` (Covasim 4.0.1, on Starsim 3.7.2) | `v4` branch, and the prototypes in `v4port/` | `oct21/covasim_review.md` | Works, except with networks, including with strains |
 | fpsim | `/home/cliffk/idm/fpsim` | `main` | `v4` branch, and `v4port/` | `oct17/fpsim_review.md`, `oct21/fpsim_recheck.md` | Not required; report whether it works or how close it is |
@@ -35,6 +35,6 @@ Check these before relying on them: `git -C <repo> branch --show-current`, `git 
     - **No single-model code in v4.** Search the snapshot's `starsim/` for code that only this model uses: its name (`grep -rni <model> starsim/`), and each v4 feature its port relies on that no test, doc, or other model uses (check `git -C /home/cliffk/idm/ssv4 log --oneline -i --grep=<model>` for features added for it). Each is a finding: either generalize it or move it into the model.
     - **The compartmental goal** in the table. Build the compartmental version of the model's disease (or diseases) as the goal states, run it under `solver='ode'` and as agents, and compare (prevalence and incidence over time, at the same parameters). Report what can't be expressed, and whether that is inside the goal's stated exceptions.
 4. **Fan out if useful,** to at most four subagents by part of the model (as the earlier reviews did: e.g. diseases, interventions, framework and speed, compartmental), each writing its findings to `<repo>/v4port/<date>/<part>/NOTES.md`. Brief each with the README's rules, the pinned paths, and this skill's definitions of the targets.
-5. **Check** every headline number and every "not met" yourself against the pinned versions. Cross-reference `deferred.md` and the latest plan (which carry earlier findings by their IDs, e.g. CV, FP, HP, ST), and say which still hold, which are fixed, and which are new.
+5. **Check** every headline number and every "not met" yourself against the pinned versions. Cross-reference `docs/admin/deferred.md` and the latest plan (which carry earlier findings by their IDs, e.g. CV, FP, HP, ST), and say which still hold, which are fixed, and which are new.
 6. **Write** `tests/reviews/<date>/<model>.md` in the README's shape. The scorecard has one row per general target and one for the compartmental goal. The details give lines by module, timings, the hacks list, the single-model code list, and the compartmental comparison. End with the model's own bugs found along the way, briefly.
 7. **Clean up** the worktrees (`git -C <repo> worktree remove --force ...`) and any background shells.
