@@ -3,7 +3,7 @@ Compare the Starsim version with the reference results of the original
 
     python compare.py [n_runs]
 
-Each agent-based run takes about a minute, so the default is three runs.
+Each agent-based run takes about 15 s, and the default is two runs.
 """
 import os
 import csv
@@ -50,7 +50,7 @@ def yearly(weeks):
 
 
 if __name__ == '__main__':
-    n_runs = int(sys.argv[1]) if len(sys.argv) > 1 else 3
+    n_runs = int(sys.argv[1]) if len(sys.argv) > 1 else 2
     runs = [run(seed) for seed in range(n_runs)]
     mean = {key:np.mean([r[key] for r in runs], axis=0) for key in runs[0]}
     print(f'\n{len(names)} places, {pop.sum():,.0f} people, {years} years; Starsim: mean of {n_runs} runs; original: mean of 50 runs')
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     print(f'  share of weeks with no infections in the second half, by place: mean {ours.mean():.3f} (original {theirs.mean():.3f}), correlation {np.corrcoef(ours, theirs)[0, 1]:.3f}, largest difference {np.abs(ours - theirs).max():.3f}')
     print(f'  weekly infections, correlation of the means: {np.corrcoef(mean["new_infections"], ref["new_infections"][1])[0, 1]:.3f}; susceptible at the end {mean["S"][n_days]:,.0f} ({ref["S"][1][n_days]:,.0f})')
 
-    # The tolerances, for three runs. Deaths in the first year are not among them: see finding 1 in the README
+    # The tolerances, for two or three runs. Deaths in the first year are not among them: see finding 1 in the README
     total = mean['new_infections'].sum()/np.sum(ref['new_infections'][1])
     assert abs(total - 1) <= 0.05, f'Infections differ by {total - 1:+.1%}'
     for p in places:

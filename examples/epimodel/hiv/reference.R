@@ -1,10 +1,11 @@
 # Run the original Gallery script, with more simulations, and write what run.py needs.
 #
-#     Rscript reference.R <original folder> <output folder> <number of simulations> <seed> <cores>
+#     Rscript reference.R <original folder> <output folder> <number of simulations> <seed> <cores> <scenarios>
 #
 # The original is run as it is, statement by statement, in its interactive configuration (N = 1500,
 # 1040 weekly steps). Only three things are changed, just before its scenario loop: the number of
 # simulations per scenario, the number of cores, and the network statistics that are recorded.
+# With only some of the scenarios (a comma-separated list), it stops after them and writes only their times.
 suppressMessages(library(EpiModel))
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -20,6 +21,7 @@ local({
   n_runs <- as.integer(args[3])
   seed <- as.integer(args[4])
   n_cores <- as.integer(args[5])
+  only <- strsplit(args[6], ",")[[1]]
   env <- globalenv()
 
   # The original sources "examples/hiv/module-fx.R", as in the Gallery repository
@@ -37,9 +39,14 @@ local({
       env$control$nwstats.formula <- multilayer(~edges + concurrent, ~edges + concurrent)
       env$sims <- list()
       for (scn in env$scenarios.list) { # The original's loop, timed by scenario
+        if (!(scn$id %in% only)) next
         seconds[paste0("netsim_", scn$id)] <- system.time(
           env$sims[[scn$id]] <- netsim(list(env$est_main, env$est_cas), use_scenario(env$param_base, scn), env$init, env$control)
         )[["elapsed"]] / n_runs
+      }
+      if (length(only) < length(env$scenarios.list)) { # The rest of the original needs every scenario
+        write.csv(data.frame(what = names(seconds), seconds = seconds), file.path(out, "seconds.csv"), row.names = FALSE)
+        quit(save = "no")
       }
       next
     }

@@ -17,7 +17,7 @@ import tools
 
 original = os.path.join(here, 'original', 'events_SISe3.R')
 reference = os.path.join(here, 'reference')
-n_runs = 200 # The model is stochastic; the seed (123) is set in the original
+n_runs = tools.runs(200, fewest=6) # The model is stochastic; the seed (123) is set in the original
 nodes = [1, 2, 3] # The nodes (herds) to report on their own; node 1 has the first infected animals
 comps = ['S_1', 'I_1', 'S_2', 'I_2', 'S_3', 'I_3']
 series = comps + ['I', 'phi', 'nodes_infected'] + [f'node{node}_{key}' for node in nodes for key in ['I', 'phi']] + [f'node1_{key}' for key in comps]

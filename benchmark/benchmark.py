@@ -1,24 +1,27 @@
 """
-Regenerate everything in the scorecard on the home page: for each model, lines of code
-and run time for the original and for Starsim, and whether their results agree.
+Regenerate everything in the benchmark table on the home page: for each model, lines of
+code and run time for the original and for Starsim, and whether their results agree.
 
-    python scorecard.py                        # Everything (a few hours)
-    python scorecard.py --only odin            # Only the models whose name contains "odin"
-    python scorecard.py --stages timing tables # Only some stages
-    python scorecard.py --kernels rust numba   # Only some kernels
+    python benchmark/benchmark.py                        # Everything
+    python benchmark/benchmark.py --only odin            # Only the models whose name contains "odin"
+    python benchmark/benchmark.py --stages timing tables # Only some stages
+    python benchmark/benchmark.py --kernels rust numba   # Only some kernels
+    python benchmark/benchmark.py --references           # Also remake the originals' reference results (over an hour)
 
-The stages, in order (see vignettes/README.md for what to install first):
+The stages, in order (see benchmark/README.md for what to install first):
 
     check       Check that each framework's environment in _envs/ is installed
-    originals   Run each original (examples/*/*/run.py), writing its results and timing
+    originals   Run each original (examples/*/*/run.py), writing its timing
     compare     Check each translation against those results (vignettes/*/*/compare.py)
-    timing      Time each translation under each kernel set, writing vignettes/timings.json and .csv
+    timing      Time each translation under each kernel set, writing timings.json and .csv in this folder
     tables      Write the lines and times into the table of each vignette's README
 
 Lines are counted, and times taken, as in design/18-conformance.md. The first run is a
 fresh process, not counting importing Starsim and reading the model file (so not reading
 data, as in the originals). A rerun is the same sim run again, already built. A rebuild
-is `sim.new().run()`. Each time is the best of several.
+is `sim.new().run()`. Each time is the best of as many runs as fit in the budget, up to
+100 unless that takes under 5 s, so that no model takes more than a couple of minutes. A full run records how long the whole
+suite and each model took, in timings.json and benchmark/README.md.
 
 Use --starsim to time a checkout other than the installed Starsim, and --commit to record
 which commit that is if it is not a git repository.
@@ -37,19 +40,26 @@ import platform
 import subprocess
 import sciris as sc
 
-root = sc.thispath(__file__)
+folder = sc.thispath(__file__)
+root = folder.parent
+sys.path.insert(0, str(root/'examples'))
+import tools
+
 stages = ['check', 'originals', 'compare', 'timing', 'tables']
 kernels = ['rust', 'numba', 'jax', 'jax-gpu'] # Every set is tried on every model, and JAX is left out where it does not apply
 kernel_names = {'rust':'Rust', 'numba':'Numba', 'jax':'JAX', 'jax-gpu':'JAX on a GPU'}
-n_rounds = 3 # Fresh processes for each kernel set, taken in turn
-n_reruns = 5 # Reruns in each one
-slow = 10 # A run over this many seconds gets fewer of both
-timeout = 7200 # Seconds for any one command
-data = root / 'vignettes' / 'timings.json'
+n_rounds = 2 # Fresh processes for each kernel set, taken in turn
+budget = 30 # Seconds of runs to time one model, after one first run of each kernel set; each time gets at least tools.least_time
+limit = 120 # Seconds for one model over all the stages, over which it is reported
+timeout = 900 # Seconds for any one command
+max_load = 10 # A load average over this pauses the run before the next model, which is checked again after `pause` seconds
+pause = 300
+data = folder / 'timings.json'
+readme = folder / 'README.md'
 
 runs = { # What one run is, where it is not the variable `sim` in the model file
     'emulsion/sir': dict(sim='compartment'), # The original timed is the compartmental one
-    'flepimop/vaccine_scenarios': dict(code='ss.parallel(runs(verbose=0), parallel=False)'), # The original timed is the 30 runs
+    'flepimop/vaccine_scenarios': dict(code='ss.parallel(runs(n_runs=2, verbose=0), parallel=False)'), # The original timed is 3 scenarios of 2 runs
     'odin/stochastic_sir_arrays': dict(code='ss.parallel(sim.new(verbose=0), n_runs=100, parallel=False)'), # The original timed is 100 groups
 }
 
@@ -94,36 +104,52 @@ def command(cmd, cwd=root, env=None, log=None):
     return ok, text
 
 
+def wait_for_quiet(spent):
+    """ Pause while the machine is busy, so as to neither slow it down further nor time a busy machine; the seconds paused are kept in `spent` and left out of the times """
+    while os.getloadavg()[0] > max_load:
+        print(f'Load {os.getloadavg()[0]:.1f}: pausing for {pause} s', flush=True)
+        time.sleep(pause)
+        spent['paused'] = spent.get('paused', 0) + pause
+    return
+
+
 def last_line(text):
     """ The last line of what a command printed, for a one-line error """
     lines = text.strip().splitlines()
     return lines[-1][:200] if lines else 'no output'
 
 
-def run_originals(names):
-    """ Run each original in its environment """
+def run_originals(names, spent, paused, references=False):
+    """ Run each original in its environment: only for its timing, unless the reference results are to be remade """
     failed = {}
+    env = dict(PYTHONPATH='') if references else dict(PYTHONPATH='', BENCHMARK_QUICK='1') # In their own environments
     for name in names:
-        print(f'Original: {name}')
-        ok, text = command([sys.executable, 'run.py'], cwd=root/'examples'/name, env=dict(PYTHONPATH=''), log=root/'examples'/name/'run.log') # In their own environments
+        wait_for_quiet(paused)
+        print(f'Original: {name}', flush=True)
+        start = time.perf_counter()
+        ok, text = command([sys.executable, 'run.py'], cwd=root/'examples'/name, env=env, log=root/'examples'/name/'run.log')
+        spent.setdefault(name, {})['originals'] = time.perf_counter() - start
         if not ok:
             failed[name] = last_line(text)
     return failed
 
 
-def run_compares(names, env):
+def run_compares(names, env, spent, paused):
     """ Check each translation against its original's results """
     failed = {}
     for name in names:
-        print(f'Compare: {name}')
+        wait_for_quiet(paused)
+        print(f'Compare: {name}', flush=True)
+        start = time.perf_counter()
         ok, text = command([sys.executable, 'compare.py'], cwd=root/'vignettes'/name, env=env, log=root/'vignettes'/name/'compare.log')
+        spent.setdefault(name, {})['compare'] = time.perf_counter() - start
         if not ok:
             failed[name] = last_line(text)
     return failed
 
 
-def worker(name, kernel, reruns):
-    """ In a fresh process: read the model, then time its first run, its reruns, and its rebuilds, printing them """
+def worker(name, kernel, rerun_time, rebuild_time, most):
+    """ In a fresh process: read the model, then time its first run, its reruns, and its rebuilds, printing them; JAX stops after the first if it was not used """
     import starsim as ss # Not timed
     import importlib.util
     used = []
@@ -152,16 +178,24 @@ def worker(name, kernel, reruns):
         again = lambda: (built[0].restart(), built[0].run())
         rebuild = lambda: base.new(verbose=0).run()
 
-    def timed(func):
-        start = time.perf_counter()
-        func()
-        return time.perf_counter() - start
+    if kernel.startswith('jax') and 'code' not in run: # Without a slow first run if JAX does not apply
+        built[0].init()
+        reason = built[0].kernel_reason()
+        use, why = (False, reason) if reason else forced(built[0])
+        if not use:
+            print('TIMING ' + json.dumps(dict(skipped=why)))
+            return
 
-    out = dict(first=timed(first))
-    out['rerun'] = min(timed(again) for i in range(reruns))
-    out['rebuild'] = min(timed(rebuild) for i in range(reruns))
+    start = time.perf_counter()
+    first()
+    out = dict(first=time.perf_counter() - start)
     if kernel.startswith('jax') and not any(use for use,why in used):
         out = dict(skipped=used[-1][1] if used else 'no compartmental run')
+    else:
+        if rerun_time:
+            out['rerun'] = tools.repeat(again, rerun_time, rerun_time, most)
+        if rebuild_time:
+            out['rebuild'] = tools.repeat(rebuild, rebuild_time, rebuild_time, most)
     print('TIMING ' + json.dumps(out))
     return
 
@@ -171,28 +205,35 @@ def kernel_env(kernel):
     if kernel == 'jax':
         return dict(JAX_PLATFORMS='cpu')
     elif kernel == 'jax-gpu':
-        return dict(JAX_PLATFORMS='gpu', XLA_PYTHON_CLIENT_PREALLOCATE='false')
+        return dict(JAX_PLATFORMS='cuda,cpu', XLA_PYTHON_CLIENT_PREALLOCATE='false')
     return dict(STARSIM_KERNELS=kernel)
 
 
-def run_worker(name, kernel, reruns, env):
+def run_worker(name, kernel, env, rerun_time=0, rebuild_time=0, most=tools.most_runs):
     """ One fresh process, returning its times, or why there are none """
-    cmd = [sys.executable, str(root/'scorecard.py'), '--worker', name, kernel, str(reruns)]
+    cmd = [sys.executable, str(folder/'benchmark.py'), '--worker', name, kernel, str(rerun_time), str(rebuild_time), str(most)]
     ok, text = command(cmd, env=dict(env, **kernel_env(kernel)))
     found = [line for line in text.splitlines() if line.startswith('TIMING ')]
     return json.loads(found[-1][7:]) if ok and found else dict(skipped=last_line(text))
 
 
+def make_plan(seconds, n_sets):
+    """ The rounds, and the seconds for reruns and for rebuilds in each, given how long one run of each kernel set takes in all: a slow model gets one round, and no rebuilds """
+    each = max(tools.least_time, budget/(2*n_sets)) # For one time of one kernel set
+    if 3*seconds > budget:
+        return 1, each, 0
+    return n_rounds, each/n_rounds, each/n_rounds
+
+
 def time_model(name, sets, env):
     """ Time one model under each kernel set, taking them in turn, with a first round thrown away to fill the caches """
-    warm = {kernel:run_worker(name, kernel, 1, env) for kernel in sets}
+    warm = {kernel:run_worker(name, kernel, env) for kernel in sets}
     out = {kernel:val for kernel,val in warm.items() if 'skipped' in val}
     live = [kernel for kernel in sets if kernel not in out]
-    longest = max([warm[kernel]['first'] for kernel in live], default=0)
-    rounds, reruns = (2, 2) if longest > slow else (n_rounds, n_reruns)
+    rounds, rerun_time, rebuild_time = make_plan(sum(warm[kernel]['first'] for kernel in live), len(live))
     for i in range(rounds):
         for kernel in live:
-            found = run_worker(name, kernel, reruns, env)
+            found = run_worker(name, kernel, env, rerun_time, rebuild_time, tools.most_runs//rounds)
             if 'skipped' in found:
                 out[kernel] = found
                 continue
@@ -242,7 +283,7 @@ def write_csv(info):
     return
 
 
-def run_timing(names, sets, env, commit):
+def run_timing(names, sets, env, commit, spent, paused):
     """ Time every model, saving as it goes """
     info = load_data()
     info.update(date=str(datetime.date.today()), starsim=starsim_info(env, commit), kernels=sets, cpus=os.cpu_count(), system=platform.platform())
@@ -250,15 +291,33 @@ def run_timing(names, sets, env, commit):
         print('Timing the compiling of the Numba kernels')
         info['numba_compile'] = compile_time(env)
     for name in names:
-        print(f'Timing: {name}')
+        wait_for_quiet(paused)
+        print(f'Timing: {name}', flush=True)
+        start = time.perf_counter()
         loads = [os.getloadavg()[0]]
         times = time_model(name, sets, env)
         loads.append(os.getloadavg()[0])
+        spent.setdefault(name, {})['timing'] = time.perf_counter() - start
         info['models'][name] = dict(kernels=times, fastest=fastest(times), load=max(loads))
         info['models'] = dict(sorted(info['models'].items()))
         sc.savejson(data, info, indent=2)
         write_csv(info)
     return
+
+
+def write_suite(spent, total):
+    """ Record how long the whole suite and each model took, and say so at the top of the README """
+    models = {name:round(sum(val.values()), 1) for name,val in spent.items()}
+    stage_times = {stage:round(sum(val.get(stage, 0) for val in spent.values()), 1) for stage in stages if any(stage in val for val in spent.values())}
+    worst = max(models, key=models.get)
+    info = load_data()
+    info['suite'] = dict(date=str(datetime.date.today()), seconds=round(total, 1), stages=stage_times, models=dict(sorted(models.items())))
+    sc.savejson(data, info, indent=2)
+    date = datetime.date.today().strftime('%-d %B %Y')
+    each = ', '.join(f'{stage} {val/60:.1f}' for stage,val in stage_times.items())
+    line = f'**Last full run:** {total/60:.0f} minutes on {date} ({each}). The slowest model, `{worst}`, took {models[worst]:.0f} s.'
+    sc.savetext(readme, re.sub(r'^\*\*Last full run:\*\*.*$', line, sc.loadtext(readme), flags=re.MULTILINE))
+    return line
 
 
 def seconds(value):
@@ -291,6 +350,9 @@ def write_tables(names):
             missing[name] = 'no timing, so only the lines were written'
             continue
         original = sc.loadjson(root/'examples'/name/'reference'/'timing.json')
+        if 'rerun' not in original:
+            missing[name] = 'the timing of the original is out of date, so only the lines were written'
+            continue
         text = set_row(text, r'(?:One|\d+ runs)', [
             f'first {seconds(original["first"])}, rerun {seconds(original["rerun"])}',
             f'first {seconds(best["first"])}, rerun {seconds(best["rerun"])} ({kernel_names[model["fastest"]]})',
@@ -309,32 +371,42 @@ def main():
     parser.add_argument('--kernels', nargs='+', choices=kernels, default=kernels)
     parser.add_argument('--starsim', help='folder of a Starsim checkout to use rather than the installed one')
     parser.add_argument('--commit', help='the commit of that checkout, if it is not a git repository')
-    parser.add_argument('--worker', nargs=3, help=argparse.SUPPRESS)
+    parser.add_argument('--references', action='store_true', help="also remake the originals' reference results, which takes over an hour")
+    parser.add_argument('--worker', nargs=5, help=argparse.SUPPRESS)
     args = parser.parse_args()
 
     if args.worker:
-        name, kernel, reruns = args.worker
-        return worker(name, kernel, int(reruns))
+        name, kernel, rerun_time, rebuild_time, most = args.worker
+        return worker(name, kernel, float(rerun_time), float(rebuild_time), int(most))
 
+    start = time.perf_counter()
     names = list_models(args.only)
     env = dict(PYTHONPATH=args.starsim) if args.starsim else {}
     failed = {}
+    spent = {} # Seconds by model and stage
+    paused = {} # Seconds paused for a busy machine
     if 'check' in args.stages:
         ok, text = command([sys.executable, str(root/'_envs'/'envs.py'), 'check'])
         print(text)
     if 'originals' in args.stages:
-        failed.update({f'original {key}':val for key,val in run_originals(names).items()})
+        failed.update({f'original {key}':val for key,val in run_originals(names, spent, paused, args.references).items()})
     if 'compare' in args.stages:
-        failed.update({f'compare {key}':val for key,val in run_compares(names, env).items()})
+        failed.update({f'compare {key}':val for key,val in run_compares(names, env, spent, paused).items()})
     if 'timing' in args.stages:
-        run_timing(names, args.kernels, env, args.commit)
+        run_timing(names, args.kernels, env, args.commit, spent, paused)
     if 'tables' in args.stages:
         for key,val in write_tables(names).items():
             print(f'Note: {key}: {val}')
 
     for key,val in failed.items():
         print(f'FAILED: {key}: {val}')
-    print(f'Done: {len(names)} models, {len(failed)} failures')
+    total = time.perf_counter() - start - paused.get('paused', 0)
+    for name,val in spent.items():
+        if sum(val.values()) > limit:
+            print(f'Over {limit} s: {name}: {val}')
+    if not args.only and args.stages == stages and not args.references: # Only a whole run, of the usual size
+        print(write_suite(spent, total))
+    print(f'Done: {len(names)} models, {len(failed)} failures, in {total/60:.1f} minutes')
     return len(failed) > 0
 
 

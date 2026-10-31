@@ -3,7 +3,7 @@ Run the original flepiMoP configuration and write its reference results, the val
 
     python run.py
 
-Needs the flepimop environment (see `_envs/flepimop`). It takes about three minutes.
+Needs the flepimop environment (see `_envs/flepimop`). The results take about a minute and a half, and the timing about a minute.
 """
 import os
 import csv
@@ -26,6 +26,8 @@ states = ['S', 'E', 'I', 'R', 'V']
 outcomes = ['incidCase', 'incidHosp', 'currHosp', 'incidDeath']
 start = datetime.date(2020, 2, 1) # start_date in the configuration
 n_days = 213
+n_slots = 10 # For the results, as in the configuration
+timed_slots = 2 # For the timing
 
 
 def read(pattern):
@@ -41,11 +43,11 @@ def day(row):
     return (datetime.date.fromisoformat(row['date'][:10]) - start).days
 
 
-def simulate():
-    """ Run the configuration (every scenario, ten slots each), returning the series and the values drawn for each slot """
+def simulate(slots=n_slots):
+    """ Run the configuration (every scenario, with a number of slots each), returning the series and the values drawn for each slot """
     with tempfile.TemporaryDirectory() as tmp: # flepiMoP reads and writes relative to where it is run
         project = shutil.copytree(os.path.join(here, 'original'), os.path.join(tmp, 'project'))
-        cmd = ['flepimop', 'simulate', config, '--write-csv', '--no-write-parquet', '--jobs', '1', '--in-id', 'reference', '--out-id', 'reference'] # Without --in-id, the outcomes look for the SEIR output under another ID and fail
+        cmd = ['flepimop', 'simulate', config, '--write-csv', '--no-write-parquet', '--jobs', '1', '--nslots', str(slots), '--in-id', 'reference', '--out-id', 'reference'] # Without --in-id, the outcomes look for the SEIR output under another ID and fail
         tools.run(cmd, 'flepimop', cwd=project)
         series = dict() # {(scenario, name): array of slots by days}
         draws = []
@@ -55,7 +57,7 @@ def simulate():
             hosp = read(os.path.join(folder, 'hosp', '*.hosp.csv'))
             spar = read(os.path.join(folder, 'spar', '*.spar.csv'))
             hpar = read(os.path.join(folder, 'hpar', '*.hpar.csv'))
-            assert len(seir) == len(hosp) == 10
+            assert len(seir) == len(hosp) == slots
             for slot in range(len(seir)):
                 Ro = [float(r['value']) for r in spar[slot] if r['parameter'] == 'Ro'][0]
                 p_case = [float(r['value']) for r in hpar[slot] if r['outcome'] == 'incidCase' and r['quantity'] == 'probability'][0]
@@ -77,12 +79,7 @@ def simulate():
 
 
 if __name__ == '__main__':
-    t0 = time.perf_counter()
-    series, draws = simulate()
-    first = time.perf_counter() - t0
-    t0 = time.perf_counter()
-    simulate()
-    rerun = time.perf_counter() - t0
+    series, draws = simulate(timed_slots if tools.quick else n_slots)
     rows = []
     for (scen,name),arr in series.items():
         ordered = np.sort(arr, axis=0)
@@ -90,10 +87,17 @@ if __name__ == '__main__':
         for t in range(n_days):
             rows.append(dict(time=t, series=f'{scen}_{name}', value=arr[:, t].mean(), low=ordered[int(0.05*(n - 1)), t], high=ordered[int(0.95*(n - 1)), t]))
     tools.write_results(here, rows)
-    with open(os.path.join(here, 'reference', 'draws.csv'), 'w', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=['scenario', 'slot', 'Ro', 'p_case'])
-        writer.writeheader()
-        writer.writerows(draws)
-    what = f'flepimop simulate {config} --jobs 1, as one command, which is the only way to run it: 3 scenarios of 10 runs each, with their outcomes (after the first, each run takes about 2.6 s). The rerun is the same command again, and each is timed once, since it takes about 90 s; both include starting Python and compiling'
+    if not tools.quick:
+        with open(os.path.join(here, 'reference', 'draws.csv'), 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=['scenario', 'slot', 'Ro', 'p_case'])
+            writer.writeheader()
+            writer.writerows(draws)
+    t0 = time.perf_counter()
+    simulate(timed_slots)
+    first = time.perf_counter() - t0
+    t0 = time.perf_counter()
+    simulate(timed_slots)
+    rerun = time.perf_counter() - t0
+    what = f'flepimop simulate {config} --jobs 1 --nslots {timed_slots}, as one command, which is the only way to run it: 3 scenarios of {timed_slots} runs each, with their outcomes (after the first, each run takes about 2.6 s). The rerun is the same command again, and each is timed once; both include starting Python and compiling'
     tools.write_timing(here, rerun, what, first=first)
     print(f'Wrote {len(rows)} rows and {len(draws)} draws; the whole command takes {first:.1f} s, and {rerun:.1f} s again')

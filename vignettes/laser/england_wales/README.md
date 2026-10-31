@@ -7,10 +7,10 @@ The translation of [examples/laser/england_wales](../../../examples/laser/englan
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 126 | 46 | Lines over 100 characters count twice. The original's 126 are for one run; with the notebook's sweep over 150 parameter sets, 172 |
-| One run | 3.0 s | 131 s | 667,864 agents for 3,650 days. LASER runs on all 20 cores; Starsim on one. LASER has no way to run a built model again, so its rerun builds the model too |
-| Results | | | **Agree.** Over the 10 years, 107,761 infections against 106,639 (+1.1%; means of 3 and 50 runs; the three Starsim runs are 106,611, 106,913, and 109,760, against the original's 5% to 95% range of 103,139 to 108,758); in each of seven places from Norwich to Southwold within 3%, except the smallest, Southwold, at +12%; 537,442 people at the end against 529,833 (+1.4%, finding 1). The share of weeks with no infections in each place, in the second half, is 0.631 against 0.628, and correlates at 0.985 across places. `compare.py` allows 5% in total, 20% in a place, 2% in people at the end, and 0.03 in the share of weeks |
+| One run | first 4.1 s, rerun 2.9 s | first 24 s, rerun 24 s (Rust) | 667,864 agents for 3,650 days. LASER runs on all 20 cores; Starsim on one. LASER has no way to run a built model again, so its rerun builds the model too |
+| Results | | | **Agree.** Over the 10 years, 107,761 infections against 106,639 (+1.1%; means of 3 and 50 runs, where `compare.py` now makes the last two of the three to keep the benchmark short; the three Starsim runs are 106,611, 106,913, and 109,760, against the original's 5% to 95% range of 103,139 to 108,758); in each of seven places from Norwich to Southwold within 3%, except the smallest, Southwold, at +12%; 537,442 people at the end against 529,833 (+1.4%, finding 1). The share of weeks with no infections in each place, in the second half, is 0.631 against 0.628, and correlates at 0.985 across places. `compare.py` allows 5% in total, 20% in a place, 2% in people at the end, and 0.03 in the share of weeks |
 
-Measured on 14 October 2026 with Starsim 4.0.0 (the `v4` branch) on a 20-core x86-64 Linux machine.
+Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `13494d38`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

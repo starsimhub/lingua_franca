@@ -35,6 +35,7 @@ project:
     - examples/summer2/sir-age-location/README.md
     - examples/summer2/seir-age-clinical/README.md
     - vignettes/README.md
+    - benchmark/README.md
     - vignettes/atomica/sir/README.md
     - vignettes/atomica/hiv_dyn/README.md
     - vignettes/camdl/sir/README.md
@@ -223,6 +224,8 @@ website:
           contents:
             - href: vignettes/README.md
               text: About the vignettes
+            - href: benchmark/README.md
+              text: The benchmark
             - vignettes/atomica/sir/README.md
             - vignettes/atomica/hiv_dyn/README.md
             - vignettes/camdl/sir/README.md

@@ -1,0 +1,618 @@
+{
+  "models": {
+    "atomica/hiv_dyn": {
+      "kernels": {
+        "rust": {
+          "first": 0.05730144795961678,
+          "rerun": 0.0034316949895583093,
+          "rebuild": 0.04532825999194756
+        },
+        "numba": {
+          "first": 0.13398746500024572,
+          "rerun": 0.0036494029918685555,
+          "rebuild": 0.0470798640162684
+        },
+        "jax": {
+          "first": 1.0239763839635998,
+          "rerun": 0.0035708530340343714,
+          "rebuild": 0.04568007797934115
+        },
+        "jax-gpu": {
+          "first": 2.5415363420033827,
+          "rerun": 0.00530899700243026,
+          "rebuild": 0.05547581001883373
+        }
+      },
+      "fastest": "rust",
+      "load": 15.28759765625
+    },
+    "atomica/sir": {
+      "kernels": {
+        "rust": {
+          "first": 0.014984497975092381,
+          "rerun": 0.0013155819615349174,
+          "rebuild": 0.011525343987159431
+        },
+        "numba": {
+          "first": 0.08376031898660585,
+          "rerun": 0.0012927069910801947,
+          "rebuild": 0.010581323993392289
+        },
+        "jax": {
+          "first": 1.0022390190279111,
+          "rerun": 0.0022391760139726102,
+          "rebuild": 0.010116686986293644
+        },
+        "jax-gpu": {
+          "first": 2.3196662479895167,
+          "rerun": 0.002380402002017945,
+          "rebuild": 0.012789481959771365
+        }
+      },
+      "fastest": "numba",
+      "load": 4.68994140625
+    },
+    "camdl/sir": {
+      "kernels": {
+        "rust": {
+          "first": 0.017712800996378064,
+          "rerun": 0.001068643992766738,
+          "rebuild": 0.012328637996688485
+        },
+        "numba": {
+          "first": 0.09296514600282535,
+          "rerun": 0.0012812979985028505,
+          "rebuild": 0.012767622014507651
+        },
+        "jax": {
+          "first": 0.7735303650260903,
+          "rerun": 0.0011294159921817482,
+          "rebuild": 0.012684542045462877
+        },
+        "jax-gpu": {
+          "first": 2.2891542289871722,
+          "rerun": 0.008522130025085062,
+          "rebuild": 0.02205009601311758
+        }
+      },
+      "fastest": "rust",
+      "load": 4.68994140625
+    },
+    "camdl/stratified": {
+      "kernels": {
+        "rust": {
+          "first": 0.01943401899188757,
+          "rerun": 0.0015968360239639878,
+          "rebuild": 0.013919128978159279
+        },
+        "numba": {
+          "first": 0.09015275799902156,
+          "rerun": 0.001999411964789033,
+          "rebuild": 0.013392933993600309
+        },
+        "jax": {
+          "first": 0.8380424830247648,
+          "rerun": 0.0019467829843051732,
+          "rebuild": 0.013715968991164118
+        },
+        "jax-gpu": {
+          "first": 1.1310006230487488,
+          "rerun": 0.033720605017151684,
+          "rebuild": 0.046114508993923664
+        }
+      },
+      "fastest": "rust",
+      "load": 4.68212890625
+    },
+    "emulsion/quickstart": {
+      "kernels": {
+        "jax": {
+          "skipped": "it runs as agents"
+        },
+        "jax-gpu": {
+          "skipped": "it runs as agents"
+        },
+        "rust": {
+          "first": 0.2598778840037994,
+          "rerun": 0.255885551974643,
+          "rebuild": 0.23860180901829153
+        },
+        "numba": {
+          "first": 0.28051109897205606,
+          "rerun": 0.2363439750042744,
+          "rebuild": 0.2442749089677818
+        }
+      },
+      "fastest": "numba",
+      "load": 7.30322265625
+    },
+    "emulsion/sir": {
+      "kernels": {
+        "rust": {
+          "first": 0.013868690002709627,
+          "rerun": 0.00099739502184093,
+          "rebuild": 0.008143164974171668
+        },
+        "numba": {
+          "first": 0.08542735903756693,
+          "rerun": 0.0012274940381757915,
+          "rebuild": 0.014356344006955624
+        },
+        "jax": {
+          "first": 0.2360163340345025,
+          "rerun": 0.0026049489970318973,
+          "rebuild": 0.014606475015170872
+        },
+        "jax-gpu": {
+          "first": 0.1834018169902265,
+          "rerun": 0.001479368016589433,
+          "rebuild": 0.008796195033937693
+        }
+      },
+      "fastest": "rust",
+      "load": 9.9794921875
+    },
+    "epimodel/hiv": {
+      "kernels": {
+        "jax": {
+          "skipped": "it runs as agents"
+        },
+        "jax-gpu": {
+          "skipped": "it runs as agents"
+        },
+        "rust": {
+          "first": 2.1694196129683405,
+          "rerun": 2.158700985950418
+        },
+        "numba": {
+          "first": 2.37711921002483,
+          "rerun": 2.3418027050211094
+        }
+      },
+      "fastest": "rust",
+      "load": 9.9794921875
+    },
+    "epimodel/sis-network": {
+      "kernels": {
+        "jax": {
+          "skipped": "it runs as agents"
+        },
+        "jax-gpu": {
+          "skipped": "it runs as agents"
+        },
+        "rust": {
+          "first": 0.3680218930239789,
+          "rerun": 0.35321453301003203,
+          "rebuild": 0.367049960012082
+        },
+        "numba": {
+          "first": 0.4407769969548099,
+          "rerun": 0.37715112598380074,
+          "rebuild": 0.38196461799088866
+        }
+      },
+      "fastest": "rust",
+      "load": 6.1884765625
+    },
+    "epydemix/covid19": {
+      "kernels": {
+        "rust": {
+          "first": 0.0330673250136897,
+          "rerun": 0.002322993997950107,
+          "rebuild": 0.025973302021156996
+        },
+        "numba": {
+          "first": 0.10761806298978627,
+          "rerun": 0.0027460280107334256,
+          "rebuild": 0.02715338603593409
+        },
+        "jax": {
+          "first": 0.145061902992893,
+          "rerun": 0.0027725619729608297,
+          "rebuild": 0.02751532895490527
+        },
+        "jax-gpu": {
+          "first": 0.1381763750105165,
+          "rerun": 0.002599567989818752,
+          "rebuild": 0.026795884012244642
+        }
+      },
+      "fastest": "rust",
+      "load": 4.5029296875
+    },
+    "epydemix/sir_kenya": {
+      "kernels": {
+        "rust": {
+          "first": 0.02367755101295188,
+          "rerun": 0.0014374700258485973,
+          "rebuild": 0.012977126985788345
+        },
+        "numba": {
+          "first": 0.19309336802689359,
+          "rerun": 0.0026382309733889997,
+          "rebuild": 0.020265383005607873
+        },
+        "jax": {
+          "first": 0.0618821459938772,
+          "rerun": 0.0014409919967874885,
+          "rebuild": 0.011160981026478112
+        },
+        "jax-gpu": {
+          "first": 0.062139349000062793,
+          "rerun": 0.0015247580013237894,
+          "rebuild": 0.021511320024728775
+        }
+      },
+      "fastest": "rust",
+      "load": 12.72607421875
+    },
+    "flepimop/seir_2pop": {
+      "kernels": {
+        "rust": {
+          "first": 0.033782194019295275,
+          "rerun": 0.0025752040091902018,
+          "rebuild": 0.012840273033361882
+        },
+        "numba": {
+          "first": 0.13869520800653845,
+          "rerun": 0.0017125909798778594,
+          "rebuild": 0.013470796984620392
+        },
+        "jax": {
+          "first": 0.8404947860399261,
+          "rerun": 0.001450671989005059,
+          "rebuild": 0.013045747007708997
+        },
+        "jax-gpu": {
+          "first": 1.0197925069951452,
+          "rerun": 0.009695096989162266,
+          "rebuild": 0.021609760995488614
+        }
+      },
+      "fastest": "jax",
+      "load": 5.31787109375
+    },
+    "flepimop/vaccine_scenarios": {
+      "kernels": {
+        "rust": {
+          "first": 1.5041961370152421,
+          "rerun": 0.652943134016823,
+          "rebuild": 0.665630019037053
+        },
+        "numba": {
+          "first": 0.818833532044664,
+          "rerun": 0.7269076520460658,
+          "rebuild": 0.7241881979862228
+        },
+        "jax": {
+          "first": 1.6009552420000546,
+          "rerun": 0.694046817952767,
+          "rebuild": 0.7594100260175765
+        },
+        "jax-gpu": {
+          "first": 1.5393995780032128,
+          "rerun": 0.7208749009878375,
+          "rebuild": 0.7350330330082215
+        }
+      },
+      "fastest": "rust",
+      "load": 5.31787109375
+    },
+    "ghana_measles/seir_districts": {
+      "kernels": {
+        "rust": {
+          "first": 1.9913627450005151,
+          "rerun": 0.6735518630011939,
+          "rebuild": 0.7339033960015513
+        },
+        "numba": {
+          "first": 1.8915659229969606,
+          "rerun": 0.7579073219676502,
+          "rebuild": 0.8248766890028492
+        },
+        "jax": {
+          "first": 0.748451745021157,
+          "rerun": 0.6465397069696337,
+          "rebuild": 0.7022707809810527
+        },
+        "jax-gpu": {
+          "first": 0.8506805400247686,
+          "rerun": 0.6710532609722577,
+          "rebuild": 0.7980899669928476
+        }
+      },
+      "fastest": "jax",
+      "load": 5.6494140625
+    },
+    "laser/england_wales": {
+      "kernels": {
+        "jax": {
+          "skipped": "it runs as agents"
+        },
+        "jax-gpu": {
+          "skipped": "it runs as agents"
+        },
+        "rust": {
+          "first": 23.750086050014943,
+          "rerun": 24.05005491297925
+        },
+        "numba": {
+          "first": 26.941639200027566,
+          "rerun": 27.278498597966973
+        }
+      },
+      "fastest": "rust",
+      "load": 5.6494140625
+    },
+    "laser/hub_spoke_seir": {
+      "kernels": {
+        "jax": {
+          "skipped": "it runs as agents"
+        },
+        "jax-gpu": {
+          "skipped": "it runs as agents"
+        },
+        "rust": {
+          "first": 1.1177702330169268,
+          "rerun": 0.7188340150169097,
+          "rebuild": 0.8595209040213376
+        },
+        "numba": {
+          "first": 1.2813465850194916,
+          "rerun": 0.8084179050056264,
+          "rebuild": 0.8812590599991381
+        }
+      },
+      "fastest": "rust",
+      "load": 5.560546875
+    },
+    "memilio/secir": {
+      "kernels": {
+        "rust": {
+          "first": 0.020997409999836236,
+          "rerun": 0.002059529011603445,
+          "rebuild": 0.01570305903442204
+        },
+        "numba": {
+          "first": 0.11084856395609677,
+          "rerun": 0.0023161410354077816,
+          "rebuild": 0.01646487199468538
+        },
+        "jax": {
+          "first": 0.9155537150218152,
+          "rerun": 0.0021388099994510412,
+          "rebuild": 0.015926872030831873
+        },
+        "jax-gpu": {
+          "first": 1.137080071028322,
+          "rerun": 0.023876499966718256,
+          "rebuild": 0.04483754298416898
+        }
+      },
+      "fastest": "rust",
+      "load": 5.88720703125
+    },
+    "memilio/secir_ageres": {
+      "kernels": {
+        "rust": {
+          "first": 0.02993056597188115,
+          "rerun": 0.0021199649781920016,
+          "rebuild": 0.022963781957514584
+        },
+        "numba": {
+          "first": 0.10774514795048162,
+          "rerun": 0.0024436679668724537,
+          "rebuild": 0.023177772003691643
+        },
+        "jax": {
+          "first": 1.0218447200022638,
+          "rerun": 0.003079012967646122,
+          "rebuild": 0.022927907994017005
+        },
+        "jax-gpu": {
+          "first": 1.1565946419723332,
+          "rerun": 0.013909492990933359,
+          "rebuild": 0.035452398005872965
+        }
+      },
+      "fastest": "rust",
+      "load": 5.88720703125
+    },
+    "odin/seir_array": {
+      "kernels": {
+        "rust": {
+          "first": 0.041704006027430296,
+          "rerun": 0.005912195018026978,
+          "rebuild": 0.02864433900685981
+        },
+        "numba": {
+          "first": 0.11611528298817575,
+          "rerun": 0.008108111971523613,
+          "rebuild": 0.030234539997763932
+        },
+        "jax": {
+          "first": 1.012302317947615,
+          "rerun": 0.017303283035289496,
+          "rebuild": 0.039049984014127403
+        },
+        "jax-gpu": {
+          "first": 1.7475058659911156,
+          "rerun": 0.09793422801885754,
+          "rebuild": 0.11943713296204805
+        }
+      },
+      "fastest": "rust",
+      "load": 4.9140625
+    },
+    "odin/stochastic_sir_arrays": {
+      "kernels": {
+        "rust": {
+          "first": 0.03881214099237695,
+          "rerun": 0.030203622998669744,
+          "rebuild": 0.01664541696663946
+        },
+        "numba": {
+          "first": 0.5161429109866731,
+          "rerun": 0.027964219043496996,
+          "rebuild": 0.029599886969663203
+        },
+        "jax": {
+          "first": 1.1329593089758419,
+          "rerun": 0.018958145985379815,
+          "rebuild": 0.01875864004250616
+        },
+        "jax-gpu": {
+          "first": 1.0352962770266458,
+          "rerun": 0.018665660987608135,
+          "rebuild": 0.018621292954776436
+        }
+      },
+      "fastest": "jax-gpu",
+      "load": 4.1953125
+    },
+    "siminf/sir_herds": {
+      "kernels": {
+        "jax": {
+          "skipped": "kernels: JAX does not run solver=\"gillespie\""
+        },
+        "jax-gpu": {
+          "skipped": "kernels: JAX does not run solver=\"gillespie\""
+        },
+        "rust": {
+          "first": 0.4400197630166076,
+          "rerun": 0.253754994017072,
+          "rebuild": 0.3735541609930806
+        },
+        "numba": {
+          "first": 0.749425019021146,
+          "rerun": 0.4293190409662202,
+          "rebuild": 0.5565789060201496
+        }
+      },
+      "fastest": "rust",
+      "load": 5.611328125
+    },
+    "siminf/sise3": {
+      "kernels": {
+        "jax": {
+          "skipped": "kernels: JAX does not run solver=\"gillespie\""
+        },
+        "jax-gpu": {
+          "skipped": "kernels: JAX does not run solver=\"gillespie\""
+        },
+        "rust": {
+          "first": 1.532949862012174,
+          "rerun": 0.9184520550188608,
+          "rebuild": 1.2947487109922804
+        },
+        "numba": {
+          "first": 2.1083712519612163,
+          "rerun": 1.5958951520151459,
+          "rebuild": 2.0936322269844823
+        }
+      },
+      "fastest": "rust",
+      "load": 5.75390625
+    },
+    "summer2/seir-age-clinical": {
+      "kernels": {
+        "rust": {
+          "first": 0.02930713299429044,
+          "rerun": 0.002678563992958516,
+          "rebuild": 0.012967224000021815
+        },
+        "numba": {
+          "first": 0.10403395601315424,
+          "rerun": 0.002280634013004601,
+          "rebuild": 0.014424188004340976
+        },
+        "jax": {
+          "first": 1.434252815961372,
+          "rerun": 0.00350450404221192,
+          "rebuild": 0.0153397920075804
+        },
+        "jax-gpu": {
+          "first": 1.3686945650260895,
+          "rerun": 0.024134771956596524,
+          "rebuild": 0.03994830895680934
+        }
+      },
+      "fastest": "numba",
+      "load": 5.75390625
+    },
+    "summer2/sir-age-location": {
+      "kernels": {
+        "rust": {
+          "first": 0.03409093199297786,
+          "rerun": 0.0014452479663304985,
+          "rebuild": 0.012492962006945163
+        },
+        "numba": {
+          "first": 0.13526206300593913,
+          "rerun": 0.0017396790208294988,
+          "rebuild": 0.012234122958034277
+        },
+        "jax": {
+          "first": 0.7264821729622781,
+          "rerun": 0.0014110860065557063,
+          "rebuild": 0.013304750027600676
+        },
+        "jax-gpu": {
+          "first": 1.5106042010011151,
+          "rerun": 0.018334413005504757,
+          "rebuild": 0.029878412024118006
+        }
+      },
+      "fastest": "jax",
+      "load": 5.5927734375
+    }
+  },
+  "date": "2026-10-31",
+  "starsim": {
+    "version": "4.0.0",
+    "commit": "13494d38"
+  },
+  "kernels": [
+    "rust",
+    "numba",
+    "jax",
+    "jax-gpu"
+  ],
+  "cpus": 20,
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+  "numba_compile": 338.2291622699704,
+  "suite": {
+    "date": "2026-10-31",
+    "seconds": 3064.5,
+    "stages": {
+      "originals": 468.9,
+      "compare": 418.3,
+      "timing": 1832.6
+    },
+    "models": {
+      "atomica/hiv_dyn": 94.9,
+      "atomica/sir": 90.6,
+      "camdl/sir": 85.1,
+      "camdl/stratified": 96.4,
+      "emulsion/quickstart": 106.3,
+      "emulsion/sir": 137.7,
+      "epimodel/hiv": 164.5,
+      "epimodel/sis-network": 170.1,
+      "epydemix/covid19": 150.6,
+      "epydemix/sir_kenya": 121.6,
+      "flepimop/seir_2pop": 120.8,
+      "flepimop/vaccine_scenarios": 202.5,
+      "ghana_measles/seir_districts": 135.1,
+      "laser/england_wales": 204.6,
+      "laser/hub_spoke_seir": 72.6,
+      "memilio/secir": 76.6,
+      "memilio/secir_ageres": 77.3,
+      "odin/seir_array": 82.7,
+      "odin/stochastic_sir_arrays": 86.5,
+      "siminf/sir_herds": 99.3,
+      "siminf/sise3": 127.7,
+      "summer2/seir-age-clinical": 114.8,
+      "summer2/sir-age-location": 101.3
+    }
+  }
+}

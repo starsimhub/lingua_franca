@@ -17,19 +17,29 @@ Results should also agree, within a stated tolerance. Missing any of these doesn
 
 The model names link to the [side-by-side comparison](../webapp/index.qmd), which shows the original code next to the Starsim version.
 
-**Note: timings have not been updated with the current version.**
-
-::: {.scorecard}
+::: {.benchmark}
 ```{python}
 #| echo: false
 #| output: asis
 import sciris as sc
 build = sc.importbypath('../webapp/build.py')
-print(build.scorecard())
+print(build.benchmark())
 ```
 :::
 
-To regenerate these results, see [about the vignettes](../vignettes/README.md).
+## Times under each set of kernels
+
+Starsim can run a model with its Rust, Numba, or JAX kernels. The table above gives the fastest rerun of each model, which is in bold here. Times are in seconds, and a blank means that model can't use those kernels, for example because it runs as agents.
+
+::: {.benchmark}
+```{python}
+#| echo: false
+#| output: asis
+print(build.kernel_table())
+```
+:::
+
+To regenerate these results, see [the benchmark](../benchmark/README.md).
 
 ## What is in each folder
 

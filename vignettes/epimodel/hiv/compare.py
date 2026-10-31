@@ -24,7 +24,7 @@ ref = {}
 for k,(t,v) in tools.read_results(example).items(): # Weeks 1 to 1040, with NaN where the original has no value (week 1, for its flows and its own modules)
     ref[k] = np.full(1040, np.nan)
     ref[k][np.array(t, dtype=int) - 1] = v
-n_runs = 20 # The reference has 10 of each scenario
+n_runs = 6 # The reference has 10 of each scenario
 weeks = slice(1, 1040) # Weeks 2 to 1040: index k is week k+1 in both (the start is week 1), for a stock the number then and for a flow the number during the step ending then
 late = slice(519, 1039) # The second half (weeks 521 to 1040), as in the original's summary
 

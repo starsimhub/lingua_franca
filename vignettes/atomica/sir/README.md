@@ -7,10 +7,10 @@ The translation of [examples/atomica/sir](../../../examples/atomica/sir). The mo
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 62 | 16 | The original is counted as rows of its two spreadsheets, plus three lines of Python. A spreadsheet row is easier for a non-programmer to fill in than a line of code, so these counts compare unlike things |
-| One run | 0.0024 s | 0.033 s, or 0.0005 s for a repeated run | The original's first run includes reading the spreadsheets, and its rerun is `Project.run_sim()` on the loaded project |
+| One run | first 0.15 s, rerun 0.0025 s | first 0.084 s, rerun 0.0013 s (Numba) | The original's first run includes reading the spreadsheets, and its rerun is `Project.run_sim()` on the loaded project |
 | Results | | | Every compartment identical, to rounding error |
 
-Measured on 30 October 2026 with Starsim 4.0.0 (the `v4` branch, commit a1e3faab) on a 20-core x86-64 Linux machine.
+Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `13494d38`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

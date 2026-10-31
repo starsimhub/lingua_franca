@@ -26,9 +26,10 @@ if __name__ == '__main__':
                 row[key] = round(row[key], 4 if row['series'].startswith('posterior') else 2)
 
     tools.write_results(here, rows)
-    with open(os.path.join(here, 'reference', 'population.json'), 'w') as f:
-        lines = [f'  {json.dumps(key)}: {json.dumps(val)}' for key,val in out['info'].items()] # One line per key
-        f.write('{\n' + ',\n'.join(lines) + '\n}\n')
+    if not tools.quick:
+        with open(os.path.join(here, 'reference', 'population.json'), 'w') as f:
+            lines = [f'  {json.dumps(key)}: {json.dumps(val)}' for key,val in out['info'].items()] # One line per key
+            f.write('{\n' + ',\n'.join(lines) + '\n}\n')
     abc = out['info']['abc']
     what = f'simulate_wrapper(): one stochastic run of the 99 days of the calibration period, as the calibration evaluates it, in process, with the model already defined. The first run is the first call, and the rerun the best of 5 calls after the calibration (the reduced ABC-SMC, {abc["particles"]} particles for {abc["generations"]} generations, takes {abc["seconds"]:.0f} s)'
     tools.write_timing(here, out['rerun'], what, first=out['first'])

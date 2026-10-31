@@ -17,7 +17,7 @@ import tools
 model = os.path.join(here, 'original', 'discrete_stochastic_sir_arrays.R')
 states = ['S', 'I', 'R']
 n_groups = 100 # The length of the arrays (`nsim`, left at its default)
-n_runs = 200 # The model is stochastic
+n_runs = tools.runs(200, fewest=100) # The model is stochastic
 seed = 1 # As in the vignette
 
 # The lines that compile and run the model are those of odin's "discrete" vignette (`odin::odin(path)`,

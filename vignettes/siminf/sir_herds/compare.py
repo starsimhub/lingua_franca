@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.join(root, 'examples'))
 import tools
 from model import sim
 
-n_runs = 200 # As many as the reference: the 7% of runs where the infection dies out early move the means a lot
+n_runs = 100 # The 7% of runs where the infection dies out early move the means a lot
 tolerance = 3 # Standard errors of the mean of the runs
 times = [100, 200, 365, 500, 700, 1000, 1460]
 

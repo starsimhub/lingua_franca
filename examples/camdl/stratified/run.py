@@ -17,7 +17,7 @@ model = os.path.join(here, 'original', 'stratified.camdl')
 pars = dict(beta=0.04, gamma=0.1, move=0.01)
 cells = [f'I_{age}_{patch}' for age in ['child', 'adult', 'elder'] for patch in ['north', 'south']]
 states = 'SEIR'
-n_runs = 200 # For the chain-binomial backend
+n_runs = tools.runs(200) # For the chain-binomial backend
 
 
 def simulate(*args):

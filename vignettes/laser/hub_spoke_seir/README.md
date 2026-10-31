@@ -7,10 +7,10 @@ The translation of [examples/laser/hub_spoke_seir](../../../examples/laser/hub_s
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 50 | 17 | |
-| One agent-based run | 0.78 s | 1.3 s | The original has 1,750,000 agents, on all cores; the Starsim run has 175,000, each standing for ten people, on one core. LASER has no way to run a built model again, so its rerun builds the model too |
+| One agent-based run | first 2.4 s, rerun 0.9 s | first 1.1 s, rerun 0.72 s (Rust) | The original has 1,750,000 agents, on all cores; the Starsim run has 175,000, each standing for ten people, on one core. LASER has no way to run a built model again, so its rerun builds the model too |
 | Results | | | **Agree.** As agents, the means of 6 Starsim runs and 20 LASER runs: 1,529,575 recovered at the end, against 1,532,298, and within 0.5% in each place shown; peaks within 5% in size and 9 days in time. As an ODE: 1,532,507 recovered, peaks within 5% in size and 8 days in time. `compare.py` allows 2%, 15%, and 10 days. |
 
-Measured on 13 October 2026 with Starsim 4.0.0 (the `v4` branch) on a 20-core x86-64 Linux machine.
+Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `13494d38`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

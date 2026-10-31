@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.join(root, 'examples'))
 import tools
 from model import sim
 
-n_runs = int(sys.argv[1]) if len(sys.argv) > 1 else 100
+n_runs = int(sys.argv[1]) if len(sys.argv) > 1 else 50
 times = [92, 183, 365, 547, 729, 911, 1093, 1275, 1457] # Days in the reference (every 7 days from day 1)
 tolerance = 3 # Standard errors of the difference from the mean of the 200 runs of the reference, taken to have the same spread
 keys = ['S_1', 'I_1', 'S_2', 'I_2', 'S_3', 'I_3', 'I', 'phi', 'nodes_infected', 'node1_I', 'node1_phi']

@@ -44,6 +44,7 @@ The lingua franca was built up in stages:
 | 3 | [Design](design/) | The design of the language, written as an extension of Starsim |
 | 4 | [Examples](examples/) | Other frameworks' own example models, and their translations into Starsim v4 |
 | 5 | [Compare](webapp/) | A tool for comparing example models between the original source and the lingua franca |
+| 6 | [Benchmark](benchmark/) | One script that regenerates every line count, run time, and check of agreement between the originals and the lingua franca |
 
 The [status page](admin/implementation.md) tracks how much has been implemented so far. This site explains how and why the design came about; to use Starsim v4, see its [documentation](https://starsim.org/v4/).
 

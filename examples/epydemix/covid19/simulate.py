@@ -30,9 +30,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(here)))
 import tools
 
 seed = 1
-n_particles = 200
-n_generations = 5
-n_runs = 200 # Runs of the model at fixed parameter values
+n_particles = tools.runs(200, fewest=20)
+n_generations = tools.runs(5, fewest=2)
+n_runs = tools.runs(200) # Runs of the model at fixed parameter values
 original = os.path.join(here, 'original', 'covid19.py')
 
 # Read the tutorial's own data from the local copies

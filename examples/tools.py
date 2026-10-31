@@ -4,6 +4,9 @@ two files, whatever framework it is written in.
 
     reference/results.csv   One row per time, series, and value (with low and high, for a summary of many runs)
     reference/timing.json   The wall-clock time of a first run and of a rerun, and the machine they were measured on
+
+The benchmark needs only the timing, so it sets BENCHMARK_QUICK: a `run.py` then makes as
+few runs as it can, and the reference results already in the repository are left alone.
 """
 import os
 import csv
@@ -13,6 +16,10 @@ import platform
 import subprocess
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+quick = bool(os.environ.get('BENCHMARK_QUICK'))
+time_budget = 20 # Seconds of reruns to time, at most
+least_time = 5 # Seconds to spend timing, at least, however many runs that takes
+most_runs = 100 # Runs to time, once `least_time` has been spent
 
 
 def env_path(framework):
@@ -27,23 +34,38 @@ def run(cmd, framework, cwd=None):
     return out.stdout
 
 
+def runs(n, fewest=3):
+    """ How many runs to make: n for the reference results, or a few if they are only for the timing """
+    return min(n, fewest) if quick else n
+
+
 first_run = dict() # The first call of the latest time_run(), which write_timing() records
 
 
-def time_run(func, n=5):
-    """ The best time in seconds of n calls of a function, after one first call, which is kept in `first_run` """
-    times = []
-    for i in range(n + 1):
+def repeat(func, budget=time_budget, least=least_time, most=most_runs):
+    """ The best time in seconds of calling a function until the budget is spent, or sooner after `most` calls if `least` seconds have been spent; there is always at least one call """
+    best, n, spent = float('inf'), 0, 0
+    while not n or spent < least or (spent < budget and n < most):
         start = time.perf_counter()
         func()
-        times.append(time.perf_counter() - start)
-    first_run['seconds'] = times[0]
-    return min(times[1:])
+        elapsed = time.perf_counter() - start
+        best, n, spent = min(best, elapsed), n + 1, spent + elapsed
+    return best
+
+
+def time_run(func):
+    """ The best time in seconds of repeated calls of a function, after one first call, which is kept in `first_run` """
+    start = time.perf_counter()
+    func()
+    first_run['seconds'] = time.perf_counter() - start
+    return repeat(func)
 
 
 def write_results(folder, rows):
-    """ Write the results: a list of dicts with keys time, series, value, and optionally low and high """
+    """ Write the results, unless they are from a quick run: a list of dicts with keys time, series, value, and optionally low and high """
     path = os.path.join(folder, 'reference', 'results.csv')
+    if quick:
+        return path
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=['time', 'series', 'value', 'low', 'high'], restval='')

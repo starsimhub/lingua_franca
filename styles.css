@@ -63,25 +63,25 @@
   }
 }
 
-/* The scorecard has long notes in its last column */
-.scorecard table {
+/* The benchmark table has long notes in its last column */
+.benchmark table {
   font-size: 0.9em;
 }
 
-.scorecard td:nth-child(3), .scorecard td:nth-child(4) { /* Lines and time: the original's above Starsim's, kept from wrapping inside a number */
+.benchmark td:nth-child(3), .benchmark td:nth-child(4) { /* Lines and time: the original's above Starsim's, kept from wrapping inside a number */
   min-width: 10rem;
 }
 
-.scorecard td:first-child {
+.benchmark td:first-child {
   white-space: nowrap;
 }
 
 /* Starsim's lines and time: green if no more than the original's, red if more (translucent, so they work in the dark theme too) */
-.scorecard td:has(.pass) {
+.benchmark td:has(.pass) {
   background-color: rgba(25, 135, 84, 0.18);
 }
 
-.scorecard td:has(.fail) {
+.benchmark td:has(.fail) {
   background-color: rgba(220, 53, 69, 0.18);
 }
 

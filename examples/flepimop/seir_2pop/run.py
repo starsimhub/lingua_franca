@@ -53,6 +53,6 @@ if __name__ == '__main__':
 
     tools.write_results(here, rows)
     rerun = tools.time_run(simulate)
-    what = 'flepimop simulate config_sample_2pop.yml, as one command, which is the only way to run it: the first run is the first call, and the rerun is the same command again, the best of 5. Both include starting Python and compiling the integrator with Numba, which is nearly all of the time and is done again on every run'
+    what = 'flepimop simulate config_sample_2pop.yml, as one command, which is the only way to run it: the first run is the first call, and the rerun is the same command again, the best of as many as fit in the time allowed. Both include starting Python and compiling the integrator with Numba, which is nearly all of the time and is done again on every run'
     tools.write_timing(here, rerun, what, first=first)
     print(f'Wrote {len(rows)} rows; a first run takes {first:.3f} s, and a rerun {rerun:.3f} s')

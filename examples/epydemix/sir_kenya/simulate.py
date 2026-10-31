@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # Time one simulation, and the 100 of the original
     kw = dict(start_date='2019-12-01', end_date='2020-04-01', percentage_in_agents=10/model.population.Nk.sum())
     rerun = tools.time_run(lambda: model.run_simulations(Nsim=1, **kw))
-    many = tools.time_run(lambda: model.run_simulations(Nsim=100, **kw), n=3)
+    many = tools.time_run(lambda: model.run_simulations(Nsim=100, **kw))
 
     info = dict(
         n_runs  = len(results.trajectories),

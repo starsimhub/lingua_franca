@@ -15,7 +15,7 @@ import tools
 
 model = os.path.join(here, 'original', 'sir.camdl')
 pars = dict(beta=0.4, gamma=0.15, rho=0.6, k=10)
-n_runs = 200 # For the stochastic backend
+n_runs = tools.runs(200) # For the stochastic backend
 
 
 def simulate(*args):

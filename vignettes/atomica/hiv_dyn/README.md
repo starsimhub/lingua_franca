@@ -7,10 +7,10 @@ The translation of [examples/atomica/hiv_dyn](../../../examples/atomica/hiv_dyn)
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 217 | 64 | The original is counted as rows of its three spreadsheets, plus 29 lines of Python; in Starsim, long lines count twice |
-| One run | 0.0054 s | 0.18 s | Without the programs. The original's first run includes reading the spreadsheets, and its rerun is `Project.run_sim()` on the loaded project. Most of Starsim's first run is building the sim (finding 8) |
+| One run | first 0.18 s, rerun 0.0049 s | first 0.057 s, rerun 0.0034 s (Rust) | Without the programs. The original's first run includes reading the spreadsheets, and its rerun is `Project.run_sim()` on the loaded project. Most of Starsim's first run is building the sim (finding 8) |
 | Results | | | **Identical,** to rounding error (a largest difference of 1 in 10<sup>14</sup>), in every compartment and every level of the cascade of both sexes, in all four runs: without programs, and with the default, doubled, and zero budgets |
 
-Measured on 30 October 2026 with Starsim 4.0.0 (the `v4` branch, commit a1e3faab) on a 20-core x86-64 Linux machine.
+Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `13494d38`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

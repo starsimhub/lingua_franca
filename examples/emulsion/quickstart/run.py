@@ -16,7 +16,7 @@ import tools
 
 model = os.path.join(here, 'original', 'quickstart.yaml')
 keys = ['J', 'A', 'NG', 'G', 'M', 'S', 'E', 'I', 'R', 'Q', 'total_population', 'nb_total_abortions'] # The count in each state of the three state machines, and two of the extra outputs
-n_runs = 200 # The model is stochastic
+n_runs = tools.runs(200) # The model is stochastic
 seed = 1
 
 

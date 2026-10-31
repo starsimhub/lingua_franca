@@ -18,7 +18,7 @@ sys.path.insert(0, os.environ.get('GHANA_MEASLES', os.path.join(examples, '..', 
 import tools
 import ghana_measles as gm
 
-n_runs = 50 # The model is stochastic
+n_runs = tools.runs(50) # The model is stochastic
 
 
 def summarize(frames, prefix):

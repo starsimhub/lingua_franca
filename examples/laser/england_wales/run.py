@@ -15,7 +15,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(here)))
 import tools
 
-n_runs = 50
+n_runs = tools.runs(50)
 center, radius, scale, years = 'Norwich', 100, 1, 10 # The places within 100 km of Norwich, at their real size, for 10 years
 
 

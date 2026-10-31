@@ -7,11 +7,11 @@ The translation of [examples/camdl/sir](../../../examples/camdl/sir). The model 
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 30 | 13 | Long lines count twice |
-| One ODE run | 0.009 s | 0.022 s, or 0.0006 s for a repeated run | The original is timed as a whole command, since camdl has no rerun within a process: its first run compiles the model, and its rerun is the same command with the model cached. Starsim's times exclude the import |
+| One ODE run | first 0.013 s, rerun 0.0058 s | first 0.018 s, rerun 0.0011 s (Rust) | The original is timed as a whole command, since camdl has no rerun within a process: its first run compiles the model, and its rerun is the same command with the model cached. Starsim's times exclude the import |
 | Results, ODE | | | **Agree.** Compartments and weekly cases within 0.02% (`compare.py` asks for 0.1%) |
 | Results, stochastic | | | **Agree.** Mean of 200 runs within 0.6% for `I` and 0.9% for weekly cases, chain-binomial in both, with whole-day steps (`compare.py` asks for 3% and 4%) |
 
-Measured on 30 October 2026 with Starsim 4.0.0 (the `v4` branch, commit a1e3faab) on a 20-core x86-64 Linux machine.
+Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `13494d38`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

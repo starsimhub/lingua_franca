@@ -4,8 +4,8 @@ Write the Markdown that compares each example with its vignette, from the files 
 show it call these functions as they are rendered, so nothing here is saved to a file:
 
     comparison()    Every model: the original and the Starsim version side by side (webapp/index.qmd)
-    scorecard()     One row per model: lines of code, run time, and agreement (index.qmd, examples/index.qmd)
-    kernel_table()  One row per model: its times under each kernel set, once `scorecard.py` has measured them
+    benchmark()     One row per model: lines of code, run time, and agreement (index.qmd, examples/index.qmd)
+    kernel_table()  One row per model: its times under each kernel set, once `benchmark/benchmark.py` has measured them
 
 To see what either one writes:
 
@@ -179,8 +179,8 @@ def mark(original, starsim, index=0):
     return f'Original: {original}<br>[Starsim: {starsim}]{{.{target}}}'
 
 
-def scorecard_row(model):
-    """ The row of the scorecard for one model: lines, time, and whether the results agree """
+def benchmark_row(model):
+    """ The row of the benchmark table for one model: lines, time, and whether the results agree """
     link = f'[**{model.meta.framework}**<br>{model.folder.parent.name}](/webapp/index.qmd#{model.id})'
     rows = table_rows(model.table)
     if not rows:
@@ -203,18 +203,18 @@ def comparison():
     return '\n'.join([f'::: {{.model-picker}}\n{picker}\n:::\n'] + [model_page(model) for model in models])
 
 
-def scorecard():
-    """ The scorecard: a table with a row for each model """
+def benchmark():
+    """ The benchmark table: a table with a row for each model """
     out = [
         '| Model | Language | Lines | Time | Results |',
         '|---|---|---|---|---|',
-    ] + [scorecard_row(model) for model in load_models()]
+    ] + [benchmark_row(model) for model in load_models()]
     return '\n'.join(out)
 
 
 def kernel_table():
-    """ The times of each model under each kernel set, from `vignettes/timings.json`, written by `scorecard.py` """
-    info = sc.loadjson(root / 'vignettes' / 'timings.json')
+    """ The times of each model under each kernel set, from `benchmark/timings.json`, written by `benchmark/benchmark.py` """
+    info = sc.loadjson(root / 'benchmark' / 'timings.json')
     sets = info['kernels']
     names = dict(rust='Rust', numba='Numba', jax='JAX', **{'jax-gpu':'JAX on a GPU'})
     out = ['| Model | ' + ' | '.join(f'{names[key]}: first | {names[key]}: rerun' for key in sets) + ' |', '|---|' + '---|---|'*len(sets)]
@@ -230,5 +230,5 @@ def kernel_table():
 
 
 if __name__ == '__main__':
-    print(scorecard())
+    print(benchmark())
     print(comparison())

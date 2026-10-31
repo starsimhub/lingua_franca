@@ -13,7 +13,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(here)))
 import tools
 
-n_runs = 20
+n_runs = tools.runs(20)
 
 
 def summarize(runs, key):

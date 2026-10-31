@@ -17,7 +17,7 @@ import tools
 model = os.path.join(here, 'original', 'intro_sis.R')
 driver = os.path.join(here, 'reference.R') # Runs the original, then repeats its simulation n_runs times
 series = ['s.num', 'i.num', 'si.flow', 'is.flow', 'edges', 'meandeg', 'concurrent', 'duration', 'prop.diss']
-n_runs = 100 # The model is stochastic
+n_runs = tools.runs(100) # The model is stochastic
 seed = 1
 n_cores = 2 # The results do not depend on this, as long as it is at least 2
 

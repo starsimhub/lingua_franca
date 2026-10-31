@@ -16,7 +16,7 @@ import tools
 
 variants = dict(compartment='compart_SIR.yaml', ibm='IBM_SIR.yaml', hybrid='hybrid_SIR.yaml') # The name in the results, and the model file
 states = ['S', 'I', 'R']
-n_runs = 200 # Every variant is stochastic
+n_runs = tools.runs(200) # Every variant is stochastic
 seed = 1
 
 
