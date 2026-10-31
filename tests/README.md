@@ -1,13 +1,13 @@
 # Tests
 
-Tests of Starsim that need what is in this repo: other frameworks' original examples and results (`examples/`), the Starsim versions of them (`vignettes/`), and the frameworks themselves (`_envs/`). **Starsim runs `conversion/` and `switching/` as a downstream test** (`.github/workflows/test_downstream.yml` in the Starsim repo calls `frameworks.yml` here), so a change here can fail Starsim's CI. They run against whichever Starsim is installed.
+Tests of Starsim that need what is in this repo: other frameworks' original models and results, with the Starsim versions of them (`docs/models/`), and the frameworks themselves (`_envs/`). **Starsim runs `conversion/` and `switching/` as a downstream test** (`.github/workflows/test_downstream.yml` in the Starsim repo calls `frameworks.yml` here), so a change here can fail Starsim's CI. They run against whichever Starsim is installed.
 
 | Folder | What it tests | How to run it |
 |---|---|---|
 | `conversion/` | `ss.import_from()` against other frameworks' examples and the frameworks themselves, and `ss.export_to()` against the tools it writes for | `lingua_franca test conversion` |
 | `switching/` | One demo per framework, for its users, written in that field's terms; see its README | `lingua_franca test switching` |
 | `threading/` | Whether BLAS threads help Starsim: a separate script for other machines; see its README | `lingua_franca test threading` |
-| `reviews/` | Not tests to run, but the [targets](reviews/targets.md) for v4, and the reports of the skills in `ai/`, by date | `/v4.review`, `/v4.others`, `/v4.canon`, `/v4.naive` |
+| `reviews/` | Not tests to run, but the [targets](reviews/targets.md) for v4, and the reports of the skills in `skills/`, by date | `/v4.review`, `/v4.others`, `/v4.canon`, `/v4.naive` |
 
 `lingua_franca test all -n auto` runs all three (install it with `pip install -e .` from the top of this repo); anything after the suite goes to pytest, or to `run.py` for `threading` alone. `pytest conversion` from this folder also still works. Tests that need a framework are skipped until its environment is installed (`lingua_franca envs install <framework>`; see `docs/models/environments.md`).
 

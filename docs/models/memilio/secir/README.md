@@ -2,6 +2,28 @@
 
 A deterministic COVID-19-type epidemic in one region and one age group of 83,000 people over 100 days: infection, then a chain of worsening states (no symptoms, symptoms, severe, critical), each of which ends in either the next state or recovery, with death from the critical state. Contacts are cut by 90% on day 30.
 
+`model.py` is the Starsim version, and `compare.py` checks it against `reference/`.
+
+## Comparison
+
+| Measure | Original | Starsim | |
+|---|---|---|---|
+| Lines of model code | 44 | 14 | |
+| One run | first 0.00046 s, rerun 0.00002 s | first 0.018 s, rerun 0.0016 s (Rust) | Neither counts starting Python or importing. MEmilio's solver is C++ code built in advance, so its first run has little to do |
+| Results | | | **Agree.** Within 67 people of 83,000 at every time, which is the error of the reference itself (it is interpolated between steps of about two days); deaths within 0.4. `compare.py` allows 73 people and 0.5 deaths |
+
+Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `4473e253`), on a 20-core Linux machine.
+
+## What was declared and what was not
+
+Everything is declared. Each severity step is one transition with two destinations and a probability; deaths leave the model, so they are counted from the flow and the people who mix are the ones alive, as in the original.
+
+## Findings
+
+- **Fixed: a value that varies in time was held for a whole step.** The original lowers contacts smoothly over day 29, along half a cosine. `ss.timeseries(..., mode='cosine')` says the same, and the ODE solver reads it at each stage of a step, so the translation no longer gives that day its average by hand.
+- **Two states left out.** The original has two "confirmed" states that nothing flows into; they are not in the translation.
+- **The dead are a flow, not a state.** The number dead is `res.death.cum`.
+
 ## What it exercises
 
 - A model that is built in, not written: the user sets parameters and initial counts on a ready-made `Model`, and the equations are in C++
@@ -13,6 +35,8 @@ A deterministic COVID-19-type epidemic in one region and one age group of 83,000
 
 ## Files
 
+- `model.py`: the Starsim version
+- `compare.py`: checks it against `reference/`
 - `original/ode_secir_simple.py`: the example, unchanged
 - `run.py`: runs it and writes `reference/`
 - `reference/results.csv`: the count in each of the 10 states on each of days 0 to 100 (`Susceptible`, `Exposed`, `InfectedNoSymptoms`, `InfectedNoSymptomsConfirmed`, `InfectedSymptoms`, `InfectedSymptomsConfirmed`, `InfectedSevere`, `InfectedCritical`, `Recovered`, `Dead`)

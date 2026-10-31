@@ -5,7 +5,7 @@ toc: false
 include-after-body: _picker.html
 ---
 
-Each model in [examples](/examples/index.qmd) as its framework's authors wrote it, next to its translation in [vignettes](/vignettes/README.md). Pick a model:
+Each of the [models](/models/index.qmd) as its framework's authors wrote it, next to its Starsim translation. Pick a model:
 
 ```{python}
 #| echo: false

@@ -1,6 +1,6 @@
 # Benchmark
 
-`lingua_franca benchmark` regenerates every number in the table on the home page. It checks each translation against its original, times the two in turn, and writes the lines and times into each vignette's table.
+`lingua_franca benchmark` regenerates every number in the table on the home page. It checks each translation against its original, times the two in turn, and writes the lines and times into each translation's table.
 
 **Last full run:** 21 minutes on 31 October 2026 (compare 7.7, timing 13.4). The slowest model, `epimodel/sis-network`, took 151 s.
 
@@ -47,7 +47,7 @@ Each full run saves how long the suite, each stage, and each model took to `timi
     lingua_franca benchmark --all-kernels          # Try every kernel set, and rewrite kernels.yaml
     ```
 
-    The times go in `timings.json` and `timings.csv` in this folder (`docs/benchmark/`), keeping the last time of any kernel set not run this time, and what each run prints goes to `compare.log` in each vignette's folder and `run.log` in each example's folder. It stops short of the text: if a result changes, `compare.py` fails, and the Results row of the vignette's table is updated by hand.
+    The times go in `timings.json` and `timings.csv` in this folder (`docs/benchmark/`), keeping the last time of any kernel set not run this time, and what each run prints goes to `compare.log` in each translation's folder and `run.log` in each example's folder. It stops short of the text: if a result changes, `compare.py` fails, and the Results row of the translation's table is updated by hand.
 
 The run ends with a scorecard of the north star: one row per model with its lines and times against the original, and whether it fails. A model fails on lines if Starsim has more than the original, and on a time if Starsim is more than 2x slower and more than 1 s slower. `--stages tables` prints it from the last run without timing anything, and `--out` saves it to a file.
 

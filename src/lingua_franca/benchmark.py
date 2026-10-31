@@ -11,9 +11,9 @@ code and run time for the original and for Starsim, and whether their results ag
 The stages, in order (see docs/benchmark/README.md for what to install first):
 
     check       Check that each framework's environment is installed in _envs/
-    compare     Check each translation against the originals' results (docs/vignettes/*/*/compare.py)
+    compare     Check each translation against the originals' results (docs/models/*/*/compare.py)
     timing      Time each original and its translation in turn, writing timings.json and .csv in docs/benchmark
-    tables      Write the lines and times into the table of each vignette's README, and print the scorecard
+    tables      Write the lines and times into the table of each model's README, and print the scorecard
 
 Lines are counted, and times taken, as in docs/design/18-conformance.md. The first run is a
 fresh process, not counting importing Starsim and reading the model file (so not reading
@@ -44,8 +44,7 @@ import subprocess
 import sciris as sc
 
 root = sc.thispath(__file__).parent.parent # The top of this repo
-models = root / 'docs' / 'models' # The originals
-vignettes = root / 'docs' / 'vignettes' # The Starsim versions
+models = root / 'docs' / 'models' # Each original, with its Starsim version
 folder = root / 'docs' / 'benchmark' # The results, and the page that shows them
 sys.path.insert(0, str(models))
 import tools
@@ -81,9 +80,7 @@ def list_models(only=None):
 
 def model_file(name):
     """ The file holding the Starsim version of a model """
-    folder = vignettes / name
-    path = folder / 'model.py'
-    return path if path.exists() else next(path for path in sorted(folder.glob('*.py')) if path.name != 'compare.py')
+    return models / name / 'model.py'
 
 
 def count_lines(path):
@@ -155,7 +152,7 @@ def run_compares(names, env, spent, paused):
         wait_for_quiet(paused)
         print(f'Compare: {name}', flush=True)
         start = time.perf_counter()
-        ok, text = command([sys.executable, 'compare.py'], cwd=vignettes/name, env=env, log=vignettes/name/'compare.log')
+        ok, text = command([sys.executable, 'compare.py'], cwd=models/name, env=env, log=models/name/'compare.log')
         spent.setdefault(name, {})['compare'] = time.perf_counter() - start
         if not ok:
             failed[name] = last_line(text)
@@ -380,11 +377,11 @@ def set_row(text, start, cells):
 
 
 def write_tables(names):
-    """ Write the lines and the times into each vignette's table """
+    """ Write the lines and the times into each model's table """
     info = load_data()
     missing = {}
     for name in names:
-        path = vignettes / name / 'README.md'
+        path = models / name / 'README.md'
         text = sc.loadtext(path)
         text = set_row(text, 'Lines of model code', [re.search(r'^\| Lines of model code \|([^|]*)\|', text, flags=re.MULTILINE).group(1).strip(), count_lines(model_file(name))])
         sc.savetext(path, text)
@@ -404,17 +401,17 @@ def write_tables(names):
         ])
         date = datetime.date.fromisoformat(info['date']).strftime('%-d %B %Y')
         measured = f'Measured on {date} with Starsim {info["starsim"]["version"]} (the `v4` branch, commit `{info["starsim"]["commit"]}`), on a {info["cpus"]}-core Linux machine.'
-        text = re.sub(r'^Measured on .*$', measured, text, flags=re.MULTILINE)
+        text = re.sub(r'^Measured on .*$', measured, text, count=1, flags=re.MULTILINE)
         sc.savetext(path, text)
     return missing
 
 
 def original_lines(name):
-    """ The original's lines: from its meta.yaml, or else the first number in the vignette's table """
+    """ The original's lines: from its meta.yaml, or else the first number in its table """
     lines = sc.loadyaml(models/name/'meta.yaml').get('lines')
     if isinstance(lines, int):
         return lines
-    row = re.search(r'^\| Lines of model code \|([^|]*)\|', sc.loadtext(vignettes/name/'README.md'), flags=re.MULTILINE).group(1)
+    row = re.search(r'^\| Lines of model code \|([^|]*)\|', sc.loadtext(models/name/'README.md'), flags=re.MULTILINE).group(1)
     return int(re.search(r'\d[\d,]*', row).group().replace(',', ''))
 
 

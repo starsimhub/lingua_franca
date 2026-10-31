@@ -52,10 +52,10 @@ To run the tests and benchmark, install this repo with `pip install -e . --group
 - `lingua_franca benchmark` checks the north star: it counts each model's lines, times it against the original, checks that their results agree, and ends with a scorecard of what passes and fails. `--stages tables` prints the scorecard again from the last run, and `--out` saves it. See [the benchmark](docs/benchmark/README.md).
 - `lingua_franca envs install` builds the frameworks' environments into `_envs/` from the recipes in `docs/models/<framework>`, and `python scripts/clean_envs.py` deletes them.
 
-The site's source is in `docs/`, and is built with `quarto render docs`. `scripts/` holds what the pages call as they are rendered, `ai/` the skills that review v4, and `tests/reviews/` the targets they check and their reports.
+The site's source is in `docs/`, and is built with `quarto render docs`. `scripts/` holds what the pages call as they are rendered, `skills/` the skills that review v4, and `tests/reviews/` the targets they check and their reports.
 
 The [status page](docs/admin/implementation.md) tracks how much has been implemented so far. This site explains how and why the design came about; to use Starsim v4, see its [documentation](https://starsim.org/v4/).
 
 ## AI disclaimer
 
-AI tools (mostly Claude) were used to summarize information, compare and assess frameworks, extract code examples, and create vignettes. Assessments and design decisions are owned by the humans.
+AI tools (mostly Claude) were used to summarize information, compare and assess frameworks, extract code examples, and create translations. Assessments and design decisions are owned by the humans.

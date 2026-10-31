@@ -47,7 +47,7 @@ def make_germany(n, k=20, seed=1):
 
 
 def make_secir(d, beta=None, damping=True):
-    """ The age-resolved SECIR of the vignette, with commuting between counties """
+    """ the age-resolved SECIR model, with commuting between counties """
     A = lambda v: ss.by(age=list(np.broadcast_to(v, 6)))
     D = lambda v: ss.by(age=[ss.days(x) for x in np.broadcast_to(v, 6)])
     beta = beta if beta is not None else A(P['beta'])

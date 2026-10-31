@@ -162,7 +162,6 @@ jobs:
           path: |
             tests/results.xml
             docs/benchmark/timings.*
-            docs/vignettes/${{ matrix.models }}**/compare.log
-            docs/models/${{ matrix.models }}**/run.log
+            docs/models/${{ matrix.models }}**/*.log
             _envs/*/build.log
           if-no-files-found: warn

@@ -12,7 +12,7 @@ The tests are of three kinds:
 
 - **Asserted**: the test fails if the behavior is wrong (the three spellings give the same results; a modifier restores the base value).
 - **Recorded**: the result is a published number or table, not a pass or fail (how far an ODE approximation of a network model is from the agent-based run).
-- **Measured against the original**: lines of code and run time for each vignette, compared with the framework it came from.
+- **Measured against the original**: lines of code and run time for each translation, compared with the framework it came from.
 
 ## Levels
 
@@ -159,15 +159,15 @@ Each error, warning, and note SHOULD have a minimal example that triggers it, wi
 
 ### 13. North star
 
-The claim: **a model should never be easier to write without the lingua franca than with it.** For each vignette in [vignettes](../vignettes), which translates one of a framework's own examples, `lingua_franca benchmark` writes a table of lines and time, original against Starsim, with the failing rows:
+The claim: **a model should never be easier to write without the lingua franca than with it.** For each model in [models](../models), with its translation of one of a framework's own examples, `lingua_franca benchmark` writes a table of lines and time, original against Starsim, with the failing rows:
 
 | Measure | How | Requirement |
 |---|---|---|
 | **Lines of model code** | Count non-blank, non-comment lines needed to define and run the model, in both versions. Docstrings, imports, plotting, data loading, and the `if __name__ == '__main__'` block are excluded. Lines longer than 100 characters count as two, so that length cannot be hidden in one long line. Where the original calls a built-in written for one situation (`interventions=close_schools_uk()`), the lines of that built-in's body count as part of the original; the lingua franca version writes the same thing out and is counted in full | Lingua franca ≤ original: the hard target |
 | **Time** | Two numbers for each: the first run in a fresh process, and the best rerun of the same sim, on the same machine, at the same population size, timestep, and duration, taking the original and the lingua franca in turn | Reported. A time fails if the lingua franca is both more than 2x slower and more than 1 s slower |
-| **Results** | Compare the vignette's results with the original's, to a tolerance stated in the vignette | Agree |
+| **Results** | Compare the translation's results with the original's, to a tolerance stated in the translation | Agree |
 
-The table has one row per vignette, failing rows included. A row where the lingua franca is longer or slower is a defect in the design or the implementation and is listed as such, with the reason. It is not hidden, and it is not a reason to drop the vignette. The table is published on the "Coming from" pages of the documentation (`docs/coming_from/`).
+The table has one row per translation, failing rows included. A row where the lingua franca is longer or slower is a defect in the design or the implementation and is listed as such, with the reason. It is not hidden, and it is not a reason to drop the translation. The table is published on the "Coming from" pages of the documentation (`docs/coming_from/`).
 
 The table SHOULD cover at least one example from each main framework: MEmilio, EpiModel, epydemix, summer2, SimInf, odin, EMULSION, flepiMoP, Atomica, LASER, and Starsim itself.
 

@@ -1,6 +1,6 @@
 """
-Write the Markdown that compares each example with its vignette, from the files in
-`docs/models/<framework>/<model>` and `docs/vignettes/<framework>/<model>`. The pages that
+Write the Markdown that compares each original with its Starsim version, from the files
+in `docs/models/<framework>/<model>`. The pages that
 show it call these functions as they are rendered, so nothing here is saved to a file:
 
     comparison()    Every model: the original and the Starsim version side by side (docs/webapp/index.qmd)
@@ -115,25 +115,21 @@ def friendly_times(text):
 
 
 def load_model(folder):
-    """ Everything known about one example and its vignette """
+    """ Everything known about one model """
     meta = sc.objdict(sc.loadyaml(folder / 'meta.yaml'))
     key = f"{folder.parent.name}/{folder.name}"
-    vfolder = root / 'docs' / 'vignettes' / key
-    title, intro, body = sections(read(folder / 'README.md'))
-    vtitle, vintro, vbody = sections(fix_links(read(vfolder / 'README.md'), vfolder))
+    title, intro, body = sections(fix_links(read(folder / 'README.md'), folder))
     model = sc.objdict(
         key      = key,
         id       = 'm-' + key.replace('/', '-'),
         meta     = meta,
         title    = title,
         intro    = intro.split('\n\n')[0],
-        vintro   = vintro,
-        table    = friendly_times(vbody.pop('Comparison', '')),
-        notes    = vbody,
+        table    = friendly_times(body['Comparison']),
+        notes    = {heading:body[heading] for heading in ['What was declared and what was not', 'Findings']},
         folder   = folder / 'original',
-        vfolder  = vfolder,
+        starsim  = folder,
         original = code_files(folder / 'original'),
-        starsim  = code_files(vfolder, suffix='.py', exclude=['compare.py']),
     )
     return model
 
@@ -149,16 +145,13 @@ def model_page(model):
         f'- **Framework:** {meta.framework} {meta.version} ({meta.license})',
         f'- **Language:** {meta.language}',
         f'- **Source:** {source}',
-        f'- **Full detail:** [the example](/examples/{model.key}/README.md) and [the vignette](/vignettes/{model.key}/README.md)\n',
+        f'- **Full detail:** [the model\'s page](/models/{model.key}/README.md)\n',
     ]
-    if model.table:
-        out += [model.table, '']
-    else: # There is no comparison yet, so say why
-        out += [model.vintro.split('\n\n')[0].partition('. ')[2], '']
     out += [
+        model.table, '',
         ':::: {.compare}\n',
         code_pane(f'Original ({meta.framework})', model.folder, model.original), '',
-        code_pane('Starsim', model.vfolder, model.starsim), '',
+        code_pane('Starsim', model.starsim, [sc.path('model.py')]), '',
         '::::\n',
     ]
     for heading, text in model.notes.items():
@@ -183,15 +176,13 @@ def benchmark_row(model):
     """ The row of the benchmark table for one model: lines, time, and whether the results agree """
     link = f'[**{model.meta.framework}**<br>{model.folder.parent.name}](/webapp/index.qmd#{model.id})'
     rows = table_rows(model.table)
-    if not rows:
-        return f'| {link} | {model.meta.language} | *Not written yet* | | |'
     lines, time = rows[0], rows[1]
     results = '; '.join(row[3] for row in rows[2:])
     return f'| {link} | {model.meta.language} | {mark(lines[1], lines[2])} | {mark(time[1], time[2], index=-1)} | {results} |'
 
 
 def load_models():
-    """ Every example that has a `meta.yaml`, in order of framework """
+    """ Every model that has a `meta.yaml`, in order of framework """
     folders = sorted(path.parent for path in (root / 'docs' / 'models').glob('*/*/meta.yaml'))
     return [load_model(folder) for folder in folders]
 

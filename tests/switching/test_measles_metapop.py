@@ -25,7 +25,7 @@ def make_districts(n=20, seed=1):
 
 
 def make_measles(d, beta=ss.perday(1.75), away=0.01, report=0.005):
-    """ The vignette's model: seasonal SEIR by district with gravity mixing, births, deaths, importation, and reported cases """
+    """ The model: seasonal SEIR by district with gravity mixing, births, deaths, importation, and reported cases """
     S, E, I, R = ss.states(4)
     infection   = S >> E @ ss.seasonal(mean=beta, amplitude=0.15, peak=59/365) * I
     importation = S >> E @ ss.peryear(0.01/1000) * (S + E + I + R).n / S.n

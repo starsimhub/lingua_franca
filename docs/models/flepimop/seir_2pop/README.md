@@ -4,6 +4,28 @@ A deterministic SEIR epidemic in two provinces, of 9,000 and 1,000 people, coupl
 
 flepiMoP calls it its "sample 2pop" model and it is often described as an SIR, but the configuration has an exposed state, so it is an SEIR.
 
+`model.py` is the Starsim version, and `compare.py` checks it against `reference/`.
+
+## Comparison
+
+| Measure | Original | Starsim | |
+|---|---|---|---|
+| Lines of model code | 42, plus 10 lines of CSV | 16 |  |
+| One run | first 11 s, rerun 13 s | first 0.89 s, rerun 0.0017 s (JAX) | The original can run only as a whole command, so its first run and rerun are both that command, about 7 s of which is compiling, on every run |
+| Results | | | **Agree exactly** (tolerance 1e-6 people): every compartment in both provinces, on every day, within 3e-12 people |
+
+Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `4473e253`), on a 20-core Linux machine.
+
+## What was declared and what was not
+
+Everything is declared. The populations and the travel between them are written in the script; the original keeps them in three CSV files, which is easier to change for many places.
+
+## Findings
+
+- **A third way of coupling places.** In flepiMoP, people who travel are exposed to the residents of the place they go to, and do not infect anyone there. Starsim's commuting has them do both, which brought the epidemic to the small province 12 days sooner. `ss.geo.Mobility(kind='visit')` matches the original exactly.
+- **Half a day is hard-coded.** flepiMoP multiplies the travel matrix by 0.5; here that is written out.
+- **`substeps=1` gives the same steps.** The original takes one RK4 step a day. By default Starsim subdivides a step when rates are high, which gives a difference of 0.007 people here; with `substeps=1` it takes the same steps as the original and they agree to 12 digits.
+
 ## What it exercises
 
 - A model with no code: compartments, parameters, and transitions are all declared in YAML
@@ -15,6 +37,8 @@ flepiMoP calls it its "sample 2pop" model and it is often described as an SIR, b
 
 ## Files
 
+- `model.py`: the Starsim version
+- `compare.py`: checks it against `reference/`
 - `original/config_sample_2pop.yml`: the configuration, unchanged
 - `original/model_input/geodata_sample_2pop.csv`, `mobility_sample_2pop.csv`, `ic_2pop.csv`: the populations, the mobility, and the initial conditions, unchanged
 - `run.py`: runs it with `flepimop simulate` and writes `reference/`

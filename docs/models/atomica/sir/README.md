@@ -2,6 +2,29 @@
 
 Atomica's SIR demo (`at.demo('sir')`): one population of 1,000 adults moving between susceptible, infected, recovered, and dead, over 23 yearly steps. The model structure is in one spreadsheet (the framework) and its data in another (the databook); the Python only loads and runs them.
 
+`model.py` is the Starsim version, and `compare.py` checks it against `reference/`.
+
+## Comparison
+
+| Measure | Original | Starsim | |
+|---|---|---|---|
+| Lines of model code | 62 | 16 | The original is counted as rows of its two spreadsheets, plus three lines of Python. A spreadsheet row is easier for a non-programmer to fill in than a line of code, so these counts compare unlike things |
+| One run | first 0.14 s, rerun 0.0031 s | first 0.022 s, rerun 0.0013 s (Rust) | The original's first run includes reading the spreadsheets, and its rerun is `Project.run_sim()` on the loaded project |
+| Results | | | Every compartment identical, to rounding error |
+
+Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `4473e253`), on a 20-core Linux machine.
+
+## What was declared and what was not
+
+Everything is declared. The force of infection is an ordinary expression of counts and parameters, not a function.
+
+## Findings
+
+- **The step is part of the model.** Atomica takes one forward Euler step a year. Matching it needs `integrator='euler', substeps=1`; with Starsim's default integrator there are 18 infected at the end, not 11.
+- **A constant inside the force of infection (fixed).** The original multiplies it by one minus the death rate. This version once wrote the number out again, since a typed rate could not be subtracted from 1. `1 - susdeath` now works.
+- **Initial conditions as given.** The databook gives the susceptible number, the total, and the prevalence, and Atomica solves for the rest; here the solved values are written in.
+- **The data is not in a spreadsheet.** The original's strength is that the structure and the data live in spreadsheets a non-programmer can edit. This version is code, and does not offer that.
+
 ## What it exercises
 
 - A model whose structure and data are both spreadsheets: compartments, a transition matrix, and parameters in the framework, and values by population and year in the databook
@@ -15,6 +38,8 @@ Atomica's SIR demo (`at.demo('sir')`): one population of 1,000 adults moving bet
 
 ## Files
 
+- `model.py`: the Starsim version
+- `compare.py`: checks it against `reference/`
 - `original/sir_framework.xlsx`, `original/sir_databook.xlsx`: the model and its data, unchanged from the package
 - `original/sir.py`: the lines of Python that load and run them
 - `original/sheets/`: every sheet of both spreadsheets as CSV, written by `dump_sheets.py` (a cell holding a formula is written as its stored result)

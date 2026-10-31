@@ -49,7 +49,7 @@ Each document starts with a pointer to the `best-practices` document that justif
 
 - [14-model-spec.md](14-model-spec.md): the model as code: there is no model spec, hash, or comparison function; an import gives code, and the exporters read the built model.
 - [15-errors.md](15-errors.md): errors, warnings, and notes: the policy, the message shape, and the five errors and four warnings that are classes (`ss.CapabilityError`, `ss.errors.AtBound`).
-- [16-interop.md](16-interop.md): importing from and exporting to other frameworks, and the vignette test.
+- [16-interop.md](16-interop.md): importing from and exporting to other frameworks, and the translation test.
 
 ### Discipline
 
@@ -64,7 +64,7 @@ Each document starts with a pointer to the `best-practices` document that justif
 3. **Approximations are named when they happen.** Asking for a solver the model does not natively fit uses the standard approximation and prints one line saying so; `approx=True` silences the line, and `approx=False` makes the approximation an error instead. [12-backends.md](12-backends.md#approximations)
 4. **Defaults are guessed and printed.** `describe()` shows every guess, marked as one. [01-objects.md](01-objects.md#describe)
 5. **The vocabulary is small and counted.** [17-vocabulary.md](17-vocabulary.md)
-6. **A model is never easier to write without the lingua franca than with it.** For each vignette, the lingua franca version takes no more lines of model code than the original framework's; that is the hard target. Run time is reported as two numbers, the first run in a fresh process and the best of five repeated runs, each failing only if it is more than 2x and more than 1 s slower than the original's. Failing rows are published. [18-conformance.md](18-conformance.md#13-north-star)
+6. **A model is never easier to write without the lingua franca than with it.** For each translation, the lingua franca version takes no more lines of model code than the original framework's; that is the hard target. Run time is reported as two numbers, the first run in a fresh process and the best of five repeated runs, each failing only if it is more than 2x and more than 1 s slower than the original's. Failing rows are published. [18-conformance.md](18-conformance.md#13-north-star)
 
 Each claim has a test suite in [18-conformance.md](18-conformance.md).
 
@@ -72,4 +72,4 @@ Each claim has a test suite in [18-conformance.md](18-conformance.md).
 
 - Justified by [best-practices](../best-practices).
 - Informed by the reviews in [approaches](../approaches).
-- Exercised by [vignettes](../vignettes), which translate the [examples](../models) corpus into this specification. Each translation is tested for results, length, and speed against its original, and where it falls short the vignette says why.
+- Exercised by [models](../models), which translates a corpus of other frameworks' models into this specification. Each translation is tested for results, length, and speed against its original, and where it falls short the translation says why.

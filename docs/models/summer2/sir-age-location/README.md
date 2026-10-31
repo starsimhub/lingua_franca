@@ -2,6 +2,31 @@
 
 An SIR epidemic with disease deaths in 1,000 people over 20 time units, stratified by age (young, old) and by location (urban, rural), each with its own mixing matrix. It is the "Multiple mixing matrices for multiple stratifications" example in summer2's documentation.
 
+`model.py` is the Starsim version, and `compare.py` checks it against `reference/`.
+
+## Comparison
+
+| Measure | Original | Starsim | |
+|---|---|---|---|
+| Lines of model code | 35 | 12 | One Starsim line is over 100 characters, so counts twice |
+| One ODE run | first 1.3 s, rerun 0.00031 s | first 0.022 s, rerun 0.0016 s (Rust) | Neither time counts importing. The original's first run builds and compiles the model with JAX, which takes much longer than Starsim's; its rerun, once compiled, is faster |
+| Results, ODE | | | Every compartment within 0.08 people of 1,000 |
+| Results, other solvers | | | The stochastic and agent-based runs give the same number recovered as the ODE, to within 1% (mean of 100 runs) |
+
+Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `4473e253`), on a 20-core Linux machine.
+
+## What was declared and what was not
+
+Everything is declared: three transitions, two stratifications, one adjustment, and the mixing.
+
+## Findings
+
+- **Contact matrices by dimension (fixed).** `ss.contacts` took one matrix with its own age groups. It now also takes a matrix for each of the model's dimensions (`ss.contacts(dict(age=..., location=...))`), multiplied together as summer2 does.
+- **Age groups as labels (fixed).** `age=['young', 'old']` clashed with the age every agent already has, which broke an agent-based run. A labeled age dimension is now kept apart from it, and nobody ages between its groups.
+- **No unit of time.** The original names none, and neither version needs one: both run in steps of 0.1.
+- **The mixing is not reciprocal.** Starsim notes that both matrices give different contacts between two groups, depending on which group is counted. It uses them as given, as summer2 does, with rows as the contacts of a person in each group.
+- **Different ways of being fast.** summer2 compiles each model with JAX, which takes a while the first time, and reruns it very quickly. Starsim runs every model on the same precompiled kernels, so it has no such wait.
+
 ## What it exercises
 
 - A base model written once, then stratified twice: 3 compartments become 12, and 3 flows become 12
@@ -12,6 +37,8 @@ An SIR epidemic with disease deaths in 1,000 people over 20 time units, stratifi
 
 ## Files
 
+- `model.py`: the Starsim version
+- `compare.py`: checks it against `reference/`
 - `original/09-mixing-matrices.ipynb`: the notebook from the summer2 documentation, unchanged
 - `original/mixing_matrices.py`: the first and fifth code cells of the notebook as a script, unchanged apart from one added line (`import numpy as np`, which the notebook has in a cell that is not used here)
 - `export.py`: runs the script in the summer2 environment and prints the results and timing (its plot is skipped)

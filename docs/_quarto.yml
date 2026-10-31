@@ -35,31 +35,7 @@ project:
     - models/siminf/sise3/README.md
     - models/summer2/sir-age-location/README.md
     - models/summer2/seir-age-clinical/README.md
-    - vignettes/README.md
     - benchmark/README.md
-    - vignettes/atomica/sir/README.md
-    - vignettes/atomica/hiv_dyn/README.md
-    - vignettes/camdl/sir/README.md
-    - vignettes/camdl/stratified/README.md
-    - vignettes/emulsion/sir/README.md
-    - vignettes/emulsion/quickstart/README.md
-    - vignettes/epimodel/sis-network/README.md
-    - vignettes/epimodel/hiv/README.md
-    - vignettes/epydemix/sir_kenya/README.md
-    - vignettes/epydemix/covid19/README.md
-    - vignettes/flepimop/seir_2pop/README.md
-    - vignettes/flepimop/vaccine_scenarios/README.md
-    - vignettes/measles_metapop/seir_districts/README.md
-    - vignettes/laser/hub_spoke_seir/README.md
-    - vignettes/laser/england_wales/README.md
-    - vignettes/memilio/secir/README.md
-    - vignettes/memilio/secir_ageres/README.md
-    - vignettes/odin/stochastic_sir_arrays/README.md
-    - vignettes/odin/seir_array/README.md
-    - vignettes/siminf/sir_herds/README.md
-    - vignettes/siminf/sise3/README.md
-    - vignettes/summer2/sir-age-location/README.md
-    - vignettes/summer2/seir-age-clinical/README.md
     - webapp/
     - webapp/README.md
     - admin/implementation.md
@@ -195,62 +171,35 @@ website:
       contents:
         - href: models/index.qmd
           text: "**Summary**"
-        - section: Originals
-          contents:
-            - href: models/README.md
-              text: About the models
-            - models/atomica/sir/README.md
-            - models/atomica/hiv_dyn/README.md
-            - models/camdl/sir/README.md
-            - models/camdl/stratified/README.md
-            - models/emulsion/sir/README.md
-            - models/emulsion/quickstart/README.md
-            - models/epimodel/sis-network/README.md
-            - models/epimodel/hiv/README.md
-            - models/epydemix/sir_kenya/README.md
-            - models/epydemix/covid19/README.md
-            - models/flepimop/seir_2pop/README.md
-            - models/flepimop/vaccine_scenarios/README.md
-            - models/measles_metapop/seir_districts/README.md
-            - models/laser/hub_spoke_seir/README.md
-            - models/laser/england_wales/README.md
-            - models/memilio/secir/README.md
-            - models/memilio/secir_ageres/README.md
-            - models/odin/stochastic_sir_arrays/README.md
-            - models/odin/seir_array/README.md
-            - models/siminf/sir_herds/README.md
-            - models/siminf/sise3/README.md
-            - models/summer2/sir-age-location/README.md
-            - models/summer2/seir-age-clinical/README.md
-        - section: Vignettes (in Starsim)
-          contents:
-            - href: vignettes/README.md
-              text: About the vignettes
-            - href: benchmark/README.md
-              text: The benchmark
-            - vignettes/atomica/sir/README.md
-            - vignettes/atomica/hiv_dyn/README.md
-            - vignettes/camdl/sir/README.md
-            - vignettes/camdl/stratified/README.md
-            - vignettes/emulsion/sir/README.md
-            - vignettes/emulsion/quickstart/README.md
-            - vignettes/epimodel/sis-network/README.md
-            - vignettes/epimodel/hiv/README.md
-            - vignettes/epydemix/sir_kenya/README.md
-            - vignettes/epydemix/covid19/README.md
-            - vignettes/flepimop/seir_2pop/README.md
-            - vignettes/flepimop/vaccine_scenarios/README.md
-            - vignettes/measles_metapop/seir_districts/README.md
-            - vignettes/laser/hub_spoke_seir/README.md
-            - vignettes/laser/england_wales/README.md
-            - vignettes/memilio/secir/README.md
-            - vignettes/memilio/secir_ageres/README.md
-            - vignettes/odin/stochastic_sir_arrays/README.md
-            - vignettes/odin/seir_array/README.md
-            - vignettes/siminf/sir_herds/README.md
-            - vignettes/siminf/sise3/README.md
-            - vignettes/summer2/sir-age-location/README.md
-            - vignettes/summer2/seir-age-clinical/README.md
+        - href: models/README.md
+          text: About the models
+        - href: benchmark/README.md
+          text: The benchmark
+        - href: models/environments.md
+          text: Environments
+        - models/atomica/sir/README.md
+        - models/atomica/hiv_dyn/README.md
+        - models/camdl/sir/README.md
+        - models/camdl/stratified/README.md
+        - models/emulsion/sir/README.md
+        - models/emulsion/quickstart/README.md
+        - models/epimodel/sis-network/README.md
+        - models/epimodel/hiv/README.md
+        - models/epydemix/sir_kenya/README.md
+        - models/epydemix/covid19/README.md
+        - models/flepimop/seir_2pop/README.md
+        - models/flepimop/vaccine_scenarios/README.md
+        - models/measles_metapop/seir_districts/README.md
+        - models/laser/hub_spoke_seir/README.md
+        - models/laser/england_wales/README.md
+        - models/memilio/secir/README.md
+        - models/memilio/secir_ageres/README.md
+        - models/odin/stochastic_sir_arrays/README.md
+        - models/odin/seir_array/README.md
+        - models/siminf/sir_herds/README.md
+        - models/siminf/sise3/README.md
+        - models/summer2/sir-age-location/README.md
+        - models/summer2/seir-age-clinical/README.md
 
     - id: costing
       title: Cost modeling

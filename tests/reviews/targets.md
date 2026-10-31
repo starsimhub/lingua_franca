@@ -32,7 +32,7 @@ R-Starsim wraps Starsim rather than modeling a disease, so the targets above don
 
 ## Other models
 
-The originals are in `docs/models/<framework>/<model>/` (with their line counts and reference timings in `meta.yaml` and `README.md`), and the Starsim versions, with `compare.py` and a comparison table, are in `docs/vignettes/<framework>/<model>/`. Reviewed with `/v4.others`.
+The originals are in `docs/models/<framework>/<model>/` (with their line counts and reference timings in `meta.yaml` and `README.md`), and the Starsim versions, with `compare.py` and a comparison table, are in `docs/models/<framework>/<model>/`. Reviewed with `/v4.others`.
 
 - [ ] measles metapop (`measles_metapop/seir_districts`: SEIR in 260 districts, on laser-measles)
   - [ ] Works as-is (more or less) when supplied as a custom module
@@ -77,7 +77,7 @@ The benchmark of the October 17 naive review: simulated newcomers (a careful nov
 
 ## Reviews
 
-The skills that check these targets are in [ai/](../../ai/README.md). Each writes its report to `tests/reviews/<date>/` (e.g. `tests/reviews/oct31/canon.md`):
+The skills that check these targets are in [skills/](../../skills/README.md). Each writes its report to `tests/reviews/<date>/` (e.g. `tests/reviews/oct31/canon.md`):
 
 - `/v4.review <model>`: one Starsim-family model per session (`covasim`, `fpsim`, `hpvsim`, `malariasim`, `stisim`, `tbsim`), one report each
 - `/v4.others`: Measles metapop, LASER, and the survey models, one report

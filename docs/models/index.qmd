@@ -1,17 +1,17 @@
 ---
-title: "Examples"
+title: "Models"
 ---
 
-The design is tested on models that other people wrote. [Examples](README.md) are models from other frameworks, kept as their authors wrote them; [vignettes](../vignettes/README.md) are the same models written in Starsim.
+The design is tested on models that other people wrote. Each [model](README.md) comes from another framework, kept as its authors wrote it, next to the same model written in Starsim.
 
 ## The test
 
-A model should never be easier to write without the lingua franca than with it. So each vignette is held to two numbers from its original:
+A model should never be easier to write without the lingua franca than with it. So each translation is held to two numbers from its original:
 
 - **No more lines of model code**, not counting imports, comments, blank lines, and plotting.
 - **No more time for a rerun**, measured on the same machine: running the same model again once it is set up, as in a parameter scan or a calibration. First-run times are shown as well, but don't count toward the mark. A first run includes setup that happens once, so a small model can take tens of milliseconds even when its reruns are much faster.
 
-Results should also agree, within a stated tolerance. Missing any of these doesn't fail the vignette: it is a gap, written up in the vignette for the [design](../design/index.qmd) to address. Times are not always like for like: some originals can only be timed as a whole command, and each vignette's notes say where that is the case.
+Results should also agree, within a stated tolerance. Missing any of these doesn't fail the translation: it is a gap, written up with the model for the [design](../design/index.qmd) to address. Times are not always like for like: some originals can only be timed as a whole command, and each model's notes say where that is the case.
 
 ## Where each model stands
 
@@ -43,8 +43,8 @@ To regenerate these results, see [the benchmark](../benchmark/README.md).
 
 ## What is in each folder
 
-Each example has the original source, where it came from and its license, reference results from running it, and its line count and run time. Each vignette has the Starsim model, a script that checks it against the reference results, and notes on what was awkward or could not be expressed.
+Each model has the original source, where it came from and its license, reference results from running it, and its line count and run time. Next to these are the Starsim version, a script that checks it against the reference results, and notes on what was awkward or could not be expressed.
 
-## How the examples were chosen
+## How the models were chosen
 
-The examples are chosen to span frameworks and paradigms, and each framework's own showcase models are preferred over ones written for this project. They are brought in as a build set and held-out waves, described in [about the examples](README.md).
+The models are chosen to span frameworks and paradigms, and each framework's own showcase models are preferred over ones written for this project. They are brought in as a build set and held-out waves, described in [about the models](README.md).
