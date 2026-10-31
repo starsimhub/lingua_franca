@@ -174,9 +174,9 @@ def install(name):
         if shutil.which('opam'): # As in CI; camdl's install.sh sets up a machine without it
             run(folder / 'src/ocaml', 'opam', 'install', '.', '--deps-only', '--yes')
         run(folder, 'make', '-C', 'src', 'build')
-        built = {'camdl':camdl, 'camdlc':camdlc, f'camdlc-{camdl_commit(camdl)}':camdlc} # camdl looks for the checker as camdlc-<commit>
+        outputs = {'camdl':camdl, 'camdlc':camdlc, f'camdlc-{camdl_commit(camdl)}':camdlc} # camdl looks for the checker as camdlc-<commit>
         (folder / 'bin').mkdir(exist_ok=True)
-        for command, path in built.items():
+        for command, path in outputs.items():
             dest = folder / 'bin' / command
             dest.unlink(missing_ok=True) # dune builds camdlc read-only, so a copy of it cannot be overwritten
             shutil.copy(path, dest)
