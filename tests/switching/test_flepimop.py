@@ -3,7 +3,7 @@ Switching demo for the flepiMoP seat: the 3,000-place config, fitted with a valu
 
 Passes when: the per-place fit runs; Poisson on weekly averages is finite.
 Blocked today by: N20, N6, `priors=True`, `to_hub()`.
-Scaled down to a config of three counties written by the test (the report's 3,000-place project is generated, not shipped); the speed at 3,000 places (5 s against flepiMoP's 34 to 58 s) is checked by the north-star script (phase 6), not here.
+Scaled down to a config of three counties written by the test (the report's 3,000-place project is generated, not shipped), not here.
 """
 import tempfile
 import numpy as np

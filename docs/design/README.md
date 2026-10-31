@@ -72,4 +72,4 @@ Each claim has a test suite in [18-conformance.md](18-conformance.md).
 
 - Justified by [best-practices](../best-practices).
 - Informed by the reviews in [approaches](../approaches).
-- Exercised by [vignettes](../vignettes), which translate the [examples](../examples) corpus into this specification. Each translation is tested for results, length, and speed against its original, and where it falls short the vignette says why.
+- Exercised by [vignettes](../vignettes), which translate the [examples](../models) corpus into this specification. Each translation is tested for results, length, and speed against its original, and where it falls short the vignette says why.

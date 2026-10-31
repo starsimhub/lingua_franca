@@ -1,13 +1,13 @@
 ---
 name: v4.review
-description: Review one Starsim-family model (covasim, fpsim, hpvsim, malariasim, mighti, stisim, tbsim, or typhoidsim) on Starsim v4 against its Starsim 3 version, for the targets in v4_design/targets.md (fewer lines, faster as ABM, no hacks, no single-model code in v4, and the model's compartmental goal), and write one report to v4_design/<date>/reviews/<model>.md. Use when Cliff runs /v4.review <model>; one model per session.
+description: Review one Starsim-family model (covasim, fpsim, hpvsim, malariasim, mighti, stisim, tbsim, or typhoidsim) on Starsim v4 against its Starsim 3 version, for the targets in tests/reviews/targets.md (fewer lines, faster as ABM, no hacks, no single-model code in v4, and the model's compartmental goal), and write one report to tests/reviews/<date>/<model>.md. Use when Cliff runs /v4.review <model>; one model per session.
 ---
 
 # Starsim-family model review
 
 Arguments: the model name, one of `covasim`, `fpsim`, `hpvsim`, `malariasim`, `mighti`, `stisim`, `tbsim`, `typhoidsim`. If none is given or it isn't one of these, ask which. Review only that model; the others are run in their own sessions.
 
-Checks the "Starsim-family models" targets in `v4_design/targets.md` for this model. Read [../README.md](../README.md) first: its rules (snapshot, line counts, timing, subagents, report shape) apply here. Like the earlier port reviews, this is a test of **v4**: what matters is what v4 should change so that each target is met, not the model's own bugs (note those briefly, at the end).
+Checks the "Starsim-family models" targets in `tests/reviews/targets.md` for this model. Read [../README.md](../README.md) first: its rules (snapshot, line counts, timing, subagents, report shape) apply here. Like the earlier port reviews, this is a test of **v4**: what matters is what v4 should change so that each target is met, not the model's own bugs (note those briefly, at the end).
 
 ## The models
 
@@ -36,5 +36,5 @@ Check these before relying on them: `git -C <repo> branch --show-current`, `git 
     - **The compartmental goal** in the table. Build the compartmental version of the model's disease (or diseases) as the goal states, run it under `solver='ode'` and as agents, and compare (prevalence and incidence over time, at the same parameters). Report what can't be expressed, and whether that is inside the goal's stated exceptions.
 4. **Fan out if useful,** to at most four subagents by part of the model (as the earlier reviews did: e.g. diseases, interventions, framework and speed, compartmental), each writing its findings to `<repo>/v4port/<date>/<part>/NOTES.md`. Brief each with the README's rules, the pinned paths, and this skill's definitions of the targets.
 5. **Check** every headline number and every "not met" yourself against the pinned versions. Cross-reference `deferred.md` and the latest plan (which carry earlier findings by their IDs, e.g. CV, FP, HP, ST), and say which still hold, which are fixed, and which are new.
-6. **Write** `v4_design/<date>/reviews/<model>.md` in the README's shape. The scorecard has one row per general target and one for the compartmental goal. The details give lines by module, timings, the hacks list, the single-model code list, and the compartmental comparison. End with the model's own bugs found along the way, briefly.
+6. **Write** `tests/reviews/<date>/<model>.md` in the README's shape. The scorecard has one row per general target and one for the compartmental goal. The details give lines by module, timings, the hacks list, the single-model code list, and the compartmental comparison. End with the model's own bugs found along the way, briefly.
 7. **Clean up** the worktrees (`git -C <repo> worktree remove --force ...`) and any background shells.

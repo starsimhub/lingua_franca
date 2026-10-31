@@ -25,7 +25,7 @@ sir_pars = dict(beta=0.4, gamma=0.15, rho=0.6, k=10)
 def test_camdl_file():
     """ A .camdl file, compiled with camdlc, against camdl's own ODE run """
     sc.heading('Testing camdl import from a .camdl file')
-    folder = lfd / 'examples/camdl/sir'
+    folder = lfd / 'docs/models/camdl/sir'
     sim = load_camdl(folder / 'original/sir.camdl', pars=sir_pars, camdlc=str(camdlc), **kw).run()
     ref = pd.read_csv(folder / 'reference/results.csv')
     res = sim.results.sir
@@ -63,7 +63,7 @@ def test_camdl_golden():
 def test_camdl_stratified(tmp_path):
     """ An SEIR by age and patch, with aging and movement, as a .camdl file: against camdl's own ODE run of it, and the saved reference """
     sc.heading('Testing camdl import of a stratified model')
-    folder = lfd / 'examples/camdl/stratified'
+    folder = lfd / 'docs/models/camdl/stratified'
     model, pars = folder / 'stratified.camdl', dict(beta=0.04, gamma=0.1, move=0.01)
     traj = tmp_path / 'traj.tsv'
     cmd = [str(camdl), 'simulate', str(model), '--backend', 'ode', '--no-progress', '--output-dir', str(tmp_path / 'store'), '-o', str(traj)]

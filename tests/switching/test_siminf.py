@@ -21,7 +21,7 @@ ref_beta, ref_gamma = 0.16, 0.077 # The values the data were simulated with
 v4_ms_per_run = 0.37 # Starsim's filter per particle run, in ms, normalized; same date
 v4_build, v4_run = 2.0, 3.0 # Starsim's build and run of the herds ten times over, in s, normalized to the reference machine (see timing.py), 2026-10-25
 ref_build, ref_run = 2.1, 1.9 # SimInf's time to build and run its herds and events ten times over (16,000 herds, 4,666,920 events, four years) on one thread: switching/siminf.md, "The second week" §2
-ref_S100 = [199_906, 199_855, 200_057] # SimInf, 1,600 herds: susceptible on day 100, mean and 5% to 95% range of 200 runs (LFD examples/siminf/sir_herds/reference/results.csv), as in vignettes/siminf/sir_herds/README.md
+ref_S100 = [199_906, 199_855, 200_057] # SimInf, 1,600 herds: susceptible on day 100, mean and 5% to 95% range of 200 runs (LFD docs/models/siminf/sir_herds/reference/results.csv), as in docs/vignettes/siminf/sir_herds/README.md
 ref_herds100 = [2.0, 0, 3] # The same for the number of herds infected on day 100
 
 
@@ -106,7 +106,7 @@ def make_herds(u0, register, stop, **kwargs):
 
 def test_siminf_register():
     sc.heading('SimInf\'s 1,600 herds and their register, for the first 100 days')
-    res = make_herds(*read_register(paths.root/'examples'/'siminf'/'sir_herds'/'reference', stop=100), stop=100).run().results.sir
+    res = make_herds(*read_register(paths.root/'docs'/'models'/'siminf'/'sir_herds'/'reference', stop=100), stop=100).run().results.sir
     S100, herds100 = res.S.values[100], (np.asarray(res.I.strata)[100] > 0).sum()
     assert ref_S100[1] <= S100 <= ref_S100[2], f'Susceptible on day 100: {S100:,.0f}, SimInf {ref_S100[0]:,} ({ref_S100[1]:,} to {ref_S100[2]:,})'
     assert ref_herds100[1] <= herds100 <= ref_herds100[2], f'Herds infected on day 100: {herds100}, SimInf {ref_herds100}'
@@ -115,7 +115,7 @@ def test_siminf_register():
 
 def test_siminf_scale():
     sc.heading('SimInf\'s herds and events ten times over: 16,000 herds and 4.7 million events, for four years')
-    u0, register = read_register(paths.root/'examples'/'siminf'/'sir_herds'/'reference', copies=10) # Reading and converting the data is not timed, as in SimInf
+    u0, register = read_register(paths.root/'docs'/'models'/'siminf'/'sir_herds'/'reference', copies=10) # Reading and converting the data is not timed, as in SimInf
     build, sim = timing.timed(lambda: make_herds(u0, register, stop=1460).init(), repeats=2) # Exact, as SimInf (about 6 million events): herds that do not affect each other are always run exactly
     run, _ = timing.timed(sim.run, repeats=1)
     herds = (np.asarray(sim.results.sir.I.strata)[-1] > 0).sum()

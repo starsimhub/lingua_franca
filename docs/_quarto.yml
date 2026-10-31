@@ -9,31 +9,32 @@ project:
     - best-practices/README.md
     - design/
     - design/README.md
-    - examples/index.qmd
-    - examples/README.md
-    - examples/atomica/sir/README.md
-    - examples/atomica/hiv_dyn/README.md
-    - examples/camdl/sir/README.md
-    - examples/camdl/stratified/README.md
-    - examples/emulsion/sir/README.md
-    - examples/emulsion/quickstart/README.md
-    - examples/epimodel/sis-network/README.md
-    - examples/epimodel/hiv/README.md
-    - examples/epydemix/sir_kenya/README.md
-    - examples/epydemix/covid19/README.md
-    - examples/flepimop/seir_2pop/README.md
-    - examples/flepimop/vaccine_scenarios/README.md
-    - examples/measles_metapop/seir_districts/README.md
-    - examples/laser/hub_spoke_seir/README.md
-    - examples/laser/england_wales/README.md
-    - examples/memilio/secir/README.md
-    - examples/memilio/secir_ageres/README.md
-    - examples/odin/stochastic_sir_arrays/README.md
-    - examples/odin/seir_array/README.md
-    - examples/siminf/sir_herds/README.md
-    - examples/siminf/sise3/README.md
-    - examples/summer2/sir-age-location/README.md
-    - examples/summer2/seir-age-clinical/README.md
+    - models/index.qmd
+    - models/README.md
+    - models/environments.md
+    - models/atomica/sir/README.md
+    - models/atomica/hiv_dyn/README.md
+    - models/camdl/sir/README.md
+    - models/camdl/stratified/README.md
+    - models/emulsion/sir/README.md
+    - models/emulsion/quickstart/README.md
+    - models/epimodel/sis-network/README.md
+    - models/epimodel/hiv/README.md
+    - models/epydemix/sir_kenya/README.md
+    - models/epydemix/covid19/README.md
+    - models/flepimop/seir_2pop/README.md
+    - models/flepimop/vaccine_scenarios/README.md
+    - models/measles_metapop/seir_districts/README.md
+    - models/laser/hub_spoke_seir/README.md
+    - models/laser/england_wales/README.md
+    - models/memilio/secir/README.md
+    - models/memilio/secir_ageres/README.md
+    - models/odin/stochastic_sir_arrays/README.md
+    - models/odin/seir_array/README.md
+    - models/siminf/sir_herds/README.md
+    - models/siminf/sise3/README.md
+    - models/summer2/sir-age-location/README.md
+    - models/summer2/seir-age-clinical/README.md
     - vignettes/README.md
     - benchmark/README.md
     - vignettes/atomica/sir/README.md
@@ -85,8 +86,8 @@ website:
         text: Best practices
       - href: design/index.qmd
         text: Design
-      - href: examples/index.qmd
-        text: Examples
+      - href: models/index.qmd
+        text: Models
       - href: webapp/index.qmd
         text: Compare
       - href: admin/implementation.md
@@ -190,37 +191,37 @@ website:
         - design/19-open-questions.md
 
     - id: models
-      title: Examples
+      title: Models
       contents:
-        - href: examples/index.qmd
+        - href: models/index.qmd
           text: "**Summary**"
         - section: Originals
           contents:
-            - href: examples/README.md
-              text: About the examples
-            - examples/atomica/sir/README.md
-            - examples/atomica/hiv_dyn/README.md
-            - examples/camdl/sir/README.md
-            - examples/camdl/stratified/README.md
-            - examples/emulsion/sir/README.md
-            - examples/emulsion/quickstart/README.md
-            - examples/epimodel/sis-network/README.md
-            - examples/epimodel/hiv/README.md
-            - examples/epydemix/sir_kenya/README.md
-            - examples/epydemix/covid19/README.md
-            - examples/flepimop/seir_2pop/README.md
-            - examples/flepimop/vaccine_scenarios/README.md
-            - examples/measles_metapop/seir_districts/README.md
-            - examples/laser/hub_spoke_seir/README.md
-            - examples/laser/england_wales/README.md
-            - examples/memilio/secir/README.md
-            - examples/memilio/secir_ageres/README.md
-            - examples/odin/stochastic_sir_arrays/README.md
-            - examples/odin/seir_array/README.md
-            - examples/siminf/sir_herds/README.md
-            - examples/siminf/sise3/README.md
-            - examples/summer2/sir-age-location/README.md
-            - examples/summer2/seir-age-clinical/README.md
+            - href: models/README.md
+              text: About the models
+            - models/atomica/sir/README.md
+            - models/atomica/hiv_dyn/README.md
+            - models/camdl/sir/README.md
+            - models/camdl/stratified/README.md
+            - models/emulsion/sir/README.md
+            - models/emulsion/quickstart/README.md
+            - models/epimodel/sis-network/README.md
+            - models/epimodel/hiv/README.md
+            - models/epydemix/sir_kenya/README.md
+            - models/epydemix/covid19/README.md
+            - models/flepimop/seir_2pop/README.md
+            - models/flepimop/vaccine_scenarios/README.md
+            - models/measles_metapop/seir_districts/README.md
+            - models/laser/hub_spoke_seir/README.md
+            - models/laser/england_wales/README.md
+            - models/memilio/secir/README.md
+            - models/memilio/secir_ageres/README.md
+            - models/odin/stochastic_sir_arrays/README.md
+            - models/odin/seir_array/README.md
+            - models/siminf/sir_herds/README.md
+            - models/siminf/sise3/README.md
+            - models/summer2/sir-age-location/README.md
+            - models/summer2/seir-age-clinical/README.md
         - section: Vignettes (in Starsim)
           contents:
             - href: vignettes/README.md

@@ -11,7 +11,7 @@ kw = dict(verbose=0)
 
 def test_sir():
     sc.heading('Testing EMULSION\'s SIR as compartments, individuals, and hybrid groups, against 200 EMULSION runs')
-    folder = paths.root/'examples/emulsion/sir'
+    folder = paths.root/'docs/models/emulsion/sir'
     ref = sc.dataframe.read_csv(folder/'reference/results.csv')
     for kind in ['compart', 'IBM', 'hybrid']:
         sir = ss.import_from(folder/f'original/{kind}_SIR.yaml', **kw)

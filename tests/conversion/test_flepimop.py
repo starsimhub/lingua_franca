@@ -9,7 +9,7 @@ import paths
 from starsim.converters.flepimop import load_flepimop
 
 kw = dict(verbose=0)
-examples = paths.root/'examples/flepimop' # The originals and their reference results
+examples = paths.root/'docs/models/flepimop' # The originals and their reference results
 
 
 def reference(folder, series):

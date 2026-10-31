@@ -159,12 +159,12 @@ Each error, warning, and note SHOULD have a minimal example that triggers it, wi
 
 ### 13. North star
 
-The claim: **a model should never be easier to write without the lingua franca than with it.** For each vignette in [vignettes](../vignettes), which translates one of a framework's own examples, `scripts/north_star.py` writes a table of lines and time, original against Starsim, with the failing rows:
+The claim: **a model should never be easier to write without the lingua franca than with it.** For each vignette in [vignettes](../vignettes), which translates one of a framework's own examples, `lingua_franca benchmark` writes a table of lines and time, original against Starsim, with the failing rows:
 
 | Measure | How | Requirement |
 |---|---|---|
 | **Lines of model code** | Count non-blank, non-comment lines needed to define and run the model, in both versions. Docstrings, imports, plotting, data loading, and the `if __name__ == '__main__'` block are excluded. Lines longer than 100 characters count as two, so that length cannot be hidden in one long line. Where the original calls a built-in written for one situation (`interventions=close_schools_uk()`), the lines of that built-in's body count as part of the original; the lingua franca version writes the same thing out and is counted in full | Lingua franca ≤ original: the hard target |
-| **Time** | Two numbers for each: the first run in a fresh process, and the best of 5 repeated runs, on the same machine, at the same population size, timestep, and duration. Each Starsim run builds and runs the sim (`sim.new().run()`) | Reported. A time fails if the lingua franca is both more than 2x slower and more than 1 s slower |
+| **Time** | Two numbers for each: the first run in a fresh process, and the best rerun of the same sim, on the same machine, at the same population size, timestep, and duration, taking the original and the lingua franca in turn | Reported. A time fails if the lingua franca is both more than 2x slower and more than 1 s slower |
 | **Results** | Compare the vignette's results with the original's, to a tolerance stated in the vignette | Agree |
 
 The table has one row per vignette, failing rows included. A row where the lingua franca is longer or slower is a defect in the design or the implementation and is listed as such, with the reason. It is not hidden, and it is not a reason to drop the vignette. The table is published on the "Coming from" pages of the documentation (`docs/coming_from/`).

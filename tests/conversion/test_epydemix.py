@@ -10,7 +10,7 @@ import starsim as ss
 import paths
 from starsim.converters.epydemix import load_epydemix
 
-lfd = paths.root/'examples' # The original examples
+lfd = paths.root/'docs/models' # The original examples
 kw = dict(verbose=False)
 
 

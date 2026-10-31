@@ -3,7 +3,7 @@ Switching demo for the MEmilio seat: 400 counties × 6 ages with commuting and p
 
 Passes when: within 3x of 1.5 s; agreement as today.
 Blocked today by: N18, the per-place hold, `priors=True` (the graph importer is done: test_io_memilio.py).
-Scaled down to 50 and 100 synthetic counties (the report's own synthetic Germany, regenerated here); the 400-county time is checked by the north-star script (phase 6).
+Scaled down to 50 and 100 synthetic counties (the report's own synthetic Germany, regenerated here).
 """
 import numpy as np
 import sciris as sc

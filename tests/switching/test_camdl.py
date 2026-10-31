@@ -3,7 +3,7 @@ Switching demo for the camdl seat: the polio model with SIAs over `patch=`, fitt
 
 Passes when: peak 130,643 on day 145, as camdl's ODE; unit slips caught.
 Blocked today by: N28.
-The model is camdl's polio_spatial_5 (5 patches, gravity importation, three SIA rounds per patch); the 774-patch build (N28) is checked by the north-star script (phase 6), not here.
+The model is camdl's polio_spatial_5 (5 patches, gravity importation, three SIA rounds per patch).
 """
 import pytest
 import numpy as np

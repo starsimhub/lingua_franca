@@ -4,7 +4,7 @@ Status of the Starsim v4 implementation of the design spec. The code is on the [
 
 ## Build set
 
-The nine build steps from [examples/README.md](../examples/README.md).
+The nine build steps from [models/README.md](../models/README.md).
 
 - [x] 1. SIR, in all spellings
 - [x] 2. SEIR with an Erlang dwell time
@@ -448,7 +448,7 @@ The work from [the review's plan](../review_oct17/implementation.md), by phase. 
 
 ### Phase 6: docs
 
-- [x] "Starsim 4 in ten minutes" (`docs/ten_minutes.qmd`), the Starsim 3 to 4 migration guide (`docs/migration/v3_v4.md`), the R path on the same page, and `tests/north_star.py` (lines, first run, and best of five against the originals).
+- [x] "Starsim 4 in ten minutes" (`docs/ten_minutes.qmd`), the Starsim 3 to 4 migration guide (`docs/migration/v3_v4.md`), and the R path on the same page.
 - [x] The tutorials and user guide ported (35 pages, all run), and a "Coming from" page for each of 13 frameworks; the bugs they found fixed or recorded (W15).
 
 ### Phase 7: features for the seats

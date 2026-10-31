@@ -1,11 +1,11 @@
 ---
 name: v4.canon
-description: Review Starsim v4 against the textbook canon (the 42 models of Keeling and Rohani and Vynnycky and White) for the targets "nothing should be ugly" and "nothing should be slow", and write one report to v4_design/<date>/reviews/canon.md. Use when Cliff runs /v4.canon or asks to rerun the canon review.
+description: Review Starsim v4 against the textbook canon (the 42 models of Keeling and Rohani and Vynnycky and White) for the targets "nothing should be ugly" and "nothing should be slow", and write one report to tests/reviews/<date>/canon.md. Use when Cliff runs /v4.canon or asks to rerun the canon review.
 ---
 
 # Canon review
 
-Checks the "Canon" targets in `v4_design/targets.md`: each textbook model should be written in v4 as the book writes it (nothing ugly) and run fast at the default settings (nothing slow). Read [../README.md](../README.md) first: its rules (snapshot, timing, subagents, report shape) apply here.
+Checks the "Canon" targets in `tests/reviews/targets.md`: each textbook model should be written in v4 as the book writes it (nothing ugly) and run fast at the default settings (nothing slow). Read [../README.md](../README.md) first: its rules (snapshot, timing, subagents, report shape) apply here.
 
 ## References
 
@@ -23,5 +23,5 @@ Checks the "Canon" targets in `v4_design/targets.md`: each textbook model should
     - Also report accuracy against the reference at the default settings (the oct17 bar: 1e-6 for an ODE, a distributional test for a stochastic model), since a model that is fast but wrong at the defaults is not met either.
 5. **Fan out if useful.** The chapters are independent; up to four subagents (e.g. KR 2–4, KR 5–6, KR 7–8, VW) can each run and score their chapters into a findings file in the scratchpad. Brief them with the README's rules and step 4's definitions.
 6. **Check** each failure with a minimal repro, and cross-reference the oct17 CR findings, `deferred.md` (including Won't do: e.g. the SDE models of KR 6.1 and 6.2 are gone by decision, so mark them "not expressible, by decision" rather than as a failure), and the latest plan.
-7. **Write** `v4_design/<date>/reviews/canon.md` in the README's shape. The details section is one table with a row per model: model, lines in v4, lines of the reference right-hand side, auto solver, error at the defaults, time at the defaults (and the SciPy time), ugly (and why), slow, and the change since the last report.
+7. **Write** `tests/reviews/<date>/canon.md` in the README's shape. The details section is one table with a row per model: model, lines in v4, lines of the reference right-hand side, auto solver, error at the defaults, time at the defaults (and the SciPy time), ugly (and why), slow, and the change since the last report.
 8. **Clean up** the snapshot worktree and any background shells.

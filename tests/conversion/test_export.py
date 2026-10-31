@@ -191,7 +191,7 @@ def run(cmd):
 @pytest.mark.parametrize('make', cases)
 def test_odin(make, tmp_path):
     if not odin_exe.exists():
-        pytest.skip('needs _envs/odin: python _envs/envs.py install odin')
+        pytest.skip('needs _envs/odin: lingua_franca envs install odin')
     sim, flat, file = export(make, 'odin', tmp_path)
     n = steps(sim)
     run([odin_exe, 'run_odin.R', file, n, tmp_path/'out.csv'])
@@ -204,7 +204,7 @@ def test_odin(make, tmp_path):
 @pytest.mark.parametrize('make', cases)
 def test_sbml(make, tmp_path):
     if not sbml_exe.exists():
-        pytest.skip('needs _envs/sbml: python _envs/envs.py install sbml')
+        pytest.skip('needs _envs/sbml: lingua_franca envs install sbml')
     sim, flat, file = export(make, 'sbml', tmp_path)
     n = steps(sim)
     errors = json.loads(run([sbml_exe, 'run_sbml.py', file, n, tmp_path/'out']).splitlines()[-1])
