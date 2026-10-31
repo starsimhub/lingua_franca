@@ -28,7 +28,7 @@ The implementation is built against a small set of models and then checked again
 
 ### Build set
 
-Nine steps, covering ten of the eighteen models in the corpus in [design/18-conformance.md](../design/18-conformance.md#the-corpus), in the order they are implemented. Each adds one layer to the one before.
+Nine steps, covering ten of the eighteen models in the corpus in [design/18-conformance.md](../docs/design/18-conformance.md#the-corpus), in the order they are implemented. Each adds one layer to the one before.
 
 | Order | Corpus # | Model | What it adds |
 |---|---|---|---|

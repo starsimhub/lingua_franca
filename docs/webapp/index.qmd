@@ -1,0 +1,16 @@
+---
+title: "Compare models"
+page-layout: full
+toc: false
+include-after-body: _picker.html
+---
+
+Each model in [examples](/examples/index.qmd) as its framework's authors wrote it, next to its translation in [vignettes](/vignettes/README.md). Pick a model:
+
+```{python}
+#| echo: false
+#| output: asis
+import sciris as sc
+build = sc.importbypath('../../scripts/build.py')
+print(build.comparison())
+```

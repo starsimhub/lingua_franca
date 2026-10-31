@@ -1,6 +1,6 @@
 # A lingua franca for epi modeling
 
-**Version:** 1.6 | **Date:** 2026.10.30 | **Status:** Beta version being tested
+**Version:** 1.7 | **Date:** 2026.10.31 | **Status:** Beta version being tested
 
 ## Introduction
 
@@ -25,7 +25,7 @@ Why do we need a lingua franca? What's wrong with existing modeling frameworks? 
 
 ## Standing on the shoulders of giants
 
-We have been using AI tools to summarize and evaluate the existing disease modeling landscape. Because of this, the lingua franca owes its existence to the many years (and hundreds of thousands of hours) of human contributors; see [Influences](approaches/influences.qmd) for where we have incorporated ideas from other models. We can be (somewhat) confident that a lingua franca based on existing models can do *at least as well* as them in terms of performance and brevity. While AI is not always very creative, it is the perfect tool for this task: it can impartially review all existing models, see who did it best, and at minimum copy that implementation (and improve upon it where possible). 
+We have been using AI tools to summarize and evaluate the existing disease modeling landscape. Because of this, the lingua franca owes its existence to the many years (and hundreds of thousands of hours) of human contributors; see [Influences](docs/approaches/influences.qmd) for where we have incorporated ideas from other models. We can be (somewhat) confident that a lingua franca based on existing models can do *at least as well* as them in terms of performance and brevity. While AI is not always very creative, it is the perfect tool for this task: it can impartially review all existing models, see who did it best, and at minimum copy that implementation (and improve upon it where possible). 
 
 Because of this, we acknowledge our indebtedness to the broader disease modeling community, and inclusiveness is one of our core principles. (More bluntly: we do not want to be the AI jerks who steal other people's work and pass it off as our own.) We are in the process of reaching out to authors of the disease modeling frameworks we borrowed from, but please [get in touch](mailto:info@starsim.org) if we haven't written to you yet!
 
@@ -39,14 +39,16 @@ The lingua franca was built up in stages:
 
 | | Section | What it is |
 |---|---|---|
-| 1 | [Approaches](approaches/) | A review of the current approaches used in the epi modeling landscape, based on the [disease modeling landscape](https://starsim.org/disease_modeling_landscape) |
-| 2 | [Best practices](best-practices/) | A distillation of the modeling landscape into best practices for each aspect of building disease models |
-| 3 | [Design](design/) | The design of the language, written as an extension of Starsim |
+| 1 | [Approaches](docs/approaches/) | A review of the current approaches used in the epi modeling landscape, based on the [disease modeling landscape](https://starsim.org/disease_modeling_landscape) |
+| 2 | [Best practices](docs/best-practices/) | A distillation of the modeling landscape into best practices for each aspect of building disease models |
+| 3 | [Design](docs/design/) | The design of the language, written as an extension of Starsim |
 | 4 | [Examples](examples/) | Other frameworks' own example models, and their translations into Starsim v4 |
-| 5 | [Compare](webapp/) | A tool for comparing example models between the original source and the lingua franca |
-| 6 | [Benchmark](benchmark/) | One script that regenerates every line count, run time, and check of agreement between the originals and the lingua franca |
+| 5 | [Compare](docs/webapp/) | A tool for comparing example models between the original source and the lingua franca |
+| 6 | [Benchmark](docs/benchmark/) | One script that regenerates every line count, run time, and check of agreement between the originals and the lingua franca |
 
-The [status page](admin/implementation.md) tracks how much has been implemented so far. This site explains how and why the design came about; to use Starsim v4, see its [documentation](https://starsim.org/v4/).
+To run the tests and benchmark, install this repo with `pip install -e .` and use `lingua_franca test [conversion|switching|threading|all]` and `lingua_franca benchmark`. The site's source is in `docs/`, and is built with `quarto render docs`. `scripts/` holds what the pages call as they are rendered (`build.py`, `influences.py`) and `north_star.py`, and `ai/` holds the skills that review v4 against its targets.
+
+The [status page](docs/admin/implementation.md) tracks how much has been implemented so far. This site explains how and why the design came about; to use Starsim v4, see its [documentation](https://starsim.org/v4/).
 
 ## AI disclaimer
 

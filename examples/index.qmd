@@ -15,14 +15,14 @@ Results should also agree, within a stated tolerance. Missing any of these doesn
 
 ## Where each model stands
 
-The model names link to the [side-by-side comparison](../webapp/index.qmd), which shows the original code next to the Starsim version.
+The model names link to the [side-by-side comparison](../docs/webapp/index.qmd), which shows the original code next to the Starsim version.
 
 ::: {.benchmark}
 ```{python}
 #| echo: false
 #| output: asis
 import sciris as sc
-build = sc.importbypath('../webapp/build.py')
+build = sc.importbypath('../scripts/build.py')
 print(build.benchmark())
 ```
 :::
@@ -39,7 +39,7 @@ print(build.kernel_table())
 ```
 :::
 
-To regenerate these results, see [the benchmark](../benchmark/README.md).
+To regenerate these results, see [the benchmark](../docs/benchmark/README.md).
 
 ## What is in each folder
 

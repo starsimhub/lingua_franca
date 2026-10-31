@@ -25,10 +25,10 @@ jobs:
           python-version: '3.13'
       - run: pip install sciris jupyter
       - uses: quarto-dev/quarto-actions/setup@v2
-      - run: quarto render
+      - run: quarto render docs
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: docs/_site
 
   deploy:
     needs: build

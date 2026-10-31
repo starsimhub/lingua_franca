@@ -1,5 +1,7 @@
 # Custom
 transcripts/
+*.html
+*_html/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -227,7 +229,7 @@ _envs/*/*
 !_envs/*/renv.lock
 
 # Quarto site: the output
-/_site/
-/.quarto/
+/docs/_site/
+/docs/.quarto/
 
 **/*.quarto_ipynb

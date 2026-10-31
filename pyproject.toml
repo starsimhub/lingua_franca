@@ -1,0 +1,25 @@
+[build-system]
+requires = ['setuptools>=77']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'lingua_franca'
+version = '1.7.0'
+description = 'The design of a lingua franca for epidemiological modeling, and its tests and benchmark against other frameworks'
+readme = 'README.md'
+requires-python = '>=3.11'
+license = 'MIT'
+dependencies = [ # Not Starsim: everything here runs against whichever Starsim is installed, and v4 is not on PyPI yet
+    'sciris',
+    'pytest',
+    'pytest-xdist',
+]
+
+[project.scripts]
+lingua_franca = 'lingua_franca.cli:main'
+
+[project.urls]
+Repository = 'https://github.com/starsimhub/lingua_franca_design'
+
+[tool.setuptools]
+packages = ['lingua_franca']

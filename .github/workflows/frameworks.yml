@@ -108,7 +108,7 @@ jobs:
         with:
           version: 0.13.0 # As the environments were built with
       - name: Install Starsim
-        run: pip install -e ".starsim[dev]" jax
+        run: pip install -e ".starsim[dev]" -e . jax
       - name: Check the kernels are compiled
         run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; print(ss.compile_status().summary)"
 
@@ -154,14 +154,14 @@ jobs:
         run: pytest ${{ matrix.tests }} -n auto -rs --durations=5 --junitxml=results.xml
       - name: Run the benchmark
         if: ${{ matrix.models && !cancelled() }}
-        run: python benchmark/benchmark.py --only ${{ matrix.models }} --stages compare timing
+        run: lingua_franca benchmark --only ${{ matrix.models }} --stages compare timing
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: results-${{ matrix.name }}
           path: |
             tests/results.xml
-            benchmark/timings.*
+            docs/benchmark/timings.*
             vignettes/${{ matrix.models }}**/compare.log
             examples/${{ matrix.models }}**/run.log
             _envs/*/build.log

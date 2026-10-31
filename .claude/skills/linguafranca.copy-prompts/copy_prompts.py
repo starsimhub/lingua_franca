@@ -18,8 +18,8 @@ from pathlib import Path
 
 repo = Path(__file__).resolve().parents[3]
 source = Path.home() / '.claude' / 'projects' / re.sub(r'[^a-zA-Z0-9]', '-', str(repo))
-dest = repo / 'transcripts'
-prompts_md = repo / 'prompts.md'
+dest = repo / 'docs' / 'admin' / 'transcripts'
+prompts_md = repo / 'docs' / 'admin' / 'prompts.md'
 
 # User-role messages that were not typed by the user
 skip_prefixes = (

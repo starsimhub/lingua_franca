@@ -4,13 +4,12 @@ Tests of Starsim that need what is in this repo: other frameworks' original exam
 
 | Folder | What it tests | How to run it |
 |---|---|---|
-| `conversion/` | `ss.import_from()` against other frameworks' examples and the frameworks themselves, and `ss.export_to()` against the tools it writes for | `pytest conversion` |
-| `switching/` | One demo per framework, for its users, written in that field's terms; see its README | `pytest switching` |
-| `north_star/` | That a model is no easier to write without Starsim than with it: a script, not run by pytest or downstream | `python north_star/north_star.py` |
-| `threading/` | Whether BLAS threads help Starsim: a separate script for other machines; see its README | `python threading/run.py` |
+| `conversion/` | `ss.import_from()` against other frameworks' examples and the frameworks themselves, and `ss.export_to()` against the tools it writes for | `lingua_franca test conversion` |
+| `switching/` | One demo per framework, for its users, written in that field's terms; see its README | `lingua_franca test switching` |
+| `threading/` | Whether BLAS threads help Starsim: a separate script for other machines; see its README | `lingua_franca test threading` |
 
-Run `pytest conversion switching -n auto` from this folder for all of them. Tests that need a framework are skipped until its environment is installed (`python _envs/envs.py install <framework>`; see `_envs/README.md`).
+`lingua_franca test all -n auto` runs all three (install it with `pip install -e .` from the top of this repo); anything after the suite goes to pytest, or to `run.py` for `threading` alone. `pytest conversion` from this folder also still works. Tests that need a framework are skipped until its environment is installed (`python _envs/envs.py install <framework>`; see `_envs/README.md`).
 
-`.github/workflows/frameworks.yml` runs these in CI, with one job for each framework: it builds the environment, runs the framework's tests, and runs `benchmark/benchmark.py` for its models, whose comparisons with the originals can fail the job (its times cannot). Environments and Starsim's Rust kernels are cached under a hash of their recipe or source, so only what has changed is rebuilt.
+`.github/workflows/frameworks.yml` runs these in CI, with one job for each framework: it builds the environment, runs the framework's tests, and runs `lingua_franca benchmark` for its models, whose comparisons with the originals can fail the job (its times cannot). Environments and Starsim's Rust kernels are cached under a hash of their recipe or source, so only what has changed is rebuilt.
 
 `paths.py` says where the top of this repo is, `timing.py` times the speed tests, as Starsim's `tests/timing.py` does but with a more lenient limit, and `conftest.py` lets the subfolders import both.

@@ -1,0 +1,284 @@
+project:
+  type: website
+  output-dir: _site
+  render: # Quarto skips a README.md in a subfolder unless it is named, so each model is listed here and in the sidebar
+    - index.qmd
+    - approaches/
+    - approaches/README.md
+    - best-practices/
+    - best-practices/README.md
+    - design/
+    - design/README.md
+    - examples/index.qmd
+    - examples/README.md
+    - examples/atomica/sir/README.md
+    - examples/atomica/hiv_dyn/README.md
+    - examples/camdl/sir/README.md
+    - examples/camdl/stratified/README.md
+    - examples/emulsion/sir/README.md
+    - examples/emulsion/quickstart/README.md
+    - examples/epimodel/sis-network/README.md
+    - examples/epimodel/hiv/README.md
+    - examples/epydemix/sir_kenya/README.md
+    - examples/epydemix/covid19/README.md
+    - examples/flepimop/seir_2pop/README.md
+    - examples/flepimop/vaccine_scenarios/README.md
+    - examples/measles_metapop/seir_districts/README.md
+    - examples/laser/hub_spoke_seir/README.md
+    - examples/laser/england_wales/README.md
+    - examples/memilio/secir/README.md
+    - examples/memilio/secir_ageres/README.md
+    - examples/odin/stochastic_sir_arrays/README.md
+    - examples/odin/seir_array/README.md
+    - examples/siminf/sir_herds/README.md
+    - examples/siminf/sise3/README.md
+    - examples/summer2/sir-age-location/README.md
+    - examples/summer2/seir-age-clinical/README.md
+    - vignettes/README.md
+    - benchmark/README.md
+    - vignettes/atomica/sir/README.md
+    - vignettes/atomica/hiv_dyn/README.md
+    - vignettes/camdl/sir/README.md
+    - vignettes/camdl/stratified/README.md
+    - vignettes/emulsion/sir/README.md
+    - vignettes/emulsion/quickstart/README.md
+    - vignettes/epimodel/sis-network/README.md
+    - vignettes/epimodel/hiv/README.md
+    - vignettes/epydemix/sir_kenya/README.md
+    - vignettes/epydemix/covid19/README.md
+    - vignettes/flepimop/seir_2pop/README.md
+    - vignettes/flepimop/vaccine_scenarios/README.md
+    - vignettes/measles_metapop/seir_districts/README.md
+    - vignettes/laser/hub_spoke_seir/README.md
+    - vignettes/laser/england_wales/README.md
+    - vignettes/memilio/secir/README.md
+    - vignettes/memilio/secir_ageres/README.md
+    - vignettes/odin/stochastic_sir_arrays/README.md
+    - vignettes/odin/seir_array/README.md
+    - vignettes/siminf/sir_herds/README.md
+    - vignettes/siminf/sise3/README.md
+    - vignettes/summer2/sir-age-location/README.md
+    - vignettes/summer2/seir-age-clinical/README.md
+    - webapp/
+    - webapp/README.md
+    - admin/implementation.md
+    - costing/
+    - costing/README.md
+
+website:
+  title: "Lingua franca"
+  description: "A design for a lingua franca for epidemic modeling, and its implementation as Starsim v4"
+  repo-url: https://github.com/starsimhub/lingua_franca_design
+  repo-subdir: docs
+  repo-actions: [source, issue]
+  page-navigation: true
+  search:
+    type: overlay
+
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: approaches/index.qmd
+        text: Approaches
+      - href: best-practices/index.qmd
+        text: Best practices
+      - href: design/index.qmd
+        text: Design
+      - href: examples/index.qmd
+        text: Examples
+      - href: webapp/index.qmd
+        text: Compare
+      - href: admin/implementation.md
+        text: Status
+      - href: costing/README.md
+        text: Cost modeling
+    tools:
+      - icon: github
+        href: https://github.com/starsimhub/lingua_franca_design
+
+  sidebar:
+    - id: approaches
+      title: Approaches
+      contents:
+        - href: approaches/index.qmd
+          text: "**Summary**"
+        - href: approaches/README.md
+          text: Full comparison
+        - href: approaches/influences.qmd
+          text: Influences
+        - section: Framework reviews
+          contents:
+            - approaches/atomica.md
+            - approaches/camdl.md
+            - approaches/emod.md
+            - approaches/emulsion.md
+            - approaches/eon.md
+            - approaches/epidemics.md
+            - approaches/epihiper.md
+            - approaches/epimodel.md
+            - approaches/epipack.md
+            - approaches/epiworld.md
+            - approaches/epydemix.md
+            - approaches/epymorph.md
+            - approaches/flepimop.md
+            - approaches/individual.md
+            - approaches/laser.md
+            - approaches/memilio.md
+            - approaches/metacast.md
+            - approaches/odin.md
+            - approaches/siminf.md
+            - approaches/starsim.md
+            - approaches/summer2.md
+            - approaches/tlo.md
+            - approaches/vivarium.md
+            - href: approaches/notes.md
+              text: Other frameworks
+
+    - id: best-practices
+      title: Best practices
+      contents:
+        - href: best-practices/index.qmd
+          text: "**Summary**"
+        - href: best-practices/README.md
+          text: Reading guide
+        - section: Documents
+          contents:
+            - best-practices/principles.md
+            - best-practices/model-structure.md
+            - best-practices/compartmental.md
+            - best-practices/stochastic-compartmental.md
+            - best-practices/metapopulation.md
+            - best-practices/agent-based.md
+            - best-practices/paradigm-conversion.md
+            - best-practices/time-and-units.md
+            - best-practices/parameters-and-distributions.md
+            - best-practices/stratification.md
+            - best-practices/population-and-mixing.md
+            - best-practices/composition-and-effects.md
+            - best-practices/interventions.md
+            - best-practices/results-and-observation.md
+            - best-practices/stochasticity-and-reproducibility.md
+            - best-practices/calibration.md
+
+    - id: design
+      title: Design
+      contents:
+        - href: design/index.qmd
+          text: "**Summary**"
+        - href: design/README.md
+          text: Reading guide
+        - design/00-overview.md
+        - design/01-objects.md
+        - design/02-types.md
+        - design/03-states-and-transitions.md
+        - design/04-parameters.md
+        - design/05-dimensions.md
+        - design/06-routes.md
+        - design/07-effects.md
+        - design/08-interventions.md
+        - design/09-results.md
+        - design/10-execution.md
+        - design/11-random.md
+        - design/12-backends.md
+        - design/13-inference.md
+        - design/14-model-spec.md
+        - design/15-errors.md
+        - design/16-interop.md
+        - design/17-vocabulary.md
+        - design/18-conformance.md
+        - design/19-open-questions.md
+
+    - id: models
+      title: Examples
+      contents:
+        - href: examples/index.qmd
+          text: "**Summary**"
+        - section: Originals
+          contents:
+            - href: examples/README.md
+              text: About the examples
+            - examples/atomica/sir/README.md
+            - examples/atomica/hiv_dyn/README.md
+            - examples/camdl/sir/README.md
+            - examples/camdl/stratified/README.md
+            - examples/emulsion/sir/README.md
+            - examples/emulsion/quickstart/README.md
+            - examples/epimodel/sis-network/README.md
+            - examples/epimodel/hiv/README.md
+            - examples/epydemix/sir_kenya/README.md
+            - examples/epydemix/covid19/README.md
+            - examples/flepimop/seir_2pop/README.md
+            - examples/flepimop/vaccine_scenarios/README.md
+            - examples/measles_metapop/seir_districts/README.md
+            - examples/laser/hub_spoke_seir/README.md
+            - examples/laser/england_wales/README.md
+            - examples/memilio/secir/README.md
+            - examples/memilio/secir_ageres/README.md
+            - examples/odin/stochastic_sir_arrays/README.md
+            - examples/odin/seir_array/README.md
+            - examples/siminf/sir_herds/README.md
+            - examples/siminf/sise3/README.md
+            - examples/summer2/sir-age-location/README.md
+            - examples/summer2/seir-age-clinical/README.md
+        - section: Vignettes (in Starsim)
+          contents:
+            - href: vignettes/README.md
+              text: About the vignettes
+            - href: benchmark/README.md
+              text: The benchmark
+            - vignettes/atomica/sir/README.md
+            - vignettes/atomica/hiv_dyn/README.md
+            - vignettes/camdl/sir/README.md
+            - vignettes/camdl/stratified/README.md
+            - vignettes/emulsion/sir/README.md
+            - vignettes/emulsion/quickstart/README.md
+            - vignettes/epimodel/sis-network/README.md
+            - vignettes/epimodel/hiv/README.md
+            - vignettes/epydemix/sir_kenya/README.md
+            - vignettes/epydemix/covid19/README.md
+            - vignettes/flepimop/seir_2pop/README.md
+            - vignettes/flepimop/vaccine_scenarios/README.md
+            - vignettes/measles_metapop/seir_districts/README.md
+            - vignettes/laser/hub_spoke_seir/README.md
+            - vignettes/laser/england_wales/README.md
+            - vignettes/memilio/secir/README.md
+            - vignettes/memilio/secir_ageres/README.md
+            - vignettes/odin/stochastic_sir_arrays/README.md
+            - vignettes/odin/seir_array/README.md
+            - vignettes/siminf/sir_herds/README.md
+            - vignettes/siminf/sise3/README.md
+            - vignettes/summer2/sir-age-location/README.md
+            - vignettes/summer2/seir-age-clinical/README.md
+
+    - id: costing
+      title: Cost modeling
+      contents:
+        - href: costing/README.md
+          text: "**Summary**"
+        - costing/metrics.md
+        - costing/hiv-and-optimization.md
+        - costing/malaria-and-ntds.md
+        - costing/tb-and-vaccines.md
+        - costing/cancer-ncd-and-health-systems.md
+        - costing/cea-software.md
+        - costing/pandemics-and-frameworks.md
+        - costing/spec.md
+
+format:
+  html:
+    from: markdown+gfm_auto_identifiers # So links to headings work here as they do on GitHub
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    mainfont: Raleway
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    code-overflow: scroll
+    grid:
+      body-width: 1100px
+    highlight-style: github
+    filters:
+      - _filters/links.lua
