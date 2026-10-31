@@ -15,6 +15,7 @@ import sys
 import venv
 
 here = pathlib.Path(__file__).resolve().parent
+starsim = 'starsim @ git+https://github.com/starsimhub/starsim@v4'
 env = here/'.venv'
 python = env/('Scripts/python.exe' if sys.platform == 'win32' else 'bin/python')
 installed = env/'installed' # Written last, so an interrupted install starts again
@@ -27,6 +28,7 @@ def install(update=False):
         print('Installing Starsim and what it needs into .venv...', flush=True)
         venv.create(env, with_pip=True, clear=True)
         subprocess.run([python, '-m', 'pip', 'install', '--quiet', '-r', here/'requirements.txt'], check=True)
+        subprocess.run([python, '-m', 'pip', 'install', '--quiet', '--no-deps', starsim], check=True) # Without JAX, which it doesn't need here, and which has no build for some platforms
         installed.touch()
     return
 

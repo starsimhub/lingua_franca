@@ -1,2 +1,10 @@
-starsim @ git+https://github.com/starsimhub/starsim@v4
+numpy
+pandas>=3.0
+sciris>=3.7.0
+numba
+scipy
+networkx
+matplotlib
+optuna
+starsim_data>=2.1.0
 threadpoolctl

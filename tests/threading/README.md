@@ -43,6 +43,6 @@ Each setting runs in a fresh process, since BLAS reads its thread count when it 
 
 ## Reading the results
 
-The last column of each table is the best time with any other thread count, as a share of the time with 1 thread, so below 1 means threads helped. Look for values well below 1 in the Starsim rows, not only the raw BLAS ones. Differences under about 10% are usually noise.
+The last column of each table is the best time with any other thread count, as a share of the time with 1 thread, so below 1 means threads helped. Look for values well below 1 in the Starsim rows, not only the raw BLAS ones. Differences under about 10% are usually noise. On macOS, NumPy and SciPy use Apple's Accelerate, which the report can't see, so it says `BLAS: none found`; the thread limit is still set.
 
-The runs use Starsim's Numba kernels, since the Rust ones aren't part of the installed package. Both call the same BLAS function.
+The runs use Starsim's Rust kernels where they get built (which needs a Rust toolchain, as GitHub's runners have), and otherwise its Numba ones; each table says which. Both call the same BLAS function. Starsim is installed without JAX, which this test doesn't use and which has no build for macOS on Intel or Windows on ARM.

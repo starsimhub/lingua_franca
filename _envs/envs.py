@@ -38,6 +38,7 @@ envs = dict(
     laser    = dict(kind='python', python='3.12'),
     memilio  = dict(kind='python', python='3.11', repo='https://github.com/SciCompMod/memilio', commit='c2c884ce430f248414099bfb901a5045c0295c26'),
     odin     = dict(kind='r', packages=['odin', 'dde']),
+    sbml     = dict(kind='python', python='3.12'),
     siminf   = dict(kind='r', packages=['SimInf']),
     summer2  = dict(kind='python', python='3.11'),
 )
