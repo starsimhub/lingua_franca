@@ -51,5 +51,5 @@ def test_run():
 def test_speed():
     sc.heading('Timing the model')
     seconds, _ = timing.timed(lambda: make_sim().run(), repeats=2)
-    timing.check(seconds, v4_seconds, 'Run of 5 years', slowdown=3)
+    timing.check(seconds, v4_seconds, 'Run of 5 years')
     return seconds

@@ -75,17 +75,18 @@ jobs:
       matrix:
         include:
           - {name: Atomica,       envs: atomica,    tests: conversion/test_atomica.py conversion/test_optima_tb.py switching/test_atomica.py, models: atomica/}
-          - {name: camdl,         envs: camdl,      tests: conversion/test_camdl.py, models: camdl/, ocaml: true}
+          - {name: camdl,         envs: camdl,      tests: conversion/test_camdl.py switching/test_camdl.py, models: camdl/, ocaml: true}
           - {name: EMULSION,      envs: emulsion,   tests: conversion/test_emulsion.py switching/test_emulsion.py, models: emulsion/}
-          - {name: EpiModel,      envs: epimodel,   models: epimodel/, r: true, apt: libcurl4-openssl-dev libssl-dev libxml2-dev}
-          - {name: epydemix,      envs: epydemix,   tests: conversion/test_epydemix.py, models: epydemix/}
-          - {name: flepiMoP,      envs: flepimop,   tests: conversion/test_flepimop.py, models: flepimop/}
-          - {name: Measles metapop, models: measles_metapop/}
-          - {name: LASER,         envs: laser,      models: laser/}
-          - {name: MEmilio,       envs: memilio,    tests: conversion/test_memilio.py, models: memilio/}
-          - {name: odin and SBML, envs: odin sbml,  tests: conversion/test_odin.py conversion/test_export.py, models: odin/, r: true}
+          - {name: EpiModel,      envs: epimodel,   tests: switching/test_epimodel.py, models: epimodel/, r: true, apt: libcurl4-openssl-dev libssl-dev libxml2-dev}
+          - {name: epydemix,      envs: epydemix,   tests: conversion/test_epydemix.py switching/test_epydemix.py, models: epydemix/}
+          - {name: flepiMoP,      envs: flepimop,   tests: conversion/test_flepimop.py switching/test_flepimop.py, models: flepimop/}
+          - {name: Measles metapop, tests: switching/test_measles_metapop.py, models: measles_metapop/}
+          - {name: LASER,         envs: laser,      tests: switching/test_laser.py, models: laser/}
+          - {name: MEmilio,       envs: memilio,    tests: conversion/test_memilio.py switching/test_memilio.py, models: memilio/}
+          - {name: odin and SBML, envs: odin sbml,  tests: conversion/test_odin.py conversion/test_export.py switching/test_odin.py, models: odin/, r: true}
           - {name: SimInf,        envs: siminf,     tests: conversion/test_siminf.py switching/test_siminf.py, models: siminf/, r: true, apt: libgsl-dev}
-          - {name: summer2,       envs: summer2,    tests: conversion/test_summer2.py, models: summer2/}
+          - {name: Starsim 3,     tests: switching/test_starsim3.py}
+          - {name: summer2,       envs: summer2,    tests: conversion/test_summer2.py switching/test_summer2.py, models: summer2/}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -152,7 +153,7 @@ jobs:
           STARSIM_SHOW: 0
         run: pytest ${{ matrix.tests }} -n auto -rs --durations=5 --junitxml=results.xml
       - name: Run the benchmark
-        if: ${{ !cancelled() }}
+        if: ${{ matrix.models && !cancelled() }}
         run: python benchmark/benchmark.py --only ${{ matrix.models }} --stages compare timing
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
