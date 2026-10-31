@@ -7,7 +7,7 @@ The translation of [examples/odin/stochastic_sir_arrays](../../../examples/odin/
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 27 | 8 | |
-| 100 runs | first 0.75 s, rerun 0.0011 s | first 1 s, rerun 0.019 s (JAX on a GPU) | Each of the original's runs holds 100 replicates in its arrays. The Starsim times are for 100 replicates, as `ss.parallel(sim, n_runs=100)` in one process. The original's first run includes compiling C code |
+| 100 runs | first 0.77 s, rerun 0.001 s | first 1.2 s, rerun 0.017 s (JAX on a GPU) | Each of the original's runs holds 100 replicates in its arrays. The Starsim times are for 100 replicates, as `ss.parallel(sim, n_runs=100)` in one process. The original's first run includes compiling C code |
 | Results | | | **Agree.** The mean of 20,000 runs is within 2.8 people of 1,001 at every time, against the original's 20,000 replicates; 45.3% of runs die out. `compare.py` allows 12 people, three standard errors of the difference |
 
 Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `13494d38`), on a 20-core Linux machine.

@@ -7,7 +7,7 @@ The translation of [examples/emulsion/quickstart](../../../examples/emulsion/qui
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 280 | 53 | Long lines count twice. About 80 of the original's lines are descriptions, names, and colors |
-| One run | first 1.4 s, rerun 1.3 s | first 0.28 s, rerun 0.24 s (Numba) | The original runs as a whole command, so its first run and rerun are the same command, and both include starting Python and reading the model (about 0.7 s). Starsim's exclude the import |
+| One run | first 1.6 s, rerun 1.6 s | first 0.31 s, rerun 0.29 s (Rust) | The original runs as a whole command, so its first run and rerun are the same command, and both include starting Python and reading the model (about 0.7 s). Starsim's exclude the import |
 | Results, as written | | | **Do not agree.** The mean of 50 runs ends with 55 animals, against 65, and every count of adults is low from early on (finding 1). Up to step 13 the timing is right apart from the quarantine, which starts two steps sooner in EMULSION (finding 5). `compare.py` asks for 13 animals, so it records this miss and fails if it grows |
 | Results, with EMULSION's quarantine | | | **Do not agree.** The quarantine now matches (`Q` within 1.3), and births come on time, but the herd is still too small: 70 animals against 76 at step 53, and 55 against 65 at step 105 (finding 1) |
 

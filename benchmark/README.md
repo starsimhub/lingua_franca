@@ -1,21 +1,23 @@
 # Benchmark
 
-This folder regenerates every number in the table on the home page. `benchmark.py` runs the originals, checks each translation against them, times each translation under each set of kernels, and writes the lines and times into each vignette's table.
+This folder regenerates every number in the table on the home page. `benchmark.py` checks each translation against its original, times the two in turn, and writes the lines and times into each vignette's table.
 
-**Last full run:** 51 minutes on 31 October 2026 (originals 7.8, compare 7.0, timing 30.5). The slowest model, `laser/england_wales`, took 205 s.
+**Last full run:** 21 minutes on 31 October 2026 (compare 7.7, timing 13.4). The slowest model, `epimodel/sis-network`, took 151 s.
 
 ## How long it takes
 
-The whole suite is meant to take under an hour, one model at a time. No model should take more than a couple of minutes over all the stages, and most should take well under a minute. To keep it that way:
+The whole suite takes about 20 minutes, one model at a time: about 13 for timing and 8 for checking results. To keep it that way:
 
+- Each model is timed by running its original and then Starsim, twice over, and taking the best of each. A round that takes over 30 s isn't repeated.
+- Each model uses only the kernels listed for it in [`kernels.yaml`](kernels.yaml): the fastest, and any others within 10% of it, so that a close call is settled each time. The note beside each model gives its reruns under every kernel set. To try them all again and rewrite the list, use `--all-kernels`, which takes about half an hour and also times Numba compiling and rebuilds. Do this after a large change to the kernels.
+- Each time within a run is the best of as many calls as fit in 3 s, or 100 calls if that takes at least 1 s (`time_budget`, `most_runs`, and `least_time` in `examples/tools.py`). There is always at least one.
 - The large reference runs of the originals are not repeated. They are kept in `examples/*/*/reference`, and each `run.py` makes only the runs its timing needs. Use `--references` to remake them, which takes over an hour.
-- Each time is the best of as many runs as fit in a budget (`budget` in `benchmark.py`, and `time_budget` in `examples/tools.py`), up to 100 runs, but with at least 5 s spent on it. A fast model is timed in 2 fresh processes, and a slow one gets a single rerun.
 - Each `compare.py` uses just enough runs for its check.
 - A few models are timed at a smaller size than the examples show, on both sides. `flepimop/vaccine_scenarios` is timed at 3 scenarios of 2 runs each, not 10, and `epimodel/hiv` at one scenario.
 
 If the load average goes over 10, the run pauses before the next model and checks again every 5 minutes; pauses aren't counted in its times.
 
-Each full run saves how long the suite, each stage, and each model took to `timings.json`, updates the line above, and lists any model over the limit.
+Each full run saves how long the suite, each stage, and each model took to `timings.json`, updates the line above, and lists any model over 2 minutes.
 
 ## Running it
 
@@ -41,9 +43,10 @@ Each full run saves how long the suite, each stage, and each model took to `timi
     ```bash
     python benchmark/benchmark.py                        # Everything
     python benchmark/benchmark.py --only odin            # Only the models whose name contains "odin"
-    python benchmark/benchmark.py --stages timing tables # Only time Starsim, and update the tables
+    python benchmark/benchmark.py --stages timing tables # Only the times, about 13 minutes
+    python benchmark/benchmark.py --all-kernels          # Try every kernel set, and rewrite kernels.yaml
     ```
 
-    The times go in `timings.json` and `timings.csv` in this folder, with every set of kernels tried, and what each run prints goes to `compare.log` in each vignette's folder and `run.log` in each example's folder. It stops short of the text: if a result changes, `compare.py` fails, and the Results row of the vignette's table is updated by hand.
+    The times go in `timings.json` and `timings.csv` in this folder, keeping the last time of any kernel set not run this time, and what each run prints goes to `compare.log` in each vignette's folder and `run.log` in each example's folder. It stops short of the text: if a result changes, `compare.py` fails, and the Results row of the vignette's table is updated by hand.
 
 Then run `quarto render` to rebuild the site.

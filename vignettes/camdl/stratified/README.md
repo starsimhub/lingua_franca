@@ -7,7 +7,7 @@ The translation of [examples/camdl/stratified](../../../examples/camdl/stratifie
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 47 | 16 | Long lines count twice |
-| One ODE run | first 0.025 s, rerun 0.015 s | first 0.019 s, rerun 0.0016 s (Rust) | The original is timed as a whole command (camdl has no way to rerun a model in the same process), and its first run includes building the model; Starsim's is in Python, without the import |
+| One ODE run | first 0.035 s, rerun 0.019 s | first 0.022 s, rerun 0.0018 s (Rust) | The original is timed as a whole command (camdl has no way to rerun a model in the same process), and its first run includes building the model; Starsim's is in Python, without the import |
 | Results, ODE | | | **Agree.** The infectious in every cell within 0.4%, with and without vaccination (`compare.py` asks for 0.5%, since camdl writes whole numbers, which matters in the smallest cells), and the totals of `S`, `E`, and `R` within 0.1%, apart from the day of the vaccination (finding below) |
 | Results, stochastic | | | **Agree in size, not quite in timing.** The peak in every cell is within 2%, but with a step of a day the south's epidemic rises about a day sooner, so the mean of 200 runs differs by up to 7% of the peak on the way up (`compare.py` asks for 2% and 8%). The gap is about the two chain-binomial schemes at a coarse step: on 14 October it shrank from 7% to 2% with a quarter-day step |
 

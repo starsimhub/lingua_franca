@@ -7,7 +7,7 @@ The translation of [examples/epimodel/hiv](../../../examples/epimodel/hiv), EpiM
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 405 | 58 | About 10 lines are the one remaining workaround (who is indicated for PrEP) |
-| One run | first 52 s, rerun 52 s | first 2.2 s, rerun 2.2 s (Rust) | With no intervention. The rerun of the original is the mean of 10 runs, and its first run adds estimating the two networks (netest), which is done once |
+| One run | first 54 s, rerun 53 s | first 2.8 s, rerun 2.8 s (Rust) | With no intervention. The rerun of the original is the mean of 10 runs, and its first run adds estimating the two networks (netest), which is done once |
 | Results | | | **Agree within the noise of the runs in three scenarios; with no intervention, the epidemic is larger, as before** (tolerance: 2.5 percentage points for prevalence, 2 for the care cascade and PrEP; below) |
 
 Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `13494d38`), on a 20-core Linux machine.

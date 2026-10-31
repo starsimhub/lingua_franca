@@ -7,7 +7,7 @@ The translation of [examples/epydemix/covid19](../../../examples/epydemix/covid1
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 161 | 39 | Both count the loading of the data, the calibration, and the scenarios; lines over 100 characters count twice. The original is formatted one item per line |
-| One run of the calibration period | first 0.037 s, rerun 0.036 s | first 0.033 s, rerun 0.0023 s (Rust) | In process, without the import or the data download. The original's times are with its model already defined; Starsim's first run includes building the sim |
+| One run of the calibration period | first 0.046 s, rerun 0.036 s | first 0.029 s, rerun 0.0022 s (Rust) | In process, without the import or the data download. The original's times are with its model already defined; Starsim's first run includes building the sim |
 | Results at fixed values | | | **Agree** (tolerance 3% of the peak). The mean of 200 runs: weekly deaths within 0.7% of the peak (833 against 837, in the same week), and 0.5% and 0.4% in the two reopening scenarios; deaths by age within 3% of the peak in every group from age 40; `E`, `I`, `R`, and `D` within 0.5%; 10,507 deaths by 2 August against 10,525 |
 | Results of the calibration | | | **Agree** (tolerance: each posterior mean inside the original's 5% to 95% range, and projected peaks within 10%). Posterior means: `R0` 2.28 (original 2.25), `Delta` 18.8 days (19.0), `I0` 4,777 (4,770), and `seasonality_min` 0.79 (0.80), with similar ranges. Peak weekly deaths projected from the posterior are 891 (897), 1,366 (1,363), and 2,231 (2,217) in the three scenarios. This is a change from before: a point estimate gave much smaller second waves |
 

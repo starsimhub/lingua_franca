@@ -7,7 +7,7 @@ The translation of [examples/ghana_measles/seir_districts](../../../examples/gha
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 89 | 23 | Long lines count twice; two lines read the data |
-| One run | first 1 s, rerun 0.96 s | first 0.75 s, rerun 0.65 s (JAX) | Both with the data already loaded. The original has no separate rerun, so its first run and rerun both build and run the sim |
+| One run | first 2.3 s, rerun 1.2 s | first 2.8 s, rerun 0.66 s (Rust) | Both with the data already loaded. The original has no separate rerun, so its first run and rerun both build and run the sim |
 | Results | | | **Agree.** Over 2010 to 2025, 3,035,293 infections against 3,040,585 and 15,169 reported cases against 15,185 (means of 20 and 50 runs); monthly means correlate at 0.999 and 0.998; infections from 2020 in each of the 16 regions within 7% (`compare.py` asks for totals within 2%, each year within 20%, a correlation over 0.98, regions within 20%, and `S` and `R` at the end within 3%) |
 
 Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `13494d38`), on a 20-core Linux machine.

@@ -1,6 +1,6 @@
 {
-  "first": 1.41476,
-  "rerun": 1.33403,
+  "first": 1.62662,
+  "rerun": 1.5615,
   "what": "emulsion run quickstart.yaml --runs 1, as one command each time: EMULSION runs a model as a whole command, so first and rerun are the same command, and both include starting Python and reading the model (about 0.7 s)",
   "machine": "x86_64",
   "cpus": 20,

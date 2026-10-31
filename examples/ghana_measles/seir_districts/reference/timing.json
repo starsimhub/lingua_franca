@@ -1,6 +1,6 @@
 {
-  "first": 1.03771,
-  "rerun": 0.9649,
+  "first": 2.26055,
+  "rerun": 1.19431,
   "what": "gm.Sim(data.districts).run(), with the data already loaded. The model has no separate rerun, so first and rerun are the same: each builds the sim and runs it",
   "machine": "x86_64",
   "cpus": 20,

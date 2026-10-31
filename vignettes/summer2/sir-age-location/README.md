@@ -7,7 +7,7 @@ The translation of [examples/summer2/sir-age-location](../../../examples/summer2
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 35 | 12 | One Starsim line is over 100 characters, so counts twice |
-| One ODE run | first 0.87 s, rerun 0.00024 s | first 0.73 s, rerun 0.0014 s (JAX) | Neither time counts importing. The original's first run builds and compiles the model with JAX, which takes much longer than Starsim's; its rerun, once compiled, is faster |
+| One ODE run | first 1.3 s, rerun 0.00031 s | first 0.022 s, rerun 0.0016 s (Rust) | Neither time counts importing. The original's first run builds and compiles the model with JAX, which takes much longer than Starsim's; its rerun, once compiled, is faster |
 | Results, ODE | | | Every compartment within 0.08 people of 1,000 |
 | Results, other solvers | | | The stochastic and agent-based runs give the same number recovered as the ODE, to within 1% (mean of 100 runs) |
 

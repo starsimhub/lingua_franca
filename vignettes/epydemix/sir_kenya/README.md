@@ -7,7 +7,7 @@ The translation of [examples/epydemix/sir_kenya](../../../examples/epydemix/sir_
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 7 | 14 | Not counting the loading of the data would be 12. The original has the model predefined and the population bundled |
-| One stochastic run | first 0.0074 s, rerun 0.0069 s | first 0.024 s, rerun 0.0014 s (Rust) | In process, without imports or loading the data. Both are the time of one run, with the 100 runs of the original taking about 0.6 s |
+| One stochastic run | first 0.0076 s, rerun 0.007 s | first 0.016 s, rerun 0.0011 s (Rust) | In process, without imports or loading the data. Both are the time of one run, with the 100 runs of the original taking about 0.6 s |
 | Results | | | **Agree** (peaks within 1%, a day apart at most, final size within 0.1 of a percentage point): the mean of 100 runs peaks 0.4% higher than the original, a day sooner, and the final size is the same (99.63%). On any one day the difference is up to 6% of the peak, since the rise is a day ahead (see the findings) |
 
 Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `13494d38`), on a 20-core Linux machine.

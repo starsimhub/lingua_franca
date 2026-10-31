@@ -17,8 +17,8 @@ import subprocess
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 quick = bool(os.environ.get('BENCHMARK_QUICK'))
-time_budget = 20 # Seconds of reruns to time, at most
-least_time = 5 # Seconds to spend timing, at least, however many runs that takes
+time_budget = 3 # Seconds of reruns to time, at most
+least_time = 1 # Seconds to spend timing, at least, however many runs that takes
 most_runs = 100 # Runs to time, once `least_time` has been spent
 
 

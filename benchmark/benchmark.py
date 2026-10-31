@@ -5,22 +5,22 @@ code and run time for the original and for Starsim, and whether their results ag
     python benchmark/benchmark.py                        # Everything
     python benchmark/benchmark.py --only odin            # Only the models whose name contains "odin"
     python benchmark/benchmark.py --stages timing tables # Only some stages
-    python benchmark/benchmark.py --kernels rust numba   # Only some kernels
+    python benchmark/benchmark.py --all-kernels          # Try every kernel set, and rewrite kernels.yaml
     python benchmark/benchmark.py --references           # Also remake the originals' reference results (over an hour)
 
 The stages, in order (see benchmark/README.md for what to install first):
 
     check       Check that each framework's environment in _envs/ is installed
-    originals   Run each original (examples/*/*/run.py), writing its timing
-    compare     Check each translation against those results (vignettes/*/*/compare.py)
-    timing      Time each translation under each kernel set, writing timings.json and .csv in this folder
+    compare     Check each translation against the originals' results (vignettes/*/*/compare.py)
+    timing      Time each original and its translation in turn, writing timings.json and .csv in this folder
     tables      Write the lines and times into the table of each vignette's README
 
 Lines are counted, and times taken, as in design/18-conformance.md. The first run is a
 fresh process, not counting importing Starsim and reading the model file (so not reading
 data, as in the originals). A rerun is the same sim run again, already built. A rebuild
-is `sim.new().run()`. Each time is the best of as many runs as fit in the budget, up to
-100 unless that takes under 5 s, so that no model takes more than a couple of minutes. A full run records how long the whole
+is `sim.new().run()`, timed only with --all-kernels. Each model gets `n_rounds` rounds of
+its original and then Starsim, in fresh processes, under the kernels listed for it in
+kernels.yaml, and each time is the best of them. A full run records how long the whole
 suite and each model took, in timings.json and benchmark/README.md.
 
 Use --starsim to time a checkout other than the installed Starsim, and --commit to record
@@ -45,16 +45,18 @@ root = folder.parent
 sys.path.insert(0, str(root/'examples'))
 import tools
 
-stages = ['check', 'originals', 'compare', 'timing', 'tables']
-kernels = ['rust', 'numba', 'jax', 'jax-gpu'] # Every set is tried on every model, and JAX is left out where it does not apply
+stages = ['check', 'compare', 'timing', 'tables']
+kernels = ['rust', 'numba', 'jax', 'jax-gpu'] # Every set is tried with --all-kernels, and JAX is left out where it does not apply
 kernel_names = {'rust':'Rust', 'numba':'Numba', 'jax':'JAX', 'jax-gpu':'JAX on a GPU'}
-n_rounds = 2 # Fresh processes for each kernel set, taken in turn
-budget = 30 # Seconds of runs to time one model, after one first run of each kernel set; each time gets at least tools.least_time
+n_rounds = 2 # Rounds of each original and its translation, in turn
+slow = 30 # Seconds for a round of one model, over which it gets no more rounds
+close = 1.1 # Kernel sets within this factor of the fastest rerun are all listed in kernels.yaml
 limit = 120 # Seconds for one model over all the stages, over which it is reported
 timeout = 900 # Seconds for any one command
 max_load = 10 # A load average over this pauses the run before the next model, which is checked again after `pause` seconds
 pause = 300
 data = folder / 'timings.json'
+kernel_file = folder / 'kernels.yaml'
 readme = folder / 'README.md'
 
 runs = { # What one run is, where it is not the variable `sim` in the model file
@@ -119,16 +121,21 @@ def last_line(text):
     return lines[-1][:200] if lines else 'no output'
 
 
-def run_originals(names, spent, paused, references=False):
-    """ Run each original in its environment: only for its timing, unless the reference results are to be remade """
-    failed = {}
+def run_original(name, references=False):
+    """ Run one original in its environment: only for its timing, unless the reference results are to be remade """
     env = dict(PYTHONPATH='') if references else dict(PYTHONPATH='', BENCHMARK_QUICK='1') # In their own environments
+    return command([sys.executable, 'run.py'], cwd=root/'examples'/name, env=env, log=root/'examples'/name/'run.log')
+
+
+def remake_references(names, spent, paused):
+    """ Run each original in full, remaking its reference results """
+    failed = {}
     for name in names:
         wait_for_quiet(paused)
         print(f'Original: {name}', flush=True)
         start = time.perf_counter()
-        ok, text = command([sys.executable, 'run.py'], cwd=root/'examples'/name, env=env, log=root/'examples'/name/'run.log')
-        spent.setdefault(name, {})['originals'] = time.perf_counter() - start
+        ok, text = run_original(name, references=True)
+        spent.setdefault(name, {})['references'] = time.perf_counter() - start
         if not ok:
             failed[name] = last_line(text)
     return failed
@@ -148,8 +155,8 @@ def run_compares(names, env, spent, paused):
     return failed
 
 
-def worker(name, kernel, rerun_time, rebuild_time, most):
-    """ In a fresh process: read the model, then time its first run, its reruns, and its rebuilds, printing them; JAX stops after the first if it was not used """
+def worker(name, kernel, rebuilds):
+    """ In a fresh process: read the model, then time its first run and its reruns (and rebuilds, if asked), printing them; JAX stops after the first if it was not used """
     import starsim as ss # Not timed
     import importlib.util
     used = []
@@ -192,10 +199,9 @@ def worker(name, kernel, rerun_time, rebuild_time, most):
     if kernel.startswith('jax') and not any(use for use,why in used):
         out = dict(skipped=used[-1][1] if used else 'no compartmental run')
     else:
-        if rerun_time:
-            out['rerun'] = tools.repeat(again, rerun_time, rerun_time, most)
-        if rebuild_time:
-            out['rebuild'] = tools.repeat(rebuild, rebuild_time, rebuild_time, most)
+        out['rerun'] = tools.repeat(again)
+        if rebuilds:
+            out['rebuild'] = tools.repeat(rebuild)
     print('TIMING ' + json.dumps(out))
     return
 
@@ -209,38 +215,39 @@ def kernel_env(kernel):
     return dict(STARSIM_KERNELS=kernel)
 
 
-def run_worker(name, kernel, env, rerun_time=0, rebuild_time=0, most=tools.most_runs):
+def run_worker(name, kernel, env, rebuilds=False):
     """ One fresh process, returning its times, or why there are none """
-    cmd = [sys.executable, str(folder/'benchmark.py'), '--worker', name, kernel, str(rerun_time), str(rebuild_time), str(most)]
+    cmd = [sys.executable, str(folder/'benchmark.py'), '--worker', name, kernel, str(int(rebuilds))]
     ok, text = command(cmd, env=dict(env, **kernel_env(kernel)))
     found = [line for line in text.splitlines() if line.startswith('TIMING ')]
     return json.loads(found[-1][7:]) if ok and found else dict(skipped=last_line(text))
 
 
-def make_plan(seconds, n_sets):
-    """ The rounds, and the seconds for reruns and for rebuilds in each, given how long one run of each kernel set takes in all: a slow model gets one round, and no rebuilds """
-    each = max(tools.least_time, budget/(2*n_sets)) # For one time of one kernel set
-    if 3*seconds > budget:
-        return 1, each, 0
-    return n_rounds, each/n_rounds, each/n_rounds
+def keep_best(best, found):
+    """ The better of two sets of times """
+    if 'skipped' in found or not best:
+        return found
+    return {key:min(best[key], found[key]) for key in found}
 
 
-def time_model(name, sets, env):
-    """ Time one model under each kernel set, taking them in turn, with a first round thrown away to fill the caches """
-    warm = {kernel:run_worker(name, kernel, env) for kernel in sets}
-    out = {kernel:val for kernel,val in warm.items() if 'skipped' in val}
-    live = [kernel for kernel in sets if kernel not in out]
-    rounds, rerun_time, rebuild_time = make_plan(sum(warm[kernel]['first'] for kernel in live), len(live))
-    for i in range(rounds):
-        for kernel in live:
-            found = run_worker(name, kernel, env, rerun_time, rebuild_time, tools.most_runs//rounds)
-            if 'skipped' in found:
-                out[kernel] = found
-                continue
-            best = out.setdefault(kernel, found)
-            if 'skipped' not in best:
-                out[kernel] = {key:min(best[key], found[key]) for key in found}
-    return out
+def time_model(name, sets, env, rebuilds=False):
+    """ Time an original and its translation in turn, returning the best times of Starsim by kernel set and of the original, or an error if the original failed """
+    path = root/'examples'/name/'reference'/'timing.json'
+    times, original = {}, {}
+    for i in range(n_rounds):
+        start = time.perf_counter()
+        ok, text = run_original(name)
+        if not ok:
+            return times, last_line(text)
+        timing = sc.loadjson(path)
+        original = keep_best(original, {key:timing[key] for key in ['first', 'rerun']})
+        sc.savejson(path, dict(timing, **original), indent=2)
+        for kernel in sets:
+            if 'skipped' not in times.get(kernel, {}):
+                times[kernel] = keep_best(times.get(kernel), run_worker(name, kernel, env, rebuilds))
+        if time.perf_counter() - start > slow:
+            break
+    return times, None
 
 
 def fastest(times):
@@ -256,6 +263,29 @@ def compile_time(env):
         ok, text = command([sys.executable, '-c', code], env=dict(env, STARSIM_KERNELS='numba', NUMBA_CACHE_DIR=tmp))
     found = re.search(r'SECONDS ([\d.]+)', text)
     return float(found.group(1)) if ok and found else None
+
+
+def listed_kernels(name):
+    """ The kernel sets to time a model with """
+    return sc.loadyaml(kernel_file)[name]
+
+
+def pretty_time(value):
+    """ A time in the units that read best """
+    return f'{float(f"{value*1000:.2g}"):g} ms' if value < 1 else f'{value:.2g} s'
+
+
+def write_kernels(info):
+    """ Write which kernel sets to time each model with: the fastest, and any others close to it """
+    lines = [f'# The kernel sets to time each model with: the fastest rerun, and any within {close - 1:.0%} of it, so that a close call is settled each time.', '# Written by `python benchmark/benchmark.py --all-kernels`; each note gives the reruns measured.']
+    for name,model in info['models'].items():
+        done = {kernel:val['rerun'] for kernel,val in model['kernels'].items() if 'rerun' in val}
+        best = min(done.values())
+        use = [kernel for kernel in sorted(done, key=done.get) if done[kernel] <= close*best]
+        note = ', '.join(f'{kernel_names[kernel]} {pretty_time(val)}' for kernel,val in sorted(done.items(), key=lambda item: item[1]))
+        lines.append(f'{name}: [{", ".join(use)}] # {note}')
+    sc.savetext(kernel_file, '\n'.join(lines) + '\n')
+    return
 
 
 def starsim_info(env, commit):
@@ -283,26 +313,34 @@ def write_csv(info):
     return
 
 
-def run_timing(names, sets, env, commit, spent, paused):
-    """ Time every model, saving as it goes """
+def run_timing(names, env, commit, spent, paused, all_kernels=False):
+    """ Time every model, saving as it goes, and returning any original that failed """
     info = load_data()
-    info.update(date=str(datetime.date.today()), starsim=starsim_info(env, commit), kernels=sets, cpus=os.cpu_count(), system=platform.platform())
-    if 'numba' in sets:
+    info.update(date=str(datetime.date.today()), starsim=starsim_info(env, commit), cpus=os.cpu_count(), system=platform.platform())
+    if all_kernels:
         print('Timing the compiling of the Numba kernels')
-        info['numba_compile'] = compile_time(env)
+        info.update(kernels=kernels, survey=info['date'], numba_compile=compile_time(env))
+    failed = {}
     for name in names:
         wait_for_quiet(paused)
         print(f'Timing: {name}', flush=True)
         start = time.perf_counter()
         loads = [os.getloadavg()[0]]
-        times = time_model(name, sets, env)
+        sets = kernels if all_kernels else listed_kernels(name)
+        times, error = time_model(name, sets, env, rebuilds=all_kernels)
         loads.append(os.getloadavg()[0])
         spent.setdefault(name, {})['timing'] = time.perf_counter() - start
-        info['models'][name] = dict(kernels=times, fastest=fastest(times), load=max(loads))
+        if error:
+            failed[name] = error
+            continue
+        known = info['models'].get(name, {}).get('kernels', {})
+        info['models'][name] = dict(kernels=dict(known, **times), fastest=fastest(times), load=max(loads))
         info['models'] = dict(sorted(info['models'].items()))
         sc.savejson(data, info, indent=2)
         write_csv(info)
-    return
+    if all_kernels:
+        write_kernels(info)
+    return failed
 
 
 def write_suite(spent, total):
@@ -368,16 +406,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--only', help='only the models whose name contains this')
     parser.add_argument('--stages', nargs='+', choices=stages, default=stages)
-    parser.add_argument('--kernels', nargs='+', choices=kernels, default=kernels)
+    parser.add_argument('--all-kernels', action='store_true', help='try every kernel set on every model, and rewrite kernels.yaml')
     parser.add_argument('--starsim', help='folder of a Starsim checkout to use rather than the installed one')
     parser.add_argument('--commit', help='the commit of that checkout, if it is not a git repository')
     parser.add_argument('--references', action='store_true', help="also remake the originals' reference results, which takes over an hour")
-    parser.add_argument('--worker', nargs=5, help=argparse.SUPPRESS)
+    parser.add_argument('--worker', nargs=3, help=argparse.SUPPRESS)
     args = parser.parse_args()
 
     if args.worker:
-        name, kernel, rerun_time, rebuild_time, most = args.worker
-        return worker(name, kernel, float(rerun_time), float(rebuild_time), int(most))
+        name, kernel, rebuilds = args.worker
+        return worker(name, kernel, int(rebuilds))
 
     start = time.perf_counter()
     names = list_models(args.only)
@@ -388,12 +426,12 @@ def main():
     if 'check' in args.stages:
         ok, text = command([sys.executable, str(root/'_envs'/'envs.py'), 'check'])
         print(text)
-    if 'originals' in args.stages:
-        failed.update({f'original {key}':val for key,val in run_originals(names, spent, paused, args.references).items()})
+    if args.references:
+        failed.update({f'original {key}':val for key,val in remake_references(names, spent, paused).items()})
     if 'compare' in args.stages:
         failed.update({f'compare {key}':val for key,val in run_compares(names, env, spent, paused).items()})
     if 'timing' in args.stages:
-        run_timing(names, args.kernels, env, args.commit, spent, paused)
+        failed.update({f'original {key}':val for key,val in run_timing(names, env, args.commit, spent, paused, args.all_kernels).items()})
     if 'tables' in args.stages:
         for key,val in write_tables(names).items():
             print(f'Note: {key}: {val}')
@@ -404,7 +442,7 @@ def main():
     for name,val in spent.items():
         if sum(val.values()) > limit:
             print(f'Over {limit} s: {name}: {val}')
-    if not args.only and args.stages == stages and not args.references: # Only a whole run, of the usual size
+    if not args.only and args.stages == stages and not args.references and not args.all_kernels: # Only a whole run, of the usual size
         print(write_suite(spent, total))
     print(f'Done: {len(names)} models, {len(failed)} failures, in {total/60:.1f} minutes')
     return len(failed) > 0

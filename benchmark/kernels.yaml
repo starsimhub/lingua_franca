@@ -1,0 +1,25 @@
+# The kernel sets to time each model with: the fastest rerun, and any within 10% of it, so that a close call is settled each time.
+# Written by `python benchmark/benchmark.py --all-kernels`; each note gives the reruns measured.
+atomica/hiv_dyn: [rust, jax, numba] # Rust 3.4 ms, JAX 3.6 ms, Numba 3.6 ms, JAX on a GPU 5.3 ms
+atomica/sir: [numba, rust] # Numba 1.3 ms, Rust 1.3 ms, JAX 2.2 ms, JAX on a GPU 2.4 ms
+camdl/sir: [rust, jax] # Rust 1.1 ms, JAX 1.1 ms, Numba 1.3 ms, JAX on a GPU 8.5 ms
+camdl/stratified: [rust] # Rust 1.6 ms, JAX 1.9 ms, Numba 2 ms, JAX on a GPU 34 ms
+emulsion/quickstart: [numba, rust] # Numba 240 ms, Rust 260 ms
+emulsion/sir: [rust] # Rust 1 ms, Numba 1.2 ms, JAX on a GPU 1.5 ms, JAX 2.6 ms
+epimodel/hiv: [rust, numba] # Rust 2.2 s, Numba 2.3 s
+epimodel/sis-network: [rust, numba] # Rust 350 ms, Numba 380 ms
+epydemix/covid19: [rust] # Rust 2.3 ms, JAX on a GPU 2.6 ms, Numba 2.7 ms, JAX 2.8 ms
+epydemix/sir_kenya: [rust, jax, jax-gpu] # Rust 1.4 ms, JAX 1.4 ms, JAX on a GPU 1.5 ms, Numba 2.6 ms
+flepimop/seir_2pop: [jax] # JAX 1.5 ms, Numba 1.7 ms, Rust 2.6 ms, JAX on a GPU 9.7 ms
+flepimop/vaccine_scenarios: [rust, jax] # Rust 650 ms, JAX 690 ms, JAX on a GPU 720 ms, Numba 730 ms
+ghana_measles/seir_districts: [jax, jax-gpu, rust] # JAX 650 ms, JAX on a GPU 670 ms, Rust 670 ms, Numba 760 ms
+laser/england_wales: [rust] # Rust 24 s, Numba 27 s
+laser/hub_spoke_seir: [rust] # Rust 720 ms, Numba 810 ms
+memilio/secir: [rust, jax] # Rust 2.1 ms, JAX 2.1 ms, Numba 2.3 ms, JAX on a GPU 24 ms
+memilio/secir_ageres: [rust] # Rust 2.1 ms, Numba 2.4 ms, JAX 3.1 ms, JAX on a GPU 14 ms
+odin/seir_array: [rust] # Rust 4.8 ms, Numba 8.1 ms, JAX 17 ms, JAX on a GPU 98 ms
+odin/stochastic_sir_arrays: [jax-gpu, jax] # JAX on a GPU 19 ms, JAX 19 ms, Numba 28 ms, Rust 30 ms
+siminf/sir_herds: [rust] # Rust 250 ms, Numba 430 ms
+siminf/sise3: [rust] # Rust 920 ms, Numba 1.6 s
+summer2/seir-age-clinical: [numba] # Numba 2.3 ms, Rust 2.7 ms, JAX 3.5 ms, JAX on a GPU 24 ms
+summer2/sir-age-location: [jax, rust] # JAX 1.4 ms, Rust 1.4 ms, Numba 1.7 ms, JAX on a GPU 18 ms

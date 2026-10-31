@@ -225,7 +225,7 @@ def kernel_table():
             bold = '**' if key == model['fastest'] else ''
             cells += [f'{time["first"]:.2g}', f'{bold}{time["rerun"]:.2g}{bold}'] if 'rerun' in time else ['', '']
         out += [f'| {name} | ' + ' | '.join(cells) + ' |']
-    out += ['', f'Measured on {info["date"]} with Starsim {info["starsim"]["version"]} (commit `{info["starsim"]["commit"]}`) on a {info["cpus"]}-core Linux machine, using each set of kernels\' default threads. Compiling the Numba kernels, needed once per install, took {info["numba_compile"]:.0f} s; the Rust kernels are built when Starsim is installed.']
+    out += ['', f'Measured on {info["date"]} with Starsim {info["starsim"]["version"]} (commit `{info["starsim"]["commit"]}`) on a {info["cpus"]}-core Linux machine, using each set of kernels\' default threads. Those not in `benchmark/kernels.yaml` were last timed on {info["survey"]}. Compiling the Numba kernels, needed once per install, took {info["numba_compile"]:.0f} s; the Rust kernels are built when Starsim is installed.']
     return '\n'.join(out)
 
 

@@ -1,0 +1,53 @@
+name: BLAS threads
+on:
+  workflow_dispatch:
+    inputs:
+      reps:
+        description: Times to run each setting
+        default: '5'
+
+jobs:
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: tests/threading
+    strategy:
+      fail-fast: false # One platform failing, e.g. a missing wheel, shouldn't stop the others
+      matrix:
+        include:
+          - {name: Linux x86-64,    os: ubuntu-24.04}
+          - {name: Linux ARM,       os: ubuntu-24.04-arm}
+          - {name: macOS ARM,       os: macos-15}
+          - {name: macOS Intel,     os: macos-15-intel}
+          - {name: Windows x86-64,  os: windows-2025}
+          - {name: Windows ARM,     os: windows-11-arm}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python run.py --reps ${{ inputs.reps }} --name "${{ matrix.name }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results-${{ matrix.name }}
+          path: tests/threading/results/
+          if-no-files-found: warn
+
+  report:
+    needs: test
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: results
+      - run: python3 tests/threading/run.py --report --out results | tee report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: report
+          path: report.md

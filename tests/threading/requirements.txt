@@ -1,0 +1,2 @@
+starsim @ git+https://github.com/starsimhub/starsim@v4
+threadpoolctl

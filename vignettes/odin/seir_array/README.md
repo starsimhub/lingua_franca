@@ -7,7 +7,7 @@ The translation of [examples/odin/seir_array](../../../examples/odin/seir_array)
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 53 | 17 | No line is over 100 characters |
-| One run | first 0.9 s, rerun 0.0015 s | first 0.042 s, rerun 0.0059 s (Rust) | The original's first run is mostly compiling the C code. Its run of the delay and Starsim's conveyor are both quick |
+| One run | first 0.81 s, rerun 0.0014 s | first 0.023 s, rerun 0.0052 s (Rust) | The original's first run is mostly compiling the C code. Its run of the delay and Starsim's conveyor are both quick |
 | Results, in total | | | **Agree.** `S`, `E`, `I`, and `R` within 0.23%, 0.36%, 0.25%, and 0.15% of their largest values on every day (a quarter of that with a step of half a day), and `I` peaks at 6.19 million on day 125, as in the original. It needs the workaround of finding 1: without it the epidemic peaks 15 days late. `compare.py` allows 0.5% |
 | Results, by age | | | **Agree, except in the youngest group,** where `E`, `I`, and `R` differ by up to 15%, 5%, and 8%. The original's delay does not let the latent age (finding 2); Starsim's does. `compare.py` allows 1% in the other groups |
 

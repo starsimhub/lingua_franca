@@ -1,6 +1,6 @@
 {
-  "first": 0.184,
-  "rerun": 0.08,
+  "first": 0.183,
+  "rerun": 0.084,
   "what": "first: SIR() building the model, and its first run(model), of 1,600 nodes for 1,460 days on one thread, with R started, SimInf loaded, and the 466,692 events read. rerun: run(model) on the same model",
   "machine": "x86_64",
   "cpus": 20,
