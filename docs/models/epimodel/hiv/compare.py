@@ -78,7 +78,7 @@ def summary(d):
 if __name__ == '__main__':
     rows = []
     for scen,sim in scenarios.items():
-        msim = ss.parallel(sim.new(verbose=0), n_runs=n_runs, parallel=False)
+        msim = ss.parallel(sim.new(verbose=0), n_runs=n_runs)
         d = ours(msim)
         a, b = summary(d), summary(theirs(scen))
         se = np.std(d.i[:, -1])/np.sqrt(n_runs)

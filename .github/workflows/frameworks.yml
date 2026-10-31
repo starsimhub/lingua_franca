@@ -8,7 +8,8 @@
 # Starsim calls this as a downstream test (test_downstream.yml in its repo), giving the commit to test.
 # On its own, this tests Starsim's v4 branch. A job fails on the comparisons with the originals' results,
 # and on the speed tests, which allow 3 times the reference time after normalizing for the machine (see
-# tests/timing.py). The benchmark's own times are noisier on GitHub's runners, so are only reported, as artifacts.
+# tests/timing.py). The benchmark's own times are noisier on GitHub's runners, so are only reported, as artifacts,
+# and are only taken in this repo's own runs (weekly, or by hand).
 
 name: Frameworks
 on:
@@ -34,6 +35,8 @@ env:
   DESIGN_REF: ${{ inputs.starsim_repo && 'main' || github.sha }} # This repo, when called from Starsim
   UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.uv-python # The Python of each environment, cached with it
   R_VERSION: 4.6.1
+  STAGES: ${{ inputs.starsim_repo && 'compare' || 'compare timing' }} # Timing takes as long again, and runs the originals, so only for this repo's own runs
+  STARSIM_KERNELS: rust # An error if the kernels are missing or stale, rather than falling back to Numba's
 
 jobs:
 
@@ -105,7 +108,7 @@ jobs:
         with:
           version: 0.13.0 # As the environments were built with
       - name: Install Starsim
-        run: pip install -e ".starsim[dev]" -e . jax
+        run: uv pip install --system -e ".starsim[dev]" -e . jax
         env:
           CARGO: 'false' # Use the kernels built above, rather than compiling them again: they are optional, so a failed cargo is not an error
       - name: Check the kernels are compiled
@@ -153,7 +156,7 @@ jobs:
         run: pytest ${{ matrix.tests }} -n auto -rs --durations=5 --junitxml=results.xml
       - name: Run the benchmark
         if: ${{ matrix.models && !cancelled() }}
-        run: lingua_franca benchmark --only ${{ matrix.models }} --stages compare timing
+        run: lingua_franca benchmark --only ${{ matrix.models }} --stages ${{ env.STAGES }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

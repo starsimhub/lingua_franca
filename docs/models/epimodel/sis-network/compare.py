@@ -21,7 +21,7 @@ tol = 0.05 # Of each number; the means of 100 runs each differ by about 1% by ch
 recovered_at_once = 0.95 # EpiModel counts after recovery, which can follow infection within a step: about 5% of those infected (the recovery probability)
 
 if __name__ == '__main__':
-    msim = ss.parallel(sim.new(verbose=0), n_runs=n_runs, parallel=False)
+    msim = ss.parallel(sim.new(verbose=0), n_runs=n_runs)
     res = msim.results.sis
     theirs = np.array(ref['i.num'][1]) # Index k is the number after k steps in both (the original's first value is the start)
     ours = np.asarray(res.I.values).mean(axis=0)[:len(theirs)]
