@@ -145,7 +145,7 @@ def test_secirvvs(tmp_path):
 @pytest.mark.parametrize('example', ['secir', 'secir_ageres'])
 def test_examples(example, tmp_path):
     sc.heading(f'Testing importing the MEmilio example {example} against the original')
-    folder = lfd / 'examples/memilio' / example
+    folder = lfd / 'docs/models/memilio' / example
     script = next((folder / 'original').glob('*.py'))
     path = tmp_path / 'model.json'
     subprocess.run([str(python), '-I', str(dump), str(script), str(path)], check=True, cwd=tmp_path, capture_output=True)

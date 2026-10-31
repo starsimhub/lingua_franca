@@ -1,5 +1,5 @@
 """
-Where the tests find what is in this repo: the frameworks' examples in `examples/` and their environments in `_envs/`
+Where the tests find what is in this repo: the frameworks' models in `docs/models/` and their environments in `_envs/`
 """
 import sciris as sc
 

@@ -222,11 +222,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Environments for the examples: the recipes are kept, what they build is not
-_envs/*/*
-!_envs/*/README.md
-!_envs/*/requirements.txt
-!_envs/*/renv.lock
+# The frameworks' environments, built from the recipes in docs/models
+/_envs/
 
 # Quarto site: the output
 /docs/_site/

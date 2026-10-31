@@ -1,5 +1,5 @@
 """
-Test the structure of the Optima TB model (see `examples/atomica/optima_tb`): that it runs, in the compiled kernels and at speed, and that it has no data
+Test the structure of the Optima TB model (see `docs/models/atomica/optima_tb`): that it runs, in the compiled kernels and at speed, and that it has no data
 """
 import ast
 import runpy
@@ -8,7 +8,7 @@ import sciris as sc
 import paths
 import timing
 
-file = paths.root/'examples/atomica/optima_tb/model.py'
+file = paths.root/'docs/models/atomica/optima_tb/model.py'
 v4_seconds = 2.0 # Starsim's run of 5 years, in s, normalized to the reference machine (see timing.py)
 
 

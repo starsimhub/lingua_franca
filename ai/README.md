@@ -1,15 +1,15 @@
 # AI skills for reviewing v4
 
-Skills that measure v4 against [targets.md](https://github.com/starsimhub/starsim/blob/v4/v4_design/targets.md). Each one is a folder with a `SKILL.md`; the folders are linked from `.claude/skills/` so that Claude Code finds them (run Claude Code from the top of this repo). Paths starting with `v4_design/` are in `ssv4`, where the targets and the reports stay.
+Skills that measure v4 against [targets.md](../tests/reviews/targets.md). Each one is a folder with a `SKILL.md`; the folders are linked from `.claude/skills/` so that Claude Code finds them (run Claude Code from the top of this repo).
 
 | Skill | Checks | Report |
 |---|---|---|
-| `/v4.review <model>` | One Starsim-family model against its v3 version: `covasim`, `fpsim`, `hpvsim`, `malariasim`, `mighti`, `stisim`, `tbsim`, or `typhoidsim`. Run each in its own session | `<date>/reviews/<model>.md` |
-| `/v4.others` | Measles metapop, LASER, and the models from the approaches survey | `<date>/reviews/others.md` |
-| `/v4.canon` | The textbook canon (Keeling and Rohani, Vynnycky and White) | `<date>/reviews/canon.md` |
-| `/v4.naive` | The naive-user benchmark | `<date>/reviews/naive.md` |
+| `/v4.review <model>` | One Starsim-family model against its v3 version: `covasim`, `fpsim`, `hpvsim`, `malariasim`, `mighti`, `stisim`, `tbsim`, or `typhoidsim`. Run each in its own session | `tests/reviews/<date>/<model>.md` |
+| `/v4.others` | Measles metapop, LASER, and the models from the approaches survey | `tests/reviews/<date>/others.md` |
+| `/v4.canon` | The textbook canon (Keeling and Rohani, Vynnycky and White) | `tests/reviews/<date>/canon.md` |
+| `/v4.naive` | The naive-user benchmark | `tests/reviews/<date>/naive.md` |
 
-`<date>` is the day's folder in `v4_design/`, e.g. `oct22`. The files a skill reuses (models, benchmarks, harnesses) are in its `references/` folder and are maintained there: when the v4 API changes, update them in place, so the next run starts from a working copy.
+`<date>` is the day's folder in `tests/reviews/`, e.g. `oct31`. The files a skill reuses (models, benchmarks, harnesses) are in its `references/` folder and are maintained there: when the v4 API changes, update them in place, so the next run starts from a working copy.
 
 ## Rules for every review
 
@@ -29,11 +29,11 @@ These apply to every skill here, and to every subagent a skill launches (pass th
 
 ## The report
 
-Write the report to `v4_design/<date>/reviews/<name>.md` (make the folder if needed). Markdown with no hard wrapping, sentence-case headings. In this order:
+Write the report to `tests/reviews/<date>/<name>.md` (make the folder if needed). Markdown with no hard wrapping, sentence-case headings. In this order:
 
 1. **Header.** Date, the `ssv4` commit and branch (and whether dirty), the versions of the other side, the machine and its load.
 2. **Scorecard.** One row per target line in `targets.md` that the skill covers: the target, its status (**met**, **partly met**, **not met**, or **not measured**), and the evidence in one line (a number, with its comparison). Say which boxes in `targets.md` could now be ticked; don't edit `targets.md` (it is Cliff's).
-3. **Since the last report.** Only if an earlier report of the same name exists (`ls -d v4_design/*/reviews/<name>.md`): list what changed, i.e. targets newly met or lost, and numbers that moved. Otherwise leave this section out; no baseline is kept on purpose.
+3. **Since the last report.** Only if an earlier report of the same name exists (`ls tests/reviews/*/<name>.md`): list what changed, i.e. targets newly met or lost, and numbers that moved. Otherwise leave this section out; no baseline is kept on purpose.
 4. **Findings.** What v4 should change to meet the targets that aren't met, ranked by how much each would move the scorecard, each with a minimal repro (a short script in the scratchpad, quoted inline or summarized with its output). Cross-reference `deferred.md` and the plan in the latest dated folder, and say for each finding whether it is already tracked.
 5. **Details.** The per-model or per-task tables behind the scorecard.
 

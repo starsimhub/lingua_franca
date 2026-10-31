@@ -8,7 +8,7 @@ import sciris as sc
 import paths
 from starsim.converters.atomica import load_atomica
 
-examples = paths.root/'examples'
+examples = paths.root/'docs/models'
 atomica_lib = paths.root/'_envs/atomica/lib/python3.12/site-packages/atomica/library' # Atomica's library workbooks, in its environment
 kw = dict(verbose=False)
 

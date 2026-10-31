@@ -1,7 +1,7 @@
 # Run Starsim against each framework: one job per environment in _envs/, which builds it if its recipe
 # has changed, runs the import and export tests, and runs the benchmark for that framework's models.
 #
-# What is built is cached: an environment under a hash of its recipe (python _envs/envs.py key), and
+# What is built is cached: an environment under a hash of its recipe (lingua_franca envs key), and
 # Starsim's Rust kernels under a hash of their source, so a job only rebuilds what has changed. Caches
 # belong to the repo a run starts from, so runs from Starsim keep their own.
 #
@@ -122,7 +122,7 @@ jobs:
       - name: Find the recipe
         if: matrix.envs
         id: recipe
-        run: echo "key=$(python _envs/envs.py key ${{ matrix.envs }})" >> "$GITHUB_OUTPUT"
+        run: echo "key=$(lingua_franca envs key ${{ matrix.envs }})" >> "$GITHUB_OUTPUT"
       - id: cache
         if: matrix.envs
         uses: actions/cache@v4
@@ -141,10 +141,10 @@ jobs:
         if: matrix.envs && steps.cache.outputs.cache-hit != 'true'
         run: |
           ${{ matrix.ocaml && 'opam install dune --yes' || 'true' }}
-          ${{ matrix.ocaml && 'opam exec --' || '' }} python _envs/envs.py install ${{ matrix.envs }}
+          ${{ matrix.ocaml && 'opam exec --' || '' }} lingua_franca envs install ${{ matrix.envs }}
       - name: Check the environment
         if: matrix.envs
-        run: python _envs/envs.py check ${{ matrix.envs }}
+        run: lingua_franca envs check ${{ matrix.envs }}
 
       - name: Run the import and export tests
         if: matrix.tests
@@ -162,7 +162,7 @@ jobs:
           path: |
             tests/results.xml
             docs/benchmark/timings.*
-            vignettes/${{ matrix.models }}**/compare.log
-            examples/${{ matrix.models }}**/run.log
+            docs/vignettes/${{ matrix.models }}**/compare.log
+            docs/models/${{ matrix.models }}**/run.log
             _envs/*/build.log
           if-no-files-found: warn

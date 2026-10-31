@@ -20,7 +20,7 @@ print(influences.heatmap(folder='approaches/'))
 
 ## Does it pass its own test?
 
-Each model below was written by the authors of another framework, usually to show that framework at its best. We translate it into Starsim and hold the translation to two numbers from the original: no more lines of model code, and no more time to run it again once it is set up. Where Starsim falls short, that is a gap for us to close. The model names link to the side-by-side code, and [examples](examples/index.qmd) has the details.
+Each model below was written by the authors of another framework, usually to show that framework at its best. We translate it into Starsim and hold the translation to two numbers from the original: no more lines of model code, and no more time to run it again once it is set up. Where Starsim falls short, that is a gap for us to close. The model names link to the side-by-side code, and [examples](docs/models/index.qmd) has the details.
 
 ::: {.benchmark}
 ```{python}

@@ -11,7 +11,7 @@ import starsim as ss
 import paths
 from starsim.converters.summer2 import load_summer2, outputs
 
-examples = paths.root/'examples'
+examples = paths.root/'docs/models'
 summer2_python = paths.root/'_envs/summer2/bin/python' # summer2's environment, to write a live model with Starsim's summer2.py
 kw = dict(verbose=False)
 

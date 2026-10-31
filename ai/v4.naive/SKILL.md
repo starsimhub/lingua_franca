@@ -1,11 +1,11 @@
 ---
 name: v4.naive
-description: Rerun the naive-user benchmark on Starsim v4 (simulated newcomers with only the docs, llms.txt, the migration pages, or guesses, doing 16 tasks with hidden reference answers), score it, and write one report to v4_design/<date>/reviews/naive.md. Use when Cliff runs /v4.naive or asks to rerun the naive-user review.
+description: Rerun the naive-user benchmark on Starsim v4 (simulated newcomers with only the docs, llms.txt, the migration pages, or guesses, doing 16 tasks with hidden reference answers), score it, and write one report to tests/reviews/<date>/naive.md. Use when Cliff runs /v4.naive or asks to rerun the naive-user review.
 ---
 
 # Naive-user review
 
-Checks the "Naive user" targets in `v4_design/targets.md`: every final answer right, and no silent wrong first attempts (code that runs cleanly and gives a wrong number). Read [../README.md](../README.md) first: its rules (snapshot, subagents, report shape) apply here.
+Checks the "Naive user" targets in `tests/reviews/targets.md`: every final answer right, and no silent wrong first attempts (code that runs cleanly and gives a wrong number). Read [../README.md](../README.md) first: its rules (snapshot, subagents, report shape) apply here.
 
 ## References
 
@@ -29,5 +29,5 @@ Keep the task set fixed, so that runs can be compared. If Cliff asks for harder 
    All of them may read docstrings (`help()`) and what Starsim prints. Tell each to write one script per task, an `answers.json` in the format `score.py` reads, and a `log.md` recording every first spelling it tried, every error and note it saw, and every first attempt whose number it later changed, with that number.
 4. **Score** with `python references/benchmark/score.py <scratchpad>/naive/*/answers.json`. Count the silent wrong first attempts from the logs: a first attempt that ran without an error and whose number would have failed `score.py`.
 5. **Reproduce** each problem the personas met in a minimal script, and check it against the NR findings, `deferred.md`, and the latest plan.
-6. **Write** `v4_design/<date>/reviews/naive.md` in the README's shape. The details are a table of persona by task (right or wrong, and whether the first attempt was silently wrong), the first spellings each persona tried for the main concepts (as in the oct17 review's "First spellings" table), and tool calls and minutes per persona. Copy each persona's `log.md` and `answers.json` to `v4_design/<date>/reviews/naive/<persona>/` so the report's evidence is kept.
+6. **Write** `tests/reviews/<date>/naive.md` in the README's shape. The details are a table of persona by task (right or wrong, and whether the first attempt was silently wrong), the first spellings each persona tried for the main concepts (as in the oct17 review's "First spellings" table), and tool calls and minutes per persona. Copy each persona's `log.md` and `answers.json` to `tests/reviews/<date>/naive/<persona>/` so the report's evidence is kept.
 7. **Clean up** the snapshot worktree and any background shells.

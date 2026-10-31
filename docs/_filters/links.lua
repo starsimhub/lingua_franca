@@ -21,7 +21,7 @@ function Link(link)
   end})
   local target = link.target
   if target:match('^%a[%w+.-]*:') or target:match('^[#/]') then return link end -- A URL, an anchor, or a path from the root
-  local up, rest = target:match('^([./]*)docs/(.*)$') -- A link from outside docs/ (the root README, or the examples), which are here on the site
+  local up, rest = target:match('^([./]*)docs/(.*)$') -- A link in the root README, which is the home page here
   if up then
     target = up .. rest
     link.target = target
@@ -57,7 +57,6 @@ function Code(code)
   if not exists(path) then return nil end
   local kind = is_folder(path) and 'tree' or 'blob'
   local relative = pandoc.path.make_relative(path, quarto.project.directory)
-  if not (relative:match('^examples/') or relative:match('^vignettes/')) then relative = 'docs/' .. relative end -- Those two are linked into docs/
-  local target = repo .. kind .. '/main/' .. relative
+  local target = repo .. kind .. '/main/docs/' .. relative
   return pandoc.Link({code}, target, '', pandoc.Attr('', {'file-link'}))
 end

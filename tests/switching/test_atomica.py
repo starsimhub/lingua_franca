@@ -13,7 +13,7 @@ import starsim as ss
 import paths
 
 lib = paths.root / '_envs/atomica/lib/python3.12/site-packages/atomica/library'
-no_lib = pytest.mark.skipif(not lib.exists(), reason=f"needs Atomica's library workbooks (not found at {lib}); install it with python _envs/envs.py install atomica")
+no_lib = pytest.mark.skipif(not lib.exists(), reason=f"needs Atomica's library workbooks (not found at {lib}); install it with lingua_franca envs install atomica")
 # Atomica 1.32.4's baseline runs: (dt, start, stop, year compared, compartments summed over populations at that year)
 ref_demos = { # switching/atomica.md, "The second week" §1 (from dump_demos.py, Atomica's own run of each library demo)
     'sir':         (1.0, 2000, 2023, 2023, dict(inf=11.23915311, rec=728.4760021)),

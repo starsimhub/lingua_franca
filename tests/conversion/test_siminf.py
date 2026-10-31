@@ -6,7 +6,7 @@ import sciris as sc
 import paths
 from starsim.converters.siminf import load_siminf, read_script, Unknown
 
-examples = paths.root/'examples/siminf' # The originals
+examples = paths.root/'docs/models/siminf' # The originals
 kw = dict(verbose=False)
 script = '''
 library(SimInf)

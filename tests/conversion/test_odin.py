@@ -66,11 +66,11 @@ def test_odin_contacts(tmp_path):
 
 def test_odin_examples():
     sc.heading('Testing the odin examples against the originals')
-    sys.path.insert(0, str(lfd / 'examples'))
+    sys.path.insert(0, str(lfd / 'docs' / 'models'))
     import tools
 
     # odin's replicates: 100 alike, independent copies are one model run many times
-    ex = lfd / 'examples' / 'odin' / 'stochastic_sir_arrays'
+    ex = lfd / 'docs' / 'models' / 'odin' / 'stochastic_sir_arrays'
     sim = load_odin(ex / 'original' / 'discrete_stochastic_sir_arrays.R', stop=100, **kw)
     assert 'n_runs=100' in sc.strjoin(sim.imported.choices)
     res = sim.new(verbose=0).run(n_runs=500).results[sim.pars.diseases[0].name]
@@ -82,7 +82,7 @@ def test_odin_examples():
         assert diff < tol, f'Expected the mean of {state} within {tol:.1f} people of the original, not {diff:.1f}'
 
     # Ages from flows between levels, and a delay as a fixed dwell time; the delay's history is listed
-    ex = lfd / 'examples' / 'odin' / 'seir_array'
+    ex = lfd / 'docs' / 'models' / 'odin' / 'seir_array'
     sim = load_odin(ex / 'original' / 'seir_array_odin.R', stop=365, **kw)
     assert '.stratify(age=[0, 1, 5, 15, 30]' in sim.imported.code
     assert [name for name,why in sim.imported.incomplete] == ['lag_inf (history)']

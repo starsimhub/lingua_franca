@@ -42,11 +42,17 @@ The lingua franca was built up in stages:
 | 1 | [Approaches](docs/approaches/) | A review of the current approaches used in the epi modeling landscape, based on the [disease modeling landscape](https://starsim.org/disease_modeling_landscape) |
 | 2 | [Best practices](docs/best-practices/) | A distillation of the modeling landscape into best practices for each aspect of building disease models |
 | 3 | [Design](docs/design/) | The design of the language, written as an extension of Starsim |
-| 4 | [Examples](examples/) | Other frameworks' own example models, and their translations into Starsim v4 |
+| 4 | [Models](docs/models/) | Other frameworks' own example models, and their translations into Starsim v4 |
 | 5 | [Compare](docs/webapp/) | A tool for comparing example models between the original source and the lingua franca |
 | 6 | [Benchmark](docs/benchmark/) | One script that regenerates every line count, run time, and check of agreement between the originals and the lingua franca |
 
-To run the tests and benchmark, install this repo with `pip install -e .` and use `lingua_franca test [conversion|switching|threading|all]` and `lingua_franca benchmark`. The site's source is in `docs/`, and is built with `quarto render docs`. `scripts/` holds what the pages call as they are rendered (`build.py`, `influences.py`) and `north_star.py`, and `ai/` holds the skills that review v4 against its targets.
+To run the tests and benchmark, install this repo with `pip install -e . --group starsim` (or just `pip install -e .` to use a Starsim you already have), then:
+
+- `lingua_franca test [conversion|switching|threading|all]` runs the tests.
+- `lingua_franca benchmark` checks the north star: it counts each model's lines, times it against the original, checks that their results agree, and ends with a scorecard of what passes and fails. `--stages tables` prints the scorecard again from the last run, and `--out` saves it. See [the benchmark](docs/benchmark/README.md).
+- `lingua_franca envs install` builds the frameworks' environments into `_envs/` from the recipes in `docs/models/<framework>`, and `python scripts/clean_envs.py` deletes them.
+
+The site's source is in `docs/`, and is built with `quarto render docs`. `scripts/` holds what the pages call as they are rendered, `ai/` the skills that review v4, and `tests/reviews/` the targets they check and their reports.
 
 The [status page](docs/admin/implementation.md) tracks how much has been implemented so far. This site explains how and why the design came about; to use Starsim v4, see its [documentation](https://starsim.org/v4/).
 

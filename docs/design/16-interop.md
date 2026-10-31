@@ -115,13 +115,13 @@ Two models are compared by their results (run both, as the importers' tests do w
 
 ## The vignette test
 
-Whether this language can express what the other frameworks do is something to test, not assert. [vignettes](../vignettes) translates the [examples](../examples) corpus into the lingua franca, and each translation is checked four ways:
+Whether this language can express what the other frameworks do is something to test, not assert. [vignettes](../vignettes) translates the [examples](../models) corpus into the lingua franca, and each translation is checked four ways:
 
 1. **It runs.**
 2. **It matches.** Its results agree with the original framework's to a stated tolerance ([18-conformance.md](18-conformance.md)).
 3. **It is no longer.** The lingua franca version has no more lines of model code than the original. Where the original calls a built-in written for one situation (`interventions=close_schools_uk()`), the lines inside that built-in count as the original's. This is the hard target.
 4. **It is not noticeably slower.** Time is reported as two numbers, the first result and the best of five repeated runs, each against the original's; a vignette fails on time only when it is more than twice as slow and more than a second slower.
 
-Points 3 and 4 are the north star: a model should never be easier to write without the lingua franca than with it. `scripts/north_star.py` reads the vignettes and writes the table, failing rows included, and the "Coming from" pages of the docs publish it for each framework. How lines and time are measured is in [18-conformance.md](18-conformance.md#13-north-star).
+Points 3 and 4 are the north star: a model should never be easier to write without the lingua franca than with it. `lingua_franca benchmark` reads the vignettes and writes the table, failing rows included, and the "Coming from" pages of the docs publish it for each framework. How lines and time are measured is in [18-conformance.md](18-conformance.md#13-north-star).
 
 Where a translation fails any of the four, the vignette says which and why. A list of what does not translate well, with reasons, is a useful result: it says where the design needs work.

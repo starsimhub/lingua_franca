@@ -21,7 +21,7 @@ ref_step_us = 1.35 # odin's single-threaded forward run per particle-step, in µ
 ref_cases = [3, 1, 12, 10, 32, 73, 116, 129, 246, 390, 740, 1094, 1950, 1599, 2598, 3189, 4885, 4012, 5096, 5655, 7789, 4031, 9381, 8058,
              8006, 5767, 5989, 3812, 4955, 3666, 3992, 3093, 5952, 4071, 3806, 4024, 2205, 3734, 3202, 1549] # Weekly cases from one odin run (cases.csv): switching/odin.md §3
 
-ref_delay = dict(peak=6_185_515, day=125, S=334_138, E=1_305_913, I=2_792_751, R=5_567_199) # odin's seir_array (a 14-day delay() solved by deSolve::dede): the peak of I and its day, and each state on day 365 (LFD examples/odin/seir_array/reference)
+ref_delay = dict(peak=6_185_515, day=125, S=334_138, E=1_305_913, I=2_792_751, R=5_567_199) # odin's seir_array (a 14-day delay() solved by deSolve::dede): the peak of I and its day, and each state on day 365 (LFD docs/models/odin/seir_array/reference)
 ref_delay_run = 0.002 # odin's run of seir_array, in s (the same reference's timing.json); with 200 Erlang stages for the delay, Starsim took 1.9 s and was 1.6% off
 
 m = [[12, 4, 2, 1], [4, 8, 3, 1], [2, 3, 6, 2], [1, 1, 2, 3]]

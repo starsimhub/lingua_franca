@@ -1,10 +1,10 @@
 """
 Write the Markdown that compares each example with its vignette, from the files in
-`examples/<framework>/<model>` and `vignettes/<framework>/<model>`. The pages that
+`docs/models/<framework>/<model>` and `docs/vignettes/<framework>/<model>`. The pages that
 show it call these functions as they are rendered, so nothing here is saved to a file:
 
     comparison()    Every model: the original and the Starsim version side by side (docs/webapp/index.qmd)
-    benchmark()     One row per model: lines of code, run time, and agreement (docs/index.qmd, examples/index.qmd)
+    benchmark()     One row per model: lines of code, run time, and agreement (docs/index.qmd, docs/models/index.qmd)
     kernel_table()  One row per model: its times under each kernel set, once `lingua_franca benchmark` has measured them
 
 To see what either one writes:
@@ -118,7 +118,7 @@ def load_model(folder):
     """ Everything known about one example and its vignette """
     meta = sc.objdict(sc.loadyaml(folder / 'meta.yaml'))
     key = f"{folder.parent.name}/{folder.name}"
-    vfolder = root / 'vignettes' / key
+    vfolder = root / 'docs' / 'vignettes' / key
     title, intro, body = sections(read(folder / 'README.md'))
     vtitle, vintro, vbody = sections(fix_links(read(vfolder / 'README.md'), vfolder))
     model = sc.objdict(
@@ -192,7 +192,7 @@ def benchmark_row(model):
 
 def load_models():
     """ Every example that has a `meta.yaml`, in order of framework """
-    folders = sorted(path.parent for path in (root / 'examples').glob('*/*/meta.yaml'))
+    folders = sorted(path.parent for path in (root / 'docs' / 'models').glob('*/*/meta.yaml'))
     return [load_model(folder) for folder in folders]
 
 

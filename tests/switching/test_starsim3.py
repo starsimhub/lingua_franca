@@ -5,7 +5,7 @@ Passes when: v4 verbs work on the model written as code; the port matches within
 Still open: N9, N10, N29, the migration page (D23 and N19, the verbs on the model written as code, are done).
 
 Scaled down to 1,000 to 5,000 agents over 10 to 15 years. N9 and N10 (routine delivery, the one-step shift) are
-for the migration page, and N29 (declared agents 1.4x slower than code) is checked by the north-star script (phase 6).
+for the migration page, and N29 is declared agents being 1.4x slower than code.
 """
 import numpy as np
 import sciris as sc
