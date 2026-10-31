@@ -5,12 +5,15 @@ Passes when: NUTS on the JAX path with no divergences.
 Blocked today by: N2, the summer2 importer (N13), the JAX log-density.
 The fit is scaled down to the TB model without age groups, with a short chain.
 """
+import subprocess
+import tempfile
 import numpy as np
 import pandas as pd
 import pytest
 import sciris as sc
 import starsim as ss
 import starsim.fit
+import paths
 
 ref_n_I = {1990: 3150.376, 2010: 1527.021, 2025: 1477.900} # switching/summer2.md, "The second week" §1: summer2's active TB (all ages) from tb_summer2.py
 ref_notifications = {1990: 2341.466, 2010: 2263.245, 2024: 2194.623} # Same section: summer2's notifications (v4: 2,341, 2,260, 2,195)
@@ -22,6 +25,28 @@ mixing = np.array([ # Same section: the 6 × 6 contact matrix of the AuTuMN-styl
     [0.5, 0.8, 1.5, 2.0, 3.0, 1.2],
     [0.3, 0.4, 0.6, 0.8, 1.2, 2.0]]) / 4.0
 lik = dict(detection=ss.poisson())
+summer2_python = paths.root/'_envs/summer2/bin/python' # summer2's environment, since summer2 needs an older JAX than Starsim
+live_model = '''
+import summer2
+from summer2.parameters import Parameter
+from summer2.functions.time import get_sigmoidal_interpolation_function
+
+
+def build_model():
+    m = summer2.CompartmentalModel(times=[1950.0, 2025.0], compartments=list('SELITR'), infectious_compartments=['I'], timestep=1.0)
+    m.set_initial_population(distribution={'S': 1e6 - 1000, 'I': 1000})
+    beta = Parameter('contact_rate')
+    m.add_infection_frequency_flow('infection', beta, 'S', 'E')
+    m.add_infection_frequency_flow('reinfection_L', beta*Parameter('rr_reinf'), 'L', 'E')
+    m.add_infection_frequency_flow('reinfection_R', beta*Parameter('rr_reinf'), 'R', 'E')
+    for name,rate,src,dst in [('stabilisation', 2.0, 'E', 'L'), ('early_activation', 0.2, 'E', 'I'), ('late_activation', 0.002, 'L', 'I'), ('self_recovery', 0.2, 'I', 'R'), ('treatment_end', 2.0, 'T', 'R')]:
+        m.add_transition_flow(name, rate, src, dst)
+    m.add_transition_flow('detection', get_sigmoidal_interpolation_function([1950.0, 1990.0, 2020.0], [0.0, 0.5, 1.0])*Parameter('detect_max'), 'I', 'T')
+    m.add_death_flow('tb_death', 0.2, 'I')
+    m.add_universal_death_flows('universal_death', death_rate=1/70)
+    m.add_crude_birth_flow('birth', 0.02, 'S')
+    return m
+'''
 
 
 def sigmoid(t, xs=(1950, 1990, 2020), ys=(0, 0.5, 1), curvature=16):
@@ -77,28 +102,18 @@ def test_summer2_tb():
     return res
 
 
-@pytest.mark.xfail(reason='summer2 1.3.6 needs JAX 0.4 (it imports jax.core.call), so it cannot be installed with Starsim and a live model cannot be imported in the same process; the same model written by starsim/converters/summer2.py in summer2\'s environment imports with nothing missing and matches make_tb(ages=False) to 1e-13 (and tests/devtests/io/test_io_summer2_atomica.py checks it by age against summer2)', strict=False)
-def test_summer2_import_live():
+@pytest.mark.skipif(not summer2_python.exists(), reason='needs the summer2 environment')
+def test_summer2_import_live(tmp_path):
     sc.heading('summer2: the live model, with its parameters and its sigmoid, imported')
-    summer2 = pytest.importorskip('summer2')
-    from summer2.parameters import Parameter
-    from summer2.functions.time import get_sigmoidal_interpolation_function
-    m = summer2.CompartmentalModel(times=[1950.0, 2025.0], compartments=list('SELITR'), infectious_compartments=['I'], timestep=1.0)
-    m.set_initial_population(distribution={'S': 1e6 - 1000, 'I': 1000})
-    beta = Parameter('contact_rate')
-    m.add_infection_frequency_flow('infection', beta, 'S', 'E')
-    m.add_infection_frequency_flow('reinfection_L', beta*Parameter('rr_reinf'), 'L', 'E')
-    m.add_infection_frequency_flow('reinfection_R', beta*Parameter('rr_reinf'), 'R', 'E')
-    for name,rate,src,dst in [('stabilisation', 2.0, 'E', 'L'), ('early_activation', 0.2, 'E', 'I'), ('late_activation', 0.002, 'L', 'I'), ('self_recovery', 0.2, 'I', 'R'), ('treatment_end', 2.0, 'T', 'R')]:
-        m.add_transition_flow(name, rate, src, dst)
-    m.add_transition_flow('detection', get_sigmoidal_interpolation_function([1950.0, 1990.0, 2020.0], [0.0, 0.5, 1.0])*Parameter('detect_max'), 'I', 'T')
-    m.add_death_flow('tb_death', 0.2, 'I')
-    m.add_universal_death_flows('universal_death', death_rate=1/70)
-    m.add_crude_birth_flow('birth', 0.02, 'S')
-    sim = ss.import_from(m, pars=dict(contact_rate=10.0, rr_reinf=0.21, detect_max=1.5), verbose=0)
+    pars = dict(contact_rate=10.0, rr_reinf=0.21, detect_max=1.5)
+    sc.savetext(tmp_path/'tb.py', live_model)
+    sc.savejson(tmp_path/'pars.json', pars)
+    script = sc.path(ss.converters.__file__).parent/'summer2.py' # Run in summer2's environment, it writes the model as JSON
+    subprocess.run([str(summer2_python), '-I', str(script), f'{tmp_path/"tb.py"}:build_model', str(tmp_path/'tb.json'), str(tmp_path/'pars.json')], check=True, capture_output=True, text=True)
+    sim = ss.import_from(tmp_path/'tb.json', format='summer2', verbose=0)
     assert not sim.imported.incomplete, f'Not translated: {sim.imported.incomplete}'
     ours = np.asarray(make_tb(ages=False).run().results.tb.detection.values)
-    theirs = np.asarray(sim.run().results.summer2.detection.values) # The flow in each year, as make_tb's (summer2's own output is the mean of the rates at either end of the year)
+    theirs = np.asarray(sim.run().results.summer2.detection.values) # The flow in each year, as make_tb's (summer2's own output is the mean of the rates at either end of a year)
     assert np.allclose(theirs[:len(ours)], ours, rtol=1e-4)
     return sim
 
@@ -119,5 +134,5 @@ def test_summer2_nuts():
 
 if __name__ == '__main__':
     res = test_summer2_tb()
-    sim = test_summer2_import_live()
+    sim = test_summer2_import_live(sc.path(tempfile.mkdtemp()))
     fit = test_summer2_nuts()
