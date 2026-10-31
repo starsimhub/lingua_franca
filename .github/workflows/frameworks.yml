@@ -1,0 +1,167 @@
+# Run Starsim against each framework: one job per environment in _envs/, which builds it if its recipe
+# has changed, runs the import and export tests, and runs the benchmark for that framework's models.
+#
+# What is built is cached: an environment under a hash of its recipe (python _envs/envs.py key), and
+# Starsim's Rust kernels under a hash of their source, so a job only rebuilds what has changed. Caches
+# belong to the repo a run starts from, so runs from Starsim keep their own.
+#
+# Starsim calls this as a downstream test (test_downstream.yml in its repo), giving the commit to test.
+# On its own, this tests Starsim's v4 branch. Times are reported as artifacts, but do not fail a job,
+# since GitHub's runners are too noisy; the comparisons with the originals' results do.
+
+name: Frameworks
+on:
+  workflow_call:
+    inputs:
+      starsim_repo:
+        type: string
+        default: starsimhub/starsim
+      starsim_ref:
+        type: string
+        default: v4
+  workflow_dispatch:
+    inputs:
+      starsim_ref:
+        description: The Starsim branch or commit to test
+        default: v4
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: '0 8 * * 1' # Weekly, for changes in what the recipes do not pin
+
+env:
+  STARSIM_REPO: ${{ inputs.starsim_repo || 'starsimhub/starsim' }}
+  STARSIM_REF: ${{ inputs.starsim_ref || 'v4' }}
+  DESIGN_REF: ${{ inputs.starsim_repo && 'main' || github.sha }} # This repo, when called from Starsim
+  UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.uv-python # The Python of each environment, cached with it
+  R_VERSION: 4.6.1
+
+jobs:
+
+  kernels:
+    name: Starsim's kernels
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.STARSIM_REPO }}
+          ref: ${{ env.STARSIM_REF }}
+      - id: cache
+        uses: actions/cache@v4
+        with:
+          path: starsim/solvers/backends/_rs.abi3.so
+          key: kernels-${{ runner.os }}-${{ hashFiles('starsim/solvers/rust/**') }}
+      - name: Build the Rust kernels
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: starsim/solvers/rust
+        run: ./build # Rust is installed on GitHub's runners
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kernels
+          path: starsim/solvers/backends/_rs.abi3.so
+          if-no-files-found: error
+          retention-days: 1
+
+  framework:
+    name: ${{ matrix.name }}
+    needs: kernels
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: Atomica,       envs: atomica,    tests: conversion/test_atomica.py conversion/test_optima_tb.py switching/test_atomica.py, models: atomica/}
+          - {name: camdl,         envs: camdl,      tests: conversion/test_camdl.py, models: camdl/, ocaml: true}
+          - {name: EMULSION,      envs: emulsion,   tests: conversion/test_emulsion.py switching/test_emulsion.py, models: emulsion/}
+          - {name: EpiModel,      envs: epimodel,   models: epimodel/, r: true, apt: libcurl4-openssl-dev libssl-dev libxml2-dev}
+          - {name: epydemix,      envs: epydemix,   tests: conversion/test_epydemix.py, models: epydemix/}
+          - {name: flepiMoP,      envs: flepimop,   tests: conversion/test_flepimop.py, models: flepimop/}
+          - {name: Measles metapop, models: measles_metapop/}
+          - {name: LASER,         envs: laser,      models: laser/}
+          - {name: MEmilio,       envs: memilio,    tests: conversion/test_memilio.py, models: memilio/}
+          - {name: odin and SBML, envs: odin sbml,  tests: conversion/test_odin.py conversion/test_export.py, models: odin/, r: true}
+          - {name: SimInf,        envs: siminf,     tests: conversion/test_siminf.py switching/test_siminf.py, models: siminf/, r: true, apt: libgsl-dev}
+          - {name: summer2,       envs: summer2,    tests: conversion/test_summer2.py, models: summer2/}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: starsimhub/lingua_franca_design
+          ref: ${{ env.DESIGN_REF }}
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.STARSIM_REPO }}
+          ref: ${{ env.STARSIM_REF }}
+          path: .starsim
+      - uses: actions/download-artifact@v4
+        with:
+          name: kernels
+          path: .starsim/starsim/solvers/backends
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: 0.13.0 # As the environments were built with
+      - name: Install Starsim
+        run: pip install -e ".starsim[dev]" jax
+      - name: Check the kernels are compiled
+        run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; print(ss.compile_status().summary)"
+
+      - name: Install what the framework needs from the system
+        if: matrix.apt
+        run: sudo apt-get update && sudo apt-get install -y ${{ matrix.apt }}
+      - uses: r-lib/actions/setup-r@v2
+        if: matrix.r
+        with:
+          r-version: ${{ env.R_VERSION }}
+      - name: Find the recipe
+        if: matrix.envs
+        id: recipe
+        run: echo "key=$(python _envs/envs.py key ${{ matrix.envs }})" >> "$GITHUB_OUTPUT"
+      - id: cache
+        if: matrix.envs
+        uses: actions/cache@v4
+        with:
+          path: |
+            _envs
+            !_envs/camdl/src/rust/target
+            !_envs/camdl/src/ocaml/_build
+            .uv-python
+          key: envs-${{ runner.os }}-r${{ matrix.r && env.R_VERSION }}-${{ steps.recipe.outputs.key }}
+      - uses: ocaml/setup-ocaml@v3
+        if: matrix.ocaml && steps.cache.outputs.cache-hit != 'true'
+        with:
+          ocaml-compiler: '5.2'
+      - name: Build the environment
+        if: matrix.envs && steps.cache.outputs.cache-hit != 'true'
+        run: |
+          ${{ matrix.ocaml && 'opam install dune --yes' || 'true' }}
+          ${{ matrix.ocaml && 'opam exec --' || '' }} python _envs/envs.py install ${{ matrix.envs }}
+      - name: Check the environment
+        if: matrix.envs
+        run: python _envs/envs.py check ${{ matrix.envs }}
+
+      - name: Run the import and export tests
+        if: matrix.tests
+        working-directory: tests
+        env:
+          STARSIM_SHOW: 0
+        run: pytest ${{ matrix.tests }} -n auto -rs --durations=5 --junitxml=results.xml
+      - name: Run the benchmark
+        if: ${{ !cancelled() }}
+        run: python benchmark/benchmark.py --only ${{ matrix.models }} --stages compare timing
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: results-${{ matrix.name }}
+          path: |
+            tests/results.xml
+            benchmark/timings.*
+            vignettes/${{ matrix.models }}**/compare.log
+            examples/${{ matrix.models }}**/run.log
+            _envs/*/build.log
+          if-no-files-found: warn
