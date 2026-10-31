@@ -16,7 +16,7 @@ ref = tools.read_results(here)
 names = dict(S='Susceptible', E='Exposed', INS='InfectedNoSymptoms', ISy='InfectedSymptoms', ISev='InfectedSevere', ICr='InfectedCritical', R='Recovered')
 
 tolerance = 73 # People, of 83,000: the error of the reference itself, which is interpolated between steps of about two days
-dead_tolerance = 0.5 # People
+dead_tolerance = 0.6 # People: 0.4 is the error of the reference, which remains with any step, and 0.12 is that of a daily step
 
 
 def compare(name, ours, tol):

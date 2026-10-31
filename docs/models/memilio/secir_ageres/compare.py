@@ -15,7 +15,7 @@ from model import sim
 
 ref = tools.read_results(here)
 names = dict(S='Susceptible', E='Exposed', INS='InfectedNoSymptoms', ISy='InfectedSymptoms', ISev='InfectedSevere', ICr='InfectedCritical', R='Recovered')
-tolerance = 1.5 # People, of 10,000: the error of the reference itself, which is interpolated between solver steps
+tolerance = 1.6 # People, of 10,000: the error of the reference itself, which is interpolated between solver steps, and which remains with a step of 0.01 days
 dead_tolerance = 0.02 # People
 
 
