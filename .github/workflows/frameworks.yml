@@ -24,10 +24,6 @@ on:
       starsim_ref:
         description: The Starsim branch or commit to test
         default: v4
-  push:
-    branches:
-      - main
-  pull_request:
   schedule:
     - cron: '0 8 * * 1' # Weekly, for changes in what the recipes do not pin
 

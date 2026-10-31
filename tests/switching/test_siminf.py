@@ -21,7 +21,7 @@ ref_beta, ref_gamma = 0.16, 0.077 # The values the data were simulated with
 v4_ms_per_run = 0.37 # Starsim's filter per particle run, in ms, normalized; same date
 v4_build, v4_run = 2.0, 3.0 # Starsim's build and run of the herds ten times over, in s, normalized to the reference machine (see timing.py), 2026-10-25
 ref_build, ref_run = 2.1, 1.9 # SimInf's time to build and run its herds and events ten times over (16,000 herds, 4,666,920 events, four years) on one thread: switching/siminf.md, "The second week" §2
-ref_S100 = [199_906, 199_855, 200_057] # SimInf, 1,600 herds: susceptible on day 100, mean and 5% to 95% range of 200 runs (LFD docs/models/siminf/sir_herds/reference/results.csv), as in docs/vignettes/siminf/sir_herds/README.md
+ref_S100 = [199_906, 199_855, 200_057] # SimInf, 1,600 herds: susceptible on day 100, mean and 5% to 95% range of 200 runs (LFD docs/models/siminf/sir_herds/reference/results.csv), as in docs/models/siminf/sir_herds/README.md
 ref_herds100 = [2.0, 0, 3] # The same for the number of herds infected on day 100
 
 
