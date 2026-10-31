@@ -6,8 +6,9 @@
 # belong to the repo a run starts from, so runs from Starsim keep their own.
 #
 # Starsim calls this as a downstream test (test_downstream.yml in its repo), giving the commit to test.
-# On its own, this tests Starsim's v4 branch. Times are reported as artifacts, but do not fail a job,
-# since GitHub's runners are too noisy; the comparisons with the originals' results do.
+# On its own, this tests Starsim's v4 branch. A job fails on the comparisons with the originals' results,
+# and on the speed tests, which allow 3 times the reference time after normalizing for the machine (see
+# tests/timing.py). The benchmark's own times are noisier on GitHub's runners, so are only reported, as artifacts.
 
 name: Frameworks
 on:
