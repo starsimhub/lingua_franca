@@ -39,9 +39,9 @@ The nine build steps from [examples/README.md](../examples/README.md).
     - [x] 16. A threshold-triggered intervention, with and without memory
     - [x] 17. TB with resistance as a strain
     - [x] 18. Two diseases with age stratified on the sim
-- [x] Wave 3: one complex example from each framework, Ghana measles, and TB
+- [x] Wave 3: one complex example from each framework, measles metapop, and TB
     - [x] camdl: SEIR by age and patch, with contacts by age within each patch, aging, movement, and a vaccination (agrees as an ODE; as chain-binomial, the same peaks a day sooner at a step of a day)
-    - [x] Ghana measles: stochastic SEIR in 260 districts with gravity mixing, seasonality, births with vaccination, deaths, importation, and reported cases (the `gm-port` rewrite; agrees, with no change to Starsim)
+    - [x] measles metapop: stochastic SEIR in 260 districts with gravity mixing, seasonality, births with vaccination, deaths, importation, and reported cases (agrees, with no change to Starsim)
     - [x] MEmilio: the age-resolved ODE SECIR, with seasonality, a cosine-smoothed cut in contacts, and test-and-trace capacity (agrees within 1.5 people of 10,000, the error of the reference itself; everything declared)
     - [x] summer2: SEIR by age with a clinical stratification of `I` only, entered by age, with infectiousness by level and derived outputs (agrees within 0.0006 people of 1,000)
     - [x] epydemix: COVID-19 in Massachusetts, nine age groups, an Erlang delay to death, seasonality, mobility, reopening scenarios, and calibration (agrees at fixed values within 1%; the calibration is a point estimate, not ABC-SMC)

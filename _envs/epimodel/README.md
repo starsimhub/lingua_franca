@@ -22,7 +22,7 @@ chmod +x bin/Rscript
 bin/Rscript -e 'ip <- installed.packages(lib.loc=.libPaths()[1]); writeLines(sprintf("%s==%s", ip[,"Package"], ip[,"Version"]), "requirements.txt")'
 ```
 
-The build takes about one minute on 8 cores (longer on a machine where all 63 packages have to be built). `install.packages` gets the latest version of each package, which may be later than the one in `requirements.txt`; `python _envs/envs.py check epimodel` says if so. `bin/Rscript` is the system `Rscript` with `lib/` in front of the library path, so an example that asks for `Rscript` in this environment gets EpiModel.
+The build takes about one minute on 8 cores (longer on a machine where all 63 packages have to be built). `bin/Rscript` is the system `Rscript` with `lib/` in front of the library path, so an example that asks for `Rscript` in this environment gets EpiModel.
 
 ## What is not in the private library
 

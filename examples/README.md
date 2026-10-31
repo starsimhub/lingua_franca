@@ -50,7 +50,7 @@ These are brought in as waves, not all at the end, because a surprise in the des
 |---|---|---|
 | 1 | Once build steps 1 to 5 run | One simple example from each framework: MEmilio, EpiModel, epydemix, summer2, SimInf, odin, EMULSION, flepiMoP, Atomica, LASER, camdl |
 | 2 | Once the build set runs | The other eight conformance corpus models (4, 7, 9, 12, 13, 16, 17, 18) |
-| 3 | Once the build set runs | One complex example from each of the same frameworks, plus the Ghana measles model and a TB model |
+| 3 | Once the build set runs | One complex example from each of the same frameworks, plus the measles metapop model and a TB model |
 
 The wave 1 frameworks were all reviewed before the design was written, and the wave 2 models were written by the same authors as the design, so neither is fully unseen. Wave 3 is the real test.
 

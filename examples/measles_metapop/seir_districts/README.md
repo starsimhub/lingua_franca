@@ -1,6 +1,6 @@
-# Ghana measles: SEIR in 260 districts
+# Measles metapopulation: SEIR in 260 districts
 
-A stochastic metapopulation SEIR model of measles in Ghana's 260 districts, run daily from 2010 to 2025 with binomial draws. It is the rewrite of a LASER-measles notebook in the Ghana measles project.
+A stochastic metapopulation SEIR model of measles in 260 made-up districts, run daily from 2010 to 2025 with binomial draws. The districts and all its values are made up.
 
 ## What it exercises
 
@@ -18,8 +18,8 @@ A stochastic metapopulation SEIR model of measles in Ghana's 260 districts, run 
 - `reference/timing.json`: the times of a first run and a rerun, each building the sim
 - `meta.yaml`: where it came from
 
-The source is not copied into `original/`, since the Ghana measles project has no public repository yet; `run.py` reads it from a checkout next to this repository. The default parameters are used throughout.
+`original/` has the model, and `make_districts.py`, which writes the districts. The default parameters are used throughout.
 
 ## Lines of model code
 
-89, counting every line of `ghana_measles/model.py` before `Sim.monthly()` that is not blank, a comment, a docstring, or an import.
+89, counting every line of `measles_metapop.py` before `Sim.monthly()` that is not blank, a comment, a docstring, or an import.

@@ -10,7 +10,7 @@
 
 ```bash
 mkdir -p lib bin
-Rscript -e 'install.packages("SimInf", lib="lib", repos="https://cloud.r-project.org")'
+Rscript -e 'install.packages("SimInf", lib="lib", repos="https://packagemanager.posit.co/cran/2026-10-13")'
 cat > bin/Rscript <<'END'
 #!/bin/sh
 here="$(cd "$(dirname "$0")/.." && pwd)"
@@ -20,4 +20,4 @@ END
 chmod +x bin/Rscript
 ```
 
-The build compiles SimInf's C code and takes about a minute. `install.packages` gets the latest version of each package, which may be later than the one in `requirements.txt`; `python _envs/envs.py check siminf` says if so. `bin/Rscript` is a wrapper that puts `lib/` at the front of R's library path, so an example that runs `Rscript` in this environment finds SimInf.
+The build compiles SimInf's C code and takes about a minute. `bin/Rscript` is a wrapper that puts `lib/` at the front of R's library path, so an example that runs `Rscript` in this environment finds SimInf.

@@ -47,10 +47,6 @@ flepimop/vaccine_scenarios,rust,0.7925627820077352,0.712918299017474,,True,
 flepimop/vaccine_scenarios,numba,0.818833532044664,0.7269076520460658,0.7241881979862228,False,
 flepimop/vaccine_scenarios,jax,1.5754654310294427,0.7273254439933226,,False,
 flepimop/vaccine_scenarios,jax-gpu,1.5393995780032128,0.7208749009878375,0.7350330330082215,False,
-ghana_measles/seir_districts,rust,2.789457628969103,0.6566930609988049,,True,
-ghana_measles/seir_districts,numba,1.8915659229969606,0.7579073219676502,0.8248766890028492,False,
-ghana_measles/seir_districts,jax,1.5810662260046229,0.6661988829728216,,False,
-ghana_measles/seir_districts,jax-gpu,1.3880309269879945,0.6718143349862657,,False,
 laser/england_wales,jax,,,,False,it runs as agents
 laser/england_wales,jax-gpu,,,,False,it runs as agents
 laser/england_wales,rust,22.222621160035487,18.695323432039004,,True,
@@ -59,6 +55,10 @@ laser/hub_spoke_seir,jax,,,,False,it runs as agents
 laser/hub_spoke_seir,jax-gpu,,,,False,it runs as agents
 laser/hub_spoke_seir,rust,0.6428022570325993,0.6183466450311244,,True,
 laser/hub_spoke_seir,numba,1.2813465850194916,0.8084179050056264,0.8812590599991381,False,
+measles_metapop/seir_districts,rust,0.5763289570459165,0.5016358940047212,,True,
+measles_metapop/seir_districts,numba,1.8915659229969606,0.7579073219676502,0.8248766890028492,False,
+measles_metapop/seir_districts,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
+measles_metapop/seir_districts,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
 memilio/secir,rust,0.0181128439726308,0.0016421100008301437,,True,
 memilio/secir,numba,0.11084856395609677,0.0023161410354077816,0.01646487199468538,False,
 memilio/secir,jax,0.7079353489680216,0.0016893069841898978,,False,

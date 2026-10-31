@@ -3,7 +3,7 @@
 ## Todo
 
 - [ ] Make list of examples -- include:
-  - [ ] Ghana measles
+  - [ ] measles metapop
   - [ ] TB
   - [ ] camdl examples
   - [ ] Everything in the Starsim tests and docs

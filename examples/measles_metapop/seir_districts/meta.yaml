@@ -1,0 +1,8 @@
+framework: measles metapopulation
+model: seir_districts
+version: as here
+source: original/measles_metapop.py
+license: as this repository
+language: Python
+env: none; it needs only NumPy, pandas, and Sciris
+lines: 89

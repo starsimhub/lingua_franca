@@ -1,9 +1,0 @@
-framework: Ghana measles
-model: seir_districts
-version: the gm-port rewrite, commit 69d026c
-source: ghana_measles/model.py in a local checkout of the Ghana measles port (ghana-measles/gm-port), which has no public repository yet; it rewrites a LASER-measles notebook
-commit: 69d026c
-license: not stated; the source is not copied here
-language: Python
-env: none; the package needs only NumPy, pandas, and Sciris, and is found next to this repository (or by setting GHANA_MEASLES)
-lines: 89

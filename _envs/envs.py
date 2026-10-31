@@ -6,6 +6,7 @@ Install, uninstall, and check the environments of the frameworks.
     python _envs/envs.py install odin siminf   # Install some of them
     python _envs/envs.py uninstall camdl       # Delete what an install builds
     python _envs/envs.py uninstall all
+    python _envs/envs.py key odin sbml         # A hash of their recipes, for caching what they build
 
 Each environment is the folder `_envs/<framework>`, whose `README.md` says what it needs and
 how it was built by hand; this script follows the same steps. An install needs `uv` (for the
@@ -15,14 +16,16 @@ the folder except the recipe (`README.md` and `requirements.txt`).
 """
 import os
 import sys
+import json
 import shutil
+import hashlib
 import argparse
 import subprocess
 import sciris as sc
 
 root = sc.thispath(__file__)
 keep = ['README.md', 'requirements.txt', 'renv.lock'] # The recipe: the files that .gitignore does not ignore
-cran = 'https://cloud.r-project.org'
+cran = 'https://packagemanager.posit.co/cran/2026-10-13' # A snapshot of CRAN, so the R environments stay the versions in requirements.txt
 
 # A Python environment has the version of Python; an R one has the packages to ask CRAN for
 # (requirements.txt lists what that installs); and a repository is fetched into src/ at one commit
@@ -169,6 +172,8 @@ def install(name):
     elif kind == 'camdl':
         camdl = folder / 'src/rust/target/release/camdl'
         camdlc = folder / 'src/ocaml/_build/default/bin/camdlc.exe'
+        if shutil.which('opam'): # As in CI; camdl's install.sh sets up a machine without it
+            run(folder / 'src/ocaml', 'opam', 'install', '.', '--deps-only', '--yes')
         run(folder, 'make', '-C', 'src', 'build')
         built = {'camdl':camdl, 'camdlc':camdlc, f'camdlc-{camdl_commit(camdl)}':camdlc} # camdl looks for the checker as camdlc-<commit>
         (folder / 'bin').mkdir(exist_ok=True)
@@ -179,6 +184,14 @@ def install(name):
             dest.chmod(0o755)
 
     return
+
+
+def key(names):
+    """ A hash of the recipes of some environments: what they build changes only when this does """
+    recipes = dict(cran=cran)
+    for name in names:
+        recipes[name] = dict(spec=envs[name], files={file:(root / name / file).read_text() for file in keep if (root / name / file).exists()})
+    return hashlib.sha256(json.dumps(recipes, sort_keys=True).encode()).hexdigest()[:16]
 
 
 def uninstall(name):
@@ -204,7 +217,7 @@ def report(name):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Install, uninstall, and check the environments of the frameworks')
-    parser.add_argument('command', choices=['install', 'uninstall', 'check'])
+    parser.add_argument('command', choices=['install', 'uninstall', 'check', 'key'])
     parser.add_argument('names', nargs='*', help='which environments, or "all" (the default, except to uninstall)')
     args = parser.parse_args()
 
@@ -218,6 +231,10 @@ if __name__ == '__main__':
     unknown = [name for name in names if name not in envs]
     if unknown:
         parser.error(f'unknown environments {unknown}; the choices are {list(envs)}')
+
+    if args.command == 'key':
+        print(key(names))
+        sys.exit()
 
     ok = True
     for name in names:

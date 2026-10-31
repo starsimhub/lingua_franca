@@ -15,10 +15,10 @@ sys.path.insert(0, os.path.join(root, 'examples'))
 import tools
 from model import sim
 
-example = os.path.join(root, 'examples', 'ghana_measles', 'seir_districts')
+example = os.path.join(root, 'examples', 'measles_metapop', 'seir_districts')
 ref = pd.read_csv(os.path.join(example, 'reference', 'results.csv'))
-n_runs = 20
-tolerance = dict(total=0.02, yearly=0.2, correlation=0.98, region=0.2, stock=0.03) # With 20 runs against 50: see the README
+n_runs = 50
+tolerance = dict(total=0.02, yearly=0.2, correlation=0.98, region=0.2, stock=0.03) # With 50 runs against 50: see the README
 
 
 def monthly(res, key):
@@ -31,7 +31,7 @@ def run(seed):
     res = sim.new(verbose=0, rand_seed=seed, results=['onset']).run().results.measles # Onsets by district every day
     by_district = res.onset.by('district')
     after = np.array([str(t)[:4] >= '2020' for t in res.timevec[:-1]]) # By the day each step starts on, as in monthly()
-    regions = pd.Series(by_district.values[1:][after].sum(axis=0), index=[col.split(':')[1] for col in by_district.columns]).groupby(level=0).sum()
+    regions = pd.Series(by_district.values[1:][after].sum(axis=0), index=[col.split(':')[0] for col in by_district.columns]).groupby(level=0).sum()
     end = [str(t)[:10] for t in res.timevec].index('2025-12-01') # The original's last value is at the start of the last month
     return sc.objdict(infections=monthly(res, 'onset'), cases=monthly(res, 'cases'), regions=regions, S=res.S.values[end], R=res.R.values[end])
 

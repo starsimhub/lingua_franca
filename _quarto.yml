@@ -23,7 +23,7 @@ project:
     - examples/epydemix/covid19/README.md
     - examples/flepimop/seir_2pop/README.md
     - examples/flepimop/vaccine_scenarios/README.md
-    - examples/ghana_measles/seir_districts/README.md
+    - examples/measles_metapop/seir_districts/README.md
     - examples/laser/hub_spoke_seir/README.md
     - examples/laser/england_wales/README.md
     - examples/memilio/secir/README.md
@@ -48,7 +48,7 @@ project:
     - vignettes/epydemix/covid19/README.md
     - vignettes/flepimop/seir_2pop/README.md
     - vignettes/flepimop/vaccine_scenarios/README.md
-    - vignettes/ghana_measles/seir_districts/README.md
+    - vignettes/measles_metapop/seir_districts/README.md
     - vignettes/laser/hub_spoke_seir/README.md
     - vignettes/laser/england_wales/README.md
     - vignettes/memilio/secir/README.md
@@ -209,7 +209,7 @@ website:
             - examples/epydemix/covid19/README.md
             - examples/flepimop/seir_2pop/README.md
             - examples/flepimop/vaccine_scenarios/README.md
-            - examples/ghana_measles/seir_districts/README.md
+            - examples/measles_metapop/seir_districts/README.md
             - examples/laser/hub_spoke_seir/README.md
             - examples/laser/england_wales/README.md
             - examples/memilio/secir/README.md
@@ -238,7 +238,7 @@ website:
             - vignettes/epydemix/covid19/README.md
             - vignettes/flepimop/seir_2pop/README.md
             - vignettes/flepimop/vaccine_scenarios/README.md
-            - vignettes/ghana_measles/seir_districts/README.md
+            - vignettes/measles_metapop/seir_districts/README.md
             - vignettes/laser/hub_spoke_seir/README.md
             - vignettes/laser/england_wales/README.md
             - vignettes/memilio/secir/README.md

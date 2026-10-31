@@ -12,7 +12,7 @@ epydemix/covid19: [rust] # Rust 2.3 ms, JAX on a GPU 2.6 ms, Numba 2.7 ms, JAX 2
 epydemix/sir_kenya: [rust, jax, jax-gpu] # Rust 1.4 ms, JAX 1.4 ms, JAX on a GPU 1.5 ms, Numba 2.6 ms
 flepimop/seir_2pop: [jax] # JAX 1.5 ms, Numba 1.7 ms, Rust 2.6 ms, JAX on a GPU 9.7 ms
 flepimop/vaccine_scenarios: [rust, jax] # Rust 650 ms, JAX 690 ms, JAX on a GPU 720 ms, Numba 730 ms
-ghana_measles/seir_districts: [jax, jax-gpu, rust] # JAX 650 ms, JAX on a GPU 670 ms, Rust 670 ms, Numba 760 ms
+measles_metapop/seir_districts: [jax, jax-gpu, rust] # JAX 650 ms, JAX on a GPU 670 ms, Rust 670 ms, Numba 760 ms
 laser/england_wales: [rust] # Rust 24 s, Numba 27 s
 laser/hub_spoke_seir: [rust] # Rust 720 ms, Numba 810 ms
 memilio/secir: [rust, jax] # Rust 2.1 ms, JAX 2.1 ms, Numba 2.3 ms, JAX on a GPU 24 ms

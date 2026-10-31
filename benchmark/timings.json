@@ -278,29 +278,6 @@
       "fastest": "rust",
       "load": 7.96337890625
     },
-    "ghana_measles/seir_districts": {
-      "kernels": {
-        "rust": {
-          "first": 2.789457628969103,
-          "rerun": 0.6566930609988049
-        },
-        "numba": {
-          "first": 1.8915659229969606,
-          "rerun": 0.7579073219676502,
-          "rebuild": 0.8248766890028492
-        },
-        "jax": {
-          "first": 1.5810662260046229,
-          "rerun": 0.6661988829728216
-        },
-        "jax-gpu": {
-          "first": 1.3880309269879945,
-          "rerun": 0.6718143349862657
-        }
-      },
-      "fastest": "rust",
-      "load": 7.8173828125
-    },
     "laser/england_wales": {
       "kernels": {
         "jax": {
@@ -341,6 +318,27 @@
       },
       "fastest": "rust",
       "load": 9.599609375
+    },
+    "measles_metapop/seir_districts": {
+      "kernels": {
+        "rust": {
+          "first": 0.5763289570459165,
+          "rerun": 0.5016358940047212
+        },
+        "numba": {
+          "first": 1.8915659229969606,
+          "rerun": 0.7579073219676502,
+          "rebuild": 0.8248766890028492
+        },
+        "jax": {
+          "skipped": "kernels: JAX does not run solver=\"binomial\""
+        },
+        "jax-gpu": {
+          "skipped": "kernels: JAX does not run solver=\"binomial\""
+        }
+      },
+      "fastest": "rust",
+      "load": 3.86669921875
     },
     "memilio/secir": {
       "kernels": {
@@ -535,7 +533,7 @@
   "date": "2026-10-31",
   "starsim": {
     "version": "4.0.0",
-    "commit": "13494d38"
+    "commit": "4473e253"
   },
   "kernels": [
     "rust",
@@ -566,7 +564,7 @@
       "epydemix/sir_kenya": 38.6,
       "flepimop/seir_2pop": 41.1,
       "flepimop/vaccine_scenarios": 144.0,
-      "ghana_measles/seir_districts": 50.9,
+      "measles_metapop/seir_districts": 50.9,
       "laser/england_wales": 101.7,
       "laser/hub_spoke_seir": 29.7,
       "memilio/secir": 15.3,
