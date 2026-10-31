@@ -23,7 +23,7 @@ import tempfile
 import numpy as np
 
 here = os.path.dirname(os.path.abspath(__file__))
-src = os.path.join(here, '..', '..', '..', '_envs', 'laser', 'src', 'laser-generic-1.1.0')
+src = os.path.join(here, '..', '..', '..', '..', '_envs', 'laser', 'src')
 best = dict(beta=3.865332, amplitude=1.310744, k=0.044565, b=0.251464, c=1.563193) # Printed by cell 18 of the notebook
 places = ['Norwich', 'Cambridge', 'Colchester', 'Kings.Lynn', 'Ely', 'Thetford', 'Southwold'] # Large to small
 

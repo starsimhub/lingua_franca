@@ -4,7 +4,7 @@ Run the original LASER model and write its reference results and timing.
     python run.py
 
 Needs the LASER environment (see `_envs/laser`), and the England and Wales data
-from the laser-generic source in `_envs/laser/src/laser-generic-1.1.0/data`.
+from the laser-generic source in `_envs/laser/src/data`.
 """
 import os
 import sys

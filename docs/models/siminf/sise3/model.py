@@ -15,7 +15,7 @@ events = pd.read_csv(os.path.join(ref, 'events.csv.gz'))
 
 # SimInf's events as a register: entering animals are S_1; the others are chosen from one age category (select 4 to 6),
 # and internal transfers (shift 1 or 2) move them up an age category in their herd, keeping S or I
-ages = events.select.map({4:'S_1,I_1', 5:'S_2,I_2', 6:'S_3,I_3'})
+ages = events['select'].map({4:'S_1,I_1', 5:'S_2,I_2', 6:'S_3,I_3'})
 register = pd.DataFrame({
     'date':      events.time,
     'from':      events.node.where(events.event != 'enter'),

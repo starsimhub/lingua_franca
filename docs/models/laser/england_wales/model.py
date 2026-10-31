@@ -8,7 +8,7 @@ import sys
 import numpy as np
 import starsim as ss
 
-folder = os.environ.get('LASER_DATA', os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '_envs', 'laser', 'src', 'laser-generic-1.1.0', 'data'))
+folder = os.environ.get('LASER_DATA', os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '_envs', 'laser', 'src', 'data'))
 sys.path.insert(0, folder)
 from EnglandWalesMeasles import data as engwal
 

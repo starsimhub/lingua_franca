@@ -53,7 +53,7 @@ The full model has 30.2 million agents. One run of 40 years would take about ten
 
 - `model.py`: the Starsim version
 - `compare.py`: checks it against `reference/`
-- `original/10_England_and_Wales.ipynb`: the notebook, unchanged, with its outputs. The data it reads (`EnglandWalesMeasles.py`, 21 MB, and `EnglandWalesDistances.npy`, 3.6 MB) are not copied here: they are read from the laser-generic source in `_envs/laser/src/laser-generic-1.1.0/data`
+- `original/10_England_and_Wales.ipynb`: the notebook, unchanged, with its outputs. The data it reads (`EnglandWalesMeasles.py`, 21 MB, and `EnglandWalesDistances.npy`, 3.6 MB) are not copied here: they are read from the laser-generic source in `_envs/laser/src/data`
 - `simulate.py`: runs the model cells of the notebook several times in the LASER environment and prints the results as JSON
 - `run.py`: calls `simulate.py` and writes `reference/`
 - `reference/results.csv`: the mean and 5% to 95% range of 50 runs, of the daily totals of `S`, `E`, `I`, and `R` (time in days, from 0 to 3,650) and of the infections imported (`imports`, days 0 to 3,649); the weekly totals of births, deaths, and infections (time is the first day of the week, for 521 weeks), in total (`new_infections`) and in seven places (`new_infections_norwich`, `_cambridge`, `_colchester`, `_kings.lynn`, `_ely`, `_thetford`, and `_southwold`, from largest to smallest); the infections in each year of 52 weeks (`yearly_infections`, time is the year) and over the whole run (`total_infections`, at time 0); and `prop_zero`, the share of the weeks in the second half of the run (weeks 260 to 520) with no infections in each place, where time is the place's index (the 53 places in alphabetical order, as in the data)

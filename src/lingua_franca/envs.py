@@ -172,7 +172,7 @@ def install(name):
         camdl = folder / 'src/rust/target/release/camdl'
         camdlc = folder / 'src/ocaml/_build/default/bin/camdlc.exe'
         if shutil.which('opam'): # As in CI; camdl's install.sh sets up a machine without it
-            run(folder / 'src/ocaml', 'opam', 'install', '.', '--deps-only', '--yes')
+            run(folder / 'src/ocaml', 'opam', 'install', '.', '--deps-only', '--with-test', '--yes') # camdl's dune build includes its tests
         run(folder, 'make', '-C', 'src', 'build')
         outputs = {'camdl':camdl, 'camdlc':camdlc, f'camdlc-{camdl_commit(camdl)}':camdlc} # camdl looks for the checker as camdlc-<commit>
         (folder / 'bin').mkdir(exist_ok=True)
