@@ -9,7 +9,7 @@
 | **License** | BSD-2-Clause |
 | **Code** | <https://github.com/monash-emu/summer2> |
 | **Docs** | <https://summer2.readthedocs.io/> |
-| **Paper** |: (documented; used across Monash EMU's TB, COVID-19 and other work) |
+| **Paper** | Trauer et al. (2025), *Infectious Disease Modelling* 10(1): 99–109, [10.1016/j.idm.2024.08.005](https://doi.org/10.1016/j.idm.2024.08.005) (used across Monash EMU's TB, COVID-19 and other work) |
 | **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/summer2.html) |
 
 ## What it's for

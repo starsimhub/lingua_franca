@@ -9,7 +9,7 @@
 | **License** | (see repository) |
 | **Code** | <https://github.com/HopkinsIDD/flepiMoP> |
 | **Docs** | `documentation/` in the repository |
-| **Paper** | — |
+| **Paper** | Lemaitre et al. (2024), *Epidemics* 47: 100753, [10.1016/j.epidem.2024.100753](https://doi.org/10.1016/j.epidem.2024.100753) |
 | **Users** | Johns Hopkins IDD; US COVID-19 and influenza Scenario Modeling Hub submissions |
 | **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/flepimop.html) |
 

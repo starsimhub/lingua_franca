@@ -9,7 +9,7 @@
 | **License** | MIT |
 | **Code** | <https://github.com/vsbuffalo/camdl> |
 | **Docs** | Ships offline: `camdl docs <topic>`; `docs/camdl-language-spec.md` |
-| **Paper** |: (alpha) |
+| **Paper** | — (alpha) |
 | **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/camdl.html) |
 
 ## What it's for

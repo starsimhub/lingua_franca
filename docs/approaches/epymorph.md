@@ -9,7 +9,7 @@
 | **License** | (see repository) |
 | **Code** | <https://github.com/NAU-CCL/epymorph> |
 | **Docs** | <https://docs.epimorph.org> |
-| **Paper** | — (EpiMoRPH project, NAU) |
+| **Paper** | Mihaljevic et al. (2026), *medRxiv*, [10.64898/2026.10.26.26366544](https://doi.org/10.64898/2026.10.26.26366544) (EpiMoRPH project, NAU) |
 
 ## What it's for
 

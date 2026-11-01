@@ -9,7 +9,7 @@
 | **License** | MIT |
 | **Code** | <https://github.com/starsimhub/starsim> |
 | **Docs** | <https://starsim.org/v4>, including a [landscape page](https://starsim.org/v4/user_guide/library_landscape.html) and [conversion guides](https://starsim.org/v4/user_guide/conversion/index.html) |
-| **Paper** | Kerr et al., Starsim methods paper; predecessor Covasim in *PLOS Comp Biol* [10.1371/journal.pcbi.1009149](https://doi.org/10.1371/journal.pcbi.1009149) |
+| **Paper** | Methods paper in preparation; Kerr et al. (2024), SciPy talk, [10.25080/ukpu4584](https://doi.org/10.25080/ukpu4584); predecessor Covasim in *PLOS Comp Biol* [10.1371/journal.pcbi.1009149](https://doi.org/10.1371/journal.pcbi.1009149) |
 | **Ecosystem** | ~12 first-party disease models (STIsim, HPVsim, TBsim, FPsim, RSVsim, Rotasim, …) built on `ss.Module` and running in the same `ss.Sim` loop |
 
 *Conflict of interest note: this project was written by Starsim's maintainers, and it became Starsim 4. So read the limitations section first.*

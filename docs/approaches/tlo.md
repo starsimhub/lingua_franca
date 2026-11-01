@@ -9,7 +9,7 @@
 | **License** | MIT |
 | **Code** | <https://github.com/UCL/TLOmodel> |
 | **Docs** | <https://www.tlomodel.org/> (module write-ups at <https://www.tlomodel.org/writeups.html>) |
-| **Paper** | Hallett et al., "Estimates of resource use in the public-sector health-care system and the effect of strengthening health-care services in Malawi during 2015–19: a modelling study (Thanzi La Onse)", *Lancet Global Health* (2025) |
+| **Paper** | Hallett et al., "Estimates of resource use in the public-sector health-care system and the effect of strengthening health-care services in Malawi during 2015–19: a modelling study (Thanzi La Onse)", *Lancet Global Health* 13(1): e28–e37 (2025), [10.1016/S2214-109X(24)00413-3](https://doi.org/10.1016/S2214-109X(24)00413-3) |
 
 ## What it's for
 
