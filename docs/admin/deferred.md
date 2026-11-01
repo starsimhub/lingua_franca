@@ -22,7 +22,6 @@ Work that has been looked at and set aside for now: worth doing, but not yet. Ea
 
 ## Features
 
-- **A count state's `init` from the population** (October 30): `ss.State(people=False, init=m*N)`, with `N` a sum of people, silently starts at 0, where a number, a bare `ss.par`, or `init=lambda sim: ...` works. `ssl.Malaria`'s mosquitoes start at zero and fill up within weeks because of this. S.
 - **`ss.par` inside `ss.seasonal(mean=...)` in a class body** (October 30) raises a confusing "two members are both named" error; `ss.par(ss.seasonal(...))` works, but makes the amplitude and peak part of one parameter. S.
 - **A count that carries a strain** (October 30): `Iv.n` in a rate of a disease with `ss.Strains` is refused, clearly, so a vector population per strain isn't one disease, and `ssl.Dengue`'s serotypes are members with mosquitoes of their own, as agents only. M.
 - **`ssl.ERGMNet`** (October 30): a full exponential random graph model, simulating from given coefficients by edge toggles. Set aside: `ss.DegreeNet` already covers edges, concurrency, degree caps, and matching on an attribute, whose docs say so; what an ERGM adds is the dependent terms below.
@@ -80,7 +79,6 @@ Set aside on 2026-10-21 when the simplification plan ([oct21/plan.md](oct21/plan
 - **Importers** (lowest priority, as before).
 - **Small items from the October 19 decisions** (Cliff, 2026-10-21: "if something is simple + useful or simplifies things, implement; otherwise, defer"; none was both): NR13 (no progress bar for very short runs; naming a clashing product after its delivery, which changes result keys); X1 (hiding the `<transfer>_stage` dimension from `describe()` and results); DF20 (contact matrices as release assets); SW8 (a seed below one agent: it rounds to 0 with a note; stochastic rounding keeps the expected number but still gives no epidemic most of the time in `test_odin_agents`, and raising would refuse models that run, so neither is clearly better than the note). L20/L23 are under Features.
 - **Two designs from October 17** (Cliff, 2026-10-21): [people_as_data.md](oct17/designs/people_as_data.md) and [burden_of_disease.md](oct17/designs/burden_of_disease.md).
-- **Names from S3.5** (Cliff, 2026-10-21: "don't love delivery.compartments or ss.solvers.CompartmentalDelivery, but we can revisit later"): `delivery.compartments`, `ss.solvers.CompartmentalDelivery`, `Product.administer()`, `delivery.reached()`.
 - **Reviews**: the canon gallery, the naive review's xfails, real models at full complexity, D-T1's rest, D-T2, D-T3, P7/D45/X30, and the downstream CI gate.
 
 ## From the October 22 plan
@@ -130,7 +128,7 @@ Set aside while building [oct22/plan_b.md](oct22/plan_b.md), each with what it w
 - A scalar fertility rate of `ss.Pregnancy` (ST2, oct26): now read as data with one value (a rate per woman-year, rescaled to the women not pregnant), births +6.8%; still −4.4% against Starsim 3 (z ≈ −2.3) and a TFR of 3.34 for a rate implying 3.5; part may be that the rate is by age at conception and the ASFR by age at delivery. Check with FPsim's TFR (below). S.
 - A chain-binomial run with more than one substep and a rate that varies in time (`ss.seasonal`) draws differently when stepped from Python (`run(profile=True)`) than as a whole run (up to 92 of 1,100 vaccinated over 60 days at 2 substeps; equal at 1). Present at `2dad9d88`; seen once TB3 gave such models 2 substeps (`tests/devtests/test_contracts.py::test_streams` now pins `substeps=1`). S.
 - MG8 follow-ups (oct26, from the MIGHTI port): the cause of death is weighted by hazard only when every claim passes `hazard=`, but the agents engine's declared deaths (`solvers/agents.py` `request_death(uids, cause=mod)`) and `ss.Deaths` pass none, so a model mixing them can't use it; pass `hazard=tr.hazard(uids)` and the death rate there. And `Transition.hazard(uids)` is per unit of the sim's time, which can be inferred (months with STIsim's HIV) whatever `dt` is: add `hazard(uids, unit='year')`. S each.
-- From the Typhoidsim port (oct26): `init = dict(susceptible=...)` in a class body is silently ignored (everyone starts in the first state); it works given to `__init__()`, as `first = '...'` works in the body; make the body form work, or raise. And in `ss.attr(init=...)` a bare state is the share of everyone in it, not whether this person is in it, so a starting value for one state only (Typhoid's prior infections for the susceptible, not the unexposed) can't be declared (TY3's hack stays); `as_cond(S)*dist` raises. S each.
+- From the Typhoidsim port (oct26): In `ss.attr(init=...)` a bare state is the share of everyone in it, not whether this person is in it, so a starting value for one state only (Typhoid's prior infections for the susceptible, not the unexposed) can't be declared (TY3's hack stays); `as_cond(S)*dist` raises. S each.
 - `ss.perday(1)*ss.by(patch=fn)` raises `IncompatibleTypes` (malariasim's port, MS2); a function returning a typed rate works. S.
 - A self-loop's dwell under a step is at least one step as agents (FP86); compartmental solvers take the mean as given, so they move people several times faster (39% at the first monthly step, against 10%). Fix: floor such a dwell's mean at `dt` in the compartmental layout. S.
 - A state that is a source both by contact and by a rate is dated −1 at the start, as for the rate, so its network part still loses the first step (plan_b HP62, question 2). Rare.
@@ -236,7 +234,6 @@ Looked at whether v4 should support modeling paradigms beyond the ODE, chain-bin
 ## From the October 31 constitution pass
 
 - **`ss.on(d.I.n > 1000)`** raises `TypeError`, though `init_triggers()`'s comment says counts work.
-- **Agents' `I` at the endemic state** is high by about dt/D (0.1175 against 0.1 at `dt=1`, D 5): the count seems to include those infected in the step reported. Cause not confirmed.
 - **Minimum stays (`after=`):** other exits skip the last slot under every solver; not checked for bias. Under the chain binomial, a cohort leaves half a step later than as agents.
 - **`ss.Result(..., label=)`** given to a declared disease loses its label.
 - **`describe()` of a coded sim with no unit** prints "every 0.00273973 steps".
@@ -248,14 +245,13 @@ Looked at whether v4 should support modeling paradigms beyond the ODE, chain-bin
 - **A declared disease on a network overriding `net_beta()`** ignores it silently; should it raise?
 - **Unusable parameter values on a declared disease** (`dur_inf=dict(...)`) fail late, with a raw `TypeError`; one check when the graph is built.
 - **Other Starsim 3 guards** remain: `infect(self)` in `__init_subclass__()`, `_infection_methods`, and the text in `check_betas()`.
-- **`ss.Births` and `ss.Deaths` as thin constructors** (decision 8) aren't reachable yet: they need `parent` and mothers' ages on declared births, a declared rate by year, sex, and age, the `cbr` and `cmr` results, and a replacement for the `make_p_death()` and `get_births()` hooks that seven downstream classes override. A declared per-agent death rate from the UN table also ends 3.5% below `ss.Deaths`, unexplained.
+- **`ss.Births` and `ss.Deaths` as thin constructors** (decision 8) aren't reachable yet: they need `parent` and mothers' ages on declared births, a declared rate by year, sex, and age, the `cbr` and `cmr` results, and a replacement for the `make_p_death()` and `get_births()` hooks that seven downstream classes override. A declared per-agent death rate from the UN table ended 3.5% below `ss.Deaths` in one run; rechecked on 2026-10-31 with `ss.Deaths`' own table and period lookup, it is within 0.3% (the original setup is lost).
 - **A matrix of distributions in `ss.MixingPools`** still makes a pool for each pair of groups, each with a state, so a newborn takes a draw for each pair (#738: about 2× slower to run than a matrix of numbers at 16 groups with births, and 6× slower to build). A matrix of numbers no longer does. If someone needs Poisson contacts at 16 groups, draw one value per person per destination group, not per pair.
 - **`ss.MixingPools`** stays: `rsvsim.RSVMixingPools` subclasses it, and typhoid, rotasim, tb_acf, and jhu-collab use it.
 - **Stepped runs under 15 µs:** 24 µs now. A prepared kernel handle might save about 4, and compiled result expressions about 3. Spans would help only modules on coarser timelines.
 - **`settled()`** doesn't notice a change inside a coded object held by identity, or to a modifier's `start=`, `stop=`, or `where=` during a run (its amount and new modifiers are noticed).
 - **`loop.insert`** anchored on an empty `step()`, which is no longer in the loop, is untested.
 - **Gillespie and tau-leaping** hold time-varying values for a whole step, which strengthens the thinning item: about 3% too many infections at `dt=91` days with an annual cycle.
-- **`Delivery.on`** could be renamed `.trigger`.
 - **Modifiers with a time-only `when=`** could be tabulated for whole runs, now that `when=` can't read the sim.
 - **`ss.modify` in the class body of a coded disease** is an error for now.
 - **Conditions on unnamed states in a class body** (`I & x` with `ss.states(3)`) get no name.
@@ -263,22 +259,21 @@ Looked at whether v4 should support modeling paradigms beyond the ODE, chain-bin
 - **`flatten_rates()`** is still about 190 lines of closures; temporary state in `choose_solver()` is held on the sim and deleted.
 - **Threaded compartmental ensembles:** `run_many()` is serial, so parallelism comes only from `ss.parallel()` workers. `advance_threads()` shows the way. Forked workers gave 3.7× on 4 cores.
 - **`share()` by BLAS** applies only when every pair has an entry; JAX's rule was an eighth of the entries. Gravity with a cutoff still loops. Measure before widening.
-- **Wheels on macOS, Windows, and Arm** have never been linked or run (the crate passes `cargo check` for each target), and the docs say wheels exist before the first release that has them. Run `build_wheels.yml` by hand (`starsim/solvers/rust/test_gh_wheels_build`).
-- **Intel Macs are not supported:** Numba's last wheels for them are 0.62 (Python 3.13 at most), so `pip` tries to compile LLVM's bindings. They could return with a `numba<0.63` marker on that platform.
+- **Intel Macs are not supported** (Cliff, 2026-10-31): no wheel is built, and Numba's last wheels for them are 0.62 (Python 3.13 at most), so `pip` tries to compile LLVM's bindings. They could return with a `numba<0.63` marker on that platform.
 - **People in a fixed delay at the start** leave half a step late under the stochastic solvers (see decision 8 of `oct31/plan.md`).
+- **Peaks with a fixed delay as the only exit** (October 31): the chain binomial's default takes whole steps, so the peak is about 15% low (22% at `dt=2`); `substeps=3` gives 5 to 8%. Counting delays in the default fixed this but cost up to 8.7× on long runs, so it was removed.
 - **Building a sim is most of a short run.** About 7 ms plus 2 µs a step: a Python object for each time point in `tvec` (`DateArray`, through `sc.toarray()`), the searches for distributions and time parameters (`sc.search` in `dists.init()` and `link_timepars()`), and copying parameters. A lazy `tvec` would fix the part that grows with steps; it touches every reader of `tvec`.
 - **Declared agents at small sizes:** about 170 µs a step more than coded (SIR at 5,000 agents is 1.27×, at 50,000 about equal), from the bookkeeping of moves. Not ablated.
 - **Numba at one group:** 33 to 41× hand-written, about 5× Rust's time, with no fix short of a second compile of `step()`.
 - **`fading_late` in `ssl.Syphilis`** uses `Ll.time`, which restarts at 0, so people moving to `Ll` jump back to full infectiousness, coded and declared alike. The docstring and STIsim count from the start of latency.
 - **Denormals:** a long SIR leaves `I` at the smallest denormal, about 10× slower per step, in hand-written code too; only runs far past the end of an epidemic.
 - **Mixing by indirect indexing** is the largest single kernel cost left at 100 groups (about 20%), if the 2.8× it would give is ever worth a program field.
-- **From the HPVsim port onto strains with courses of their own** (see `family_tradeoffs.md`): `rel_sus` scales each act's hazard when declared (`agents_branching.py:615`) but the chance over all acts when coded (`networks.py:785`), which gave nab-only prevalence of 0.30 against 0.16; this is silent. `ss.outcome()` gave 13 deaths against 22.8 from fractional agent weights in multiscale (`agents.py:1148`), not traced. `fit.py:1343` names a shared beta `hpv16.beta`, and `graph.py:240` blocks an `infected` property.
+- **From the HPVsim port onto strains with courses of their own** (see `family_tradeoffs.md`): `fit.py:1343` names a shared beta `hpv16.beta`, and `graph.py:240` blocks an `infected` property.
 - **`inspect.signature()` of a disease class** gives `(*args, **kwargs)`, from the `BuiltAfterInit` metaclass (`diseases.py:22`). STIsim reads `cls.__init__` instead.
 - **`ss.diff_sims(die=True)`** raises on different values, not on keys that differ (`debugtools.py:457`), so a baseline test passes with stale keys.
 - **A declared HPV genotype** costs about 2.5 ms a step against 0.75 ms coded, so the HPVsim port is about 1.5× a coded model with the same network: flat Python in `send()`, `fire()`, `enter()`, and `schedule()`, and `Arr.grow()` over about twice the arrays. M.
 - **`BoolState.time`** is O(N) per read; give it a form for some agents. S.
 - **`docs/design/12-backends.md`** still describes the chain binomial in JAX.
-- **Flow names left in the old style:** `ss.Births` and `ss.Deaths` have `new` and a stored `cumulative` (`new.cum` would do); `ss.Pregnancy` and `FetalHealth` have flows named `n_preterm`, `n_births`, etc., so `n_` means a flow there and a stock elsewhere, and `maternal_deaths` and `neonatal_deaths` are plural. S.
 
 ## Won't do
 

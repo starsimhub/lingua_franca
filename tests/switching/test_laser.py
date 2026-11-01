@@ -77,7 +77,7 @@ def peak_memory(total, fresh=True):
     """ The peak memory of a run, in a fresh process so that earlier tests in the same process do not change it """
     if fresh:
         code = f'import sciris as sc; print(sc.importbypath({__file__!r}).peak_memory({total}, fresh=False))'
-        out = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True, check=True).stdout
+        out = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True, check=True, cwd=sc.thispath(__file__).parent).stdout
         return float(out.split()[-1])
     sim = make_sim(total)
     tracemalloc.start()
