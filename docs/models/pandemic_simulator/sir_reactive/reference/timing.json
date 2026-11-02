@@ -1,0 +1,8 @@
+{
+  "first": 1.21396,
+  "rerun": 1.2274,
+  "what": "first and rerun: a fresh process each, importing JAX and running the model with and without the measure in two worker processes, as its main script does; the framework has no way to run a model again in the same process",
+  "machine": "x86_64",
+  "cpus": 20,
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
+}

@@ -5,7 +5,7 @@
 | **Language** | Python, on JAX |
 | **Paradigms** | Compartmental only: deterministic ODE, and stochastic runs as many tau-leaping trajectories |
 | **Specification style** | A class per model: a declared schema of compartments, edges, and fields, plus a hand-written `equation()` |
-| **Version reviewed** | 0.1.0, `main` at commit `5ec712b` (October 2026), read but not run |
+| **Version reviewed** | 0.1.0, `main` at commit `5ec712b` (October 2026); one model run, the rest read |
 | **License** | Apache 2.0 |
 | **Code** | <https://github.com/WHO-Collaboratory/pandemic-simulator-compartment> |
 | **Docs** | <https://who-collaboratory.github.io/pandemic-simulator-compartment/> |
@@ -113,7 +113,7 @@ The most unusual part of the framework is what surrounds a model:
 
 ## Implications for the lingua franca
 
-The [corpus example](../models/pandemic_simulator/sir_reactive/README.md) was translated to check these. Each item says what Starsim v4 already does.
+The [corpus example](../models/pandemic_simulator/sir_reactive/README.md), which agrees with the original, was translated to check these. Each item says what Starsim v4 already does.
 
 1. **A release threshold is worth one keyword (done).** A lockdown that starts at 2% and ends at 1% is a common policy, and `ss.modify()` needed a coded module for it. `ss.modify(beta, multiply=0.5, where=I.n >= a, until=I.n <= b)` now states it, and every solver carries it, which the Pandemic Simulator's default solver can't.
 2. **Audit a conversion against its source (done).** Comparing runs can't catch a mistake that both models share, or check a paper with no code. The `validate-conversion` skill now has the fidelity audit: each facet, a verdict, an exact quotation and where it is, in a fresh context.

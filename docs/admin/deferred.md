@@ -279,7 +279,7 @@ Looked at whether v4 should support modeling paradigms beyond the ODE, chain-bin
 
 The reasons are in [the review](../approaches/pandemic_simulator.md).
 
-- **Run the original of `pandemic_simulator/sir_reactive`.** It needs a recipe in `docs/models/pandemic_simulator`, `run.py`, `reference/`, and `meta.yaml`, after which the benchmark picks it up. A second, harder model (`wuhan_seir_model`, or the Ebola model of Legrand et al.) would then cover contact matrices and published papers.
+- **A second, harder Pandemic Simulator model** (`wuhan_seir_model`, or the Ebola model of Legrand et al.), to cover contact matrices and published papers.
 - **An importer for the Pandemic Simulator**, in three tiers, and an exporter to its model directories, which matters more if its reviewers want generated models. About 300 to 400 lines for the importer. Both wait for a decision, and for being able to run the 22 models.
 - **Inputs as JSON Schema** for forms, MCP tools, and validated configs: one function over `ss.par`. Waits for something that needs it.
 - **Model cards.** `not_for`, `biases`, and `key_assumptions` as a docstring section of library models, asked for by `convert-model`, and a `metadata=` keyword only if a form or registry needs one.

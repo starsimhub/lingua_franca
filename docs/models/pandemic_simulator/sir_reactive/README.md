@@ -2,20 +2,19 @@
 
 The framework's declarative teaching example, `example_parameter_uncertainty_declarative_model`: a closed SIR in one zone of 1,000,000 people, with a measure that responds to prevalence, run with and without the measure and with three uncertain inputs. See the [review](../../../approaches/pandemic_simulator.md).
 
-**Status: not yet in the benchmark.** The original has not been run here, so this folder has no `reference/`, `run.py`, or `meta.yaml`, and the benchmark skips it. The check below is against the numbers its authors published, which is weaker than a comparison at every time point.
-
-`model.py` is the Starsim version, and `compare.py` checks it against the published numbers.
+`model.py` is the Starsim version, and `compare.py` checks it against `reference/`, a run of the original with the central value of every input.
 
 ## Comparison
 
 | Measure | Original | Starsim | |
 |---|---|---|---|
-| Size | `model.py` of 188 lines, of which about 110 are a declaration that also serves the web form and model card, and a config of 91 lines | 6 lines of model | Not a fair count: the original's lines include what a web platform needs, and the Starsim version has no form. The rules for counting lines have not been applied |
-| Results, central values, with the measure | Not published | Peak 19.9% on day 58; 860,467 infections | From `model.py` |
-| Results, 20 draws (median at each time), peak | 25% to 19%, about 10 days later | 24.6–25.9% to 17.8–18.9%, 7–11 days later | **Consistent.** Five sets of 20 draws; 400 draws give 25.2% to 18.0%, 8 days later |
-| Results, 20 draws, infections | About 939,000 to 865,000 | 939,751–941,209 to 847,189–868,337 | **Consistent**, read in the same way |
+| Lines of model code | 99 | 8 | Most of the original's lines are the declaration that also serves the web form and model card, which the Starsim version doesn't have |
+| One run | first 1.2 s, rerun 1.2 s | first 0.049 s, rerun 0.046 s (Rust) | Not a like-for-like time: each of the original's runs is a fresh process that imports JAX and starts two workers, and it has no way to run again in the same process. Starsim's excludes importing it, and its kernel sets have not yet been compared |
+| Results, without the measure | | | **Agree** to 1.2e-5 of the population on every day (6 people in `I`), with a daily RK4 step against an adaptive solver |
+| Results, with the measure | Peak 198,528 on day 59; 860,705 infections | Peak 198,673 on day 58; 860,467 infections | **Agree** to 4.2e-3 of the population, or 1.2e-3 with `dt=ss.days(0.1)` and 860,695 infections. The difference is when the threshold is noticed: Starsim checks it once a step |
+| Results, 20 draws (median at each time) | 23.9% to 16.5% at the peak, 7 days later, and about 938,000 to 844,000 infections, in one run; the guide on interventions gives 25% to 19%, and 939,000 to 865,000 | About 25% to 18%, 8 days later, and 940,000 to 857,000 infections, with 200 draws | **Consistent**: inside the original's 95% band on every day. The original's draws have no seed, so two of its runs differ by this much |
 
-The published row is from [the guide on interventions](https://github.com/WHO-Collaboratory/pandemic-simulator-compartment/blob/main/docs/guides/interventions.md), which does not give the seed of its draws. The ranges are the spread across the five sets. Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4-nov02e` branch, commit `24a36055`).
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `3e5318d8`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 
@@ -23,8 +22,8 @@ Everything is declared. The measure is `ss.modify()` with a condition on a count
 
 ## Findings
 
-- **A median of runs is not a run.** The 25% in the guide is the peak of the median curve over draws of `beta`. Each run peaks near 30% at the central `beta`, later or earlier in others, so the median curve is lower than the median peak. A comparison with these numbers has to summarize in the same way.
-- **The release threshold.** The config sets a trigger at 2% and a release at 1%, but the guide says that the default solver does not carry the status between steps, so the release is not used. With no memory, the measure is on whenever prevalence is at least 2%. With the release, a separate fine-step calculation gives the same peak, 857,986 infections rather than 860,760, and 90 days under the measure rather than 80. In Starsim, `until=` on `ss.modify()` gives the release (857,944 infections), and the translation leaves it out only to match the original.
+- **A median of runs is not a run.** The 25% in the guide is the peak of the median curve over draws of `beta`. With the central `beta` the peak is 30%, and the draws peak at different times, so the median curve is lower. A comparison with these numbers has to summarize in the same way.
+- **The release threshold.** The config sets a trigger at 2% and a release at 1%, but the guide says that the default solver does not carry the status between steps, and the original's results confirm it: the decline slows as soon as prevalence falls below 2%. So the translation has no release. With `until=sir.I.n <= 10_000`, the release as configured, the peak is the same, with 857,944 infections rather than 860,467.
 - **Uncertainty.** `ss.parallel(sim, priors=True)` draws bounded parameters afresh, but not on a Latin hypercube, and the draws can be given directly as `priors=`. The two factors of the measure aren't parameters here, so `compare.py` makes its sims itself.
 
 ## What it exercises
@@ -37,8 +36,12 @@ Everything is declared. The measure is `ss.modify()` with a condition on a count
 ## Files
 
 - `model.py`: the Starsim version
-- `compare.py`: checks it against the published numbers
+- `compare.py`: checks it against `reference/`
 - `original/model.py` and `original/example-config.json`: the example, unchanged, at commit `5ec712b` of the source repository
+- `original/central-config.json`: the same config with no uncertain inputs
+- `run.py`: runs it and writes `reference/`
+- `reference/results.csv`: `S`, `I`, and `R` on each day, with the measure and without
+- `meta.yaml`: where it came from
 - `LICENSE`: the upstream license (Apache 2.0)
 
 ## The model

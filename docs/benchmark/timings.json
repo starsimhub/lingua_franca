@@ -429,6 +429,16 @@
       "fastest": "rust",
       "load": 3.3056640625
     },
+    "pandemic_simulator/sir_reactive": {
+      "kernels": {
+        "rust": {
+          "first": 0.049257803009822965,
+          "rerun": 0.04576649202499539
+        }
+      },
+      "fastest": "rust",
+      "load": 5.30859375
+    },
     "siminf/sir_herds": {
       "kernels": {
         "jax": {
@@ -524,7 +534,7 @@
   "date": "2026-11-02",
   "starsim": {
     "version": "4.0.0rc1",
-    "commit": "e26de815+"
+    "commit": "3e5318d8"
   },
   "kernels": [
     "rust",

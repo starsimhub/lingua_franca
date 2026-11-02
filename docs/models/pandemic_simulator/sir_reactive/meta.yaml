@@ -1,0 +1,9 @@
+framework: pandemic_simulator
+model: sir_reactive
+version: 0.1.0
+source: https://github.com/WHO-Collaboratory/pandemic-simulator-compartment/tree/main/compartment/models/example_parameter_uncertainty_declarative_model
+commit: 5ec712b9fb915b44401320ebaa93d4beea5c7ee9
+license: Apache-2.0
+language: Python
+env: _envs/pandemic_simulator
+lines: 99

@@ -1,39 +1,29 @@
 """
-Compare the Starsim version with the numbers published in the Pandemic Simulator's interventions guide
-
-The guide reports a run of the example config: 20 Latin hypercube draws of beta, adherence, and
-reduction, summarized by the median at each time. Twenty draws vary, so this makes five sets of them.
+Compare the Starsim version with the reference results of the original
 
     python compare.py
 """
+import os
+import sys
 import numpy as np
-import scipy.stats.qmc as qmc
-import starsim as ss
 
-published = 'peak 25% to 19%, ten days later; infections about 939,000 to 865,000'
-pars = dict(total_pop=1e6, start='2026-01-01', stop='2026-12-31', dt=ss.days(1), solver='ode', verbose=0)
+here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(os.path.dirname(here)))
+import tools
+from model import sim, control
 
-
-def run(beta, multiply=None):
-    """ One run: the number infectious at each time, and the infections in all """
-    S, I, R = ss.states('S I R')
-    sir = ss.Disease(infection=S >> I @ beta*I, recovery=I >> R @ ss.days(10), init_n=dict(I=100), name='sir')
-    measure = None if multiply is None else ss.modify(sir.pars.beta, multiply=multiply, where=sir.I.n >= 20_000)
-    res = ss.Sim(sir, interventions=measure, **pars).run().results.sir
-    return res.I.values.copy(), np.cumsum(res.infection.values) + 100
+ref = {k:np.array(v[1]) for k,v in tools.read_results(here).items()}
+tolerances = dict(control=2e-5, measure=5e-3) # As shares of the population; see the README for why the second is wider
 
 
-def summary(runs):
-    """ The peak of the median, its day, and the median of the infections at the end """
-    median = np.median([r[0] for r in runs], axis=0)
-    return median.max()/1e6, median.argmax(), np.median([r[1][-1] for r in runs])
+def check(name, which, run, tol):
+    """ The largest difference from the original over all days and states """
+    res = run.results.sir
+    diff = max(np.abs(res[c].values - ref[f'{which}_{c}']).max() for c in 'SIR')/1e6
+    print(f'{name}: largest difference {diff:.2e} of the population, tolerance {tol:.0e}')
+    assert diff < tol
 
 
 if __name__ == '__main__':
-    print(f'Published: {published}')
-    for seed in range(5):
-        u = qmc.LatinHypercube(d=3, seed=seed).random(20)
-        betas, adherence, reduction = 0.2 + 0.2*u[:,0], 0.4 + 0.2*u[:,1], 0.45 + 0.1*u[:,2]
-        p0, d0, n0 = summary([run(b) for b in betas])
-        p1, d1, n1 = summary([run(b, 1 - a*r) for b,a,r in zip(betas, adherence, reduction)])
-        print(f'Draws {seed}: peak {p0:.1%} to {p1:.1%}, {d1 - d0} days later; infections {n0:,.0f} to {n1:,.0f}')
+    check('Without the measure', 'control', control.run(), tolerances['control'])
+    check('With the measure', 'with', sim.run(), tolerances['measure'])
