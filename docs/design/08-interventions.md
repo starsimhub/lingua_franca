@@ -280,6 +280,8 @@ closures = ss.modify('school.pars.n_contacts', multiply=0.2, when=many_cases)
 sim = ss.Sim(sir, networks=[home, school], interventions=closures, n_agents=2000, stop=ss.days(100)).run()
 ```
 
+A policy with a release takes `until=`, so that it doesn't switch on and off around one threshold: `ss.modify(beta, multiply=0.5, where=I.n >= 2000, until=I.n <= 1000)` is on from when `where=` holds until `until=` does, for each place or group on its own, under every solver.
+
 - The function is called each step, at the intervention's place in the loop, and can read anything in the sim, including results up to the previous step. Results are read as in Starsim: storage is preallocated for the whole run, and during a step `sim.ti` is the step's own index, where its results will go, so the results so far are `[:sim.ti]` ([10-execution.md](10-execution.md)). A shorter spelling for "the steps so far" would be a convenience and is not specified ([19-open-questions.md](19-open-questions.md)).
 - It can read any result, including an outcome ([09-results.md](09-results.md)): `when=lambda sim: sim.results.sir.n_hosp[sim.ti - 1] > 500` acts on hospital occupancy without hospitalization being a state.
 - There is no built-in vocabulary for calendar conditions. "No school contacts on Fridays" is `ss.modify('school.pars.n_contacts', multiply=lambda sim: 0.0 if sim.now.weekday() == 4 else 1.0)`, in a sim with dates.

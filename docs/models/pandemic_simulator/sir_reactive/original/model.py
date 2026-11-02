@@ -1,0 +1,188 @@
+import jax.numpy as jnp
+import numpy as np
+import logging
+from compartment.model import Model, ValueType
+# from compartment.helpers import get_gravity_model_travel_matrix
+
+logger = logging.getLogger(__name__)
+
+
+class ExampleParameterUncertaintyDeclarativeModel(Model):
+    """A simple SIR compartmental model for Example Disease with Parameter Uncertainty."""
+
+    @classmethod
+    def define_parameters(cls, schema):
+        """Declare the model's compartments, transmission edges, and parameters.
+
+        Called once by the framework to build the model schema, from which the
+        config validator and parameter set are generated.
+
+        Args:
+            schema (ParameterSchemaBuilder): Schema builder to populate with
+                model info, metadata, compartments, transmission edges,
+                and interventions.
+        """
+        schema.set_model_info(
+            disease_type="example_parameter_uncertainty_declarative",
+            label="Example Disease with Declarative Parameter Uncertainty",
+            description="A SIR model for an example disease with declarative parameter uncertainty",
+        )
+        schema.set_model_metadata(
+            authors=[
+                {
+                    "name": "Example Author",
+                    "email": "example@example.com",
+                    "affiliation": "Example LLC",
+                }
+            ],
+            license="MIT",
+            model_type="Compartmental",
+            diseases=["Example disease"],
+            transmission_routes=["Airborne"],
+            questions_answered=[
+                "How wide are the outcome intervals when transmission and recovery are only known within a range?",
+                "How much does a transmission-reducing intervention shift the median trajectory?",
+                "How do uncertainty ranges on intervention adherence and transmission reduction affect the outcome band?",
+            ],
+            key_assumptions=[
+                "Closed population — no births or deaths.",
+                "Frequency-dependent transmission (force of infection scales with the proportion infectious).",
+                "Recovered individuals are fully immune with no waning (no R→S transition).",
+                "Parameter uncertainty is uniform: fields marked with variance in the config are drawn from their min/max range by Latin Hypercube Sampling.",
+                "No inter-zone mobility — the travel matrix is the identity, so zones evolve independently.",
+            ],
+            applicability=(
+                "A teaching example for the declarative authoring workflow and "
+                "parameter uncertainty. Copy it as the starting point for a new model."
+            ),
+            not_for=(
+                "Real-world forecasting or policy advice — the compartments and "
+                "parameter ranges are illustrative, not fitted to any disease."
+            ),
+        )
+
+        # --- Compartments ---
+        # Mark infective=True on compartments that contribute to force of infection.
+        schema.add_compartment("S", "Susceptible", "Population susceptible to infection")
+        schema.add_compartment("I", "Infected", "Currently infectious population", infective=True)
+        schema.add_compartment("R", "Recovered", "Recovered and immune")
+
+        # --- Transmission edges ---
+        # The framework auto-generates I_total, R_total cumulative compartments
+        # for the targets of these edges — do not declare them by hand.
+        schema.add_transmission_parameter(
+            source="susceptible",
+            target="infected",
+            variable_name="beta",
+            frequency_dependent=True,
+            label="Transmission Rate (S->I)",
+            description="Rate at which susceptibles become infected through contact",
+            default=0.3,
+            default_min=0.1,
+            default_max=0.5,
+            min_value=0.01,
+            max_value=2.0,
+            unit="per day",
+        )
+        schema.add_transmission_parameter(
+            source="infected",
+            target="recovered",
+            variable_name="gamma",
+            label="Recovery Period (I->R)",
+            description="Average number of days to recover",
+            default=10.0,
+            default_min=5.0,
+            default_max=20.0,
+            min_value=1.0,
+            max_value=100.0,
+            value_type=ValueType.DAYS,
+            unit="days",
+        )
+
+        # --- Optional: spatial travel support ---
+        # Declare your mobility parameters as custom fields, then define how
+        # they build the matrix in build_travel_matrix() below. Without this,
+        # the base class supplies an identity matrix (no inter-zone travel).
+        # schema.add_parameter(
+        #     name="travel_sigma",
+        #     label="Travel Rate (σ)",
+        #     description="Percentage of each zone's population away from home per day.",
+        #     value_type=ValueType.PERCENTAGE,
+        #     default=20.0,
+        #     min_value=0.0,
+        #     max_value=100.0,
+        #     unit="%",
+        # )
+
+        # --- Optional: interventions ---
+        schema.add_intervention(
+            id="my_intervention",
+            label="My Intervention",
+            description="Reduces transmission while active",
+            target_rates=["beta"],
+            adherence=50.0,
+            transmission_reduction=50.0,
+        )
+
+    def __init__(self, config):
+        """Initialize the model from a validated simulation config.
+
+        Args:
+            config (dict): Validated simulation configuration produced by the
+                framework's config loader.
+        """
+        super().__init__(config)
+        # Add any model-specific initialisation here (e.g. temperature).
+
+    # --- Optional: spatial travel support ---
+    # The framework calls this before prepare_initial_state() and stores the
+    # result on self.travel_matrix. The default returns the identity matrix,
+    # so only override it if your model has inter-zone mobility.
+    #
+    # def build_travel_matrix(self, admin_zones):
+    #     # PERCENTAGE params arrive as 20.0, not 0.2 — convert first.
+    #     sigma = self._to_rate(self.travel_sigma, ValueType.PERCENTAGE)
+    #     return get_gravity_model_travel_matrix(admin_zones, sigma)
+
+    def prepare_initial_state(self):
+        """Return the initial compartment populations for the solver.
+
+        Returns:
+            jnp.ndarray: Population matrix (compartments x admin zones) used as
+                the solver's initial state.
+        """
+        return self.population_matrix
+
+    def equation(self, y, t, p):
+        """Compute the compartment derivatives for one integration step.
+
+        Args:
+            y (jnp.ndarray): Current compartment values, ordered by
+                ``compartment_list``.
+            t (float): Current time in days since the simulation start date.
+            p (tuple): Packed parameter tuple, unpacked via ``_unpack_params``.
+
+        Returns:
+            jnp.ndarray: Stacked per-compartment derivatives (dy/dt).
+        """
+        C = self.COMPARTMENTS
+        params = self._unpack_params(p)
+
+        states = {c: y[i] for i, c in enumerate(self.compartment_list)}
+
+        I = states[C.I]  
+        non_total = [c for c in C if not c.endswith("_total")]
+        N_total = sum(states[c] for c in non_total)
+        prop_infective = I.sum() / (N_total.sum() + 1e-10)
+
+        # _apply_interventions scales target_rates and returns the updated travel
+        # matrix. With no interventions configured it returns both unchanged.
+        rates, self.travel_matrix = self._apply_interventions(
+            t, {"beta": params["beta"]}, prop_infective
+        )
+        rates["gamma"] = params["gamma"]
+
+        # _compute_equations handles mass-action / frequency-dependent FOI,
+        # _total accumulation, and skips compartments not active in this model.
+        derivs = self._compute_equations(states, rates)
+        return jnp.stack([derivs[c] for c in self.compartment_list])

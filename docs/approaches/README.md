@@ -22,7 +22,7 @@ Every document follows the same template, so that the sections can be read acros
 
 ### Included — full reviews
 
-23 frameworks, one document each.
+24 frameworks, one document each.
 
 | Framework | Language | Paradigms | Specification style | Why |
 |---|---|---|---|---|
@@ -49,6 +49,7 @@ Every document follows the same template, so that the sections can be read acros
 | [Thanzi La Onse](tlo.md) | Python | Agent-based microsimulation, whole health system | `Module` subclasses with declared parameters and properties; behavior as scheduled events | The only model here with a health system that can refuse care: requests with staff-time and consumable footprints, priorities, and finite capacity, plus built-in DALY accounting |
 | [LASER](laser.md) | Python / Numba | Spatial ABM at eradication scale | A columnar `LaserFrame` of agent properties plus a list of components | IDM's other agent-based engine; its design point differs from Starsim's in instructive ways, and its migration-model library is the best spatial-interaction vocabulary in the review |
 | [epidemics](epidemics.md) | R (odin under the hood) | Compartmental, fixed structures | Model structure is a library; the user composes *composable elements* around it | The clearest statement of the opposite design choice (fix the structure, open the scenario) with a published design-principles document |
+| [Pandemic Simulator](pandemic_simulator.md) | Python (JAX) | Compartmental (ODE, tau-leaping) | Model classes with a declared schema and a hand-written `equation()` | The clearest case of a model as a published product: the WHO's platform builds validation, a web form, and a model card from each model's declaration |
 
 ### Included — brief notes
 

@@ -2,7 +2,7 @@
 title: "Approaches"
 ---
 
-This section reviews 23 existing disease modeling frameworks, plus brief notes on several more: how each one represents states, transitions, populations, networks, interventions, and time, and what we learned from it. Everything else here builds on this work by others. For help choosing a tool, see the [modeling landscape](https://starsim.org/v4/user_guide/library_landscape.html) page of the Starsim docs.
+This section reviews 24 existing disease modeling frameworks, plus brief notes on several more: how each one represents states, transitions, populations, networks, interventions, and time, and what we learned from it. Everything else here builds on this work by others. For help choosing a tool, see the [modeling landscape](https://starsim.org/v4/user_guide/library_landscape.html) page of the Starsim docs.
 
 ## Key takeaways
 
