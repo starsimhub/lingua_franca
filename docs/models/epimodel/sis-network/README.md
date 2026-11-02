@@ -9,10 +9,10 @@ A stochastic SIS epidemic among 500 people whose partnerships form and dissolve 
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 13 | 9 |  |
-| One run | first 8 s, rerun 7 s | first 0.45 s, rerun 0.43 s (Rust) | The first run of the original includes estimating the network (`netest`), which is done once; a rerun uses the fitted network |
+| One run | first 6.5 s, rerun 5.4 s | first 0.54 s, rerun 0.34 s (Rust) | The first run of the original includes estimating the network (`netest`), which is done once; a rerun uses the fitted network |
 | Results | | | **Agree, once the order within a step is allowed for** (within 5% at equilibrium): 11.7 new infections a step at equilibrium, against 12.0 (means of 100 runs each). Over the last 200 steps 240 of 500 are infected, against 227.5: EpiModel lets people recover in the step in which they are infected and counts them after that, which makes its count 5% lower for the same epidemic (240 × 0.95 = 228). With the same allowance, 118 are infected after step 50, against 113, where the runs vary most |
 
-Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `4473e253`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

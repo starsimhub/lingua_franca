@@ -9,10 +9,10 @@ A stochastic SIR epidemic in 1,600 cattle herds (nodes) over four years, where t
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 12 | 21 | 7 of the Starsim lines turn SimInf's table of events into a movement register, and 4 read the data, which the original gets from the package |
-| One run | first 0.18 s, rerun 0.084 s | first 0.46 s, rerun 0.25 s (Rust) | Gillespie's method in both, on one thread. Neither time counts starting up or reading the data (nor, for Starsim, turning the events into a register). A rerun of the original is `run(model)` again |
+| One run | first 0.17 s, rerun 0.078 s | first 0.27 s, rerun 0.14 s (Rust) | Gillespie's method in both, on one thread. Neither time counts starting up or reading the data (nor, for Starsim, turning the events into a register). A rerun of the original is `run(model)` again |
 | Results | | | **Agree.** The mean of 200 runs (`compare.py` now makes 100, to keep the benchmark short) is within three standard errors (at most 2.7) of the original's mean of 200 at every day checked, for the totals, the number of herds infected, and the first herd, including the total susceptible on day 100, where little else varies (199,901 ± 3 against 199,906). The infection dies out early in 4% of runs (7% in the original), so it takes about 200 runs to compare the means: 20 runs can easily have none of these runs, and then differ a lot |
 
-Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `4473e253`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

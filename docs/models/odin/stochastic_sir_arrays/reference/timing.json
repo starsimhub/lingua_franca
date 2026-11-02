@@ -1,6 +1,6 @@
 {
-  "first": 0.77314,
-  "rerun": 0.00105,
+  "first": 0.75017,
+  "rerun": 0.00096,
   "what": "first is generating and compiling the C code with odin::odin, $new(), and one run of 100 groups for 100 steps, not counting starting R or loading odin; rerun is the best of 99 more calls of `x$run(0:100)` on the same model",
   "machine": "x86_64",
   "cpus": 20,

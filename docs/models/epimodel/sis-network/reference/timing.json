@@ -1,7 +1,7 @@
 {
-  "first": 7.975,
-  "rerun": 6.956,
-  "what": "netsim with nsims = 1 (500 steps, 500 nodes), inside one R session. The first run is estimating the network (netest, 0.85 s) and one netsim, after the original script has run; the rerun is the best of 5 netsim calls with the same fitted network. Neither includes starting R or loading EpiModel",
+  "first": 6.488,
+  "rerun": 5.37,
+  "what": "netsim with nsims = 1 (500 steps, 500 nodes), inside one R session. The first run is estimating the network (netest, 0.70 s) and one netsim, after the original script has run; the rerun is the best of 5 netsim calls with the same fitted network. Neither includes starting R or loading EpiModel",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

@@ -1,7 +1,7 @@
 {
-  "first": 54.279,
-  "rerun": 53.437,
-  "what": "one netsim simulation (1040 weekly steps, 1500 nodes, two network layers) with no intervention, on one core, inside one R session. The rerun is the mean of 1 run(s) in one netsim call, as one run cannot be taken alone without a further long run (by scenario: none 53.4 s); the first run is that plus estimating the two networks (netest, 0.8 s). Neither includes starting R or loading EpiModel",
+  "first": 48.257,
+  "rerun": 47.511,
+  "what": "one netsim simulation (1040 weekly steps, 1500 nodes, two network layers) with no intervention, on one core, inside one R session. The rerun is the mean of 1 run(s) in one netsim call, as one run cannot be taken alone without a further long run (by scenario: none 47.5 s); the first run is that plus estimating the two networks (netest, 0.7 s). Neither includes starting R or loading EpiModel",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

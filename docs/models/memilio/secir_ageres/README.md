@@ -11,10 +11,10 @@ This is MEmilio's wave 3 example. `model.py` is the Starsim version, and `compar
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 45 | 22 | 18 lines, three of them over 100 characters, so counted twice |
-| One run | first 0.00083 s, rerun 0.00006 s | first 0.023 s, rerun 0.0018 s (Rust) | Neither counts starting Python or importing. Starsim's first run is nearly all building the sim. MEmilio's solver is C++ code built in advance |
+| One run | first 0.00082 s, rerun 0.00006 s | first 0.02 s, rerun 0.00056 s (Rust) | Neither counts starting Python or importing. Starsim's first run is nearly all building the sim. MEmilio's solver is C++ code built in advance |
 | Results | | | **Agree.** Within 1.5 people of 10,000 at every time (1.3 in `Susceptible`, 1.5 in `Recovered`), the same with a step of a day or a tenth of a day, which is the error of the reference itself (it is interpolated between solver steps); deaths within 0.02. `compare.py` allows 1.6 people and 0.02 deaths |
 
-Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `4473e253`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

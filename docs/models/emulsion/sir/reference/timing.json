@@ -1,6 +1,6 @@
 {
-  "first": 1.00148,
-  "rerun": 0.99783,
+  "first": 0.80478,
+  "rerun": 0.76732,
   "what": "emulsion run compart_SIR.yaml --runs 1, as one command each time: EMULSION runs a model as a whole command, so first and rerun are the same command, and both include starting Python and reading the model (about 0.7 s; EMULSION itself reports about 0.06 s for the simulation)",
   "machine": "x86_64",
   "cpus": 20,

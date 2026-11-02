@@ -1,6 +1,6 @@
 {
-  "first": 30.30671,
-  "rerun": 30.55952,
+  "first": 23.25108,
+  "rerun": 22.55109,
   "what": "flepimop simulate config_sample_2pop_vaccine_scenarios.yml --jobs 1 --nslots 2, as one command, which is the only way to run it: 3 scenarios of 2 runs each, with their outcomes (after the first, each run takes about 2.6 s). The rerun is the same command again, and each is timed once; both include starting Python and compiling",
   "machine": "x86_64",
   "cpus": 20,

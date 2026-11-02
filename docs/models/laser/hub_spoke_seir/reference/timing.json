@@ -1,6 +1,6 @@
 {
-  "first": 2.22758,
-  "rerun": 0.81265,
+  "first": 1.91534,
+  "rerun": 0.72225,
   "what": "Building and running the model once in Python (1,750,000 agents, 365 steps, on all cores), not counting starting Python or importing. first is the first run, which includes compiling; rerun is the best of 2 more in the same process, each of which builds the model again, since a LASER model cannot be run twice",
   "machine": "x86_64",
   "cpus": 20,

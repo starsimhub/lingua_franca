@@ -2,7 +2,7 @@
 
 `lingua_franca benchmark` regenerates every number in the table on the home page. It checks each translation against its original, times the two in turn, and writes the lines and times into each translation's table.
 
-**Last full run:** 21 minutes on 31 October 2026 (compare 7.7, timing 13.4). The slowest model, `epimodel/sis-network`, took 151 s.
+**Last full run:** 19 minutes on 2 November 2026 (compare 7.4, timing 11.4). The slowest model, `flepimop/vaccine_scenarios`, took 141 s.
 
 ## How long it takes
 

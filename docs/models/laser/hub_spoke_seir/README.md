@@ -9,10 +9,10 @@ An agent-based SEIR epidemic in 1,750,000 people living in 16 patches (a central
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 50 | 17 | |
-| One agent-based run | first 2.2 s, rerun 0.81 s | first 0.64 s, rerun 0.62 s (Rust) | The original has 1,750,000 agents, on all cores; the Starsim run has 175,000, each standing for ten people, on one core. LASER has no way to run a built model again, so its rerun builds the model too |
+| One agent-based run | first 1.9 s, rerun 0.72 s | first 0.61 s, rerun 0.62 s (Rust) | The original has 1,750,000 agents, on all cores; the Starsim run has 175,000, each standing for ten people, on one core, since Starsim's passes over the agents take threads only from 200,000 agents. LASER has no way to run a built model again, so its rerun builds the model too |
 | Results | | | **Agree.** As agents, the means of 6 Starsim runs and 20 LASER runs: 1,529,575 recovered at the end, against 1,532,298, and within 0.5% in each place shown; peaks within 5% in size and 9 days in time. As an ODE: 1,532,507 recovered, peaks within 5% in size and 8 days in time. `compare.py` allows 2%, 15%, and 10 days. |
 
-Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `4473e253`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

@@ -1,6 +1,6 @@
 {
-  "first": 0.14007,
-  "rerun": 0.00306,
+  "first": 0.12138,
+  "rerun": 0.0023,
   "what": "Atomica 1.32.4, one run of 23 yearly steps. First: reading the spreadsheets (about 0.1 s) and Project.run_sim(). Rerun: Project.run_sim() again on the loaded project",
   "machine": "x86_64",
   "cpus": 20,

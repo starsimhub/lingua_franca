@@ -11,10 +11,10 @@ flepiMoP calls it its "sample 2pop" model and it is often described as an SIR, b
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 42, plus 10 lines of CSV | 16 |  |
-| One run | first 11 s, rerun 13 s | first 0.89 s, rerun 0.0017 s (JAX) | The original can run only as a whole command, so its first run and rerun are both that command, about 7 s of which is compiling, on every run |
+| One run | first 8.6 s, rerun 8.8 s | first 0.018 s, rerun 0.00045 s (Rust) | The original can run only as a whole command, so its first run and rerun are both that command, about 7 s of which is compiling, on every run |
 | Results | | | **Agree exactly** (tolerance 1e-6 people): every compartment in both provinces, on every day, within 3e-12 people |
 
-Measured on 31 October 2026 with Starsim 4.0.0 (the `v4` branch, commit `4473e253`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

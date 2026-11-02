@@ -1,6 +1,6 @@
 {
-  "first": 0.87546,
-  "rerun": 0.87926,
+  "first": 0.86809,
+  "rerun": 0.85968,
   "what": "mm.Sim(districts).run(), with the data already loaded. The model has no separate rerun, so first and rerun are the same: each builds the sim and runs it",
   "machine": "x86_64",
   "cpus": 20,

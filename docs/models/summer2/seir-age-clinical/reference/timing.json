@@ -1,7 +1,7 @@
 {
-  "first": 3.77944,
-  "rerun": 0.0004,
-  "what": "first: building, compiling with JAX, and running all seven models, as the original does to get all its outputs, in a fresh process, with summer2 and JAX already imported (the first model alone takes 1.38 s). rerun: model.run() on the last of the seven, already compiled, with four derived outputs",
+  "first": 2.92995,
+  "rerun": 0.0003,
+  "what": "first: building, compiling with JAX, and running all seven models, as the original does to get all its outputs, in a fresh process, with summer2 and JAX already imported (the first model alone takes 0.91 s). rerun: model.run() on the last of the seven, already compiled, with four derived outputs",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
