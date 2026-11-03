@@ -1,0 +1,9 @@
+framework: pandemic_simulator
+model: ebola_legrand
+version: 0.1.0
+source: https://github.com/WHO-Collaboratory/pandemic-simulator-compartment/tree/main/compartment/models/ebola_seihfr_burial_legrand_model
+commit: 5ec712b9fb915b44401320ebaa93d4beea5c7ee9
+license: Apache-2.0
+language: Python
+env: _envs/pandemic_simulator
+lines: 306

@@ -31,6 +31,7 @@ project:
     - models/memilio/secir_ageres/README.md
     - models/odin/stochastic_sir_arrays/README.md
     - models/odin/seir_array/README.md
+    - models/pandemic_simulator/ebola_legrand/README.md
     - models/pandemic_simulator/sir_reactive/README.md
     - models/siminf/sir_herds/README.md
     - models/siminf/sise3/README.md
@@ -199,6 +200,7 @@ website:
         - models/memilio/secir_ageres/README.md
         - models/odin/stochastic_sir_arrays/README.md
         - models/odin/seir_array/README.md
+        - models/pandemic_simulator/ebola_legrand/README.md
         - models/pandemic_simulator/sir_reactive/README.md
         - models/siminf/sir_herds/README.md
         - models/siminf/sise3/README.md

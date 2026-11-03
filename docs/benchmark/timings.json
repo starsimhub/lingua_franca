@@ -429,15 +429,40 @@
       "fastest": "rust",
       "load": 3.3056640625
     },
+    "pandemic_simulator/ebola_legrand": {
+      "kernels": {
+        "rust": {
+          "first": 0.08740351698361337,
+          "rerun": 0.056817168020643294
+        },
+        "numba": {
+          "first": 0.15501395298633724,
+          "rerun": 0.053210632991977036
+        },
+        "jax": {
+          "first": 1.2052872619824484,
+          "rerun": 0.0475926959188655
+        }
+      },
+      "fastest": "jax",
+      "load": 9.205078125
+    },
     "pandemic_simulator/sir_reactive": {
       "kernels": {
         "rust": {
-          "first": 0.049257803009822965,
-          "rerun": 0.04576649202499539
+          "first": 0.08135558397043496,
+          "rerun": 0.06588578608352691
+        },
+        "numba": {
+          "first": 172.5033323590178,
+          "rerun": 0.0783034369815141
+        },
+        "jax": {
+          "skipped": "measure has a step of its own (a modifier with where=, when=, or a function as its amount)"
         }
       },
       "fastest": "rust",
-      "load": 5.30859375
+      "load": 6.25146484375
     },
     "siminf/sir_herds": {
       "kernels": {

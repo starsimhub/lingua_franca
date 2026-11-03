@@ -68,7 +68,6 @@ readme = folder / 'README.md'
 runs = { # What one run is, where it is not the variable `sim` in the model file
     'emulsion/sir': dict(sim='compartment'), # The original timed is the compartmental one
     'flepimop/vaccine_scenarios': dict(code='ss.parallel(runs(n_runs=2, verbose=0), parallel=False)'), # The original timed is 3 scenarios of 2 runs
-    'odin/stochastic_sir_arrays': dict(code='ss.parallel(sim.new(verbose=0), n_runs=100, parallel=False)'), # The original timed is 100 groups
 }
 
 

@@ -75,7 +75,12 @@ odin/stochastic_sir_arrays,rust,0.016763105057179928,0.01273284200578928,,True,
 odin/stochastic_sir_arrays,numba,0.3335403579985723,0.018677616026252508,0.01896928297355771,False,
 odin/stochastic_sir_arrays,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
 odin/stochastic_sir_arrays,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
-pandemic_simulator/sir_reactive,rust,0.049257803009822965,0.04576649202499539,,True,
+pandemic_simulator/ebola_legrand,rust,0.08740351698361337,0.056817168020643294,,False,
+pandemic_simulator/ebola_legrand,numba,0.15501395298633724,0.053210632991977036,,False,
+pandemic_simulator/ebola_legrand,jax,1.2052872619824484,0.0475926959188655,,True,
+pandemic_simulator/sir_reactive,rust,0.08135558397043496,0.06588578608352691,,True,
+pandemic_simulator/sir_reactive,numba,172.5033323590178,0.0783034369815141,,False,
+pandemic_simulator/sir_reactive,jax,,,,False,"measure has a step of its own (a modifier with where=, when=, or a function as its amount)"
 siminf/sir_herds,jax,,,,False,"kernels: JAX does not run solver=""gillespie"""
 siminf/sir_herds,jax-gpu,,,,False,"kernels: JAX does not run solver=""gillespie"""
 siminf/sir_herds,rust,0.2728086120914668,0.14272547303698957,,True,

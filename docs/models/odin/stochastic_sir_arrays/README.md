@@ -8,9 +8,9 @@ A closed, stochastic SIR epidemic in discrete time, with every variable an array
 
 | Measure | Original | Starsim | |
 |---|---|---|---|
-| Lines of model code | 27 | 8 | |
-| 100 runs | first 0.75 s, rerun 0.00096 s | first 0.017 s, rerun 0.013 s (Rust) | Each of the original's runs holds 100 replicates in its arrays. The Starsim times are for 100 replicates, as `ss.parallel(sim, n_runs=100)` in one process. The original's first run includes compiling C code |
-| Results | | | **Agree.** The mean of 20,000 runs is within 2.8 people of 1,001 at every time, against the original's 20,000 replicates; 45.3% of runs die out. `compare.py` allows 12 people, three standard errors of the difference |
+| Lines of model code | 27 | 10 | |
+| 100 runs | first 0.75 s, rerun 0.00096 s | first 0.018 s, rerun 0.0011 s (Rust) | Each of the original's runs holds 100 replicates in its arrays. The Starsim times are for one run of 100 replicates, held as places that nobody moves between, which is the form of the original. As 100 separate runs (`ss.parallel(sim, n_runs=100)` in one process), a rerun takes 0.013 s. The original's first run includes compiling C code |
+| Results | | | **Agree.** The mean of 20,000 replicates is within 6.1 people of 1,001 at every time, against the original's 20,000 replicates; 44.8% die out. `compare.py` allows 12 people, three standard errors of the difference |
 
 Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
 
@@ -23,7 +23,7 @@ Everything is declared. The original writes out the binomial draws and the updat
 - **Whole steps have to be asked for.** Starsim's chain binomial now chooses its own substeps, to reduce the error of taking a whole step, but the original's model is defined by its whole steps. Without `substeps=1`, people infected in a step can recover in the same step, and the mean `S` at the end is 22 people too high (5 standard errors), with 47.6% of runs dying out rather than 45.2%. That is a closer answer to the continuous-time model, but a different model from this one. A separate NumPy simulation of the original's equations, 2 million runs, gave the check.
 - **Many runs are fast in one process, and not with the default.** `ss.parallel(sim, n_runs=20_000, parallel=False)` is one call to the kernels and takes about 3 s. `sim.run(n_runs=20_000)` has no such option, and took about 300 s on 20 workers with a great deal of memory, since it starts a process for each worker. It would be better if a run the kernels take whole never started workers, or if `sim.run()` took `parallel=False`.
 - **The original's compiled model is faster.** The original compiles code for this model; Starsim's kernels are general, working through arrays that describe the model. See the table above for how much.
-- **The arrays are not groups.** This example was chosen as a step up from odin's deterministic SIR, but its arrays hold replicates, not coupled groups, so it exercises nothing about stratification. The [age-structured SEIR](../seir_array) has coupled groups.
+- **The arrays are not coupled groups.** This example was chosen as a step up from odin's deterministic SIR, but its arrays hold replicates. They are written as places since that is 12× faster to rerun than separate runs, and `kind='space'` is what keeps them independent: as plain groups they mix, and the mean final `S` is 220, with no warning. The [age-structured SEIR](../seir_array) has coupled groups.
 
 ## What it exercises
 

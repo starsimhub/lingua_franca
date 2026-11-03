@@ -9,7 +9,7 @@ The framework's declarative teaching example, `example_parameter_uncertainty_dec
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 99 | 8 | Most of the original's lines are the declaration that also serves the web form and model card, which the Starsim version doesn't have |
-| One run | first 1.2 s, rerun 1.2 s | first 0.049 s, rerun 0.046 s (Rust) | Not a like-for-like time: each of the original's runs is a fresh process that imports JAX and starts two workers, and it has no way to run again in the same process. Starsim's excludes importing it, and its kernel sets have not yet been compared |
+| One run | first 0.36 s, rerun 0.0069 s | first 0.081 s, rerun 0.066 s (Rust) | Each is one run with the measure, and includes results. A first run excludes imports; the original's includes compiling with JAX, and Starsim's uses kernels already compiled. A rerun is 10 times faster in the original, whose whole loop is compiled, while Starsim steps this model in Python to check the measure's condition, which also rules out JAX |
 | Results, without the measure | | | **Agree** to 1.2e-5 of the population on every day (6 people in `I`), with a daily RK4 step against an adaptive solver |
 | Results, with the measure | Peak 198,528 on day 59; 860,705 infections | Peak 198,673 on day 58; 860,467 infections | **Agree** to 4.2e-3 of the population, or 1.2e-3 with `dt=ss.days(0.1)` and 860,695 infections. The difference is when the threshold is noticed: Starsim checks it once a step |
 | Results, 20 draws (median at each time) | 23.9% to 16.5% at the peak, 7 days later, and about 938,000 to 844,000 infections, in one run; the guide on interventions gives 25% to 19%, and 939,000 to 865,000 | About 25% to 18%, 8 days later, and 940,000 to 857,000 infections, with 200 draws | **Consistent**: inside the original's 95% band on every day. The original's draws have no seed, so two of its runs differ by this much |
@@ -39,7 +39,7 @@ Everything is declared. The measure is `ss.modify()` with a condition on a count
 - `compare.py`: checks it against `reference/`
 - `original/model.py` and `original/example-config.json`: the example, unchanged, at commit `5ec712b` of the source repository
 - `original/central-config.json`: the same config with no uncertain inputs
-- `run.py`: runs it and writes `reference/`
+- `run.py`: runs it and writes `reference/`, with `export.py` in the framework's environment
 - `reference/results.csv`: `S`, `I`, and `R` on each day, with the measure and without
 - `meta.yaml`: where it came from
 - `LICENSE`: the upstream license (Apache 2.0)
