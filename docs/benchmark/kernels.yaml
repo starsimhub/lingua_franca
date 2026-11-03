@@ -19,8 +19,8 @@ memilio/secir: [rust, jax] # Rust 1.2 ms, JAX 1.2 ms, Numba 1.6 ms, JAX on a GPU
 memilio/secir_ageres: [rust] # Rust 1.3 ms, Numba 1.5 ms, JAX 2.1 ms, JAX on a GPU 11 ms
 odin/seir_array: [rust] # Rust 4.1 ms, Numba 5.6 ms, JAX 23 ms, JAX on a GPU 97 ms
 odin/stochastic_sir_arrays: [rust] # Rust 14 ms, Numba 19 ms
-pandemic_simulator/ebola_legrand: [jax] # JAX 48 ms, Numba 53 ms, Rust 57 ms
-pandemic_simulator/sir_reactive: [rust] # Rust 66 ms, Numba 78 ms
+pandemic_simulator/ebola_legrand: [rust] # Rust 1.5 ms, JAX 1.7 ms, Numba 2.3 ms
+pandemic_simulator/sir_reactive: [rust] # Rust 0.39 ms, JAX 0.53 ms, Numba 0.86 ms
 siminf/sir_herds: [rust] # Rust 130 ms, Numba 310 ms
 siminf/sise3: [rust] # Rust 740 ms, Numba 1.2 s
 summer2/seir-age-clinical: [rust] # Rust 1.1 ms, Numba 1.3 ms, JAX 2.3 ms, JAX on a GPU 22 ms

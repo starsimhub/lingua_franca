@@ -93,7 +93,7 @@ def test_flepimop_hub(tmp_path):
     sc.heading('flepiMoP: runs with Ro drawn from its prior, written as a hub submission')
     sim = load_config(tmp_path)
     msim = ss.parallel(sim, n_runs=10, priors=True) # Each run draws Ro from the config's truncated normal
-    peaks = list(msim.results.values())[0].incidHosp.values.max(axis=1) # Each run's peak
+    peaks = next(res for res in msim.results.values() if isinstance(res, ss.Results)).incidHosp.values.max(axis=1) # Each run's peak
     assert len(set(np.round(peaks, 6))) > 1, 'Expected runs with different draws of Ro to differ'
     hub = ss.converters.to_hub(msim, targets=dict(incidHosp='inc hosp'), by='subpop', every='week')
     assert {'origin_date', 'scenario_id', 'location', 'target', 'horizon', 'output_type', 'output_type_id', 'value'} == set(hub.columns)

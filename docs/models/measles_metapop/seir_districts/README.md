@@ -9,10 +9,10 @@ A stochastic metapopulation SEIR model of measles in 260 made-up districts, run 
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 89 | 22 | Long lines count twice; two lines read the data |
-| One run | first 0.87 s, rerun 0.86 s | first 0.54 s, rerun 0.5 s (Rust) | Both with the data already loaded. The original has no separate rerun, so its first run and rerun both build and run the sim |
+| One run | first 0.82 s, rerun 0.82 s | first 0.44 s, rerun 0.41 s (Rust) | Both with the data already loaded. The original has no separate rerun, so its first run and rerun both build and run the sim |
 | Results | | | **Agree.** Over 2010 to 2025, 1,734,028 infections against 1,740,643 and 17,325 reported cases against 17,396 (means of 50 runs each); monthly means correlate at 0.999 and 0.998; infections from 2020 in each of the 16 regions within 6% (`compare.py` asks for totals within 2%, each year within 20%, a correlation over 0.98, regions within 20%, and `S` and `R` at the end within 3%) |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

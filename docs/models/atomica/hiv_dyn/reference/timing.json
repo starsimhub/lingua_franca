@@ -1,7 +1,7 @@
 {
-  "first": 0.14489,
-  "rerun": 0.00405,
-  "what": "Atomica 1.32.4, one run of 20 yearly steps without programs. First: reading the spreadsheets (about 0.1 s) and Project.run_sim(). Rerun: Project.run_sim() again on the loaded project. The three budget scenarios (Project.run_scenarios()) take 0.0208 s together",
+  "first": 0.14025,
+  "rerun": 0.0041,
+  "what": "Atomica 1.32.4, one run of 20 yearly steps without programs. First: reading the spreadsheets (about 0.1 s) and Project.run_sim(). Rerun: Project.run_sim() again on the loaded project. The three budget scenarios (Project.run_scenarios()) take 0.0198 s together",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

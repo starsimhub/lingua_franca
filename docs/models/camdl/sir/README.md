@@ -9,11 +9,11 @@ A closed SIR epidemic in 10,000 people over 12 weeks, observed through weekly re
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 30 | 13 | Long lines count twice |
-| One ODE run | first 0.013 s, rerun 0.0056 s | first 0.0094 s, rerun 0.00029 s (Rust) | The original is timed as a whole command, since camdl has no rerun within a process: its first run compiles the model, and its rerun is the same command with the model cached. Starsim's times exclude the import |
+| One ODE run | first 0.022 s, rerun 0.0056 s | first 0.0095 s, rerun 0.00022 s (Rust) | The original is timed as a whole command, since camdl has no rerun within a process: its first run compiles the model, and its rerun is the same command with the model cached. Starsim's times exclude the import |
 | Results, ODE | | | **Agree.** Compartments and weekly cases within 0.02% (`compare.py` asks for 0.1%) |
 | Results, stochastic | | | **Agree.** Mean of 200 runs within 0.6% for `I` and 0.9% for weekly cases, chain-binomial in both, with whole-day steps (`compare.py` asks for 3% and 4%) |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

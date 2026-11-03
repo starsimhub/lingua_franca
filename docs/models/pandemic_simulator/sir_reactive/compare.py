@@ -13,7 +13,7 @@ import tools
 from model import sim, control
 
 ref = {k:np.array(v[1]) for k,v in tools.read_results(here).items()}
-tolerances = dict(control=2e-5, measure=5e-3) # As shares of the population; see the README for why the second is wider
+tolerances = dict(control=2e-5, measure=2e-3) # As shares of the population; see the README for why the second is wider
 
 
 def check(name, which, run, tol):

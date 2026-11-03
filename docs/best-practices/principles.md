@@ -136,7 +136,7 @@ The [approaches README](../approaches/README.md) frames this project as AI-nativ
 3. **The model is data, so the model can be checked.** Everything in [model-structure.md](model-structure.md) follows from this.
 4. **A standard printed form.** If two agents are given the same description, it should be easy to see whether they wrote the same model.
 
-Where Starsim stands on each: (1) the docs are built with each version, with a generated API index for agents (`llms.txt`), and the skills in `starsim_ai` (`import-model`, `validate-import`, `migrate-starsim3`) are shipped with the code; (2) the Python API is the contract, along with a small `starsim` command line (`init`, `compile`); (3) is the declared model; (4) is `describe()`, which prints a model in one form. An earlier normalized model spec (`sim.to_spec()`, `sim.hash()`, `ss.diff()`, `sim.to_code()`) was removed on 2026-10-27: a model is its code ([14-model-spec.md](../design/14-model-spec.md)).
+Where Starsim stands on each: (1) the docs are built with each version, with a generated API index for agents (`llms.txt`), and the skills in `starsim/.agents/skills/` (`starsim`, `convert-model`, `validate-conversion`, `migrate-starsim3`) are shipped with the code; (2) the Python API is the contract, along with a small `starsim` command line (`init`, `compile`); (3) is the declared model; (4) is `describe()`, which prints a model in one form. An earlier normalized model spec (`sim.to_spec()`, `sim.hash()`, `ss.diff()`, `sim.to_code()`) was removed on 2026-10-27: a model is its code ([14-model-spec.md](../design/14-model-spec.md)).
 
 ## What we are deliberately not building
 

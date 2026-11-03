@@ -9,10 +9,10 @@ A deterministic COVID-19-type epidemic in one region and one age group of 83,000
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 44 | 14 | |
-| One run | first 0.00045 s, rerun 0.00002 s | first 0.014 s, rerun 0.00043 s (Rust) | Neither counts starting Python or importing. MEmilio's solver is C++ code built in advance, so its first run has little to do |
+| One run | first 0.00046 s, rerun 0.00002 s | first 0.014 s, rerun 0.00037 s (Rust) | Neither counts starting Python or importing. MEmilio's solver is C++ code built in advance, so its first run has little to do |
 | Results | | | **Agree.** Within 67 people of 83,000 at every time, which is the error of the reference itself (it is interpolated between steps of about two days); deaths within 0.5, of which 0.4 is the reference's error (it remains with a step of 0.01 days) and 0.12 is Starsim's daily step. `compare.py` allows 73 people and 0.6 deaths |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

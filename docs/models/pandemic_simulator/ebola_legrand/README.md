@@ -9,11 +9,11 @@ The framework's `ebola_seihfr_burial_legrand_model`, its port of Legrand et al. 
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 306 | 30 | Most of the original's lines are the declaration that also serves the web form and model card |
-| One run | first 0.39 s, rerun 0.0074 s | first 1.2 s, rerun 0.048 s (JAX) | Each is one run with the measures, and includes results. A first run excludes imports; Starsim's with Rust takes 0.087 s, against JAX's 1.2 s with compiling. A rerun is 6 times faster in the original, whose whole loop is compiled, while Starsim makes a Python call for each step, with any kernels, to bring its measures up to date |
+| One run | first 0.31 s, rerun 0.0059 s | first 0.021 s, rerun 0.0014 s (Rust) | Each is one run with the measures, and includes results. A first run excludes imports; the original's includes compiling with JAX, and Starsim's uses kernels already compiled. A rerun solves in about the same time on each side (the original's solve alone is 0.98 ms); most of the original's rerun is building its results |
 | Results, without the measures | 17,044 left in `S` | 17,044 left in `S` | **Agree** to 2.9e-6 of the population on every day, with a daily RK4 step against an adaptive solver |
 | Results, with the measures | 179,445 left in `S` | 179,407 left in `S` | **Agree** to 1.9e-4 of the population, or 3.1e-7 with the original in float64 (`JAX_ENABLE_X64=1`), where it leaves 179,407. See the findings for the difference |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `3e5318d8`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

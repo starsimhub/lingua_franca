@@ -9,11 +9,11 @@ A closed, stochastic, discrete-time SIR epidemic in 100 individuals over 100 day
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 81 (compartments), 86 (individuals) | 10 | The original is one YAML file per paradigm; here one model is run two ways |
-| One compartmental run | first 0.8 s, rerun 0.77 s | first 0.0077 s, rerun 0.00026 s (Rust) | The original runs as a whole command, so its first run and rerun are the same command, and both include starting Python and reading the model (about 0.7 s; it reports 0.06 s for the run itself). Starsim's exclude the import |
+| One compartmental run | first 0.73 s, rerun 0.73 s | first 0.0078 s, rerun 0.00018 s (Rust) | The original runs as a whole command, so its first run and rerun are the same command, and both include starting Python and reading the model (about 0.7 s; it reports 0.06 s for the run itself). Starsim's exclude the import |
 | Results, compartments | | | **Agree.** Mean of 200 runs: a peak of 38 infectious on day 18, against 37 on day 18; 86 recovered at the end, against 85 (`compare.py` asks for 1.5 and 2 animals). This needs whole-day steps, `substeps=1` |
 | Results, individuals | | | **Agree, within chance.** Mean of 200 runs: a peak of 35 on day 18, against 37 on day 19; 79 recovered at the end, against 81, with 21% of runs dying out early, against about 19% (`compare.py` asks for 3 and 6 animals) |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

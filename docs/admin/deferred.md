@@ -281,7 +281,7 @@ Looked at whether v4 should support modeling paradigms beyond the ODE, chain-bin
 
 The reasons are in [the review](../approaches/pandemic_simulator.md).
 
-- **Starsim's cost per step with a measure.** The Ebola model reruns in about 50 ms against the original's 7 ms, and `sir_reactive` in 66 ms against 7 ms: a measure brings the kernel's program up to date in Python on every step (`refresh_program()`, about 130 µs), even one with only a start date, so a compiled kernel gains little. A dated measure could change the program only on its dates, and JAX is ruled out for `where=`.
+- **`ss.modify(until=)` in the kernels.** A condition on a count now stays in the kernels as part of the rate, and dated measures are tabulated where they change (2 November), which took reruns from about 50 ms to 1.5 ms (Ebola) and 0.4 ms (`sir_reactive`), against the originals' 6 and 4.5 ms. `until=` and `hold=` still run a step at a time, at about 50 ms a year, since they need a memory of whether the measure is on; the kernels would need a status for each.
 - **An exporter to the Pandemic Simulator's model directories.** Worth having only if its reviewers want generated models, so ask them first.
 - **An importer for the Pandemic Simulator**, in three tiers, about 300 to 400 lines. Set aside for now: 21 of the 22 models run, but a traced `equation()` gives a flow's dependencies and not its formula, so most would come out incomplete. `references/pandemic_simulator.md` in the `convert-model` skill covers them by hand.
 - **Inputs as JSON Schema** for forms, MCP tools, and validated configs: one function over `ss.par`. Waits for something that needs it.

@@ -1,6 +1,6 @@
 {
-  "first": 0.83977,
-  "rerun": 0.00148,
+  "first": 0.83108,
+  "rerun": 0.00141,
   "what": "first is generating and compiling the C code with odin::odin, $new(), and one run of 365 days with deSolve::dede, not counting starting R or loading odin; rerun is the best of 5 more calls of `mod$run(0:365)` on the same model",
   "machine": "x86_64",
   "cpus": 20,

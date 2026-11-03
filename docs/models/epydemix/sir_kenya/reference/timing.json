@@ -1,7 +1,7 @@
 {
-  "first": 0.00717,
-  "rerun": 0.00656,
-  "what": "model.run_simulations(Nsim=1): one stochastic run of 123 daily steps, in process, with the model already defined, and without the import or the data download. The first run is the first call in the process, and the rerun the best of 5 calls after it (the 100 runs of the original take 0.63 s)",
+  "first": 0.00711,
+  "rerun": 0.00661,
+  "what": "model.run_simulations(Nsim=1): one stochastic run of 123 daily steps, in process, with the model already defined, and without the import or the data download. The first run is the first call in the process, and the rerun the best of 5 calls after it (the 100 runs of the original take 0.59 s)",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

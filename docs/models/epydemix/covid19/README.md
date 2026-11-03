@@ -9,11 +9,11 @@ This is epydemix's wave 3 example. `model.py` is the Starsim version, and `compa
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 161 | 39 | Both count the loading of the data, the calibration, and the scenarios; lines over 100 characters count twice. The original is formatted one item per line |
-| One run of the calibration period | first 0.037 s, rerun 0.036 s | first 0.025 s, rerun 0.0013 s (Rust) | In process, without the import or the data download. The original's times are with its model already defined; Starsim's first run includes building the sim |
+| One run of the calibration period | first 0.037 s, rerun 0.032 s | first 0.024 s, rerun 0.0012 s (Rust) | In process, without the import or the data download. The original's times are with its model already defined; Starsim's first run includes building the sim |
 | Results at fixed values | | | **Agree** (tolerance 3% of the peak). The mean of 200 runs: weekly deaths within 0.7% of the peak (833 against 837, in the same week), and 0.5% and 0.4% in the two reopening scenarios; deaths by age within 3% of the peak in every group from age 40; `E`, `I`, `R`, and `D` within 0.5%; 10,507 deaths by 2 August against 10,525 |
 | Results of the calibration | | | **Agree** (tolerance: each posterior mean inside the original's 5% to 95% range, and projected peaks within 10%). Posterior means: `R0` 2.28 (original 2.25), `Delta` 18.8 days (19.0), `I0` 4,777 (4,770), and `seasonality_min` 0.79 (0.80), with similar ranges. Peak weekly deaths projected from the posterior are 891 (897), 1,366 (1,363), and 2,231 (2,217) in the three scenarios. This is a change from before: a point estimate gave much smaller second waves |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `e26de815+`), on a 20-core Linux machine.
+Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
 
 The calibration is the same method in both: ABC-SMC with 200 particles for 5 generations (the tutorial's 1,000 for 10 take over an hour). It took 25 s in Starsim and 87 s in the original on a quiet machine (222 s when the machine was busy, so these are a rough guide).
 
