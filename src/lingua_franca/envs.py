@@ -167,6 +167,8 @@ def install(name):
         wrapper = folder / 'bin' / 'Rscript'
         wrapper.write_text(r_wrapper.format(rscript=rscript))
         wrapper.chmod(0o755)
+        if 'local' in spec: # With the wrapper, so the packages just installed in lib/ are found as its dependencies
+            run(folder, str(wrapper), '-e', f'install.packages("{spec["local"]}", lib="lib", repos=NULL, type="source")')
 
     elif kind == 'camdl':
         camdl = folder / 'src/rust/target/release/camdl'

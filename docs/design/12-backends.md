@@ -97,6 +97,7 @@ ss.Sim(sir, solver='binomial')    # chain-binomial, discrete time
 ss.Sim(sir, solver='gillespie')   # exact stochastic, continuous time
 ss.Sim(sir, solver='tau')         # tau-leaping: stochastic, close to exact, for a run of many events
 ss.Sim(sir, solver='abm')         # agent-based
+ss.Sim(sir, solver='abm-events')  # agent-based, event by event in continuous time (prototype; below)
 ```
 
 The diffusion approximation of earlier drafts (`'sde'`) is gone: it resolved competing exits in declaration order at coarse steps, agreed worst with the ODE, and had no user. An unknown solver raises an error that lists the solvers.
@@ -111,6 +112,7 @@ The model object is the same in every case, and whatever the solver, a sim is on
 | `tau` | continuous | integer | large stochastic runs, close to exact | rates change quickly within a leap |
 | `binomial` | discrete | integer | simple stochastic models on a fixed step | `rate * dt` is large |
 | `abm` | discrete | individuals | networks, heterogeneity, histories | `rate * dt` is large; cost grows with `n_agents` |
+| `abm-events` | continuous | individuals | networks where the events are fast against a step, or few against the agents | what is stepped changes quickly within a step; cost grows with the number of events |
 
 Some of these conditions are checked and reported as one-line notes, each naming the quantity involved and what would not have the problem: after an ODE run, that it starts with only a few infected, or that the number infected falls below one and rises again; at `init()`, for a solver that takes whole steps (`abm`, and `binomial` with `substeps=` given), that a transition's `rate * dt` is large, which also says how far whole steps can be from the ODE and to run `sim.check_dt()`. They are notes, not errors: the run goes ahead and the user is told.
 
@@ -122,6 +124,44 @@ solver: gillespie (requested)
 ```
 
 Small counts, where extinction questions arise, are runs of few events, for which the exact solver is fast. The tau leaps choose their own size from the rates, so a step that is large for them needs no note of its own.
+
+### Agents in continuous time: `'abm-events'`
+
+`solver='abm-events'` runs the declared modules as agents taken event by event, in continuous time, as epipack and EoN run a network (prototype, 2026-11-04). The people are agents as under `'abm'` (`sim.solver` is `'abm'`, and the reason printed says events), and everything that reads agents reads them as it does there; only how a declared module moves its agents within a step changes. `'auto'` never chooses it.
+
+```python
+ss.Sim(siarx, networks=ssl.StaticNet(n_contacts=50), solver='abm-events', unit='day', stop=40)    # every declared module by events
+ss.Sim(ss.Disease(..., solver='abm-events'), other, solver='abm', ...)                              # one module by events, the rest by steps
+```
+
+**Within a step.** Each module's engine is called once a step, as any module is, and advances its agents through the step event by event. Each agent's exit from its state is at its exact time: the earliest of a dwell time drawn on entry (`dur=`, kept across steps) and of the competing rates out of the state (an exponential of their sum, the exit chosen in proportion). Infection is a clock for each infectious agent: on a network, contacts at the rate of its edges' hazards, each to a neighbor drawn at random; in a mixing pool, to a member of the pool drawn at random; each contact infects with the share its real hazard is of the bound the clock ran at (thinning), so a contact whose state changed during the step (recovered, or susceptible again) is taken exactly. Someone infected starts infecting at once, not at the next step, and someone recovered stops at once. Everything else is held as it was at the step's start: the networks, modifiers and products, the rates (a rate that is a function of the sim, or that reads counts, at its value then), the other modules' states, and the members of each pool. What the events change is read by the stepped modules at the next step, and what the stepped modules change (an intervention, a new set of contacts, births and deaths) is read by the events at the next step. Since the clocks of contacts and of competing rates are exponential, the ones pending at the end of a step are drawn again at the next, from the values then, so the run is exact for values constant within each step, as `'gillespie'` is within each quarter of a step.
+
+**The step.** With nothing stepped that matters, `dt` is only how often results are recorded, and a coarse step loses nothing: the SIRS of epipack's README on its network needs 1,600 steps as `'abm'` to agree with epipack, and 40 by events. With something stepped (a delivery, a network that changes, a modifier that changes), `dt` is how late the events see it: contact tracing (`trace=`) is a delivery, so the people traced are moved at the end of the step in which the person they were traced from was quarantined, up to one step late (as under `'abm'`). [PROPOSAL: for a delivery triggered by an event of the same module, with no capacity, queue or product (siarx_tracing's), the events could take its moves at the event's own time; deferred until something needs it, since it needs the delivery's machinery inside the events.]
+
+**Mixing the two.** Because each engine is called once a step, a module by events and another by steps run on the same agents: a module's `solver=` (`'abm'` or `'abm-events'`) overrides the sim's, and under a compartmental solver a module's `solver=` is a `CapabilityError`. Each sees the other's states as they were at the step's start, so a coupling between them (`ss.modify` between diseases, a connector) acts with a lag of up to a step, as it does between stepped modules.
+
+**Results and dates.** Results are on the sim's time points; the flows of a step count every event in it, and someone who goes through two transitions in a step (infected and quarantined) is counted in both. A move is dated (`ti_X`) at the step it happened in. Events of a step (`on=`, a delivery's `who=`) are news to the other modules at the next step's start.
+
+**Random numbers.** Each module draws its events from a stream of its own, seeded by the sim's seed, the module, and the step, so a run is reproducible, but there are no common random numbers between agents: once two scenarios differ in one event, the draws after it differ. The pass is in Numba only for now (no Rust copy yet), so a first run compiles it (about 10 s, once per install).
+
+**Name.** `'abm-events'`: the agents of `'abm'`, taken event by event. Not `'gillespie'`, which is the exact compartmental solver and which on a network means its standard approximation (homogeneous mixing); not `'events'` alone, since events are already the transitions that happen (`on=`, `who=`), and the name should say the people are agents. [PROPOSAL]
+
+**What the first version takes** (as `branching=True` did, the rest is a `CapabilityError` that says what and why): declared states of people, with transitions by a rate, by a dwell time (`dur=`: an exponential or Erlang with a fixed mean is drawn in the pass, and any other, with parameters by person or modifiers included, is drawn for each agent at the step's start, for an entry within it), splits on entry and of a destination (`[I, A]` with `p=`) whose shares are the same for everyone (numbers, or expressions of parameters such as `1 - p_death`), and deaths (`ss.null`, as `ss.SIR`'s); one transmission per module, over any number of networks without acts (`edges.beta` a weight on each edge) and of `ss.MixingPool`s; rates and susceptibility that differ between agents (held for the step); and the rest of the sim stepped beside it: interventions and deliveries (contact tracing included), analyzers, networks, demographics. Refused for now: strains, stratifications (more than one group), attributes and clocks, triggers (`ss.on`), minimum stays (`after=`), `ss.stay`, migration, births by a transition, life tables, states that are not people, transmission with no route (homogeneous mixing, whose rate reads counts that change within the step: a `ss.MixingPool` of everyone is the same model), networks with acts and other routes with their own transmission (`net_beta()`, contact matrices within places, `ss.MixingPools`), a coefficient of transmission that differs between agents, shares that differ between agents, modifiers on a route or on a dwell time (which agents rescale when they change), branching processes, and the infection log. Each is work on the pass rather than a new idea (the pass records who infected whom already), and what to take next should follow a model that needs it. An edge's `beta` raised in place (`net.edges.beta[i] = ...`) above the largest it had is caught and is an error, since the contacts are drawn at a bound from it.
+
+**Measured** (2026-11-04, same 20-core machine, one thread; best of 7 runs of a sim already made, and in brackets with making it, which includes its network of 250,000 edges; epipack's on a network already made):
+
+| Model | Solver | Step (days) | One run | Largest difference from epipack's mean, of the population |
+|---|---|---|---|---|
+| siarx_tracing (40 days) | epipack | continuous | 0.52 s | |
+| | `abm` | 0.1 | 0.77 s (1.09) | 1.2e-2 (100 runs) |
+| | `abm-events` | 0.1 | 0.48 s (0.81) | 5.0e-3 (40 runs) |
+| | `abm-events` | 0.25 | 0.21 s (0.52) | 9.5e-3 (40 runs) |
+| | `abm-events` | 1 | 0.07 s (0.39) | 3.8e-2 (tracing a day late) |
+| SIRS on a network (40 days) | epipack | continuous | 3.6 s | |
+| | `abm` | 0.025 | 1.9 s (2.3) | 2.1e-2 (100 runs) |
+| | `abm-events` | 1 | 0.11 s (0.47) | 1.2e-2 (40 runs; 5e-3 in `I`), within the error of the means |
+
+The run by events at a step of 0.1 days spends about half its time in the delivery that traces contacts and in the network's step, which are stepped and cost the same under `'abm'`; the pass itself takes about 0.4 ms a step. Against agents by steps at a step of 0.05 days (an SEIR with a lognormal latent period on a static network, 2,000 agents, 100 runs), the peak (within 0.6%) and final size by events at a step of a day agree within their standard errors; against `'gillespie'` in a mixing pool of everyone (an SIR of 2,000, 300 runs), the peak within 0.3% and the final size within 0.1% (`tests/devtests/test_events.py`). For an epidemic on a network the events are faster than epipack's; with contact tracing, they are as fast as epipack's at a step of a quarter day, with a smaller difference from it than `'abm'` has at a tenth.
 
 ## Approximations
 
@@ -383,7 +423,7 @@ For complex models, exact equivalence between solvers is neither provable nor th
 
 ## Deferred: mixing solvers within one model
 
-Some questions need most of a model to run as smooth flows while a few rare transitions happen as whole, random events: for example, importation of a single case into a population where the ODE says the epidemic is over. This would be spelled as a `solver=` keyword on the transition (`ss.transmission('S -> I', beta=1e-6, solver='gillespie')`), defaulting to following the run. It is not in v1. Until then, such questions use a stochastic solver for the whole model.
+Some questions need most of a model to run as smooth flows while a few rare transitions happen as whole, random events: for example, importation of a single case into a population where the ODE says the epidemic is over. This would be spelled as a `solver=` keyword on the transition (`ss.transmission('S -> I', beta=1e-6, solver='gillespie')`), defaulting to following the run. It is not in v1. Until then, such questions use a stochastic solver for the whole model. Mixing agents by steps and agents by events, module by module, is in (`solver=` on a module: [Agents in continuous time](#agents-in-continuous-time-abm-events)), since each engine is called once a step either way.
 
 ## Rejected
 

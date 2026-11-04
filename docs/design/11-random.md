@@ -26,7 +26,7 @@ The name MUST come from the declaration's path in the model (its module and attr
 
 With common random numbers (CRN), the same agent making the same decision gets the same random number in the baseline and in the intervention scenario. Most of the Monte Carlo noise then cancels in the difference, so small intervention effects can be seen with far fewer runs. CRN is on by default, as in Starsim.
 
-A per-agent draw is made from the agent's slot and the distribution's stream, so agent 7's uniform for a given decision does not depend on how many other agents drew from that distribution.
+A per-agent draw is made from the agent's slot and the distribution's stream, so agent 7's uniform for a given decision does not depend on how many other agents drew from that distribution. Each call moves the stream on, so draws are independent between agents, steps, and calls; but an agent who appears twice in the UIDs of one call (two events for one person in a batch) gets the same uniform both times. `rvs(uids, repeats=True)` gives each repeat a uniform of its own (from its own stream, so still common random numbers). It is not checked by default: UIDs from Starsim never repeat, and checking every call would slow draws by 20 to 40%.
 
 - **The slot is the only key.** It is the persistent per-agent index that Starsim already maintains for this purpose: one integer to hash, and it identifies the same agent across scenarios that start from the same population. A newborn's slot is drawn from its parent's stream, so the same birth gets the same slot in both scenarios.
 - **`ss.options.crn = False`** turns CRN off, as in Starsim today, for analyses that want independent runs or that compare structurally different models across which agent identity means nothing.

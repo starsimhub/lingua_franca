@@ -281,7 +281,7 @@ There is no replicate count on `ss.Sim`: `sim.run(n_runs=100)` is a shortcut for
 | `sim.plot()`, `sim.summarize()`, `sim.to_df()` | results, as in Starsim ([09-results.md](09-results.md)) |
 | `sim.fit()` | fits parameters that have bounds to results that have data ([13-inference.md](13-inference.md)) |
 
-Age, sex, and place are properties of people, and every module in a sim has to agree on them, so they are stratified once, on the sim. A dimension that belongs to one disease (strain, drug resistance) is stratified on that disease with `sir.stratify(...)`. The sim works on its own copies of the modules it is given, as in Starsim, so one `sir` can be passed to several sims.
+Age, sex, and place are properties of people, and every module in a sim has to agree on them, so they are stratified once, on the sim. A dimension that belongs to one disease (strain, drug resistance) is stratified on that disease with `sir.stratify(...)`. The sim works on its own copies of the modules it is given, as in Starsim, so one `sir` can be passed to several sims, and the one that ran is read from the sim (`sim.sir`); a condition on a module given (`(sir.I == 1).uids` after the run) says so. `ss.Sim(copy_modules=False)` runs the modules given themselves instead, for code that keeps them (as a port of another framework's model does); such a sim can't be run again or copied with `sim.new()`, and its modules can't be given to another sim.
 
 ## Lifecycle
 
@@ -293,12 +293,15 @@ Every module has the same lifecycle, and it is Starsim's:
 | Each step | `start_step()` | start the step (e.g. move the random number streams on) |
 | Each step, diseases written as code | `step_state()` | progress people between states, before networks and interventions |
 | Each step | `step()` | read the current state and change it; a declared disease takes all of its transitions here |
-| Each step, diseases | `step_die(uids)` | take out the people who died this step |
+| Each step, at a birth | `on_birth(parents, children)` | set up the newborns (e.g. traits from their parents), wherever they are born (`ss.Births`, `ss.Pregnancy`, a declared birth); a module that needs nothing doesn't define it |
+| Each step | `on_death(uids)` | react to the people who died or left this step, once each has one cause (`people.cause_of_death`); a disease takes them out of its states. Not called in a step with no deaths |
 | Each step | `update_results()` | record results, at the end of the step |
 | Each step | `finish_step()` | tidy up |
 | End | `finalize()` | finalize results |
 
 A module that only has states, transitions, parameters, and results does not define any of these.
+
+A module written as code keeps its per-agent values in arrays (`define_states()`): `ss.FloatArr`, `ss.IntArr`, `ss.BoolArr`, `ss.BoolState` (a boolean whose count is a result, counted with the others in one pass over the agents), and `ss.CatArr`, a categorical state (a district, a wealth quintile), stored as integer codes and read, compared and set by category (`arr == 'urban'`, `arr[uids] = 'urban'`, `arr.labels()`). An integer given to it is a code, since that is what `arr[uids]` returns (so `arr[children] = arr[mothers]` works); integer categories (wealth quintiles 1 to 5) need no codes, so they are stored as they are (`arr == 3` is category 3), and only a mix of integer and other categories is refused. A module that does something on a calendar, rather than every step, gives itself an `ss.schedule` (`ss.schedule(ss.months(3), start=ss.months(3))`, a list of dates, or a function of the date) and asks it in `step()` (`if self.poll.due():`, the number of its times in the step); a module can have several, so they are not timesteps of their own ([10-execution.md](10-execution.md#per-module-timesteps)).
 
 `step()` reads and writes the sim's current state directly. Modules run in a defined order each step (Starsim's: start of step, custom modules, demographics, disease state updates, connectors, networks, interventions, diseases (transmission, and every transition of a declared disease), deaths, the move of time to the end of the step, results, analyzers, end of step), modules of one type run in the order given, and the order is a data object, `sim.loop`, that can be printed, plotted, and inserted into. Step `k` runs from time point `k-1` to `k`, and throughout it, in every module, `sim.ti` is `k`, where its results go (`self.results.x[self.ti]`), and `sim.now` is its start. There are no queued updates and no named phases: a module sees whatever the modules before it did this step, so infection, testing, and treatment can all happen within one step if ordered that way. [10-execution.md](10-execution.md) specifies the loop.
 
