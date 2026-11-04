@@ -8,7 +8,7 @@ Full reviews are listed in [README.md](README.md).
 
 ## Covasim / HPVsim / STIsim / FPsim
 
-**Python · agent-based · Starsim's predecessors and descendants · [covasim.org](https://covasim.org), [hpvsim.org](https://hpvsim.org), [stisim.org](https://stisim.org), [fpsim.org](https://fpsim.org)**
+**Python · agent-based · Starsim's predecessors and descendants · [covasim.org](https://covasim.org), [hpvsim.org](https://hpvsim.org), [stisim.org](https://stisim.org), [fpsim.org](https://fpsim.org) · code at [github.com/starsimhub](https://github.com/starsimhub)**
 
 Covered in [starsim.md](starsim.md), because the history matters: three disease-specific frameworks became one modular framework, and the cost of three near-identical codebases is what motivated `ss.Module`.
 
@@ -22,7 +22,7 @@ Worth noting individually:
 
 ## Kendrick
 
-**Pharo / Smalltalk · compartmental, with separation of concerns as the organizing principle · [doi.org/10.1016/j.procs.2015.05.126](https://doi.org/10.1016/j.procs.2015.05.126)**
+**Pharo / Smalltalk · compartmental, with separation of concerns as the organizing principle · [github.com/KendrickOrg/kendrick](https://github.com/KendrickOrg/kendrick) · Bui et al. (2015), IEEE RIVF, [10.1109/RIVF.2015.7049888](https://doi.org/10.1109/RIVF.2015.7049888)**
 
 A domain-specific modeling language built around the claim that an epidemiological model is a *composition of independent concerns* (the disease process, the demographic process, the spatial process, the intervention process) and that these should be written separately and combined mechanically rather than being interleaved in one system of equations.
 
@@ -36,7 +36,7 @@ It is important as an idea and little used: it is written in Pharo Smalltalk, ha
 
 ## NDlib
 
-**Python · diffusion processes on complex networks · [ndlib.readthedocs.io](https://ndlib.readthedocs.io)**
+**Python · diffusion processes on complex networks · [github.com/GiulioRossetti/ndlib](https://github.com/GiulioRossetti/ndlib) · [ndlib.readthedocs.io](https://ndlib.readthedocs.io)**
 
 *Excluded from the review by choice.* A library of epidemic and opinion-diffusion models on NetworkX graphs, where rules are built from parts (`NodeStochastic`, `NodeThreshold`, `EdgeStochastic`), with a web front end. It is strong on general processes and has less epidemiology; EoN covers network simulation more rigorously, with analytic approximations.
 
@@ -44,7 +44,7 @@ It is important as an idea and little used: it is written in Pharo Smalltalk, ha
 
 ## PyRoss
 
-**Python · age-structured stochastic compartmental, with inference and optimal control · [10.5281/zenodo.4290294](https://doi.org/10.5281/zenodo.4290294)**
+**Python · age-structured stochastic compartmental, with inference and optimal control · [github.com/SoftMatterGroupCambridge/pyross](https://github.com/SoftMatterGroupCambridge/pyross) · Li et al. (2021), *R Soc Open Sci* 8: 211065, [10.1098/rsos.211065](https://doi.org/10.1098/rsos.211065)**
 
 Age-structured compartmental models with several stochastic formulations (Gillespie, tau-leaping, Gaussian/van Kampen approximations), Bayesian inference over them, and (unusually) **optimal control**: computing the intervention trajectory that optimizes an objective subject to constraints.
 
@@ -75,7 +75,7 @@ A small library of compartmental models from Data For Science. A model is a set 
 
 ## Mesa
 
-**Python · general-purpose agent-based modeling · [github.com/projectmesa/mesa](https://github.com/projectmesa/mesa) · v4 in development**
+**Python · general-purpose agent-based modeling · [github.com/mesa/mesa](https://github.com/mesa/mesa) · v4 in development**
 
 The default general-purpose ABM framework in Python, alongside NetLogo, Repast, and MASON. It is not epidemiological, so it is not in the landscape database, but many one-off epidemic ABMs are built on it.
 
@@ -121,7 +121,7 @@ The high-performance member of the Repast family (Argonne National Laboratory): 
 
 ## ModelingToolkit.jl / Catalyst.jl
 
-**Julia · symbolic reaction networks with automatic multi-paradigm code generation · [docs.sciml.ai/Catalyst](https://docs.sciml.ai/Catalyst/stable/) · [10.1371/journal.pcbi.1011530](https://doi.org/10.1371/journal.pcbi.1011530)**
+**Julia · symbolic reaction networks with automatic multi-paradigm code generation · [github.com/SciML/Catalyst.jl](https://github.com/SciML/Catalyst.jl) · [docs.sciml.ai/Catalyst](https://docs.sciml.ai/Catalyst/stable/) · [10.1371/journal.pcbi.1011530](https://doi.org/10.1371/journal.pcbi.1011530)**
 
 **The strongest existing demonstration anywhere of "one specification, many paradigms", and it is not in epidemiology.**
 
@@ -152,7 +152,7 @@ and the *same* `ReactionSystem` then generates an ODE system, an SDE system, a j
 
 ## SBML (Systems Biology Markup Language)
 
-**XML standard · model interchange · [sbml.org](https://sbml.org) · [10.1093/bioinformatics/btg015](https://doi.org/10.1093/bioinformatics/btg015)**
+**XML standard · model interchange · [sbml.org](https://sbml.org) · [github.com/sbmlteam](https://github.com/sbmlteam) · [10.1093/bioinformatics/btg015](https://doi.org/10.1093/bioinformatics/btg015)**
 
 Twenty-five years of experience with a machine-readable model interchange format for reaction-network models, supported by hundreds of tools, with a curated model repository (BioModels) and a formal specification with versioned Levels.
 
@@ -199,13 +199,13 @@ Each references **Concepts**: a name, a display name, `identifiers` (a mapping o
 
 Recorded so the decisions are reviewable.
 
-- **FRED** (University of Pittsburgh): synthetic-population ABM with household/school/workplace networks. **Excluded on license**: distributed under a University of Pittsburgh EULA, not an open-source license, per the landscape database's license audit. (It would have been included if open source.)
+- **FRED** (University of Pittsburgh, [GitHub](https://github.com/PublicHealthDynamicsLab/FRED)): synthetic-population ABM with household/school/workplace networks. **Excluded on license**: distributed under a University of Pittsburgh EULA, not an open-source license, per the landscape database's license audit. (It would have been included if open source.)
 - **GLEAM / GLEAMviz**: the landmark global metapopulation model integrating worldwide census and air-travel data. Closed source; referenced from [epymorph.md](epymorph.md) as the reference point for the metapopulation paradigm rather than reviewed.
-- **MetaWards**: ward-level metapopulation for England and Wales. Effectively one application with settings; epymorph and flepiMoP are more useful here for how metapopulations are written.
-- **GEMS** (Julia): nationwide microsimulation over synthetic German populations. It would have been the only Julia agent-based entry, but how its models are written adds little to `individual` and Starsim, and Catalyst.jl is the more useful Julia entry for this project.
-- **Episimmer**: institutional-reopening simulator. Excluded on license (Commons Clause is not open source).
-- **UHOHCoronaPolicyLab** (TypeScript): continuous-space COVID-19 policy simulation, one of the comparison frameworks in the MEmilio paper (Bicker et al. 2026, Fig. 1a). Excluded on license: CC BY-NC-SA 4.0's non-commercial clause is not open source.
+- **MetaWards** ([GitHub](https://github.com/metawards/MetaWards)): ward-level metapopulation for England and Wales. Effectively one application with settings; epymorph and flepiMoP are more useful here for how metapopulations are written.
+- **GEMS** (Julia, [GitHub](https://github.com/IMMIDD/GEMS)): nationwide microsimulation over synthetic German populations. It would have been the only Julia agent-based entry, but how its models are written adds little to `individual` and Starsim, and Catalyst.jl is the more useful Julia entry for this project.
+- **Episimmer** ([GitHub](https://github.com/healthbadge/episimmer)): institutional-reopening simulator. Excluded on license (Commons Clause is not open source).
+- **UHOHCoronaPolicyLab** (TypeScript, [GitHub](https://github.com/BenVermeulen/UHOHCoronaPolicyLab)): continuous-space COVID-19 policy simulation, one of the comparison frameworks in the MEmilio paper (Bicker et al. 2026, Fig. 1a). Excluded on license: CC BY-NC-SA 4.0's non-commercial clause is not open source.
 - **PanVADERE** (Java): pandemic extension of the Vadere pedestrian-dynamics simulator, modeling transmission between individuals moving in continuous space; also in the MEmilio paper's comparison. A single-purpose application (indoor/crowd transmission) rather than a model-specification framework.
-- **statnet / ergm**: the network substrate under EpiModel; discussed inside [epimodel.md](epimodel.md).
+- **statnet / ergm** ([GitHub](https://github.com/statnet)): the network substrate under EpiModel; discussed inside [epimodel.md](epimodel.md).
 - **dust / monty**: the engine and inference layers under odin; discussed inside [odin.md](odin.md).
 - **Stan, PyMC, NumPyro**: inference substrates rather than model-structure languages. They belong to the calibration discussion in `best-practices`.

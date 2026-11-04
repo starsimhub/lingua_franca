@@ -7,7 +7,7 @@
 | **Specification style** | A model is a `LaserFrame` of agent properties plus a list of **components**, each with an init and a step function |
 | **Version reviewed** | `laser-core` 0.6.x |
 | **License** | MIT |
-| **Code** | <https://github.com/InstituteforDiseaseModeling/laser-core> |
+| **Code** | <https://github.com/laser-base/laser-core> |
 | **Docs** | <https://docs.idmod.org/projects/laser/en/latest/> |
 | **Paper** | — |
 | **Ecosystem** | `laser-core` plus disease packages: `laser-polio`, `laser-measles` |

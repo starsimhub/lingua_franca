@@ -79,14 +79,14 @@ The landscape database (as of 2026.08.25) lists 137 tools. Most are not in scope
 
 Other models considered and not included:
 
-- **FRED**: **excluded on license.** Distributed under a University of Pittsburgh EULA, not an open-source license, per the landscape database's license audit. (Included if open source; it is not.)
+- **FRED** ([GitHub](https://github.com/PublicHealthDynamicsLab/FRED)): **excluded on license.** Distributed under a University of Pittsburgh EULA, not an open-source license, per the landscape database's license audit. (Included if open source; it is not.)
 - **GLEAM / GLEAMviz**: closed source. A landmark metapopulation model, referenced from [epymorph.md](epymorph.md) as the paradigm's reference point rather than reviewed on its own.
-- **Episimmer**: excluded on license (Commons Clause is not open source).
-- **UHOHCoronaPolicyLab**: excluded on license (CC BY-NC-SA 4.0 is not open source).
+- **Episimmer** ([GitHub](https://github.com/healthbadge/episimmer)): excluded on license (Commons Clause is not open source).
+- **UHOHCoronaPolicyLab** ([GitHub](https://github.com/BenVermeulen/UHOHCoronaPolicyLab)): excluded on license (CC BY-NC-SA 4.0 is not open source).
 - **PanVADERE**: a single-purpose application (transmission among pedestrians in continuous space), not a model-specification framework. Reasons in [notes.md](notes.md#frameworks-considered-and-not-written-up).
-- **MetaWards**, **GEMS**, **Epi Info**: useful tools, but each is effectively one application with settings, and something already in the list serves this review better. Reasons in [notes.md](notes.md#frameworks-considered-and-not-written-up).
-- **NDlib**: a network diffusion library with a compartment-composition API; EoN covers the same ground more rigorously and ships the analytic approximations alongside.
-- **statnet / ergm**: the network substrate under EpiModel, discussed inside [epimodel.md](epimodel.md).
+- **[MetaWards](https://github.com/metawards/MetaWards)**, **[GEMS](https://github.com/IMMIDD/GEMS)**, **[Epi Info](https://github.com/Epi-Info/Epi-Info-Community-Edition)**: useful tools, but each is effectively one application with settings, and something already in the list serves this review better. Reasons in [notes.md](notes.md#frameworks-considered-and-not-written-up).
+- **NDlib** ([GitHub](https://github.com/GiulioRossetti/ndlib)): a network diffusion library with a compartment-composition API; EoN covers the same ground more rigorously and ships the analytic approximations alongside.
+- **statnet / ergm** ([GitHub](https://github.com/statnet)): the network substrate under EpiModel, discussed inside [epimodel.md](epimodel.md).
 - **dust / monty**: the engine and inference layers under odin; discussed inside [odin.md](odin.md).
 - **Stan, PyMC, NumPyro**: inference substrates rather than model-structure languages. They belong to the calibration discussion in `best-practices`, not here.
 
