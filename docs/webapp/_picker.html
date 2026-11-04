@@ -1,0 +1,17 @@
+<script>
+// Show one model at a time on the comparison page, chosen by the link clicked or the # in the address
+(function () {
+  const models = Array.from(document.querySelectorAll('.model'));
+  const links = Array.from(document.querySelectorAll('.model-picker a, .model-nav a'));
+
+  function show() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const chosen = models.find(model => model.id === id) || models[0];
+    models.forEach(model => { model.hidden = model !== chosen; });
+    links.forEach(link => link.classList.toggle('chosen', decodeURIComponent(link.hash) === '#' + chosen.id)); // Not the href attribute, which Quarto rewrites
+  }
+
+  window.addEventListener('hashchange', show);
+  show();
+})();
+</script>

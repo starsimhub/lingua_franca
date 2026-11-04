@@ -1,6 +1,8 @@
 # Custom
 transcripts/
 *.html
+# ...except the comparison page's script, which is source, not build output
+!docs/webapp/_picker.html
 *_html/
 
 # Byte-compiled / optimized / DLL files

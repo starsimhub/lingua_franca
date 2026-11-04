@@ -188,10 +188,19 @@ def load_models():
 
 
 def comparison():
-    """ The comparison page: a link to pick each model, then a section for each """
+    """ The comparison page: a link to pick each model, grouped by framework, then a section for each """
     models = load_models()
-    picker = ' '.join(f'[{model.meta.framework}](#{model.id}){{.model-link}}' for model in models)
-    return '\n'.join([f'::: {{.model-picker}}\n{picker}\n:::\n'] + [model_page(model) for model in models])
+    frameworks = {}
+    for model in models:
+        frameworks.setdefault(model.meta.framework, []).append(model)
+    groups = []
+    for framework, group in frameworks.items():
+        links = ''.join(f'<a href="#{model.id}">{html.escape(model.starsim.name)}</a>' for model in group)
+        groups.append(f'<div class="framework"><span>{html.escape(str(framework))}</span>{links}</div>')
+    groups = ''.join(groups)
+    picker = f'```{{=html}}\n<div class="model-picker">{groups}</div>\n```\n' # Raw HTML, so Quarto doesn't wrap the links in a paragraph
+    nav = f'```{{=html}}\n<nav class="model-nav">{groups}</nav>\n```\n' # The same links, down the left side
+    return '\n'.join([picker, '::: {.compare-layout}\n', nav, '::: {.models}\n'] + [model_page(model) for model in models] + [':::\n', ':::\n'])
 
 
 def benchmark():
