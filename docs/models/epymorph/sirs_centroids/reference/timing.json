@@ -1,7 +1,7 @@
 {
-  "first": 0.53653,
-  "rerun": 0.38013,
-  "what": "first: building the RUME (with the ADRIOs replaced by the values they return) and running it once, in a process with epymorph already imported. rerun: the same RUME run again, by a new BasicSimulator, as the vignette runs it. Both are a single run of 190 days in 15 counties, with two tau steps a day; the reference results are 40 more runs, of which the 38 in which the epidemic took off are summarized",
+  "first": 0.4269,
+  "rerun": 0.33328,
+  "what": "first: building the RUME (with the ADRIOs replaced by the values they return) and running it once, in a process with epymorph already imported. rerun: the same RUME run again, by a new BasicSimulator, as the vignette runs it. Both are a single run of 190 days in 15 counties, with two tau steps a day; the reference results are 3 more runs, of which the 3 in which the epidemic took off are summarized",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

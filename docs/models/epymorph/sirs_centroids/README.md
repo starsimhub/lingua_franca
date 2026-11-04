@@ -9,10 +9,10 @@ The centroids exercise of epymorph's vignette "Intro to Movement Models": an SIR
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 29 | 10 | The original's IPM (`SIRS`) and MM (`Centroids`) come from epymorph's library; the Starsim version writes both |
-| One run | first 0.54 s, rerun 0.38 s | first 0.019 s, rerun 0.0047 s (Rust) | Each is one stochastic run of 190 days. A first run excludes imports; the original's includes building the RUME, with the ADRIOs' values already fetched |
+| One run | first 0.43 s, rerun 0.33 s | first 0.016 s, rerun 0.0039 s (Rust) | Each is one stochastic run of 190 days. A first run excludes imports; the original's includes building the RUME, with the ADRIOs' values already fetched |
 | Results | Peak 415,899 infectious on day 96 (the mean of the 38 runs of 40 that took off); 3,273,531 recovered at the end | Peak 400,150 on day 93 (39 of 40); 3,240,514 recovered | **Agree** to within 8% at the peak in each county, and 5 days in its timing; 1.0% in the number recovered. Starsim is 1 to 5 days early in every county; see the findings |
 
-Measured on 3 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `0d5e22f4`), on a 20-core Linux machine.
+Measured on 3 November 2026 with Starsim 4.0.0rc2 (the `v4` branch, commit `d0107e93`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

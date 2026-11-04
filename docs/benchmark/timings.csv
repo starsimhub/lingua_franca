@@ -47,6 +47,14 @@ epipack/sirs,rust,0.012882594019174576,0.00021961599122732878,0.0075911208987236
 epipack/sirs,numba,0.17524864908773452,0.0004001050256192684,0.007672821986488998,False,
 epipack/sirs,jax,0.994019704987295,0.0004629578907042742,0.007241403101943433,False,
 epipack/sirs,jax-gpu,2.444558774936013,0.006328604998998344,0.014576239977031946,False,
+epiworld/covid_flu,rust,0.017338608973659575,0.0012016399996355176,0.015130192041397095,True,
+epiworld/covid_flu,numba,0.18375170894432813,0.0015154610155150294,0.015220431960187852,False,
+epiworld/covid_flu,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
+epiworld/covid_flu,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
+epiworld/seirconn,rust,0.009156754007562995,0.00018459407147020102,0.0073956099804490805,True,
+epiworld/seirconn,numba,0.1730485720327124,0.0003799370024353266,0.007551579969003797,False,
+epiworld/seirconn,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
+epiworld/seirconn,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
 epydemix/covid19,rust,0.02410567202605307,0.0011712820269167423,,True,
 epydemix/covid19,numba,0.10761806298978627,0.0027460280107334256,0.02715338603593409,False,
 epydemix/covid19,jax,0.145061902992893,0.0027725619729608297,0.02751532895490527,False,
@@ -55,6 +63,14 @@ epydemix/sir_kenya,rust,0.009730216930620372,0.00029795989394187927,,True,
 epydemix/sir_kenya,numba,0.19309336802689359,0.0026382309733889997,0.020265383005607873,False,
 epydemix/sir_kenya,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
 epydemix/sir_kenya,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
+epymorph/pei_humidity,rust,0.0674941330216825,0.0018938030116260052,0.0650077749742195,True,
+epymorph/pei_humidity,numba,0.22340291598811746,0.0026720589958131313,0.06599648098926991,False,
+epymorph/pei_humidity,jax,,,,False,"kernels: JAX does not run solver=""tau"""
+epymorph/pei_humidity,jax-gpu,,,,False,"kernels: JAX does not run solver=""tau"""
+epymorph/sirs_centroids,rust,0.01566583605017513,0.003912469022907317,0.013758025947026908,True,
+epymorph/sirs_centroids,numba,0.17449820996262133,0.006020762957632542,0.0156184519873932,False,
+epymorph/sirs_centroids,jax,,,,False,"kernels: JAX does not run solver=""tau"""
+epymorph/sirs_centroids,jax-gpu,,,,False,"kernels: JAX does not run solver=""tau"""
 flepimop/seir_2pop,rust,0.011464147944934666,0.00036014895886182785,,True,
 flepimop/seir_2pop,numba,0.08200381800998002,0.001236798008903861,0.010366181028075516,False,
 flepimop/seir_2pop,jax,0.6805178830400109,0.0004988099681213498,,False,

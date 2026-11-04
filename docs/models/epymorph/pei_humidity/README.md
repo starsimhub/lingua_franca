@@ -9,10 +9,10 @@ The example in epymorph's `USAGE` notebook, its IPM and MM `Pei`, after Pei et a
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 22 | 19 | The notebook's lines; the IPM and MM it takes from epymorph's library (`original/ipm_pei.py` and `original/mm_pei.py`) are 21 and 62 more |
-| One run | first 0.27 s, rerun 0.16 s | first 0.077 s, rerun 0.0022 s (Rust) | Each is one stochastic run of 150 days. A first run excludes imports; the original's includes building the RUME |
+| One run | first 0.23 s, rerun 0.13 s | first 0.067 s, rerun 0.0019 s (Rust) | Each is one stochastic run of 150 days. A first run excludes imports; the original's includes building the RUME |
 | Results | Peak 2,474,561 infectious in all on day 95; 37,075,485 infections | Peak 2,528,987 on day 92; 37,226,473 infections | **Agree** to within 3.4% at the peak in each state, 3 days in its timing, and 0.9% in the number infected. Florida, where it starts, peaks on day 59 in both; the other states peak 1 to 3 days earlier in Starsim, for the reason given for the [SIRS in Arizona](../sirs_centroids/README.md#findings) |
 
-Measured on 3 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `0d5e22f4`), on a 20-core Linux machine.
+Measured on 3 November 2026 with Starsim 4.0.0rc2 (the `v4` branch, commit `d0107e93`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

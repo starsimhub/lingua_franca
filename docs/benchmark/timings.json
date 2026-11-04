@@ -280,6 +280,50 @@
       "fastest": "rust",
       "load": 2.40576171875
     },
+    "epiworld/covid_flu": {
+      "kernels": {
+        "rust": {
+          "first": 0.017338608973659575,
+          "rerun": 0.0012016399996355176,
+          "rebuild": 0.015130192041397095
+        },
+        "numba": {
+          "first": 0.18375170894432813,
+          "rerun": 0.0015154610155150294,
+          "rebuild": 0.015220431960187852
+        },
+        "jax": {
+          "skipped": "kernels: JAX does not run solver=\"binomial\""
+        },
+        "jax-gpu": {
+          "skipped": "kernels: JAX does not run solver=\"binomial\""
+        }
+      },
+      "fastest": "rust",
+      "load": 1.9814453125
+    },
+    "epiworld/seirconn": {
+      "kernels": {
+        "rust": {
+          "first": 0.009156754007562995,
+          "rerun": 0.00018459407147020102,
+          "rebuild": 0.0073956099804490805
+        },
+        "numba": {
+          "first": 0.1730485720327124,
+          "rerun": 0.0003799370024353266,
+          "rebuild": 0.007551579969003797
+        },
+        "jax": {
+          "skipped": "kernels: JAX does not run solver=\"binomial\""
+        },
+        "jax-gpu": {
+          "skipped": "kernels: JAX does not run solver=\"binomial\""
+        }
+      },
+      "fastest": "rust",
+      "load": 2.27734375
+    },
     "epydemix/covid19": {
       "kernels": {
         "rust": {
@@ -325,6 +369,50 @@
       },
       "fastest": "rust",
       "load": 1.94580078125
+    },
+    "epymorph/pei_humidity": {
+      "kernels": {
+        "rust": {
+          "first": 0.0674941330216825,
+          "rerun": 0.0018938030116260052,
+          "rebuild": 0.0650077749742195
+        },
+        "numba": {
+          "first": 0.22340291598811746,
+          "rerun": 0.0026720589958131313,
+          "rebuild": 0.06599648098926991
+        },
+        "jax": {
+          "skipped": "kernels: JAX does not run solver=\"tau\""
+        },
+        "jax-gpu": {
+          "skipped": "kernels: JAX does not run solver=\"tau\""
+        }
+      },
+      "fastest": "rust",
+      "load": 2.33056640625
+    },
+    "epymorph/sirs_centroids": {
+      "kernels": {
+        "rust": {
+          "first": 0.01566583605017513,
+          "rerun": 0.003912469022907317,
+          "rebuild": 0.013758025947026908
+        },
+        "numba": {
+          "first": 0.17449820996262133,
+          "rerun": 0.006020762957632542,
+          "rebuild": 0.0156184519873932
+        },
+        "jax": {
+          "skipped": "kernels: JAX does not run solver=\"tau\""
+        },
+        "jax-gpu": {
+          "skipped": "kernels: JAX does not run solver=\"tau\""
+        }
+      },
+      "fastest": "rust",
+      "load": 2.33056640625
     },
     "flepimop/seir_2pop": {
       "kernels": {
@@ -670,7 +758,7 @@
   ],
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
-  "numba_compile": 308.1381352019962,
+  "numba_compile": 315.2358750810381,
   "suite": {
     "date": "2026-11-02",
     "seconds": 935.2,
