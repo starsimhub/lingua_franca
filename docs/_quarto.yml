@@ -254,4 +254,4 @@ format:
     highlight-style: github
     filters:
       - _filters/links.lua
-      - _filters/authorship.lua
+      - authorship # Each page's authorship front matter as a badge (quartopydoc's extension, in _extensions/sciris)
