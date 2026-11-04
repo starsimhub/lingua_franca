@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Health economic metrics
 
 A short reference to the health economic indicators disease models are asked to compute, for modelers, not economists. Each entry gives a definition, a formula, what the model has to output, and common pitfalls. Almost every metric can be worked out after the run from a few model outputs (person-time in states, event counts, the ages and times of events, and each event's cause or intervention), plus outside inputs (weights, unit costs, life tables, discount rates, thresholds). The last section, [What a disease model needs to provide](#what-a-disease-model-needs-to-provide), lists those outputs. The sources cited were checked; where a number could not be, the text says so.

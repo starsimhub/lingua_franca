@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epidemics: the default SEIR-V by age
 
 The model of epidemics' "Get started" vignette: the package's default model (`model_default()`), an SEIR-V in the UK in three age groups (0–19, 20–39, and 40+), mixing by a contact matrix from the POLYMOD survey, with R0 = 1.3, a latent period of 2 days, and an infectious period of 7, run for 600 days from one infectious person in a million. There is no vaccination, so `V` stays empty. See the [review](../../../approaches/epidemics.md).

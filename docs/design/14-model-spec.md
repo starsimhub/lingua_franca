@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # The model as code
 
 There is no model spec (decided 2026-10-27, replacing the JSON spec with `sim.to_spec()`, `sim.hash()`, `ss.diff()`, and `sim.to_code()`). A model is its code: the script that builds the sim is the thing to read, share, version, and compare, and two models are compared by their results, by `describe()`, or by a text diff of their code. There is no code-to-code translator: Starsim never turns a sim back into code.

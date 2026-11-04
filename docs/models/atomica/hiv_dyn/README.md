@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Atomica: the HIV care cascade, with programs and budgets
 
 Atomica's dynamic HIV demo (`at.demo('hiv_dyn')`): the HIV care cascade in two populations, females and males, of a country of 56 million, from 2016 to 2035 in yearly steps. People are born susceptible, are infected, diagnosed, linked to care, put on treatment, and virally suppressed, can fail treatment or be lost to follow-up and come back, and die of HIV or of other causes. Seven programs (two testing, two kinds of initiation counseling, client tracing, and two kinds of adherence support) turn spending into coverage, and coverage into the values of five parameters, under three budgets. As in the SIR demo, the model is spreadsheets, and the Python only loads and runs them.

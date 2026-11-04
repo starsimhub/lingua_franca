@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Objects and construction
 
 The class hierarchy, how models are constructed, how things get their names, and the rule that keeps the short form and the long form the same language.

@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Pandemic Simulator: Ebola with community, hospital, and burial transmission
 
 The framework's `ebola_seihfr_burial_legrand_model`, its port of Legrand et al. (2007): an SEIHFR model of the 1995 outbreak in Kikwit, in 200,000 people, with measures from 4 May 1995. See the [review](../../../approaches/pandemic_simulator.md).

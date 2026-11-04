@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Types: time, rates, and quantities
 
 Durations, rates, probabilities, and frequencies; how bare numbers get their units; and time in a sim.

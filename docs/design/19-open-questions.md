@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Open questions
 
 What this revision settled, what is still open, what is left out of v1, and what could go wrong with the design as a whole.

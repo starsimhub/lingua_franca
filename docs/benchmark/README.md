@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Benchmark
 
 `lingua_franca benchmark` regenerates every number in the table on the home page. It checks each translation against its original, times the two in turn, and writes the lines and times into each translation's table.

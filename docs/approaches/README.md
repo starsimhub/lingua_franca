@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Approaches
 
 A review of the current approaches used in the epi modeling landscape, based on the [disease modeling landscape](https://starsim.org/disease_modeling_landscape). The project owes a great deal to these frameworks. This folder records what it learned from each, for the design. For how they compare with Starsim today, and when one of them is the better choice, see the Starsim docs: [Modeling landscape](https://starsim.org/v4/user_guide/library_landscape.html) and the [conversion guides](https://starsim.org/v4/user_guide/conversion/index.html).

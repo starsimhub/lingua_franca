@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Execution
 
 The run loop: what is called in what order each step, how modules with different timesteps interleave, and what is and is not affected by order.

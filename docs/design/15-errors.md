@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Errors, warnings, and notes
 
 What the library says when something is wrong, doubtful, or guessed, and the few errors and warnings that are classes of their own.

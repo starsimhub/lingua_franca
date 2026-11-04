@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # odin / odin2 (with dust and monty)
 
 |  |  |

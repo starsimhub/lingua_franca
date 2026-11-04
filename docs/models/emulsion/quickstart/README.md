@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # EMULSION: the quickstart model
 
 A stochastic, hybrid (individual-based, grouped) model of 100 animals over two years in weekly steps, each animal with three state machines at once: an age group, a gestation cycle, and a health state. It is the model EMULSION's authors wrote "to provide an overview of several EMULSION features", shipped as `models/quickstart/quickstart.yaml` with EMULSION 1.1.1 and used in its quickstart tutorial.

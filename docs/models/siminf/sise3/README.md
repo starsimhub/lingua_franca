@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # SimInf: SIS by age in 1,600 cattle herds, with an environmental infectious pressure
 
 A stochastic SIS in 1,600 cattle herds (nodes) over four years, in three age categories (calves, young stock, and adults), where animals are not infected by each other but by an environmental infectious pressure `phi` in their herd: infected animals shed into it, and it decays at a rate that changes with the season. The herds are linked by a schedule of births, deaths, movements, and aging. It is SimInf's built-in `SISe3()` model, run as in the example in SimInf's documentation of `events_SISe3` and `u0_SISe3`, with the data that come with the package.

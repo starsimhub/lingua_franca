@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Design
 
 The specification of the epi modeling lingua franca, following the practices argued for in [best-practices](../best-practices).

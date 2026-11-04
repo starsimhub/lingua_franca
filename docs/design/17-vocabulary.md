@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # The complete vocabulary
 
 Every public name the specification uses, in one place.

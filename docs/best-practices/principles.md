@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Principles
 
 The principles the rest of this folder applies. Read this first; every other document assumes it.

@@ -3,6 +3,10 @@ title: "Compare models"
 page-layout: full
 toc: false
 include-after-body: _picker.html
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
 ---
 
 Each of the [models](/models/index.qmd) as its framework's authors wrote it, next to its Starsim translation. Pick a model:

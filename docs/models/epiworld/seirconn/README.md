@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epiworld: SEIR in a fully connected population
 
 COVID-19 as an SEIR among 10,000 agents for 50 days, in which everyone can meet everyone: each person meets two others a day at random, an infectious contact infects with a chance of 0.5, and the infection starts from one person exposed. This is the model of epiworldR's vignette "Run Multiple", which runs it 50 times with `run_multiple()`; it is the template `ModelSEIRCONN`, where `CONN` means fully connected.

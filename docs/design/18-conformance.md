@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Conformance
 
 What has to be tested for the specification's claims to hold, and the models the tests run on.

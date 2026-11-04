@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Malaria and neglected tropical diseases
 
 Much of the economic evaluation of transmission models in global health has been for malaria and the neglected tropical diseases (NTDs), because funders (Global Fund, PMI, WHO, Gates) need cost-effectiveness and investment-case numbers for population-scale interventions: bed nets, indoor residual spraying (IRS), chemoprevention, vaccines, and mass drug administration (MDA). This file covers seven exemplars, from engines that keep a cost counter during the simulation (EMOD), to engines that only output resource-use counts (OpenMalaria, malariasimulation), to models where spending is an input that drives coverage (Optima/Atomica), to NTD models where nearly all the economics is in the paper, not the code. Very few of these engines compute costs or DALYs (disease burden in healthy life-years lost) internally; the usual pattern is "simulate events, then apply unit costs and disability weights (0–1 severity scores) after the run." Metric definitions (DALY, ICER, discounting) are in [metrics.md](metrics.md).

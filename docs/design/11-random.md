@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Randomness and reproducibility
 
 Random number streams, common random numbers, run identity, and convergence checks.

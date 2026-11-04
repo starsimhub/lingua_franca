@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Stochastic compartmental
 
 Gillespie (exact, in continuous time), tau-leaping (close to exact, for a run of many events), and chain-binomial (in discrete time). One model, several ways of being random.

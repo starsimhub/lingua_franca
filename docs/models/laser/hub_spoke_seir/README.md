@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # LASER: spatial SEIR on a hub and spokes
 
 An agent-based SEIR epidemic in 1,750,000 people living in 16 patches (a central city, five towns around it, and two small places on the way to each town), coupled by a gravity model, over 365 days. It is the SEIR model at the end of the "Grid function examples" notebook in the laser-generic documentation.

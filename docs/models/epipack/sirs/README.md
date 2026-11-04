@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epipack: SIRS as ODEs, by Gillespie's method, and on a network
 
 The SIRS of epipack's README, its first example: infection at 2.5 a day, recovery at 1 a day, and waning immunity at 1/14 a day, in 1,000 people with 10 infectious at the start, integrated as ODEs and simulated by Gillespie's method for 40 days. The README then runs the same model on a random network of 10,000 people with 50 contacts each, written with the processes of a different class. See the [review](../../../approaches/epipack.md).

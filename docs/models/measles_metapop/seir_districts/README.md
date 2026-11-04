@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Measles metapopulation: SEIR in 260 districts
 
 A stochastic metapopulation SEIR model of measles in 260 made-up districts, run daily from 2010 to 2025 with binomial draws. The districts and all its values are made up.

@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Cancer, chronic disease, and health systems
 
 Cancer and chronic disease models did cost-effectiveness analysis (CEA, comparing interventions on cost and health gained) long before most infectious disease models, because their main customers (screening guideline bodies, national agencies that assess whether health technologies are worth funding, insurers) ask for little else. Whole-health-system models are newer and ask a different question: not "what does this intervention cost per DALY averted" (a DALY is one healthy life-year lost) but "what does the health system actually use, and what happens to health when it runs out". This page covers seven exemplars: two individual-based whole-system or multi-disease platforms (Thanzi La Onse and Vivarium), the Starsim-family HPVsim, the closed-source cervical and colorectal cancer consortium models, the open IMPACT NCD microsimulation, and the WHO-CHOICE and OneHealth approaches. A section on health system capacity follows, then cross-cutting patterns. Metric definitions (DALY, QALY, ICER, net monetary benefit) are in [metrics.md](metrics.md); general cost-effectiveness software is in [cea-software.md](cea-software.md).

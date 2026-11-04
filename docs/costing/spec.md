@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Costing specification
 
 A proposed specification for costs and health economic outcomes in Starsim v4: where costs attach to a model, how DALYs and QALYs are computed, how results are discounted, and how scenarios become cost-effectiveness results.

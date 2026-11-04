@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epydemix: SIR in Kenya with age-structured contacts
 
 A stochastic SIR epidemic in the population of Kenya (55.9 million people in five age groups), mixing through contact matrices for school, work, home, and community, over four months. It is the model of epydemix's second tutorial, "Using population data from epydemix_data".

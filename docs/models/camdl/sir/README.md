@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # camdl: SIR with weekly reported cases
 
 A closed SIR epidemic in 10,000 people over 12 weeks, observed through weekly reported cases.

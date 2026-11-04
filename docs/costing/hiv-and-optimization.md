@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # HIV and budget optimization
 
 HIV is where disease modeling and health economics have been tied together longest. Two decades of donor-funded antiretroviral therapy (ART) scale-up, national plans, Global Fund applications, and "investment cases" have produced three costing traditions: (1) program-budget models (Optima, Goals plus the Resource Needs Model, OneHealth), where spending is an *input* that drives coverage and the model is optimized over allocations; (2) individual-based models (HIV Synthesis, EMOD-HIV), where costs add up as unit cost × resource use per agent, usually after the run, and feed into incremental cost-effectiveness ratios (ICERs, extra cost per extra unit of health) against a threshold; and (3) multi-model comparisons (the HIV Modelling Consortium) that applied a *common costing framework* to structurally different models so their economic outputs could be compared. This page reviews seven exemplars, focusing on how costs attach to the model. For metric definitions (DALYs, ICERs, net DALYs, allocative efficiency) see [metrics.md](metrics.md), especially [allocative efficiency and optimization](metrics.md#allocative-efficiency-and-optimization); for general-purpose cost-effectiveness analysis (CEA) packages see [cea-software.md](cea-software.md).

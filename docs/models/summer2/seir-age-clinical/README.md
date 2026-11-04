@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # summer2: SEIR by age and clinical status, with derived outputs
 
 An SEIR epidemic with disease deaths in 1,000 people over 20 time units, stratified by age (young, old), with the infectious further stratified by clinical status (asymptomatic, symptomatic, isolated, in hospital). Which clinical status a new case takes depends on their age, and each status has its own infectiousness and death rate. The model is then built and run seven times, each time with a different set of derived outputs: cumulative deaths by age, incidence by age, by clinical status, and by both, notifications, hospital occupancy, and the proportion of the infectious who are in hospital. It is the "Derived outputs in stratified models" notebook in summer2's documentation, the most detailed of its stratification tutorials (notebooks 06 to 10).

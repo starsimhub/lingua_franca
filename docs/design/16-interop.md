@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Working with other frameworks
 
 Importing models from, and exporting them to, the other frameworks reviewed in [approaches](../approaches). This is different from changing the solver ([12-backends.md](12-backends.md)), which runs one model in different ways; this moves a model between languages.

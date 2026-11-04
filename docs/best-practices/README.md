@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Best practices
 
 Distillation of the modeling landscape into best practices for each type of modeling.

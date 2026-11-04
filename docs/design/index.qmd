@@ -1,5 +1,9 @@
 ---
 title: "Design"
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
 ---
 
 This section is the specification of Starsim v4: what a model is made of, how it is run and fitted, and what the library says when something is wrong. It turns the [best practices](../best-practices/README.md) into definite decisions. To learn to use Starsim, start with the [docs](https://starsim.org/v4/) instead.

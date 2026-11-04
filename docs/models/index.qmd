@@ -1,5 +1,9 @@
 ---
 title: "Models"
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
 ---
 
 The design is tested on models that other people wrote. Each [model](README.md) comes from another framework, kept as its authors wrote it, next to the same model written in Starsim.

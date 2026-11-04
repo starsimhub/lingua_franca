@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # SimInf: SIR in 1,600 cattle herds with births, deaths, and movements
 
 A stochastic SIR epidemic in 1,600 cattle herds (nodes) over four years, where the only link between herds is a schedule of animal movements. It is the example in SimInf's documentation of `events_SIR()`, using the data that come with the package.

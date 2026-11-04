@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Overview
 
 The language on one page, then the object model behind it. Everything here is specified in detail elsewhere in this folder.

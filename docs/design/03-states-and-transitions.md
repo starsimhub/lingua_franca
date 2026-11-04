@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # States and transitions
 
 The core of the language. A model is a set of states and the transitions between them, written so that it reads like the equations.

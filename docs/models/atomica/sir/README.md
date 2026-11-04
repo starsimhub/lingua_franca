@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Atomica: SIR with deaths, defined in spreadsheets
 
 Atomica's SIR demo (`at.demo('sir')`): one population of 1,000 adults moving between susceptible, infected, recovered, and dead, over 23 yearly steps. The model structure is in one spreadsheet (the framework) and its data in another (the databook); the Python only loads and runs them.

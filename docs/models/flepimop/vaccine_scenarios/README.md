@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # flepiMoP: vaccination scenarios in two subpopulations
 
 The two-province SEIR of the [wave 1 example](../seir_2pop) with most of what else a flepiMoP configuration can declare for a forward run added on top: a vaccinated compartment with waning, three scenarios defined as modifiers that switch parameters off, outcomes (reported cases, hospital admissions, the number in hospital, and deaths) derived from the incidence of infectiousness by a probability and a delay, and parameter uncertainty, with `Ro` and the probability of detecting a case drawn from truncated normals for each of ten runs ("slots") of each scenario. It is flepiMoP's `config_sample_2pop_vaccine_scenarios.yml`, which brings together the scenarios, outcomes, and parameter uncertainty that the other forward-simulation tutorials show one at a time, and the configuration that flepiMoP's own tests of scenarios and outcomes run (`tests/seir/test_run_parallel_SEIR.py`, `tests/outcomes/test_run_parallel_outcomes.py`).

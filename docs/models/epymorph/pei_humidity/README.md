@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epymorph: influenza driven by humidity in six US states (Pei et al. 2018)
 
 The example in epymorph's `USAGE` notebook, its IPM and MM `Pei`, after Pei et al. (2018): an SIRS of influenza in Florida, Georgia, Maryland, North Carolina, South Carolina, and Virginia, 56 million people, in which transmission falls as absolute humidity rises, in each state on each day, with commuters and other travelers moving between the states for a third of each day. It starts from 10,000 infectious people in Florida. See the [review](../../../approaches/epymorph.md).

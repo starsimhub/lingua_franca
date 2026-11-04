@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # EpiModel: HIV with a care cascade and PrEP
 
 HIV among 1,500 people over 20 years in weekly steps, transmitted over two networks of partnerships (main and casual) that form and dissolve, with acute, chronic, and AIDS stages, a care cascade from testing to viral suppression, PrEP for people at risk, and arrivals and departures. Four scenarios compare no intervention, a cascade that reaches the UNAIDS 95-95-95 targets, PrEP at 50% coverage among those indicated, and both. This is the HIV example of the EpiModel Gallery, the set of worked examples maintained by EpiModel's authors, and the one that brings the most of EpiModel together.

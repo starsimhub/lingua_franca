@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Models
 
 Models written in other frameworks, each with its translation into the lingua franca.

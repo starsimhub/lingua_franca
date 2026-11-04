@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Pandemic Simulator: SIR with a reactive intervention
 
 The framework's declarative teaching example, `example_parameter_uncertainty_declarative_model`: a closed SIR in one zone of 1,000,000 people, with a measure that responds to prevalence, run with and without the measure and with three uncertain inputs. See the [review](../../../approaches/pandemic_simulator.md).

@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # odin: age-structured SEIR with a delay
 
 A deterministic SEIR in 10 million people in five age groups (0–1, 1–5, 5–15, 15–30, and 30+ years), over one year in days, with births, deaths, aging, waning immunity, and a latent period of exactly 14 days written as a delay differential equation. It is odin's own age-structured example (the README's "more complicated example", `array_odin.R`, with `E` and a delay added), and one of the six models odin's tests check against hand-written deSolve code.

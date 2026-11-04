@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epiworld: COVID-19 and flu, with a vaccine and two measures
 
 COVID-19 and flu spreading at the same time among 50,000 agents for 50 days, in a fully connected population in which each person meets four others a day. Half of the population is vaccinated at the start, with a vaccine that lowers the chance of infection, the chance of passing it on, and the time infectious, and two measures cut the number of contacts, to two a day from day 10 and to 1.5 from day 20. This is the model of epiworldR's vignette "Advanced Modeling - Multiple Diseases, Tools, and Events", which builds it a step at a time on the template `ModelSIRCONN`: it shows what epiworld is known for, several viruses and the tools that protect against them, carried by the same agents.

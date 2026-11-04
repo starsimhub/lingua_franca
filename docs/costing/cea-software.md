@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Health-economic modeling software
 
 Disease models usually add costing at the end, but a separate family of tools exists to attach costs and utilities (quality-of-life scores from 0 to 1) to a model of disease progression. They turn the result into incremental cost-effectiveness ratios (ICERs, extra cost per extra unit of health), acceptability curves (the chance each option is best at a given willingness to pay), and value-of-information (VOI) estimates (what reducing uncertainty is worth). These cost-effectiveness analysis (CEA) tools (mostly R packages, plus a few GUIs and the Excel workbook tradition) have the most developed interfaces anywhere for saying "this state costs X per cycle", "this transition costs Y once", "discount costs at 3.5% and effects at 1.5%" (discounting counts the future for less than the present), and "draw this cost from a gamma distribution in the probabilistic sensitivity analysis (PSA)". Their disease engines are simple (cohort Markov chains, decision trees, sometimes individual-level multistate models), so what is worth borrowing is the economic layer: how it is declared, where it attaches, and what comes out. This page reviews eight exemplars and compares their interfaces. For definitions of QALYs, DALYs, ICERs, net monetary benefit (NMB), and EVPI, see [metrics.md](metrics.md).

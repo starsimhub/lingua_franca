@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Brief notes
 
 Short entries for frameworks worth learning from without a full review. Each says what it is, the one or two ideas to carry into the design, and why it has no full review.

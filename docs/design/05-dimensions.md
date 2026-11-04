@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Dimensions and stratification
 
 Age, space, risk, and vaccination status are handled by one operation: take a finished model and stratify it by a property of the people in it. Strains are part of the disease ([Strains](#strains)).

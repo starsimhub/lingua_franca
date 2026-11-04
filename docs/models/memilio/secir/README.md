@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # MEmilio: ODE SECIR model with severity branches
 
 A deterministic COVID-19-type epidemic in one region and one age group of 83,000 people over 100 days: infection, then a chain of worsening states (no symptoms, symptoms, severe, critical), each of which ends in either the next state or recovery, with death from the critical state. Contacts are cut by 90% on day 30.

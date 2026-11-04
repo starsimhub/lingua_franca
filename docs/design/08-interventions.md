@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Interventions
 
 What is delivered, and how it is delivered: products, delivery, cascades of steps, parameter changes, triggers, and scenarios.

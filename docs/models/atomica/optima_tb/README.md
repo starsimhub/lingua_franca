@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Optima TB: the structure of a large model
 
 The structure of the Optima TB model: 97 states, 318 transitions, and 9 populations with aging, as Starsim code, for testing how Starsim handles a model of this size imported from Atomica.

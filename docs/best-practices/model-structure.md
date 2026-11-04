@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Model structure: states and transitions
 
 The central document. Everything else in this folder depends on the position taken here.

@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Webapp
 
 A tool for viewing the originals in `models` side by side with their translations, with diff-style markup and highlighting.

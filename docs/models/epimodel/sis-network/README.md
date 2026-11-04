@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # EpiModel: SIS on a dynamic network
 
 A stochastic SIS epidemic among 500 people whose partnerships form and dissolve over time, for 500 time steps. This is the network example from EpiModel's own introduction: a statistical model of the network is estimated from target statistics, and the epidemic is then simulated over networks drawn from it.

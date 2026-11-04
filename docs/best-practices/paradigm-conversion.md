@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Paradigm conversion
 
 Running one model text as an ODE, as a stochastic compartmental model, or with agents, and what happens when the model does not fit the solver that was asked for.

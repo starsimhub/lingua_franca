@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # odin: discrete-time stochastic SIR, written with arrays
 
 A closed, stochastic SIR epidemic in discrete time, with every variable an array of length 100. It is the third model of odin's "discrete" vignette, one step up from its scalar stochastic SIR.

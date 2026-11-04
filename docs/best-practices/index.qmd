@@ -1,5 +1,9 @@
 ---
 title: "Best practices"
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
 ---
 
 This section draws on the [framework reviews](../approaches/README.md) to take a position on how each modeling concept should be expressed. Each position was checked against one test: **a model should never be easier to write without the lingua franca than with it.** Code is written as Starsim (`import starsim as ss`). For how to use these features, see the [Starsim docs](https://starsim.org/v4/).

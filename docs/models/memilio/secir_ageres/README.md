@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # MEmilio: age-resolved ODE SECIR, with seasonality and testing capacity
 
 The SECIR model of [the wave 1 example](../secir) in three age groups of 10,000 people over 50 days, with three things the wave 1 example leaves at their defaults: seasonal transmission, a limited capacity to test and trace (so that symptomatic people infect more once it is overwhelmed), and contacts between every pair of age groups. Contacts are cut by 70% on day 30.

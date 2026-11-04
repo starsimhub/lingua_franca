@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epipack: SIARX with contact tracing, on a network, well mixed, and deterministic
 
 The example of contact tracing in epipack's tutorial on networks: an SIARX model in 10,000 people on a random network with 50 contacts each, where infected people become symptomatic (`I`) or not (`A`), symptomatic people are quarantined (`X`), and each quarantine traces the person's contacts, quarantining each who is symptomatic with a chance of 25%. The tutorial runs it on the network, then well mixed, then as a deterministic model in which tracing is approximated by a flow. See the [review](../../../approaches/epipack.md).

@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # flepiMoP: SEIR in two subpopulations
 
 A deterministic SEIR epidemic in two provinces, of 9,000 and 1,000 people, coupled by daily travel, over seven months. It starts with 5 exposed people in the large province and reaches the small one only through mobility. The whole model is one YAML configuration and three small CSV files: this is the configuration that flepiMoP's quick start guide runs first.

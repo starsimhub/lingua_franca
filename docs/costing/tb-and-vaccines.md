@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Tuberculosis and vaccines
 
 Global-health economic evaluation is most routine for tuberculosis and vaccine-preventable diseases: WHO investment cases, Gavi's [Vaccine Investment Strategy](https://www.gavi.org/our-alliance/strategy/vaccine-investment-strategy), and country introduction decisions all rest on a few reusable models whose outputs become costs and DALYs (healthy life-years lost). This file covers eight exemplars spanning the main ways of attaching costs to a disease model: a GUI planning tool with an ingredients-based costing module, multiplying itemized quantities by prices (TIME), a dynamic transmission model with a cost layer after the run (tbvax), decision trees with costs on the nodes (HEdtree), a cross-model output standard (VIMC/Montagu), a dynamic model that outputs that standard (DynaMICE), and three static or integrated vaccine tools (PRIME, UNIVAC, and the Kid Risk polio model). Metric definitions (DALY, ICER, net monetary benefit, discounting) are in [metrics.md](metrics.md).

@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Interactions between modules: `ss.modify`, conditions, and plain code
 
 How one module changes a quantity that belongs to another, how conditions ("who" and "when") are written, and what order things run in.

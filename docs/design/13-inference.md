@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Inference: calibration, sensitivity, and model comparison
 
 If parameters have bounds and results have data, calibration is one call. Nobody has to think about likelihoods to build or fit a model.

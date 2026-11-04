@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Composition and effects
 
 How one module changes a quantity owned by another, and what runs when.

@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # LASER: measles in England and Wales
 
 An agent-based model of measles in the 954 towns and cities of England and Wales before vaccination, from the laser-generic tutorial notebook "Spatial features of measles transmission in England and Wales during the pre-vaccine era". Each place has its 1944 population; people are born at the mean crude birth rate of the data, die at an age drawn from a life table, catch measles by a seasonal force of infection that is shared between places by a gravity model, and three infectious people are brought in every 30 days for the first 10 years. The notebook runs 150 simulations of 40 years over a sample of five parameters (transmission, the amplitude of the seasonality, and three of the gravity model), and ranks them against the measles case reports by the share of weeks with no cases in each place (the critical community size) and by the phase of each place's epidemics relative to London's (travelling waves).

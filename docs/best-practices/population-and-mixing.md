@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Population and mixing
 
 Finding 4 of the [landscape review](../approaches/README.md#cross-cutting-findings) calls this "the hardest unsolved problem in this review, and where the project has to do original work." This document sets out the approach taken.

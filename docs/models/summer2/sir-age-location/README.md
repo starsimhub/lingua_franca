@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # summer2: SIR stratified by age and location, with mixing matrices
 
 An SIR epidemic with disease deaths in 1,000 people over 20 time units, stratified by age (young, old) and by location (urban, rural), each with its own mixing matrix. It is the "Multiple mixing matrices for multiple stratifications" example in summer2's documentation.

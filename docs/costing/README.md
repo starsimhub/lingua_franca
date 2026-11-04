@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Costing
 
 A review of how disease models do cost, financial, and economic modeling, and how they compute health economic outcomes such as DALYs and QALYs.

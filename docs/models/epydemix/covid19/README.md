@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epydemix: the first wave of COVID-19 in Massachusetts
 
 An age-structured SEIR with deaths, in the population of Massachusetts (7.0 million people in nine age groups), from 23 February to 2 August 2020. Transmission is scaled each day by a contact reduction computed from Google mobility data and by a seasonal factor; deaths follow the infectious period with the age-specific infection fatality rate, after an Erlang-distributed delay. The model is calibrated by ABC-SMC to weekly deaths up to 31 May, and then projected to 2 August under three reopening scenarios. It is epydemix's seventh tutorial, "Modeling the first wave of COVID-19 in Massachusetts", and its most complete worked example.

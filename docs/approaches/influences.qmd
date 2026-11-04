@@ -1,5 +1,9 @@
 ---
 title: "Influences"
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
 ---
 
 What the lingua franca owes to each framework reviewed here: which framework's ideas, API shapes, meanings, or defaults the [best practices](../best-practices/README.md) and the [design](../design/00-overview.md) took up. It is a rough judgment, made by reading each area's best-practices document and design document against the reviews, not a count of mentions: a framework cited only as a counterexample, or for an approach that was rejected, gets nothing. **New** is what no framework did first; **Other** is frameworks without a review here, such as Covasim, MIRA, and PyRoss. Hover over a bar or a cell for what was taken.

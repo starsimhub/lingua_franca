@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Environments
 
 What each framework needs in order to run its models. The recipe is in `docs/models/<framework>`, shared by all of that framework's models: `env.cfg` says how to build it, `requirements.txt` lists the exact versions, and `README.md` gives the version used and what it needs. `sbml`, `epipack`, and `epymorph` have a recipe but no models.

@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epidemics: seasonal transmission with interventions and vaccination
 
 The default SEIR-V of epidemics' "Get started" vignette (the UK in three age groups, mixing by a contact matrix from POLYMOD, with R0 = 1.3), with a transmission rate that varies through the year, `beta * (1 + sin(πt/91.25))`, so that it peaks twice, under the three scenarios of the vignette on time dependence: no intervention; three overlapping cuts in contacts (schools closed from day 50 to 120, workplaces from day 65 to 90, and schools partly reopened from day 120 to 180), each a reduction for each age group; and vaccination of people aged 40 and over between the waves, from day 120 to 220. This is the vignette that composes the most of epidemics' scenario elements: a population, time dependence, contact interventions, and a vaccination. See the [review](../../../approaches/epidemics.md).

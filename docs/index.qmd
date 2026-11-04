@@ -1,5 +1,9 @@
 ---
 toc: false
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
 ---
 
 {{< include ../README.md >}}

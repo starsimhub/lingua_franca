@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # epymorph: SIRS in Arizona's counties, with commuting by distance
 
 The centroids exercise of epymorph's vignette "Intro to Movement Models": an SIRS in Arizona's 15 counties, 7.2 million people, starting from 5 infectious people in Maricopa County, with a movement model in which 15% of people commute each day for a third of the day, to a county drawn with a weight that falls off with distance. Their own county is one of those drawn, and the others are far away for the kernel's scale of 20 miles, so people spend only 0.06% to 0.8% of their time in other counties. See the [review](../../../approaches/epymorph.md).

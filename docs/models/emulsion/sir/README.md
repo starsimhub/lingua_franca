@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # EMULSION: SIR as a compartmental, individual-based, and hybrid model
 
 A closed, stochastic, discrete-time SIR epidemic in 100 individuals over 100 days, written three times: once for each of the ways EMULSION can represent a population.

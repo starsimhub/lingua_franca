@@ -1,3 +1,10 @@
+---
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
 # Pandemics, macroeconomics, and modeling frameworks
 
 Most costing elsewhere in this folder is health-sector costing: a unit cost per test, dose, or treatment course, plus DALYs or QALYs (healthy life-years lost or gained) for the health effect. Pandemic modeling differs. When the intervention is closing schools or a third of the economy, the main costs are lost output, lost schooling, and the monetary value of lives lost, in trillions, not millions. These models couple an epidemic model to a (usually very simple) model of the economy, and some let the economy feed back into transmission. Part 1 reviews five such exemplars. Part 2 asks the narrower question that matters most for Starsim v4: which general epi frameworks in [approaches/](../approaches/README.md) support costs and health economic outputs at all, and how. Definitions of DALYs, QALYs, VSL (the value of a statistical life), net monetary benefit (NMB), and related terms are in [metrics.md](metrics.md); cost-effectiveness analysis (CEA) software is in [cea-software.md](cea-software.md).
