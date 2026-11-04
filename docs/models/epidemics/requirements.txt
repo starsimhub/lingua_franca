@@ -1,0 +1,5 @@
+BH==1.90.0-1
+cinterpolate==1.0.2
+epidemics==0.5.0
+odin==1.2.7
+ring==1.0.8

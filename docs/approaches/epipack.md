@@ -5,7 +5,7 @@
 | **Language** | Python (with SymPy for the symbolic layer) |
 | **Paradigms** | Compartmental: deterministic ODE, stochastic well-mixed (Gillespie), and stochastic on networks; all from one process specification |
 | **Specification style** | Reaction-style tuples: the model is a list of processes |
-| **Version reviewed** | 0.1.x |
+| **Version reviewed** | 0.1.x; two models translated, with 0.1.5: [an SIRS run three ways](../models/epipack/sirs/README.md) and [contact tracing](../models/epipack/siarx_tracing/README.md) |
 | **License** | MIT |
 | **Code** | <https://github.com/benmaier/epipack> |
 | **Docs** | <http://epipack.benmaier.org> |

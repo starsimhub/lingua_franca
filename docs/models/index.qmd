@@ -48,3 +48,34 @@ Each model has the original source, where it came from and its license, referenc
 ## How the models were chosen
 
 The models are chosen to span frameworks and paradigms, and each framework's own showcase models are preferred over ones written for this project. They are brought in as a build set and held-out waves, described in [about the models](README.md).
+
+Of the 24 frameworks [reviewed](../approaches/index.qmd), 16 have models here. The measles metapopulation model is here too, though it isn't a framework. Each of the others is left out because its models are already covered by one that is, or because a translation would test something other than how a model is written.
+
+| Framework | Models here | Why |
+|---|---|---|
+| [Atomica](../approaches/atomica.md) | `hiv_dyn`, `sir` | Held-out wave 1: the strongest non-programmer specification path, in spreadsheets |
+| [camdl](../approaches/camdl.md) | `sir`, `stratified` | Held-out wave 1: the closest existing thing to the target design |
+| [EMULSION](../approaches/emulsion.md) | `quickstart`, `sir` | Held-out wave 1: one model run as compartments, agents, or both |
+| [epidemics](../approaches/epidemics.md) | `seasonal_scenarios`, `seirv` | Added after the waves: a library of fixed models, composed into scenarios with elements |
+| [EpiModel](../approaches/epimodel.md) | `hiv`, `sis-network` | Held-out wave 1: the most widely used framework in R, and the network models |
+| [epipack](../approaches/epipack.md) | `siarx_tracing`, `sirs` | Added after the waves: one model run as ODEs, by Gillespie's method, and on a network, plus contact tracing |
+| [epiworld](../approaches/epiworld.md) | `covid_flu`, `seirconn` | Added after the waves: several viruses and protective tools carried by the same agents |
+| [Epydemix](../approaches/epydemix.md) | `covid19`, `sir_kenya` | Held-out wave 1: named in the project brief as an interconversion target |
+| [epymorph](../approaches/epymorph.md) | `pei_humidity`, `sirs_centroids` | Added after the waves: disease, movement, and geography as separate parts |
+| [flepiMoP](../approaches/flepimop.md) | `seir_2pop`, `vaccine_scenarios` | Held-out wave 1: models as configuration files, at production scale |
+| [LASER](../approaches/laser.md) | `england_wales`, `hub_spoke_seir` | Held-out wave 1: IDM's other agent-based engine, and the speed comparison for large ABMs |
+| [MEmilio](../approaches/memilio.md) | `secir`, `secir_ageres` | Held-out wave 1: the library that spans the most paradigms |
+| [odin](../approaches/odin.md) | `seir_array`, `stochastic_sir_arrays` | Held-out wave 1: the best-established equations-as-code approach |
+| [Pandemic Simulator](../approaches/pandemic_simulator.md) | `ebola_legrand`, `sir_reactive` | Added after the waves: a published platform of ready-made models |
+| [SimInf](../approaches/siminf.md) | `sir_herds`, `sise3` | Held-out wave 1: compartments, metapopulations, and networks in one small vocabulary |
+| [summer2](../approaches/summer2.md) | `seir-age-clinical`, `sir-age-location` | Held-out wave 1: the most developed answer to stratification |
+| [Starsim](../approaches/starsim.md) | None | Starsim is what is being tested. Its own models (Covasim, HPVsim, STIsim, and the rest) are reviewed against v4 separately, in `tests/reviews/` |
+| [MetaCast](../approaches/metacast.md) | None | No longer maintained; its metapopulation ODEs are covered by summer2, flepiMoP, and MEmilio |
+| [EoN](../approaches/eon.md) | None | Network SIR and SIS, which EpiModel's network model already covers; what EoN adds is its analytic approximations, which aren't a model to translate |
+| [individual](../approaches/individual.md) | None | A low-level toolkit with no disease concepts: its users write the model from scratch, so there is no showcase model of its own to translate |
+| [EMOD](../approaches/emod.md) | None | A model is several large JSON files for a C++ engine, so a translation would mostly test the mapping of its parameters, not how a model is written |
+| [EpiHiper](../approaches/epihiper.md) | None | Its models run on synthetic national contact networks, which aren't available to rerun here |
+| [Vivarium](../approaches/vivarium.md) | None | Its models are whole microsimulations built from many components and data files, not models to translate on their own |
+| [Thanzi La Onse](../approaches/tlo.md) | None | A whole health-system model, too large to translate as one model here; rebuilding it on Starsim v4 is a separate piece of work (see `admin/deferred.md`) |
+
+Each of the frameworks with [brief notes](../approaches/notes.md) is left out too, since those notes are about one idea from each, not its models.

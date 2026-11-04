@@ -306,6 +306,27 @@ The reasons are in [the review](../approaches/pandemic_simulator.md).
 - **A `metadata=` keyword for model cards**, if a form or registry needs one; the `convert-model` skill asks for the docstring section.
 - **`wuhan_seir_model`**, if contact matrices need a test from a published paper; Ebola covered the harder structure.
 
+## From the epidemics, epiworld, epipack, and epymorph models (2026-11-03)
+
+Found while translating two models from each; the details are in each model's Findings. Each item waits for Cliff to say whether it should be fixed in v4.
+
+- **Any modifier makes a compartmental rerun about 30 times slower** (1.1 ms to about 31 ms on `epidemics/seasonal_scenarios`, even for a constant modifier): `Compartmental.tables()` rebuilds the per-step rate tables in Python on every run, though `kernel_reason()` is None. This is why that model misses its time target.
+- **`ss.modify(mixing, multiply=ss.by(age=...))` crashes compartmental runs** with a broadcast error in `set_contacts()` (a scalar works), and as agents it acts only on the side of the people who would be infected. A pair of `rel_sus`/`rel_trans` modifiers is the exact workaround (`epidemics/seasonal_scenarios`).
+- **Effects that add.** epidemics adds overlapping contact cuts; v4 modifiers multiply, and `add=` is refused on `rel_sus`/`rel_trans`.
+- **`ss.Delivery(move=S >> V, capacity=ss.perday(n))` runs outside the kernels** (147 ms a run on `epidemics/seasonal_scenarios`), and `V` has to be passed to `ss.Disease` by hand when no transition reaches it.
+- **Agents can't take a discrete-time step.** As agents, a step's other transitions run before transmission, so someone who becomes infectious has had half a step's chance of recovering first; no setting makes agents work out a step's chances at its start. On `epiworld/seirconn` agents die out in 46% of runs against 21%, so both epiworld models run as a chain binomial. The "Solvers and backends" page in ssv4 says agents do work them out at the start, which is wrong either way.
+- **Strain values only as multipliers of rates**, so flu's daily recovery of 0.5 against COVID's 0.25 is `np.log(0.5)/np.log(0.75)`; and **a vaccine can't enhance recovery** as 1 − (1 − p)(1 − e) (`epiworld/covid_flu`, written as a second `I → R` transition).
+- **`sim.plot()` raises `ValueError`** for a sim with a delivery at a fixed time plus an `ss.modify` with `start=` and `stop=`: `ss.results.intervention_marks()` compares an `np.float64` with a tuple (`mark not in out`). A bug; reproduces in a 6-line SIR.
+- **A flow driven by its own source state is misread.** By the documented rule `I >> X @ c*I` is `c` times the share of contacts in `I`, but it is taken as the whole flow, `c` per person, with only a line in `describe()`. `ss.import_from()` has the same bug for epipack's `I + I -> I + X`, giving 9,787 in `S` against 2,942 (`epipack/siarx_tracing`).
+- **Contact tracing has no compartmental form**: `trace=` raises `CapabilityError` under `solver='ode'`, even on a mixing pool, where the mean-field form `kappa*p*k0*I*I/N` would do. And a mixing pool has no contacts to trace, so the well-mixed run needs a `RandomNet` redrawn every step.
+- **Agents on a dense network are slow** (`epipack/siarx_tracing` reruns at 2.7 s against 0.53 s): one pass over all 250,000 edges per transmission per step, a `restart()` rebuilds the network, and fixed steps need `dt=0.025` to match continuous time; an event-by-event solver for agents on a network would avoid the last.
+- **`init_n` can't be changed by `sim.new()` or `pars=`**, since it isn't a parameter.
+- **`ss.parallel` and `run(n_runs=)` use all cores** despite `SCIRIS_NUM_THREADS=1`.
+- **No fixed-step leap** of given lengths, so epymorph's own stepping (thirds of a day) can't be reproduced; and the docstring of `converters/epymorph.py` wrongly says `solver='tau'` "leaps in the same way".
+- **The epymorph importer flattens parameters that vary by time and place** (Pei's humidity at each state's mean), so its runs peak 7 days late; `ss.by(patch=[ss.timeseries(...)])` would carry them. Smaller: commuting has no time of day, and `ss.geo` has no exponential distance kernel.
+- **`beta` can't be given by R0**, though R0 is reported.
+- **`lingua_franca envs` ignores `local` for R packages**, so the epidemics package (not on CRAN) was installed by hand; the fix is to run `install.packages("src", lib="lib", repos=NULL, type="source")` in the R branch when `local` is set, and then drop the by-hand step from `docs/models/epidemics/README.md`.
+
 ## From the JSON form (2026-11-03)
 
 - **The rest of a declared model in the JSON form** (`ss.export_to(sim, 'json')`, spec 14). Listed by `LossyExport` and not yet written: outcomes (`ss.outcome`, with their delays and likelihoods), modifiers (`ss.modify()`, which need conditions written out; Syphilis in the library has two), functions and attributes, strains (`ss.Strains`), transfers, `where=`, `move=`, and `increment=` on a transition, the sim's own stratification (`sim.stratify()`), named populations and geographies (`ss.people('Kenya')`, `ss.geo.geography()`; a stratification by places is written as their names, without their movement), and values by group given as an array or a table. Each is a few lines in `starsim/converters/starsim_json.py` (a field in the writer, and its check in the reader); add each when a model that uses it needs to be moved.

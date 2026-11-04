@@ -18,10 +18,18 @@ project:
     - models/camdl/stratified/README.md
     - models/emulsion/sir/README.md
     - models/emulsion/quickstart/README.md
+    - models/epidemics/seirv/README.md
+    - models/epidemics/seasonal_scenarios/README.md
     - models/epimodel/sis-network/README.md
     - models/epimodel/hiv/README.md
+    - models/epipack/sirs/README.md
+    - models/epipack/siarx_tracing/README.md
+    - models/epiworld/seirconn/README.md
+    - models/epiworld/covid_flu/README.md
     - models/epydemix/sir_kenya/README.md
     - models/epydemix/covid19/README.md
+    - models/epymorph/sirs_centroids/README.md
+    - models/epymorph/pei_humidity/README.md
     - models/flepimop/seir_2pop/README.md
     - models/flepimop/vaccine_scenarios/README.md
     - models/measles_metapop/seir_districts/README.md
@@ -187,10 +195,18 @@ website:
         - models/camdl/stratified/README.md
         - models/emulsion/sir/README.md
         - models/emulsion/quickstart/README.md
+        - models/epidemics/seirv/README.md
+        - models/epidemics/seasonal_scenarios/README.md
         - models/epimodel/sis-network/README.md
         - models/epimodel/hiv/README.md
+        - models/epipack/sirs/README.md
+        - models/epipack/siarx_tracing/README.md
+        - models/epiworld/seirconn/README.md
+        - models/epiworld/covid_flu/README.md
         - models/epydemix/sir_kenya/README.md
         - models/epydemix/covid19/README.md
+        - models/epymorph/sirs_centroids/README.md
+        - models/epymorph/pei_humidity/README.md
         - models/flepimop/seir_2pop/README.md
         - models/flepimop/vaccine_scenarios/README.md
         - models/measles_metapop/seir_districts/README.md

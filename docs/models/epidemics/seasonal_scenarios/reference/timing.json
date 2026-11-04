@@ -1,0 +1,8 @@
+{
+  "first": 0.0697,
+  "rerun": 0.01118,
+  "what": "the scenario with the interventions and the seasonal transmission rate: the call of model_default() that makes data_npi (checking the inputs, running the compiled odin model for 365 days, and making its table of results). first is that call as the vignette makes it, in a fresh R session with epidemics loaded, after the baseline scenario; rerun is the best of 3 more of the same call. Neither includes starting R or loading the package",
+  "machine": "x86_64",
+  "cpus": 20,
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
+}

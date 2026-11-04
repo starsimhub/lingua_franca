@@ -5,7 +5,7 @@
 | **Language** | R, with models written in the odin DSL |
 | **Paradigms** | Deterministic compartmental (ODE via odin); one discrete-time stochastic model |
 | **Specification style** | **Model structure is fixed.** The user composes a scenario from *composable elements* |
-| **Version reviewed** | 0.5.0 |
+| **Version reviewed** | 0.5.0; two models translated: [the default SEIR-V](../models/epidemics/seirv/README.md) and [seasonal scenarios](../models/epidemics/seasonal_scenarios/README.md) |
 | **License** | MIT |
 | **Code** | <https://github.com/epiverse-trace/epidemics> |
 | **Docs** | <https://epiverse-trace.github.io/epidemics/> |

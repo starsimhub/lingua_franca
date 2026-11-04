@@ -1,0 +1,9 @@
+framework: epidemics
+model: seasonal_scenarios
+version: 0.5.0
+source: vignettes/modelling_time_dependence.Rmd ("Modelling time-dependence and seasonality in transmission dynamics") at https://github.com/epiverse-trace/epidemics (rendered at https://epiverse-trace.github.io/epidemics/articles/modelling_time_dependence.html)
+commit: ac11c6fd15483f5a9fa2f053b714d04dd3c407b7 (the v0.5.0 tag)
+license: MIT
+language: R (models written in odin)
+env: _envs/epidemics
+lines: 76

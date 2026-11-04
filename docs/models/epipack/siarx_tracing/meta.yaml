@@ -1,0 +1,9 @@
+framework: epipack
+model: siarx_tracing
+version: 0.1.5
+source: https://github.com/benmaier/epipack/blob/v0.1.5/docs/tutorial/networks.rst
+commit: 52fb26ba35672fbce1f2f598eac2ed71e6fcb90f
+license: MIT
+language: Python
+env: _envs/epipack
+lines: 61

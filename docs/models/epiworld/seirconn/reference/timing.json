@@ -1,0 +1,8 @@
+{
+  "first": 0.00438,
+  "rerun": 0.00291,
+  "what": "run() of the vignette's ModelSEIRCONN for 50 days (10,000 agents), with its progress bar off, inside one R session. The first run is building the model with the vignette's own statement and running it once, after the vignette has run; the rerun is the best of repeated run() calls. Neither includes starting R or loading epiworldR",
+  "machine": "x86_64",
+  "cpus": 20,
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
+}

@@ -1,0 +1,9 @@
+framework: epymorph
+model: pei_humidity
+version: 1.2.0
+source: https://github.com/NAU-CCL/epymorph/blob/v1.2.0/USAGE.ipynb
+commit: 7027fcf5aca2394601dfd9ab530cc8576b84d89c
+license: GPL-3.0
+language: Python
+env: _envs/epymorph
+lines: 22

@@ -1,27 +1,31 @@
 # The kernel sets to time each model with: the fastest rerun, and any within 10% of it, so that a close call is settled each time.
 # Written by `lingua_franca benchmark --all-kernels`; each note gives the reruns measured.
-atomica/hiv_dyn: [rust] # Rust 2 ms, Numba 2.3 ms, JAX 2.3 ms, JAX on a GPU 3.9 ms
-atomica/sir: [rust, jax] # Rust 0.8 ms, JAX 0.84 ms, Numba 0.96 ms, JAX on a GPU 2 ms
-camdl/sir: [rust, jax] # Rust 0.71 ms, JAX 0.76 ms, Numba 0.93 ms, JAX on a GPU 7.8 ms
-camdl/stratified: [rust] # Rust 1.9 ms, JAX 2.3 ms, Numba 3.7 ms, JAX on a GPU 34 ms
-emulsion/quickstart: [rust, numba] # Rust 220 ms, Numba 220 ms
-emulsion/sir: [rust] # Rust 0.55 ms, Numba 0.77 ms
-epimodel/hiv: [rust, numba] # Rust 2 s, Numba 2.1 s
-epimodel/sis-network: [rust] # Rust 330 ms, Numba 370 ms
-epydemix/covid19: [rust] # Rust 1.5 ms, JAX on a GPU 2.6 ms, Numba 2.7 ms, JAX 2.8 ms
-epydemix/sir_kenya: [rust] # Rust 0.7 ms, Numba 2.6 ms
-flepimop/seir_2pop: [rust, jax] # Rust 0.92 ms, JAX 0.98 ms, Numba 1.2 ms, JAX on a GPU 9.5 ms
-flepimop/vaccine_scenarios: [rust, numba, jax] # Rust 540 ms, Numba 550 ms, JAX 570 ms, JAX on a GPU 670 ms
-laser/england_wales: [rust, numba] # Rust 15 s, Numba 16 s
-laser/hub_spoke_seir: [rust, numba] # Rust 620 ms, Numba 620 ms
-measles_metapop/seir_districts: [rust] # Rust 500 ms, Numba 560 ms
-memilio/secir: [rust, jax] # Rust 1.2 ms, JAX 1.2 ms, Numba 1.6 ms, JAX on a GPU 12 ms
-memilio/secir_ageres: [rust] # Rust 1.3 ms, Numba 1.5 ms, JAX 2.1 ms, JAX on a GPU 11 ms
-odin/seir_array: [rust] # Rust 4.1 ms, Numba 5.6 ms, JAX 23 ms, JAX on a GPU 97 ms
-odin/stochastic_sir_arrays: [rust] # Rust 14 ms, Numba 19 ms
-pandemic_simulator/ebola_legrand: [rust] # Rust 1.5 ms, JAX 1.7 ms, Numba 2.3 ms
-pandemic_simulator/sir_reactive: [rust] # Rust 0.39 ms, JAX 0.53 ms, Numba 0.86 ms
-siminf/sir_herds: [rust] # Rust 130 ms, Numba 310 ms
-siminf/sise3: [rust] # Rust 740 ms, Numba 1.2 s
-summer2/seir-age-clinical: [rust] # Rust 1.1 ms, Numba 1.3 ms, JAX 2.3 ms, JAX on a GPU 22 ms
-summer2/sir-age-location: [rust, jax] # Rust 0.88 ms, JAX 0.91 ms, Numba 1.2 ms, JAX on a GPU 18 ms
+atomica/hiv_dyn: [rust] # Rust 0.34 ms, Numba 2.3 ms, JAX 2.3 ms, JAX on a GPU 3.9 ms
+atomica/sir: [rust] # Rust 0.17 ms, JAX 0.4 ms, Numba 0.96 ms, JAX on a GPU 2 ms
+camdl/sir: [rust] # Rust 0.22 ms, JAX 0.44 ms, Numba 0.93 ms, JAX on a GPU 7.8 ms
+camdl/stratified: [rust] # Rust 0.46 ms, JAX 2.3 ms, Numba 3.7 ms, JAX on a GPU 34 ms
+emulsion/quickstart: [rust, numba] # Rust 210 ms, Numba 210 ms
+emulsion/sir: [rust] # Rust 0.18 ms, Numba 0.77 ms
+epidemics/seasonal_scenarios: [rust] # Rust 47 ms, Numba 52 ms, JAX 52 ms, JAX on a GPU 110 ms
+epidemics/seirv: [jax] # JAX 0.98 ms, Rust 1.3 ms, Numba 2.1 ms, JAX on a GPU 62 ms
+epimodel/hiv: [numba, rust] # Numba 2 s, Rust 2 s
+epimodel/sis-network: [rust] # Rust 320 ms, Numba 370 ms
+epipack/siarx_tracing: [rust, numba] # Rust 1.1 s, Numba 1.2 s
+epipack/sirs: [rust] # Rust 0.22 ms, Numba 0.4 ms, JAX 0.46 ms, JAX on a GPU 6.3 ms
+epydemix/covid19: [rust] # Rust 1.2 ms, JAX on a GPU 2.6 ms, Numba 2.7 ms, JAX 2.8 ms
+epydemix/sir_kenya: [rust] # Rust 0.3 ms, Numba 2.6 ms
+flepimop/seir_2pop: [rust] # Rust 0.36 ms, JAX 0.5 ms, Numba 1.2 ms, JAX on a GPU 9.5 ms
+flepimop/vaccine_scenarios: [jax, rust, numba] # JAX 350 ms, Rust 350 ms, Numba 350 ms, JAX on a GPU 670 ms
+laser/england_wales: [rust] # Rust 12 s, Numba 13 s
+laser/hub_spoke_seir: [rust, numba] # Rust 620 ms, Numba 640 ms
+measles_metapop/seir_districts: [rust] # Rust 410 ms, Numba 560 ms
+memilio/secir: [rust] # Rust 0.37 ms, JAX 0.62 ms, Numba 1.6 ms, JAX on a GPU 12 ms
+memilio/secir_ageres: [rust] # Rust 0.49 ms, Numba 1.5 ms, JAX 2.1 ms, JAX on a GPU 11 ms
+odin/seir_array: [rust] # Rust 2.9 ms, Numba 5.6 ms, JAX 23 ms, JAX on a GPU 97 ms
+odin/stochastic_sir_arrays: [rust] # Rust 0.85 ms, Numba 19 ms
+pandemic_simulator/ebola_legrand: [rust] # Rust 1.4 ms, JAX 1.7 ms, Numba 2.3 ms
+pandemic_simulator/sir_reactive: [rust] # Rust 0.34 ms, JAX 0.53 ms, Numba 0.86 ms
+siminf/sir_herds: [rust] # Rust 140 ms, Numba 310 ms
+siminf/sise3: [rust] # Rust 520 ms, Numba 1.2 s
+summer2/seir-age-clinical: [rust] # Rust 0.48 ms, Numba 1.3 ms, JAX 2.3 ms, JAX on a GPU 22 ms
+summer2/sir-age-location: [rust] # Rust 0.34 ms, JAX 0.56 ms, Numba 1.2 ms, JAX on a GPU 18 ms

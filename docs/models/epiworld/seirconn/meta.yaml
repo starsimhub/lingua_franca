@@ -1,0 +1,9 @@
+framework: epiworld
+model: seirconn
+version: epiworldR 0.14.0.0
+source: the vignette "Run Multiple" of epiworldR, https://uofuepibio.github.io/epiworldR/articles/run-multiple.html (source at https://github.com/UofUEpiBio/epiworldR/blob/v0.14.0.0/vignettes/run-multiple.qmd)
+commit: v0.14.0.0 (7c36b6c; installed from CRAN, sha256 of epiworldR_0.14.0.0.tar.gz is 8d08817f78f41df6df609df7e777345a75e79e1b59f754eb89968a296d208c53)
+license: MIT
+language: R
+env: _envs/epiworld
+lines: 12

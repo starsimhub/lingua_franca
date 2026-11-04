@@ -5,8 +5,8 @@
 | **Language** | Python (SymPy for the disease model) |
 | **Paradigms** | Metapopulation: compartmental dynamics within nodes, discrete movement between them |
 | **Specification style** | Composition of independently declared parts: IPM (disease) × MM (movement) × scope (geography) × initializer × parameters |
-| **Version reviewed** | current `main` |
-| **License** | (see repository) |
+| **Version reviewed** | current `main`; two models translated, with 1.2.0: [an SIRS with commuting by distance](../models/epymorph/sirs_centroids/README.md) and [influenza driven by humidity](../models/epymorph/pei_humidity/README.md) |
+| **License** | GPL-3.0 |
 | **Code** | <https://github.com/NAU-CCL/epymorph> |
 | **Docs** | <https://docs.epimorph.org> |
 | **Paper** | Mihaljevic et al. (2026), *medRxiv*, [10.64898/2026.10.26.26366544](https://doi.org/10.64898/2026.10.26.26366544) (EpiMoRPH project, NAU) |

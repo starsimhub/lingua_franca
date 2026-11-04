@@ -1,0 +1,8 @@
+{
+  "first": 0.09156,
+  "rerun": 0.08773,
+  "what": "run() of the vignette's final model for 50 days (50,000 agents, two viruses, a vaccine, and two events), with its progress bar off, inside one R session. The first run is building the model with the vignette's own statements and running it once, after the vignette has run; the rerun is the best of repeated run() calls, each after setting the contact rate back to 4. Neither includes starting R or loading epiworldR",
+  "machine": "x86_64",
+  "cpus": 20,
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"
+}

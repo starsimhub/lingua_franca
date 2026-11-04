@@ -1,0 +1,409 @@
+time,series,value,low,high
+0,Susceptible,49900.0,49900.0,49900.0
+1,Susceptible,49829.981,49815.0,49844.0
+2,Susceptible,49728.156,49693.0,49760.0
+3,Susceptible,49568.808,49501.0,49635.0
+4,Susceptible,49310.118,49177.0,49429.0
+5,Susceptible,48885.343,48655.0,49097.0
+6,Susceptible,48189.323,47786.0,48562.0
+7,Susceptible,47064.686,46398.0,47698.0
+8,Susceptible,45307.337,44292.0,46304.0
+9,Susceptible,42734.334,41306.0,44216.0
+10,Susceptible,39308.686,37518.0,41229.0
+11,Susceptible,35297.89,33411.0,37462.0
+12,Susceptible,33087.173,31290.0,35266.0
+13,Susceptible,31211.518,29513.0,33264.0
+14,Susceptible,29654.272,28093.0,31596.0
+15,Susceptible,28378.751,26938.0,30149.0
+16,Susceptible,27342.179,26053.0,28981.0
+17,Susceptible,26508.472,25357.0,27985.0
+18,Susceptible,25838.725,24778.0,27153.0
+19,Susceptible,25300.276,24319.0,26511.0
+20,Susceptible,24867.105,23974.0,25987.0
+21,Susceptible,24517.114,23697.0,25544.0
+22,Susceptible,24305.532,23523.0,25272.0
+23,Susceptible,24139.059,23386.0,25058.0
+24,Susceptible,24006.733,23274.0,24887.0
+25,Susceptible,23901.531,23196.0,24747.0
+26,Susceptible,23817.892,23136.0,24638.0
+27,Susceptible,23751.06,23085.0,24549.0
+28,Susceptible,23697.818,23046.0,24475.0
+29,Susceptible,23655.159,23016.0,24423.0
+30,Susceptible,23621.136,22987.0,24379.0
+31,Susceptible,23594.202,22967.0,24338.0
+32,Susceptible,23572.412,22952.0,24317.0
+33,Susceptible,23555.044,22940.0,24294.0
+34,Susceptible,23541.15,22927.0,24269.0
+35,Susceptible,23530.021,22919.0,24250.0
+36,Susceptible,23521.114,22912.0,24242.0
+37,Susceptible,23513.896,22908.0,24232.0
+38,Susceptible,23508.219,22904.0,24228.0
+39,Susceptible,23503.667,22900.0,24216.0
+40,Susceptible,23500.025,22899.0,24213.0
+41,Susceptible,23497.127,22898.0,24211.0
+42,Susceptible,23494.771,22896.0,24207.0
+43,Susceptible,23492.906,22895.0,24203.0
+44,Susceptible,23491.419,22894.0,24201.0
+45,Susceptible,23490.197,22893.0,24200.0
+46,Susceptible,23489.254,22892.0,24200.0
+47,Susceptible,23488.512,22891.0,24198.0
+48,Susceptible,23487.903,22891.0,24198.0
+49,Susceptible,23487.409,22891.0,24198.0
+50,Susceptible,23486.999,22890.0,24198.0
+0,Infected,100.0,100.0,100.0
+1,Infected,116.81,100.0,135.0
+2,Infected,170.599,140.0,205.0
+3,Infected,267.978,212.0,327.0
+4,Infected,436.454,342.0,543.0
+5,Infected,721.046,560.0,896.0
+6,Infected,1195.076,922.0,1495.0
+7,Infected,1962.065,1500.0,2441.0
+8,Infected,3143.487,2422.0,3838.0
+9,Infected,4808.321,3802.0,5736.0
+10,Infected,6854.4,5655.0,7855.0
+11,Infected,8899.2,7747.0,9793.0
+12,Infected,8545.348,7708.0,9143.0
+13,Infected,8005.129,7496.0,8358.0
+14,Infected,7315.053,7055.0,7534.0
+15,Infected,6539.79,6317.0,6741.0
+16,Infected,5741.092,5438.0,6014.0
+17,Infected,4963.904,4606.0,5301.0
+18,Infected,4238.151,3870.0,4626.0
+19,Infected,3583.278,3219.0,3990.0
+20,Infected,3006.435,2661.0,3401.0
+21,Infected,2508.579,2188.0,2891.0
+22,Infected,2011.84,1732.0,2354.0
+23,Infected,1617.07,1376.0,1916.0
+24,Infected,1301.721,1099.0,1559.0
+25,Infected,1047.097,870.0,1268.0
+26,Infected,842.035,697.0,1026.0
+27,Infected,676.781,552.0,831.0
+28,Infected,543.18,435.0,678.0
+29,Infected,435.935,344.0,546.0
+30,Infected,349.667,271.0,441.0
+31,Infected,280.254,215.0,358.0
+32,Infected,225.012,171.0,294.0
+33,Infected,180.285,134.0,237.0
+34,Infected,144.537,106.0,195.0
+35,Infected,115.776,81.0,159.0
+36,Infected,92.914,64.0,130.0
+37,Infected,74.46,50.0,105.0
+38,Infected,59.59,38.0,85.0
+39,Infected,47.79,30.0,71.0
+40,Infected,38.071,23.0,57.0
+41,Infected,30.538,17.0,48.0
+42,Infected,24.556,13.0,39.0
+43,Infected,19.71,10.0,32.0
+44,Infected,15.794,7.0,27.0
+45,Infected,12.634,6.0,22.0
+46,Infected,10.022,4.0,18.0
+47,Infected,8.047,3.0,15.0
+48,Infected,6.49,2.0,13.0
+49,Infected,5.17,1.0,11.0
+50,Infected,4.194,1.0,10.0
+0,Recovered,0.0,0.0,0.0
+1,Recovered,53.209,45.0,61.0
+2,Recovered,101.245,91.0,112.0
+3,Recovered,163.214,146.0,181.0
+4,Recovered,253.428,221.0,288.0
+5,Recovered,393.611,335.0,457.0
+6,Recovered,615.601,513.0,726.0
+7,Recovered,973.249,798.0,1164.0
+8,Recovered,1549.176,1243.0,1869.0
+9,Recovered,2457.345,1950.0,2980.0
+10,Recovered,3836.914,3045.0,4623.0
+11,Recovered,5802.91,4682.0,6869.0
+12,Recovered,8367.479,6882.0,9679.0
+13,Recovered,10783.353,9078.0,12281.0
+14,Recovered,13030.675,11235.0,14602.0
+15,Recovered,15081.459,13209.0,16647.0
+16,Recovered,16916.729,15077.0,18415.0
+17,Recovered,18527.624,16756.0,19963.0
+18,Recovered,19923.124,18249.0,21284.0
+19,Recovered,21116.446,19533.0,22383.0
+20,Recovered,22126.46,20640.0,23314.0
+21,Recovered,22974.307,21601.0,24056.0
+22,Recovered,23682.628,22420.0,24698.0
+23,Recovered,24243.871,23061.0,25192.0
+24,Recovered,24691.546,23578.0,25580.0
+25,Recovered,25051.372,23997.0,25885.0
+26,Recovered,25340.073,24323.0,26137.0
+27,Recovered,25572.159,24610.0,26338.0
+28,Recovered,25759.002,24830.0,26500.0
+29,Recovered,25908.906,25025.0,26621.0
+30,Recovered,26029.197,25177.0,26725.0
+31,Recovered,26125.544,25302.0,26800.0
+32,Recovered,26202.576,25401.0,26869.0
+33,Recovered,26264.671,25473.0,26920.0
+34,Recovered,26314.313,25541.0,26959.0
+35,Recovered,26354.203,25590.0,26992.0
+36,Recovered,26385.972,25635.0,27016.0
+37,Recovered,26411.644,25666.0,27035.0
+38,Recovered,26432.191,25687.0,27049.0
+39,Recovered,26448.543,25707.0,27062.0
+40,Recovered,26461.904,25726.0,27070.0
+41,Recovered,26472.335,25739.0,27079.0
+42,Recovered,26480.673,25752.0,27085.0
+43,Recovered,26487.384,25754.0,27092.0
+44,Recovered,26492.787,25760.0,27095.0
+45,Recovered,26497.169,25771.0,27098.0
+46,Recovered,26500.724,25774.0,27100.0
+47,Recovered,26503.441,25778.0,27103.0
+48,Recovered,26505.607,25782.0,27105.0
+49,Recovered,26507.421,25784.0,27105.0
+50,Recovered,26508.807,25786.0,27107.0
+0,Infected COVID-19,50.0,50.0,50.0
+1,Infected COVID-19,69.09,56.0,83.0
+2,Infected COVID-19,115.817,89.0,144.0
+3,Infected COVID-19,202.436,152.0,260.0
+4,Infected COVID-19,357.516,270.0,453.0
+5,Infected COVID-19,626.317,465.0,797.0
+6,Infected COVID-19,1081.995,797.0,1377.0
+7,Infected COVID-19,1830.63,1370.0,2307.0
+8,Infected COVID-19,2996.756,2278.0,3715.0
+9,Infected COVID-19,4653.232,3630.0,5585.0
+10,Infected COVID-19,6702.629,5490.0,7734.0
+11,Infected COVID-19,8765.425,7599.0,9689.0
+12,Infected COVID-19,8458.23,7606.0,9080.0
+13,Infected COVID-19,7949.552,7415.0,8320.0
+14,Infected COVID-19,7280.8,7006.0,7509.0
+15,Infected COVID-19,6519.122,6291.0,6723.0
+16,Infected COVID-19,5729.071,5432.0,6000.0
+17,Infected COVID-19,4957.0,4600.0,5293.0
+18,Infected COVID-19,4234.208,3867.0,4624.0
+19,Infected COVID-19,3581.004,3218.0,3985.0
+20,Infected COVID-19,3005.176,2661.0,3399.0
+21,Infected COVID-19,2507.884,2188.0,2891.0
+22,Infected COVID-19,2011.463,1732.0,2353.0
+23,Infected COVID-19,1616.862,1376.0,1916.0
+24,Infected COVID-19,1301.608,1099.0,1559.0
+25,Infected COVID-19,1047.048,870.0,1268.0
+26,Infected COVID-19,842.014,697.0,1026.0
+27,Infected COVID-19,676.77,552.0,831.0
+28,Infected COVID-19,543.172,435.0,678.0
+29,Infected COVID-19,435.932,344.0,546.0
+30,Infected COVID-19,349.667,271.0,441.0
+31,Infected COVID-19,280.254,215.0,358.0
+32,Infected COVID-19,225.012,171.0,294.0
+33,Infected COVID-19,180.285,134.0,237.0
+34,Infected COVID-19,144.537,106.0,195.0
+35,Infected COVID-19,115.776,81.0,159.0
+36,Infected COVID-19,92.914,64.0,130.0
+37,Infected COVID-19,74.46,50.0,105.0
+38,Infected COVID-19,59.59,38.0,85.0
+39,Infected COVID-19,47.79,30.0,71.0
+40,Infected COVID-19,38.071,23.0,57.0
+41,Infected COVID-19,30.538,17.0,48.0
+42,Infected COVID-19,24.556,13.0,39.0
+43,Infected COVID-19,19.71,10.0,32.0
+44,Infected COVID-19,15.794,7.0,27.0
+45,Infected COVID-19,12.634,6.0,22.0
+46,Infected COVID-19,10.022,4.0,18.0
+47,Infected COVID-19,8.047,3.0,15.0
+48,Infected COVID-19,6.49,2.0,13.0
+49,Infected COVID-19,5.17,1.0,11.0
+50,Infected COVID-19,4.194,1.0,10.0
+0,Infected Flu,50.0,50.0,50.0
+1,Infected Flu,47.72,37.0,59.0
+2,Infected Flu,54.782,38.0,72.0
+3,Infected Flu,65.542,42.0,90.0
+4,Infected Flu,78.938,47.0,112.0
+5,Infected Flu,94.729,56.0,135.0
+6,Infected Flu,113.081,64.0,164.0
+7,Infected Flu,131.435,73.0,195.0
+8,Infected Flu,146.731,79.0,221.0
+9,Infected Flu,155.089,82.0,236.0
+10,Infected Flu,151.771,77.0,237.0
+11,Infected Flu,133.775,66.0,210.0
+12,Infected Flu,87.118,41.0,142.0
+13,Infected Flu,55.577,25.0,93.0
+14,Infected Flu,34.253,13.0,60.0
+15,Infected Flu,20.668,7.0,38.0
+16,Infected Flu,12.021,3.0,24.0
+17,Infected Flu,6.904,1.0,15.0
+18,Infected Flu,3.943,0.0,9.0
+19,Infected Flu,2.274,0.0,6.0
+20,Infected Flu,1.259,0.0,4.0
+21,Infected Flu,0.695,0.0,3.0
+22,Infected Flu,0.377,0.0,2.0
+23,Infected Flu,0.208,0.0,1.0
+24,Infected Flu,0.113,0.0,1.0
+25,Infected Flu,0.049,0.0,0.0
+26,Infected Flu,0.021,0.0,0.0
+27,Infected Flu,0.011,0.0,0.0
+28,Infected Flu,0.008,0.0,0.0
+29,Infected Flu,0.003,0.0,0.0
+30,Infected Flu,0.0,0.0,0.0
+31,Infected Flu,0.0,0.0,0.0
+32,Infected Flu,0.0,0.0,0.0
+33,Infected Flu,0.0,0.0,0.0
+34,Infected Flu,0.0,0.0,0.0
+35,Infected Flu,0.0,0.0,0.0
+36,Infected Flu,0.0,0.0,0.0
+37,Infected Flu,0.0,0.0,0.0
+38,Infected Flu,0.0,0.0,0.0
+39,Infected Flu,0.0,0.0,0.0
+40,Infected Flu,0.0,0.0,0.0
+41,Infected Flu,0.0,0.0,0.0
+42,Infected Flu,0.0,0.0,0.0
+43,Infected Flu,0.0,0.0,0.0
+44,Infected Flu,0.0,0.0,0.0
+45,Infected Flu,0.0,0.0,0.0
+46,Infected Flu,0.0,0.0,0.0
+47,Infected Flu,0.0,0.0,0.0
+48,Infected Flu,0.0,0.0,0.0
+49,Infected Flu,0.0,0.0,0.0
+50,Infected Flu,0.0,0.0,0.0
+0,vignette Susceptible,49900.0,,
+1,vignette Susceptible,49836.0,,
+2,vignette Susceptible,49744.0,,
+3,vignette Susceptible,49576.0,,
+4,vignette Susceptible,49304.0,,
+5,vignette Susceptible,48849.0,,
+6,vignette Susceptible,48091.0,,
+7,vignette Susceptible,46842.0,,
+8,vignette Susceptible,44880.0,,
+9,vignette Susceptible,42006.0,,
+10,vignette Susceptible,38304.0,,
+11,vignette Susceptible,34038.0,,
+12,vignette Susceptible,31832.0,,
+13,vignette Susceptible,29993.0,,
+14,vignette Susceptible,28555.0,,
+15,vignette Susceptible,27412.0,,
+16,vignette Susceptible,26485.0,,
+17,vignette Susceptible,25744.0,,
+18,vignette Susceptible,25184.0,,
+19,vignette Susceptible,24680.0,,
+20,vignette Susceptible,24336.0,,
+21,vignette Susceptible,24054.0,,
+22,vignette Susceptible,23874.0,,
+23,vignette Susceptible,23713.0,,
+24,vignette Susceptible,23609.0,,
+25,vignette Susceptible,23523.0,,
+26,vignette Susceptible,23455.0,,
+27,vignette Susceptible,23377.0,,
+28,vignette Susceptible,23339.0,,
+29,vignette Susceptible,23294.0,,
+30,vignette Susceptible,23256.0,,
+31,vignette Susceptible,23236.0,,
+32,vignette Susceptible,23222.0,,
+33,vignette Susceptible,23205.0,,
+34,vignette Susceptible,23191.0,,
+35,vignette Susceptible,23183.0,,
+36,vignette Susceptible,23179.0,,
+37,vignette Susceptible,23174.0,,
+38,vignette Susceptible,23172.0,,
+39,vignette Susceptible,23168.0,,
+40,vignette Susceptible,23161.0,,
+41,vignette Susceptible,23158.0,,
+42,vignette Susceptible,23154.0,,
+43,vignette Susceptible,23152.0,,
+44,vignette Susceptible,23151.0,,
+45,vignette Susceptible,23151.0,,
+46,vignette Susceptible,23148.0,,
+47,vignette Susceptible,23147.0,,
+48,vignette Susceptible,23146.0,,
+49,vignette Susceptible,23145.0,,
+50,vignette Susceptible,23145.0,,
+0,vignette Infected,100.0,,
+1,vignette Infected,112.0,,
+2,vignette Infected,154.0,,
+3,vignette Infected,268.0,,
+4,vignette Infected,458.0,,
+5,vignette Infected,761.0,,
+6,vignette Infected,1309.0,,
+7,vignette Infected,2203.0,,
+8,vignette Infected,3531.0,,
+9,vignette Infected,5377.0,,
+10,vignette Infected,7575.0,,
+11,vignette Infected,9647.0,,
+12,vignette Infected,9139.0,,
+13,vignette Infected,8332.0,,
+14,vignette Infected,7476.0,,
+15,vignette Infected,6441.0,,
+16,vignette Infected,5518.0,,
+17,vignette Infected,4736.0,,
+18,vignette Infected,3973.0,,
+19,vignette Infected,3332.0,,
+20,vignette Infected,2756.0,,
+21,vignette Infected,2288.0,,
+22,vignette Infected,1803.0,,
+23,vignette Infected,1458.0,,
+24,vignette Infected,1166.0,,
+25,vignette Infected,955.0,,
+26,vignette Infected,772.0,,
+27,vignette Infected,649.0,,
+28,vignette Infected,489.0,,
+29,vignette Infected,417.0,,
+30,vignette Infected,339.0,,
+31,vignette Infected,281.0,,
+32,vignette Infected,219.0,,
+33,vignette Infected,159.0,,
+34,vignette Infected,134.0,,
+35,vignette Infected,104.0,,
+36,vignette Infected,81.0,,
+37,vignette Infected,65.0,,
+38,vignette Infected,53.0,,
+39,vignette Infected,43.0,,
+40,vignette Infected,37.0,,
+41,vignette Infected,31.0,,
+42,vignette Infected,30.0,,
+43,vignette Infected,26.0,,
+44,vignette Infected,20.0,,
+45,vignette Infected,15.0,,
+46,vignette Infected,16.0,,
+47,vignette Infected,15.0,,
+48,vignette Infected,10.0,,
+49,vignette Infected,9.0,,
+50,vignette Infected,4.0,,
+0,vignette Recovered,0.0,,
+1,vignette Recovered,52.0,,
+2,vignette Recovered,102.0,,
+3,vignette Recovered,156.0,,
+4,vignette Recovered,238.0,,
+5,vignette Recovered,390.0,,
+6,vignette Recovered,600.0,,
+7,vignette Recovered,955.0,,
+8,vignette Recovered,1589.0,,
+9,vignette Recovered,2617.0,,
+10,vignette Recovered,4121.0,,
+11,vignette Recovered,6315.0,,
+12,vignette Recovered,9029.0,,
+13,vignette Recovered,11675.0,,
+14,vignette Recovered,13969.0,,
+15,vignette Recovered,16147.0,,
+16,vignette Recovered,17997.0,,
+17,vignette Recovered,19520.0,,
+18,vignette Recovered,20843.0,,
+19,vignette Recovered,21988.0,,
+20,vignette Recovered,22908.0,,
+21,vignette Recovered,23658.0,,
+22,vignette Recovered,24323.0,,
+23,vignette Recovered,24829.0,,
+24,vignette Recovered,25225.0,,
+25,vignette Recovered,25522.0,,
+26,vignette Recovered,25773.0,,
+27,vignette Recovered,25974.0,,
+28,vignette Recovered,26172.0,,
+29,vignette Recovered,26289.0,,
+30,vignette Recovered,26405.0,,
+31,vignette Recovered,26483.0,,
+32,vignette Recovered,26559.0,,
+33,vignette Recovered,26636.0,,
+34,vignette Recovered,26675.0,,
+35,vignette Recovered,26713.0,,
+36,vignette Recovered,26740.0,,
+37,vignette Recovered,26761.0,,
+38,vignette Recovered,26775.0,,
+39,vignette Recovered,26789.0,,
+40,vignette Recovered,26802.0,,
+41,vignette Recovered,26811.0,,
+42,vignette Recovered,26816.0,,
+43,vignette Recovered,26822.0,,
+44,vignette Recovered,26829.0,,
+45,vignette Recovered,26834.0,,
+46,vignette Recovered,26836.0,,
+47,vignette Recovered,26838.0,,
+48,vignette Recovered,26844.0,,
+49,vignette Recovered,26846.0,,
+50,vignette Recovered,26851.0,,

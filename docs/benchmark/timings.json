@@ -139,6 +139,58 @@
       "fastest": "rust",
       "load": 3.4404296875
     },
+    "epidemics/seasonal_scenarios": {
+      "kernels": {
+        "rust": {
+          "first": 0.0739268409088254,
+          "rerun": 0.046826148056425154,
+          "rebuild": 0.07369152992032468
+        },
+        "numba": {
+          "first": 0.3104567200643942,
+          "rerun": 0.051533923018723726,
+          "rebuild": 0.07537254295311868
+        },
+        "jax": {
+          "first": 1.1822506999596953,
+          "rerun": 0.05162931000813842,
+          "rebuild": 0.07521504594478756
+        },
+        "jax-gpu": {
+          "first": 3.4756831049453467,
+          "rerun": 0.1136508530471474,
+          "rebuild": 0.1379183609969914
+        }
+      },
+      "fastest": "rust",
+      "load": 5.4306640625
+    },
+    "epidemics/seirv": {
+      "kernels": {
+        "rust": {
+          "first": 0.029892702936194837,
+          "rerun": 0.001284247962757945,
+          "rebuild": 0.012405916000716388
+        },
+        "numba": {
+          "first": 0.3068767070071772,
+          "rerun": 0.0020533549832180142,
+          "rebuild": 0.013735616928897798
+        },
+        "jax": {
+          "first": 0.8424185800831765,
+          "rerun": 0.0009800889529287815,
+          "rebuild": 0.010814410052262247
+        },
+        "jax-gpu": {
+          "first": 2.528730269987136,
+          "rerun": 0.0618626739596948,
+          "rebuild": 0.073961331974715
+        }
+      },
+      "fastest": "jax",
+      "load": 4.3759765625
+    },
     "epimodel/hiv": {
       "kernels": {
         "jax": {
@@ -179,6 +231,54 @@
       },
       "fastest": "rust",
       "load": 2.31005859375
+    },
+    "epipack/siarx_tracing": {
+      "kernels": {
+        "rust": {
+          "first": 1.2792691229842603,
+          "rerun": 1.1416221599793062,
+          "rebuild": 1.152617763960734
+        },
+        "numba": {
+          "first": 7.639974407968111,
+          "rerun": 1.17083871003706,
+          "rebuild": 1.1127848270116374
+        },
+        "jax": {
+          "skipped": "it runs as agents"
+        },
+        "jax-gpu": {
+          "skipped": "it runs as agents"
+        }
+      },
+      "fastest": "rust",
+      "load": 2.40576171875
+    },
+    "epipack/sirs": {
+      "kernels": {
+        "rust": {
+          "first": 0.012882594019174576,
+          "rerun": 0.00021961599122732878,
+          "rebuild": 0.007591120898723602
+        },
+        "numba": {
+          "first": 0.17524864908773452,
+          "rerun": 0.0004001050256192684,
+          "rebuild": 0.007672821986488998
+        },
+        "jax": {
+          "first": 0.994019704987295,
+          "rerun": 0.0004629578907042742,
+          "rebuild": 0.007241403101943433
+        },
+        "jax-gpu": {
+          "first": 2.444558774936013,
+          "rerun": 0.006328604998998344,
+          "rebuild": 0.014576239977031946
+        }
+      },
+      "fastest": "rust",
+      "load": 2.40576171875
     },
     "epydemix/covid19": {
       "kernels": {
@@ -557,10 +657,10 @@
       "load": 2.41357421875
     }
   },
-  "date": "2026-11-02",
+  "date": "2026-11-03",
   "starsim": {
-    "version": "4.0.0rc1",
-    "commit": "5a43500f"
+    "version": "4.0.0rc2",
+    "commit": "d0107e93"
   },
   "kernels": [
     "rust",
@@ -570,7 +670,7 @@
   ],
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
-  "numba_compile": 294.78296341502573,
+  "numba_compile": 308.1381352019962,
   "suite": {
     "date": "2026-11-02",
     "seconds": 935.2,
@@ -606,5 +706,5 @@
       "summer2/sir-age-location": 28.5
     }
   },
-  "survey": "2026-11-02"
+  "survey": "2026-11-03"
 }

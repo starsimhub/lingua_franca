@@ -2,7 +2,7 @@
 
 - **Version:** 1.2.0, from PyPI
 - **Source:** https://github.com/NAU-CCL/Epymorph (GPL-3.0)
-- **Needs:** Python 3.12 and `uv`; a network connection when a model's data comes from an ADRIO
+- **Needs:** Python 3.12 and `uv`; a network connection when a model's data comes from an ADRIO (the models here keep the data their ADRIOs fetch, so they run offline)
 
 ## Build
 

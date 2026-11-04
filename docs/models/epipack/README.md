@@ -10,10 +10,10 @@
 
 ```bash
 uv venv --python 3.12 .
-VIRTUAL_ENV=$PWD uv pip install epipack==0.1.5
+VIRTUAL_ENV=$PWD uv pip install epipack==0.1.5 networkx
 VIRTUAL_ENV=$PWD uv pip freeze > requirements.txt
 ```
 
 Run from `_envs/epipack`. To rebuild with the same versions of everything, install from `requirements.txt` instead: `VIRTUAL_ENV=$PWD uv pip install -r requirements.txt`.
 
-The optional `SamplableSet`, which speeds up the stochastic models, is not installed.
+The optional `SamplableSet`, which speeds up the stochastic models, is not installed. `networkx` is not a dependency of epipack, but its examples use it to make their networks.

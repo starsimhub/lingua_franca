@@ -1,0 +1,9 @@
+framework: epymorph
+model: sirs_centroids
+version: 1.2.0
+source: https://www.docs.epimorph.org/demo/G2.L0.1-MM_intro.html
+commit: 7027fcf5aca2394601dfd9ab530cc8576b84d89c
+license: GPL-3.0
+language: Python
+env: _envs/epymorph
+lines: 29

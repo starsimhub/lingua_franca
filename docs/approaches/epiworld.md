@@ -5,7 +5,7 @@
 | **Language** | Header-only C++ core; R and Python bindings |
 | **Paradigms** | Agent-based: networks, fully-connected mixing, and mixing-matrix models |
 | **Specification style** | Model built from states, transition functions, viruses, and tools, either from templates or with a model builder |
-| **Version reviewed** | epiworldR (CRAN) |
+| **Version reviewed** | epiworldR 0.14.0.0 (CRAN); two models translated: [an SEIR in a connected population](../models/epiworld/seirconn/README.md) and [COVID-19 and flu with a vaccine](../models/epiworld/covid_flu/README.md) |
 | **License** | MIT |
 | **Code** | <https://github.com/UofUEpiBio/epiworld>, <https://github.com/UofUEpiBio/epiworldR> |
 | **Docs** | <https://uofuepibio.github.io/epiworldR/> |

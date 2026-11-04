@@ -22,7 +22,7 @@ Every document follows the same template, so that the sections can be read acros
 
 ### Included — full reviews
 
-24 frameworks, one document each.
+24 frameworks, one document each. Sixteen of them also have models translated into Starsim; the [models page](../models/index.qmd#how-the-models-were-chosen) says which, and why each of the others doesn't.
 
 | Framework | Language | Paradigms | Specification style | Why |
 |---|---|---|---|---|

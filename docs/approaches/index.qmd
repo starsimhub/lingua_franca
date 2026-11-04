@@ -12,4 +12,4 @@ This section reviews 24 existing disease modeling frameworks, plus brief notes o
 - **Many frameworks have found they need to tell rates, probabilities, and durations apart**, since mixing them up is an easy mistake to make.
 - **Configuration files have a real tradeoff.** Models in YAML or JSON are clear about what they contain, but can be hard to write and read at length.
 
-The [full comparison](README.md) has a table of all the frameworks and how they were chosen. Each framework has its own review, and [other frameworks](notes.md) has brief entries for the rest.
+The [full comparison](README.md) has a table of all the frameworks and how they were chosen. Each framework has its own review, and [other frameworks](notes.md) has brief entries for the rest. The [models page](../models/index.qmd#how-the-models-were-chosen) says which frameworks have models translated into Starsim, and why the others don't.
