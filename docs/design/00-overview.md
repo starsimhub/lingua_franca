@@ -83,7 +83,7 @@ ss.Sim                          modules, a population, mixing, a timeline, a sol
  ├── people:   ss.People        size, demography, per-agent attributes
  ├── stratifications            dimensions such as age and place (sim.stratify), with ss.geo.Mobility between places
  ├── networks: ss.Network, ss.MixingPool     none given means homogeneous mixing
- ├── modifiers: ss.modify, ss.change     changes to named quantities while a condition holds, or at given times
+ ├── modifiers: ss.modify                changes to named quantities while a condition holds, or over time
  ├── loop                       the order modules run in each step (sim.loop)
  └── results                    sim.results, with data attached by name
 ss.MultiSim                     many runs of a sim (ss.parallel); its results have a run dimension
@@ -118,7 +118,7 @@ Subclassing adds behavior. It does not add vocabulary.
 
 ## Four properties the design aims for
 
-1. **The model is data.** States and transitions are objects, so the diagram, the equations, the stratified model, and the exports are all derived from them. The model itself is its code; there is no serialized form besides a saved sim ([14-model-spec.md](14-model-spec.md)).
+1. **The model is data.** States and transitions are objects, so the diagram, the equations, the stratified model, and the exports are all derived from them. The model itself is its code; besides a saved sim, a declared model can be written as JSON, Starsim's own format, which is read by writing its code ([14-model-spec.md](14-model-spec.md#the-json-form)).
 2. **The solver is chosen for you, and can be changed.** `solver='auto'` picks the simplest, fastest representation that runs the model faithfully: an ODE if every part has a compartmental form, agents otherwise. `solver='ode' | 'binomial' | 'gillespie' | 'abm'` asks for one. For simple models this is a free run-time choice; for complex models the solver is effectively part of the specification. [12-backends.md](12-backends.md)
 3. **Approximations are stated.** `'auto'` never approximates the mixing and never drops individual-level structure; the one thing it does unasked is represent a non-exponential dwell time by Erlang sub-stages, and it says so. When a solver is asked for that the model does not natively fit, the library uses the standard approximation where one exists and says so in one line; it stops only when there is no sensible approximation. `approx=False` makes any approximation an error, and `approx=True` keeps the note in `sim.notes` without printing it. `sir.solvers()` shows which solvers can run a model before anything runs.
 4. **Defaults are guessed and printed.** `describe()` shows every guessed dwell-time distribution, unit, and mixing assumption, and which states are people and which are counts. [01-objects.md §`describe()`](01-objects.md#describe)

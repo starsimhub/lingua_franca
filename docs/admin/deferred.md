@@ -16,6 +16,24 @@ Work that has been looked at and set aside for now: worth doing, but not yet. Ea
 - **Rust kernels that abort on bad input.** Found in review (2026-10-28), for input Starsim itself never makes: a failed allocation inside a pass (e.g. `census` with 10^12 groups) aborts, where Numba raises `MemoryError` (it would need `try_reserve` on sizes taken from arguments). Every other panic raises a `RuntimeError` through `ss.perflib.rust.fallback()`, and arrays the kernels can't take (read-only, object, 2-D where 1-D is meant) go to Numba.
 - **Compiling the kernels by solver.** Each solver could compile only its own path through `ss.kernels.step()`, which would cut a first compiled run from about 45 s to 18 s (ODE) or 27 s (binomial) ([oct21/numba_vs_jax.md](oct21/numba_vs_jax.md)). Numba makes it awkward: a literal `solver` didn't drop the other paths and made calls 20× slower, and passing or closing over a step function defeats Numba's cache (its type, or its pickle, differs in every process). What works is a closure over the solver as a number (Numba drops the other branches and caches each), with each caller reaching the solver's `step()` through an `if` on that number, or a module-level tuple of functions (an experimental Numba feature that can't inline). Set aside on 2026-10-21 (S5.11 of [oct21/plan.md](oct21/plan.md)), since the kernels now run as plain Python until compiling pays, so the compile is opt-in and happens once; worth it if the one-time compile (about 100 s for everything) becomes a problem, e.g. in CI.
 
+### Models whose rerun is still slower than the original (2026-11-02)
+
+From the full benchmark (`lingua_franca benchmark`, in [timings.csv](../benchmark/timings.csv)), after the November 2 fixes that keep dated measures, `when=`, conditions on counts, typed coverage, and outcomes in the kernels. None of these models hit those cliffs, so the fixes left them within noise. LASER is left out here; its gap is whole-population passes over the agents (see "What is left of `benchmark-gaps.md`" above). Times are reruns with the Rust kernels.
+
+| Model | Original | Starsim | Gap | What it is |
+|---|---|---|---|---|
+| `memilio/secir` | 0.02 ms | 0.37 ms | 18× | Starsim's fixed cost per run |
+| `memilio/secir_ageres` | 0.06 ms | 0.49 ms | 8× | Starsim's fixed cost per run |
+| `siminf/sise3` | 90 ms | 520 ms | 5.8× | Real model work, mostly `place_rates()` (see above) |
+| `siminf/sir_herds` | 75 ms | 140 ms | 1.9× | Real model work, not yet looked at |
+| `odin/seir_array` | 1.4 ms | 2.9 ms | 2.1× | Real model work, not yet looked at |
+| `summer2/seir-age-clinical` | 0.29 ms | 0.48 ms | 1.7× | Starsim's fixed cost per run |
+| `summer2/sir-age-location` | 0.22 ms | 0.34 ms | 1.5× | Starsim's fixed cost per run |
+
+- **The fixed cost per run.** A restart and run of a small model costs about 0.2 ms, of which only 0.06 to 0.12 ms is the kernel; the rest is restarting, storing results, and finalizing, spread over many functions. MEmilio and summer2 run their whole model in less than that. Closing the gap would mean a leaner path from `sim.run()` to the kernel and back, not removing a cliff; it waits since all of these pass the benchmark's limit (2×, or 1 s) and a rerun under half a millisecond is rarely what limits a user.
+- **Real model work.** SISe3, SIR in herds, and odin's SEIR on arrays spend their time in the run itself. SISe3's is the interpreter over the program; the other two haven't been profiled, and are the place to start if these gaps matter.
+- **The rest.** About 20 models rerun faster than their originals, many by 10 to 100×. Every model passes on time except LASER's England and Wales.
+
 ## Accuracy
 
 - **Continuous times of entering in the agent engine.** A declared disease run as agents and one written as code now round a time between steps the same way, at random in proportion by each agent's phase (`ss.People.phase()`: step floor(t + phase)). But the engine starts each stay at a whole step (the step of the move), and rounds each dwell from there, while code that chains its times (HIV's `ti_falling = ti_latent + dur_latent`) rounds the sum. So the same agent's successive stays are rounded the same way (with a fixed 1.5 steps, always 1 or always 2), and a chain of stays is rounded piece by piece rather than once. The exact version keeps each move's continuous time (the drawn exit time) as the next state's time of entering, schedules from it, and takes the exit at floor(t + phase): then both are one continuous-time process observed at the steps. It would take the scheduled exits as floats (`ti_exit_X` compared with the phase wherever it is now compared with `ti`, including the rescaling of a dwell whose rate changes and `backdate()`), and `schedule()` given the exit time on each scheduled move; it is not simpler or faster than the rounding by phase, and the difference is in how each agent's rounding errors are correlated, not in any mean, so it waits.
@@ -287,6 +305,11 @@ The reasons are in [the review](../approaches/pandemic_simulator.md).
 - **Inputs as JSON Schema** for forms, MCP tools, and validated configs: one function over `ss.par`. Waits for something that needs it.
 - **A `metadata=` keyword for model cards**, if a form or registry needs one; the `convert-model` skill asks for the docstring section.
 - **`wuhan_seir_model`**, if contact matrices need a test from a published paper; Ebola covered the harder structure.
+
+## From the JSON form (2026-11-03)
+
+- **The rest of a declared model in the JSON form** (`ss.export_to(sim, 'json')`, spec 14). Listed by `LossyExport` and not yet written: outcomes (`ss.outcome`, with their delays and likelihoods), modifiers (`ss.modify()`, which need conditions written out; Syphilis in the library has two), functions and attributes, strains (`ss.Strains`), transfers, `where=`, `move=`, and `increment=` on a transition, the sim's own stratification (`sim.stratify()`), named populations and geographies (`ss.people('Kenya')`, `ss.geo.geography()`; a stratification by places is written as their names, without their movement), and values by group given as an array or a table. Each is a few lines in `starsim/converters/starsim_json.py` (a field in the writer, and its check in the reader); add each when a model that uses it needs to be moved.
+- **Whether `sim.to_json()` should give the JSON form.** It still writes Starsim 3's record of the results and parameters, which cannot be read back; the model's form is `ss.export_to(sim, 'json')`. Ask Cliff before changing either.
 
 ## Won't do
 

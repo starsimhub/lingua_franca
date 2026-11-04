@@ -21,10 +21,10 @@ Interventions are passed to the sim with `interventions=`.
 
 ## Simple cases that need no product
 
-**A change to a parameter over time** is `ss.change` ([below](#sschange)):
+**A change to a parameter over time** is `ss.modify` of a time series ([below](#changes-at-given-times)):
 
 ```python
-ss.change(sir.pars.beta, at=['2020-03-15', '2020-06-01'], by=[0.5, 1.0])
+ss.modify(sir.pars.beta, multiply=ss.timeseries({'2020-03-15': 0.5, '2020-06-01': 1.0}), start='2020-03-15')
 ```
 
 **A change that applies to some people, or under a condition,** is `ss.modify` ([07-effects.md](07-effects.md)):
@@ -114,8 +114,8 @@ With an event in it, delivery is triggered; otherwise it is routine or in rounds
 
 | Keyword | Meaning |
 |---|---|
-| `start=`, `stop=` | the period of delivery (dates, durations since the start of the sim, or numbers in the sim's unit, as for `at=` of [`ss.change`](#sschange)) |
-| `at=` | deliver in rounds at these times (a campaign), given as for `at=` of `ss.change`: in a sim with dates, a calendar year is written as a date (`'2030'`) |
+| `start=`, `stop=` | the period of delivery (dates, durations since the start of the sim, or numbers in the sim's unit, as for `at=` below) |
+| `at=` | deliver in rounds at these times (a campaign), given as the times of a time series are ([below](#changes-at-given-times)): in a sim with dates, a calendar year is written as a date (`'2030'`) |
 | `interval=` | deliver in rounds this far apart, between `start` and `stop` |
 | `who=` | who receives it: a condition, an event, or both ([above](#delivery)) |
 | `where=` | the condition part of `who=`: a [condition](07-effects.md#conditions), as for `where=` of `ss.modify` |
@@ -246,26 +246,26 @@ The choice between the three ways of representing an observed quantity:
 
 An intervention marks individuals (a positive result triggers the next step, and is remembered per person); an outcome never does, because it never recorded who they were.
 
-## `ss.change`
+## Changes at given times
 
-The simplest time-varying intervention is a list of times and a list of values:
+The simplest time-varying intervention is a modifier whose amount is a time series:
 
 ```python
-ss.change(sir.pars.beta, at=['2020-03-15', '2020-06-01'], by=[0.5, 1.0])
-ss.change('school.pars.n_contacts', at=[2020.2, 2020.6], by=[0.2, 1.0])
-ss.change(sir.pars.beta, at=[ss.days(30), ss.days(60)], to=[0.02, 0.05])
+ss.modify(sir.pars.beta, multiply=ss.timeseries({'2020-03-15': 0.5, '2020-06-01': 1.0}), start='2020-03-15')
+ss.modify('school.pars.n_contacts', multiply=ss.timeseries({2020.2: 0.2, 2020.6: 1.0}), start=2020.2)
+ss.modify(sir.pars.beta, set=ss.timeseries({ss.days(30): 0.02, ss.days(60): 0.05}), start=ss.days(30))
 ```
 
-- `target` is any quantity `ss.modify` accepts.
-- `at=` takes dates, durations since the start of the sim (`ss.days(30)`), or numbers, which are times in the sim's unit: in a sim with dates, that long after the start, unless that falls outside the sim and the number is a whole year within it, which is then the start of that year (`at=2005` in a sim from 1975 to 2030), since that is the only reading in the sim; in a sim whose `start` and `stop` are years (`start=2020`), the year. A time outside the sim raises a `ValueError`; so does a `start=` or a round of a delivery, while a `stop=` after the end means it never stops. `start=` is not accepted: the change starts at its first time.
-- `by=` gives multipliers relative to the baseline value (not to the previous entry); `to=` gives absolute values. Exactly one is given, with one entry per time.
-- Each value holds from its time until the next; before the first time the baseline applies.
+- The target is any quantity `ss.modify` accepts.
+- The times take dates, durations since the start of the sim (`ss.days(30)`), or numbers, which are times in the sim's unit: in a sim with dates, that long after the start, unless that falls outside the sim and the number is a whole year within it, which is then the start of that year (`2005` in a sim from 1975 to 2030), since that is the only reading in the sim; in a sim whose `start` and `stop` are years (`start=2020`), the year. A time outside the sim raises a `ValueError`; so does a `start=` or a round of a delivery, while a `stop=` after the end means it never stops.
+- `multiply=` gives multipliers relative to the baseline value (not to the previous entry); `set=` gives absolute values.
+- Each value holds from its time until the next (`mode='constant'`, the default for a time series); `start=` at the first time keeps the baseline before it.
 
-`ss.change` returns a modifier ([07-effects.md](07-effects.md)), an `ss.modify` whose multiplier (or set value) is a step function of time, starting at its first time (before it, the quantity has its own value). It combines with other modifiers by the same rule, appears in `what_modifies()`, and takes `stop=`, `when=`, and `where=` like any modifier.
+It is an ordinary modifier ([07-effects.md](07-effects.md)): it combines with other modifiers by the same rule, appears in `what_modifies()`, and takes `stop=`, `when=`, and `where=`. Starsim 3's `ss.change(target, at=[...], by=[...])` (and `to=`) was a shorthand for it, removed in v4 since it was no shorter; `ss.converters.migrate` rewrites it.
 
 ## Triggers
 
-"When" is usually `start=`, `stop=`, `at=`, or `interval=`: the same keywords for a delivery, `ss.change`, and `ss.modify`. Anything more complex is a function of the sim returning `True` or `False`, passed as `when=` to a delivery or to `ss.modify`:
+"When" is usually `start=`, `stop=`, `at=`, or `interval=`: the same keywords for a delivery and `ss.modify`. Anything more complex is a function of the sim returning `True` or `False`, passed as `when=` to a delivery or to `ss.modify`:
 
 ```python
 S, I, R = ss.states('S I R')
@@ -334,7 +334,7 @@ Conditions, coverage functions, and `deliver=` functions are tried on what the s
 
 | Declaration | Compartmental | Agent-based |
 |---|---|---|
-| `ss.change`, `ss.modify` | a time- or group-varying multiplier on the quantity | a per-agent or scalar multiplier |
+| `ss.modify` | a time- or group-varying multiplier on the quantity | a per-agent or scalar multiplier |
 | `ss.Delivery(move=dict(dim=...), coverage=)` | a flow between the dimension's compartments | select eligible agents, thin to coverage, change the property |
 | `ss.vaccinate`, `ss.treat` with a product | adds a `has_<product>` dimension to the model (printed) and moves people along it; waning given as a duration is a flow back (a function of time since delivery is agents only) | records who holds the product and when they got it |
 | `ss.screen` | flows thinned by sensitivity and specificity (a `delay=` is agents only) | a result per agent |
@@ -359,7 +359,8 @@ Conditions, coverage functions, and `deliver=` functions are tried on what the s
 - **A rule language with its own variables, sets, and operations.** Conditions and functions in Python say the same thing in a line.
 - **`min_duration=` on a trigger.** `hold=` is that minimum; other rules with memory are a `step()`.
 - **An outcome and a testing intervention both producing cases.** If the model has tests, the tests produce the cases.
-- **`days=` as the time keyword of `ss.change`.** `at=` takes dates, years, or durations.
+- **`days=` as a time keyword.** `at=` and a time series take dates, years, or durations.
+- **`ss.change(at=, by=, to=)`**, a shorthand for `ss.modify` of a time series. It was no shorter, and was a second name for one idea.
 - **Follow-ups nested in a test (`on_positive=`, `on_negative=`).** A cascade is not a tree: a trigger can be the union of several events, one result feeds several steps, and memory carries a result forward. Steps are peers, triggered by events.
 - **`who >> what` as the spelling of a step** (`screening.ascus >> ss.screen(hpv_dna)`), by analogy with `S >> I`. Keywords (`who=`, `what=`) say the same without parentheses around a trigger of several parts.
 - **Delivery extras, removed 2026-10-20 (they can come back if needed):** stock targets (`target=`, `above=`, `ss.share`; STIsim keeps its own), a resource shared by steps (`ss.Resource`, `uses=`, and numeric `priority=` classes), `ss.cascade` (it ran as its steps would as a list), `ss.visit` (a delivery with no product), `count_events=` and `events_df()`, and reading any condition on age as delivery by age (only `at_age=` is). A target is `deliver=` or `capacity=` as a function of the sim, a shared clinic a `capacity=` function that reads what the steps before it used, and a log of events an analyzer.

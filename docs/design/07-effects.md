@@ -31,7 +31,7 @@ Read as: *for people with active syphilis, multiply HIV transmissibility by 2.*
 | `share=` | with `multiply=` or `efficacy=`, the share of acts (or, on a route without acts, of contacts) it acts on: since hazards add, the hazard is multiplied by `1 − share·(1 − multiply)`, exactly. A number, an `ss.timeseries`, an `ss.by`, or, with `route=` and as agents only, a function of the network returning one value per edge (`lambda net: net.edges.condoms`) |
 | `route=` | for a modifier of a transmission, the network or networks (by name) it applies on, e.g. condoms on the sexual network and not the needle-sharing one; a name that is not a route raises a `ValueError`, and a target that is not a transmission raises. `where=` is then of the people who would be infected. Under the compartmental solvers it multiplies the contacts through that route's term of the mixing, by group |
 | `where=` | who it applies to: a [condition](#conditions). Omitted means everyone |
-| `start=`, `stop=` | the period it applies in: from the step at `start` up to, but not including, the step at `stop`. Times are dates, durations since the start of the sim, or numbers in the sim's unit, as for `at=` of [`ss.change`](08-interventions.md#sschange). A `start` outside the sim raises a `ValueError`; a `stop` after the end never stops it. Omitted means always |
+| `start=`, `stop=` | the period it applies in: from the step at `start` up to, but not including, the step at `stop`. Times are dates, durations since the start of the sim, or numbers in the sim's unit, as for `at=` of a delivery ([08-interventions.md](08-interventions.md#delivery)). A `start` outside the sim raises a `ValueError`; a `stop` after the end never stops it. Omitted means always |
 | `when=` | a function of the sim returning `True` or `False`, for anything `start`/`stop` cannot say. The modifier applies on exactly the steps where it returns `True` |
 | `hold=` | once `where=` (or `when=`) selects someone, the modifier stays on for them for at least this long (a bare number is in the sim's unit). This is the one memory a modifier has; any other rule with memory is `step()` code ([08-interventions.md](08-interventions.md#triggers)) |
 | `name=` | used in `describe()` and `what_modifies()`; defaults to the variable name, else to what it does (`beta_multiply`) |
@@ -177,7 +177,7 @@ A modifier that depends only on time, and on who it applies to only through stat
 
 Protection that wanes with time since a dose is a property of a product (`waning=`, [08-interventions.md](08-interventions.md#products)).
 
-`ss.change` ([08-interventions.md](08-interventions.md#sschange)) is a shorthand that returns an `ss.modify` whose amount is a step function of time (`ss.timeseries(..., mode='constant')`), starting at its first time, so `stop=`, `when=`, and `where=` work as for any modifier.
+A change at given times is a modifier whose amount is a step function of time, starting at its first time: `ss.modify(sir.pars.beta, multiply=ss.timeseries({'2020-03-15': 0.5, '2020-06-01': 1.0}), start='2020-03-15')` (with `set=` for values rather than multipliers). Each value holds from its time until the next (`mode='constant'`, the default), and `stop=`, `when=`, and `where=` work as for any modifier. (`ss.change(at=, by=, to=)` was a shorthand for this; it was removed as no shorter, and `ss.converters.migrate` rewrites it.)
 
 ### `sim.what_modifies()`
 
@@ -193,7 +193,7 @@ sir.rel_sus
     masks            multiply=0.6   where=sir.S   start=5
 ```
 
-Modifiers are declared, so they are always listed: every `ss.modify`, `ss.change`, and product efficacy on the target, with its operation, condition, and period. The list MUST be complete; it is available before the sim has run (`what_modifies()` initializes the sim if needed). If the modifiers took the quantity out of its range during a run, a line says so. Code that assigns the base value directly (`hiv.rel_trans[uids] = ...`) is not a modifier, and is not tracked.
+Modifiers are declared, so they are always listed: every `ss.modify` and product efficacy on the target, with its operation, condition, and period. The list MUST be complete; it is available before the sim has run (`what_modifies()` initializes the sim if needed). If the modifiers took the quantity out of its range during a run, a line says so. Code that assigns the base value directly (`hiv.rel_trans[uids] = ...`) is not a modifier, and is not tracked.
 
 Scaling a shared quantity through `ss.modify` (or `*=`) is preferred to overwriting it, so that two modules do not clobber each other. This is guidance, and `what_modifies()` is how to check; nothing is enforced.
 

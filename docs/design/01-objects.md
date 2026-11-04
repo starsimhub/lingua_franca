@@ -18,7 +18,7 @@ ss.Module                   lifecycle: init → step → finalize; owns states, 
  ├── ss.Demographics        births, deaths, pregnancy, migration
  ├── ss.Product             ss.Vaccine, ss.Diagnostic, ss.Treatment (08-interventions.md)
  ├── ss.Intervention        deliveries: ss.vaccinate, ss.screen, ss.treat (08-interventions.md)
- ├── ss.Connector           cross-module code in step(); ss.modify and ss.change make one
+ ├── ss.Connector           cross-module code in step(); ss.modify makes one
  └── ss.Analyzer            extra results
 ss.State                    something a person can be in, or a count of something that is not people
 ss.Transition               a movement between states; built by >> and @, or by
@@ -39,7 +39,7 @@ ss.Result                   a named time series, with a dimension per stratifica
 | | Examples |
 |---|---|
 | CamelCase | `ss.Sim`, `ss.MultiSim`, `ss.People`, `ss.Module`, `ss.Disease`, `ss.Network`, `ss.RandomNet`, `ss.MixingPool`, `ss.geo.Mobility`, `ss.Intervention`, `ss.Connector`, `ss.Analyzer`, `ss.fit.Fit`; the two graph classes `ss.State` and `ss.Transition`; the products `ss.Vaccine`, `ss.Diagnostic`, `ss.Treatment` |
-| lowercase | time (`ss.days`, `ss.perday`), distributions (`ss.normal`, `ss.lognorm_ex`), `ss.par`, `ss.states`, `ss.null`, `ss.transmission`, `ss.progression`, `ss.birth`, `ss.death`, `ss.transfer`, `ss.modify`, `ss.outcome`, `ss.by`, `ss.timeseries`, `ss.seasonal`; deliveries `ss.vaccinate`, `ss.screen`, `ss.treat`, `ss.change`; loaders `ss.people`, `ss.contacts`, `ss.data`; functions `ss.parallel`, `ss.fit.compare_models` |
+| lowercase | time (`ss.days`, `ss.perday`), distributions (`ss.normal`, `ss.lognorm_ex`), `ss.par`, `ss.states`, `ss.null`, `ss.transmission`, `ss.progression`, `ss.birth`, `ss.death`, `ss.transfer`, `ss.modify`, `ss.outcome`, `ss.by`, `ss.timeseries`, `ss.seasonal`; deliveries `ss.vaccinate`, `ss.screen`, `ss.treat`; loaders `ss.people`, `ss.contacts`, `ss.data`; functions `ss.parallel`, `ss.fit.compare_models` |
 
 Methods that describe the model are `describe()`, `diagram()`, and `equations()`. Methods about results keep their Starsim names: `plot()`, `summarize()`, `to_df()`.
 
@@ -115,7 +115,7 @@ Rule 3 is found by looking for the object among the caller's local and global va
 
 States and `ss.par` objects are named by the same lookup, with one difference for states: there is no fallback. A state from `S, I, R = ss.states(3)` or `S = ss.State()` has no name until the module is built, and gets it from rules 1 to 3; one that cannot be matched to a keyword, a `name=`, or exactly one variable raises a `ValueError`, which says to use `ss.states('S I R')` or `ss.State('S')`. A state from `ss.states('S I R')`, or declared in a class body, already has its name. A module's name (for a plain `ss.Disease`, a delivery, a modifier, or a product) is its `name=`, else the variable it was assigned to when it was made (`campaign = ss.vaccinate(...)`, read from the instruction that stores it, so a loop variable or `sim.new()` that later holds it does not change it), else the variable it is bound to where it is passed to `ss.Sim` (unless that is a name the sim already uses, as `interventions` is in `def run(interventions): ss.Sim(interventions=interventions)`), else the lowercased class name as in Starsim; this is why `sir = ss.Disease(...)` gives `sim.diseases.sir` and `sim.results.sir`. A product that a delivery makes from its keywords (`ss.vaccinate(efficacy=0.9, ...)`) is named for its kind (`vaccine`) if that name is free, else for its delivery (`campaign_product`), without a warning. A product with a default name that its delivery took from their shared variable (`bcg = ss.vaccinate(BCG(), ...)`, where `BCG` is a subclass of `ss.Vaccine`) is named for the delivery and its kind (`bcg_vaccine`).
 
-The name is then used everywhere: `sir.infection`, the results, `ss.modify` and `ss.change` targets, random streams, and messages. Names are Python identifiers and are unique within a module. Two members given the same explicit name raise a `ValueError`, and a name that collides with an attribute of `ss.Module` (`step`, `init_pre`, `results`, `pars`, `describe`, `stratify`, `name`, `dt`, and so on) raises a `ValueError`.
+The name is then used everywhere: `sir.infection`, the results, `ss.modify` targets, random streams, and messages. Names are Python identifiers and are unique within a module. Two members given the same explicit name raise a `ValueError`, and a name that collides with an attribute of `ss.Module` (`step`, `init_pre`, `results`, `pars`, `describe`, `stratify`, `name`, `dt`, and so on) raises a `ValueError`.
 
 ### The class form
 

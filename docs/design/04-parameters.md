@@ -17,7 +17,7 @@ sir = ss.Disease(
 )
 ```
 
-Both values become parameters of the module, named after their slots, `sir.pars.beta` and `sir.pars.dur` (qualified only on a clash, e.g. `dur_recovery`), for modifiers ([07-effects.md](07-effects.md)), `ss.change` ([08-interventions.md](08-interventions.md)), `pars=`, and inspection. Name a parameter when it is reused, fitted, or documented.
+Both values become parameters of the module, named after their slots, `sir.pars.beta` and `sir.pars.dur` (qualified only on a clash, e.g. `dur_recovery`), for modifiers ([07-effects.md](07-effects.md)), `pars=`, and inspection. Name a parameter when it is reused, fitted, or documented.
 
 ## `ss.par`
 

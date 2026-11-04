@@ -106,7 +106,6 @@ Everything spatial is in the submodule `ss.geo`.
 | Name | What it is |
 |---|---|
 | **`ss.modify`** | While a condition holds, multiply, add to, or set a named quantity |
-| **`ss.change`** | A parameter change at given times; shorthand for a modifier |
 | **`ss.immunity`** | Protection between strains, combined by a rule: what protects is `due_to=` (a state, or an attribute), the quantity it lowers is the keyword and the protection its value, a matrix (rows from, columns against) or a number (`ss.immunity(due_to=R, rel_sus=m, combine='sum')`, `rel_trans=`, `dur=dict(In=m)`); for `ss.Strains(immunity=)` |
 | **`ss.Vaccine`** **`ss.Diagnostic`** **`ss.Treatment`** | Products: nouns for things (Starsim 3's `ss.Vx`, `ss.Dx`, `ss.Tx` remain only as base classes for products written as code, not as aliases; `ss.Diagnostic` was `ss.Test`, renamed so that no product and delivery differ only by case) |
 | **`ss.vaccinate`** **`ss.screen`** **`ss.treat`** | Deliveries: verbs (`ss.Delivery` with no product is a step people attend, a visit) |
@@ -162,7 +161,6 @@ Keywords are not listed above, but they are vocabulary too, so the main sets are
 | `ss.Strains` | the strains (names, a dict of values by strain, or diseases), `shared` `immunity` `max_strains` `transmit` `split` `name` `label`, and values by parameter |
 | `ss.immunity` | `due_to` `scale` `curve` `rel_sus` `rel_trans` `dur` `p` `combine` |
 | `ss.modify` | `multiply` `add` `set` `efficacy` `share` `route` `where` `when` `start` `stop` `hold` `name` |
-| `ss.change` | `at` `by` `to` |
 | Deliveries | `what` `who` `operator` `start` `stop` `at` `interval` `at_age` `where` `coverage` `capacity` `deliver` `on` `when` `trace` `move` `increment` `disease` |
 | Products | `efficacy` `waning` `cost` (all); `leaky` (`ss.Vaccine`); `sensitivity` `specificity` `delay` `detects` (`ss.Diagnostic`); `cure` (a number, or a dict by state) `transition` `to` (`ss.Treatment`) |
 | `ss.outcome` | `delay` `duration` `likelihood` |
@@ -200,8 +198,8 @@ A bare number in any of these slots takes the slot's type and the sim's unit ([0
 | `during=` | the product is held, and acts, only while people are in these states | products |
 | `delay=`, `duration=` | a duration | `ss.outcome`, `ss.Diagnostic` |
 | `interval=`, `away=` | a duration; `away` is a fraction of time | deliveries, `ss.geo.Mobility` |
-| `multiply=`, `add=`, `set=`, `by=`, `to=` | a multiplier, or a value in the target's own type | `ss.modify`, `ss.change` |
-| `at=`, `start=`, `stop=` | a time in the sim's unit, counted from the start (a calendar year only in a sim whose own `start` and `stop` are year-like numbers); dates are written as dates. A time outside the sim raises a `ValueError` | `ss.change`, `ss.modify`, deliveries |
+| `multiply=`, `add=`, `set=` | a multiplier, or a value in the target's own type | `ss.modify` |
+| `at=`, `start=`, `stop=` | a time in the sim's unit, counted from the start (a calendar year only in a sim whose own `start` and `stop` are year-like numbers); dates are written as dates. A time outside the sim raises a `ValueError` | `ss.modify`, deliveries |
 | `bounds=` | a pair, in the unit of the parameter's value | `ss.par` |
 | `cost=` | a plain number | products |
 

@@ -68,6 +68,7 @@ Rules 2 and 3 are guesses about what the source meant, and the difference matter
 | **flepiMoP** | `'flepimop'` (the config YAML) | Compartment products, `proportional_to` rates, the outcomes chain as `ss.outcome`, `seir_modifiers` (every scenario kept in `sim.imported.scenarios`), and drawn parameters with their distributions as priors |
 | **summer2** | `'summer2'` (a JSON dump, or the model) | Each flow kind as one transition, `stratify_with` as `stratify`, adjustments as `adjust=`, and the mixing matrix; the derived outputs are worked out from the results by `ss.converters.summer2.outputs()` |
 | **Atomica** | `'atomica'` (the framework, databook, and program book workbooks) | Compartments, transitions, characteristics, and the databook's values (a series without the points equal to those on either side, which change nothing); the program book's spending as parameters whose coverage moves the parameters they affect; a junction whose shares change (with the counts, or in time) as a transition to each destination with its share as a factor of the rate, which is the same flow, since people pass through a junction at once |
+| **Starsim** | `'json'` (Starsim's own JSON form, [14-model-spec.md](14-model-spec.md#the-json-form)) | A declared model as written: its settings, parameters, states, transitions, results, starting values, stratifications, and other modules by type; no rate is classified, since the rates are Starsim's own |
 | **camdl** | `'camdl'` (a `.camdl` file, or camdlc's JSON) | The model, with the parameter values of one of its scenarios (`scenario=`), as an ODE or a chain binomial as camdl's backends run it |
 | **EpiModel** | `'epimodel'` (a JSON dump from `dump_epimodel.R`, or the R script) | `netsim()`, `dcm()`, and `icm()` runs with the built-in models and networks (`ss.DegreeNet` for the network model's targets); custom modules are listed with their R source |
 | **epydemix** | `'epydemix'` (a JSON dump from `starsim/converters/epydemix.py` run as a script, or the model) | The transitions, the population, and its contact matrices |
@@ -92,7 +93,7 @@ ss.export_to(sim, 'sbml', filename='model.xml')
 ss.export_to(sim, 'odin', filename='model.R')
 ```
 
-The code is the complete form of a model ([14-model-spec.md](14-model-spec.md)). The exporters read the built model (each disease's graph and engine), not a serialized form; every other format carries less, and each export MUST print what was left out or changed, one line per declaration (`LossyExport`):
+The code is the complete form of a model ([14-model-spec.md](14-model-spec.md)). The exporters read the built model (each disease's graph and engine), not a serialized form. Starsim's own JSON form (`'json'`) carries a declared model as written, stratifications and all, and is read back by writing its code ([14-model-spec.md](14-model-spec.md#the-json-form)); every other format carries less, and each export MUST print what was left out or changed, one line per declaration (`LossyExport`):
 
 ```text
 >>> ss.export_to(sim, 'sbml', filename='model.xml')    # stratified by age, with a lognormal dwell time and a random network
