@@ -38,7 +38,7 @@ Read as: *for people with active syphilis, multiply HIV transmissibility by 2.*
 | `share=` | with `multiply=` or `efficacy=`, the share of acts (or, on a route without acts, of contacts) it acts on: since hazards add, the hazard is multiplied by `1 − share·(1 − multiply)`, exactly. A number, an `ss.timeseries`, an `ss.by`, or, with `route=` and as agents only, a function of the network returning one value per edge (`lambda net: net.edges.condoms`) |
 | `route=` | for a modifier of a transmission, the network or networks (by name) it applies on, e.g. condoms on the sexual network and not the needle-sharing one; a name that is not a route raises a `ValueError`, and a target that is not a transmission raises. `where=` is then of the people who would be infected. Under the compartmental solvers it multiplies the contacts through that route's term of the mixing, by group |
 | `where=` | who it applies to: a [condition](#conditions). Omitted means everyone |
-| `start=`, `stop=` | the period it applies in: from the step at `start` up to, but not including, the step at `stop`. Times are dates, durations since the start of the sim, or numbers in the sim's unit, as for `at=` of a delivery ([08-interventions.md](08-interventions.md#delivery)). A `start` outside the sim raises a `ValueError`; a `stop` after the end never stops it. Omitted means always |
+| `start=`, `stop=` | the period it applies in: from the first step that starts at or after `start` (step 0 for the start of the run) up to, but not including, the first that starts at or after `stop`. Times are dates, durations since the start of the sim, or numbers in the sim's unit, as for `at=` of a delivery ([08-interventions.md](08-interventions.md#delivery)). A `start` outside the sim raises a `ValueError`; a `stop` after the end never stops it. Omitted means always |
 | `when=` | a function of the sim returning `True` or `False`, for anything `start`/`stop` cannot say. The modifier applies on exactly the steps where it returns `True` |
 | `hold=` | once `where=` (or `when=`) selects someone, the modifier stays on for them for at least this long (a bare number is in the sim's unit). This is the one memory a modifier has; any other rule with memory is `step()` code ([08-interventions.md](08-interventions.md#triggers)) |
 | `name=` | used in `describe()` and `what_modifies()`; defaults to the variable name, else to what it does (`beta_multiply`) |
@@ -175,7 +175,7 @@ A quantity with no modifiers behaves exactly as in Starsim.
 school   = ss.RandomNet(n_contacts=10, name='school')
 seasonal = ss.modify(sir.pars.beta, multiply=ss.seasonal(mean=1.0, amplitude=0.3, peak='January'))
 closures = ss.modify('school.pars.n_contacts', multiply=ss.timeseries({'2020-03-15': 0.2, '2020-06-01': 0.6, '2020-09-01': 1.0}))
-caution  = ss.modify(sir.rel_sus, multiply=lambda sim: 0.5 if sim.results.sir.I[sim.ti - 1] > 200 else 1.0)
+caution  = ss.modify(sir.rel_sus, multiply=lambda sim: 0.5 if sim.results.sir.I[sim.ti] > 200 else 1.0)
 sim = ss.Sim(sir, networks=school, interventions=[seasonal, closures, caution], start='2020-01-01', stop='2020-12-31', n_agents=2000)
 sim.run()
 ```

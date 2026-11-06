@@ -121,7 +121,7 @@ With an event in it, delivery is triggered; otherwise it is routine or in rounds
 
 | Keyword | Meaning |
 |---|---|
-| `start=`, `stop=` | the period of delivery (dates, durations since the start of the sim, or numbers in the sim's unit, as for `at=` below) |
+| `start=`, `stop=` | the period of delivery (dates, durations since the start of the sim, or numbers in the sim's unit, as for `at=` below), from the first step that starts at or after `start` (step 0 for the start of the run). A delivery on a date happens at the start of the step from that time point, and is counted in that row |
 | `at=` | deliver in rounds at these times (a campaign), given as the times of a time series are ([below](#changes-at-given-times)): in a sim with dates, a calendar year is written as a date (`'2030'`) |
 | `interval=` | deliver in rounds this far apart, between `start` and `stop` |
 | `who=` | who receives it: a condition, an event, or both ([above](#delivery)) |
@@ -289,8 +289,8 @@ sim = ss.Sim(sir, networks=[home, school], interventions=closures, n_agents=2000
 
 A policy with a release takes `until=`, so that it doesn't switch on and off around one threshold: `ss.modify(beta, multiply=0.5, where=I.n >= 2000, until=I.n <= 1000)` is on from when `where=` holds until `until=` does, for each place or group on its own, under every solver.
 
-- The function is called each step, at the intervention's place in the loop, and can read anything in the sim, including results up to the previous step. Results are read as in Starsim: storage is preallocated for the whole run, and during a step `sim.ti` is the step's own index, where its results will go, so the results so far are `[:sim.ti]` ([10-execution.md](10-execution.md)). A shorter spelling for "the steps so far" would be a convenience and is not specified ([19-open-questions.md](19-open-questions.md)).
-- It can read any result, including an outcome ([09-results.md](09-results.md)): `when=lambda sim: sim.results.sir.n_hosp[sim.ti - 1] > 500` acts on hospital occupancy without hospitalization being a state.
+- The function is called each step, at the intervention's place in the loop, and can read anything in the sim, including the stocks of this step and the flows of the steps before it. Results are read as in Starsim: storage is preallocated for the whole run, and during a step `sim.ti` is the step's own index, where its results go; its stocks (the state at its start) are recorded before any module's step, so are `[sim.ti]`, and its flows at its end, so the flows so far are `[:sim.ti]` ([10-execution.md](10-execution.md)). A shorter spelling for "the steps so far" would be a convenience and is not specified ([19-open-questions.md](19-open-questions.md)).
+- It can read any result, including an outcome ([09-results.md](09-results.md)): `when=lambda sim: sim.results.sir.n_hosp[sim.ti] > 500` acts on hospital occupancy without hospitalization being a state.
 - There is no built-in vocabulary for calendar conditions. "No school contacts on Fridays" is `ss.modify('school.pars.n_contacts', multiply=lambda sim: 0.0 if sim.now.weekday() == 4 else 1.0)`, in a sim with dates.
 
 **`when=` and `where=` have no memory, except a hold.** The intervention is active on exactly the steps where the function returns `True`. A bare threshold therefore switches on and off as the quantity crosses it, which is rarely the policy meant. The one memory a modifier has is `hold=`: once its condition holds for someone, it stays on for them for at least that long (`hold=ss.days(14)`), which with a condition on a transition's incidence by place is MEmilio's dynamic NPIs, each place on its own (`where=secir.symptoms.incidence(over=ss.days(7), by='patch') > 200e-5`). Any other rule that remembers what it did (reopen only after two weeks below the threshold, close at most three times) is a module with a `step()`, where the memory is an ordinary attribute and can be read, printed, and tested:
