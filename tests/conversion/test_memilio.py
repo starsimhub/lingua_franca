@@ -155,7 +155,7 @@ def test_examples(example, tmp_path):
     res = sim.results.osecir
     for s in ['Susceptible', 'Exposed', 'InfectedNoSymptoms', 'InfectedSymptoms', 'InfectedSevere', 'InfectedCritical', 'Recovered', 'Dead']:
         theirs = ref[ref.series == s].sort_values('time').value.values
-        ours = res.death.cum.values if s == 'Dead' else res[s].values
+        ours = np.append(0, res.death.cum.values[:-1]) if s == 'Dead' else res[s].values # Deaths before each day: a flow's row k is the step from day k
         diff = np.abs(ours - theirs).max()/total
         assert diff < 1e-3, f'{s} should be within 0.1% of the population of the original, not {diff:.2%}' # The original's own interpolation error is about this
     return sim

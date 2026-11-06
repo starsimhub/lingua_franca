@@ -53,7 +53,7 @@ Everything is declared. The six compartments are states, and the infectious pres
 
 3. **Fixed: a movement register could not move people between states.** SimInf's `intTrans` events, 40% of all the events, age animals from `S_1` to `S_2` and from `I_1` to `I_2`, which used to need a 30-line custom intervention. The register now has a `to_states` column, under every solver, and the events happen in the order of the table, as in SimInf.
 
-4. **Still open: age categories as states.** With the age categories as six states, the register can age animals. Making age a stratification instead (`age=['1', '2', '3']`, `use_aging=False`) would be more natural, but the register can name only states, not a level of another dimension. Suggested change: let a register choose and change the level of any dimension (columns named for the dimension, such as `age` and `to_age`). The states no longer need `people=True`, which they used to.
+4. **Still open: age categories as states.** With the age categories as six states, the register can age animals. Making age a stratification instead (`age=['1', '2', '3']`, `aging=False`) would be more natural, but the register can name only states, not a level of another dimension. Suggested change: let a register choose and change the level of any dimension (columns named for the dimension, such as `age` and `to_age`). The states no longer need `people=True`, which they used to.
 
 5. **Fixed: no yearly cycle for a step function.** The seasonal decay is now one line, an `ss.timeseries` with `period=`.
 

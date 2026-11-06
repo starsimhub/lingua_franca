@@ -17,7 +17,7 @@ ref_peak_day = 40 # Same section: epydemix's day of the peak (v4: 39)
 ref_final = 0.9963 # Same section: epydemix's final size (v4: 0.9959)
 ref_under5 = 6_938_210 # Same report, §4: under-5s in Kenya in 2020 (UN WPP, as ss.People(1).age < 5 selects them)
 true_b = 0.5 # The value the filter's data are drawn at (§2, the 25-line repro)
-kenya = dict(start='2019-12-01', stop='2020-04-02', use_aging=False, verbose=0)
+kenya = dict(start='2019-12-01', stop='2020-04-02', aging=False, verbose=0)
 
 
 def make_kenya(beta=0.04):
@@ -42,14 +42,14 @@ def make_seasonal(data=None):
 def weekly_data():
     """ Weekly new infections from one run at the true value """
     dates = pd.date_range('2020-03-01', periods=13, freq='W')
-    truth = make_seasonal(data=ss.simdata(pd.DataFrame({'infection': 0.0}, index=dates))).run()
+    truth = make_seasonal(data=ss.SimData(pd.DataFrame({'infection': 0.0}, index=dates))).run()
     weekly = ss.results.compare(truth)['infection'][1]
-    return ss.simdata(pd.DataFrame({'infection': np.round(weekly)}, index=dates))
+    return ss.SimData(pd.DataFrame({'infection': np.round(weekly)}, index=dates))
 
 
 def test_epydemix_kenya():
     sc.heading('epydemix: the Kenya tutorial, 100 chain-binomial runs, against epydemix')
-    sim = ss.Sim(make_kenya(), networks=ss.contacts('Kenya'), people=ss.people('Kenya', year=2020), solver='binomial', substeps=1, **kenya) # Whole days, as epydemix takes them
+    sim = ss.Sim(make_kenya(), networks=ss.contacts('Kenya'), people=ss.population('Kenya', year=2020), solver='binomial', substeps=1, **kenya) # Whole days, as epydemix takes them
     res = sim.run(n_runs=100).results.sir
     I, R = [np.asarray(res[key].values).mean(axis=0) for key in ['I', 'R']]
     N = I[0] + R[0] + np.asarray(res.S.values).mean(axis=0)[0]
@@ -64,7 +64,7 @@ def test_epydemix_vaccine_by_age():
     def delivered(eligible):
         sir = make_kenya(beta=0)
         vax = ss.vaccinate(ss.Vaccine(efficacy=0.9), coverage=1.0, at=['2019-12-02'], where=eligible(sir))
-        sim = ss.Sim(sir, people=ss.people('Kenya', year=2020), interventions=vax, solver='ode', **sc.mergedicts(kenya, stop='2019-12-05')).run()
+        sim = ss.Sim(sir, people=ss.population('Kenya', year=2020), interventions=vax, solver='ode', **sc.mergedicts(kenya, stop='2019-12-05')).run()
         return np.nansum(sim.results.vax.delivered.values)
     under5 = delivered(lambda sir: sir.age < 5)
     assert np.isclose(under5, ref_under5, rtol=0.01), f'sir.age < 5 vaccinated {under5:,.0f}, not {ref_under5:,}'
@@ -75,11 +75,10 @@ def test_epydemix_vaccine_by_age():
 
 def test_epydemix_filter():
     sc.heading('epydemix: the particle filter peaks at the true value for a seasonal × mobility beta')
-    sim = make_seasonal(data=weekly_data()).init()
-    filt = ss.fit.ParticleFilter(sim, likelihood=dict(infection=ss.poisson()))
+    sim = make_seasonal(data=weekly_data())
     loglik = {}
     for b in [0.4, true_b, 0.6]:
-        sim.restart(pars=dict(b=b), rand_seed=0)
+        filt = ss.fit.ParticleFilter(sim.new(pars=dict(b=b), rand_seed=0).init(), likelihood=dict(infection=ss.poisson())) # The filter starts from the sim as initialized
         loglik[b] = filt(n_particles=100, seed=0)
     assert max(loglik, key=loglik.get) == true_b, f'Expected the filter to peak at b = {true_b}: {loglik}'
     return loglik
@@ -103,7 +102,7 @@ def test_epydemix_posterior_projection():
 @pytest.mark.xfail(reason='The US states\' data are not published by starsim_data yet, so they cannot be downloaded (tests/test_data.py tests them from a copy of its repository)', strict=False)
 def test_epydemix_us_state():
     sc.heading('epydemix: Massachusetts by name, as load_epydemix_population() gives it')
-    people = ss.people('United States:Massachusetts', year=2020)
+    people = ss.population('United States:Massachusetts', year=2020)
     sim = ss.Sim(make_kenya(), networks=ss.contacts('United States:Massachusetts'), people=people, solver='ode', **kenya).run()
     N = sim.results.sir.S[0] + sim.results.sir.I[0]
     assert 6.5e6 < N < 7.5e6, f'Expected Massachusetts\' 7.0 million people (2020 census), not {N:,.0f}'

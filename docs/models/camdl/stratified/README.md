@@ -28,12 +28,12 @@ Everything is declared: three transitions, two stratifications, the population b
 
 ## Findings
 
-- **Aging has to be asked for.** With no births or deaths, Starsim leaves people in their age group and says so in a note, so this model gives `use_aging=True`. Without it, children have 2% too many infections. The original ages people because it says so in its transitions.
+- **Aging has to be asked for.** With no births or deaths, Starsim leaves people in their age group and says so in a note, so this model gives `aging=True`. Without it, children have 2% too many infections. The original ages people because it says so in its transitions.
 - **A move between states (fixed).** The original moves 60% of susceptible children to `R` on day 20. This version once gave them a fully effective vaccine, which left them in `S`. `ss.vaccinate(move=seir.S >> seir.R, ...)` now says what the original says, and `S` and `R` agree.
 - **The day a move shows.** camdl's count on day 20 is after the move, and Starsim's is before it: its move is at the start of the step from day 20 to 21, so it shows on day 21. The two agree from then on. This is why `compare.py` leaves out that row for `S`, `E`, and `R`.
 - **Whole days have to be asked for.** Starsim's chain binomial takes smaller steps by default. Against the original's whole days that gives a peak about 4 days sooner, so `compare.py` gives `substeps=1`.
 - **The contact matrix is not reciprocal.** Starsim gives a note that the original's matrix has different contacts in the two directions for this population, and uses it as given, as camdl does.
-- **Contacts within places, and populations by two dimensions (fixed).** A contact matrix by age now acts within each place, and `split=` takes an `ss.by` over several dimensions, written as the original writes it. As agents, a contact matrix still mixes people across places.
+- **Contacts within places, and populations by two dimensions (fixed).** A contact matrix by age now acts within each place, and `fractions=` takes an `ss.by` over several dimensions, written as the original writes it. As agents, a contact matrix still mixes people across places.
 - **Results by group (fixed).** Sums of stratified results keep their groups where they can, and many runs keep the values of each group (unless they would take more than 500 MB).
 
 ## What it exercises

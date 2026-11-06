@@ -51,11 +51,11 @@ def make_sim(total, days=30, declared=False):
         name      = 'measles',
         **deaths,
     )
-    measles.stratify(patch=ss.geo.geography(names=d.names, pop=d.popsize, distances=d.dist), mobility=ss.geo.Mobility(matrix=d.gravity, kind='force'))
+    measles.stratify(patch=ss.geo.geography(names=d.names, populations=d.popsize, distances=d.dist), mobility=ss.geo.Mobility(matrix=d.gravity, kind='force'))
     seeding = None
     if declared: # Three people seeded every 30 days; and age groups, for the life table as compartments
         measles.stratify(age=[0, 5, 15, 30, 50, 70])
-        seeding = ss.Delivery(move=measles.S >> measles.I, capacity=3, start=ss.days(30), interval=ss.days(30), name='seeding')
+        seeding = ss.Delivery(move=measles.S >> measles.I, capacity=3, start=ss.days(30), every=ss.days(30), name='seeding')
     people = ss.People(int(d.popsize.sum()), age_data=np.array([ages, pyramid]).T)
     return ss.Sim(measles, people=people, interventions=seeding, unit='day', stop=days, verbose=0)
 

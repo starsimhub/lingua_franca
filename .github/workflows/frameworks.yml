@@ -112,7 +112,7 @@ jobs:
         env:
           CARGO: 'false' # Use the kernels built above, rather than compiling them again: they are optional, so a failed cargo is not an error
       - name: Check the kernels are compiled
-        run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; print(ss.compile_status().summary)"
+        run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; print(ss.kernels.compile_status().summary)"
 
       - name: Install what the framework needs from the system
         if: matrix.apt

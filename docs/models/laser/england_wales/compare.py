@@ -23,9 +23,9 @@ n_days = years*365
 
 
 def weekly(vals):
-    """ Weekly totals of a flow, whose value at index k is the number during the step ending on day k (so the first, at the start, is 0) """
+    """ Weekly totals of a flow, whose value at index k is the number during the step from day k """
     weeks = n_days//7
-    return np.asarray(vals)[1:weeks*7 + 1].reshape(weeks, 7).sum(axis=1)
+    return np.asarray(vals)[:weeks*7].reshape(weeks, 7).sum(axis=1)
 
 
 def run(seed):

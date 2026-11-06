@@ -20,9 +20,14 @@ clinical = ['asymptomatic', 'symptomatic', 'isolated', 'hospital']
 names = dict(zip(clinical, ['Ia', 'Is', 'Ii', 'Ih'])) # As four states
 
 
+def ending(values):
+    """ The value of the step that ends at each time point, as summer2 reports a flow (0 at the start): Starsim's row k is the step from time point k """
+    return np.concatenate([[0], values[:-1]])
+
+
 def flow(values):
-    """ A flow in each step as summer2 reports it: a rate per unit of time, at the end of the step (as Starsim's is, so the first, at the start, is 0) """
-    return values/0.1
+    """ A flow in each step as summer2 reports it: a rate per unit of time, at the end of the step """
+    return ending(values)/0.1
 
 
 def start():
@@ -66,7 +71,7 @@ if __name__ == '__main__':
     hosp = res.I.select(clinical='hospital').values
     outputs = dict(hospital_occupancy=hosp, prop_infected_hosp=hosp/res.I.values, notifications=flow(res.incidence.select(clinical=['isolated', 'hospital']).values))
     for age in ages:
-        outputs[f'accum_death_{age}'] = res.infection_death.cum.select(age=age).values / 0.1
+        outputs[f'accum_death_{age}'] = ending(res.infection_death.cum.select(age=age).values) / 0.1
         outputs[f'incidence_{age}'] = flow(res.incidence.select(age=age).values)
         for name in clinical:
             outputs[f'incidence_{age}_{name}'] = flow(res.incidence.select(age=age, clinical=name).values)

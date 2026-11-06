@@ -36,7 +36,7 @@ def make_measles(d, beta=ss.perday(1.75), away=0.01, report=0.005):
     deaths      = ss.death(rate=ss.peryear(0.007))
     cases       = ss.outcome(report*onset)
     measles = ss.Disease(infection, importation, onset, recovery, births, vaccinated, deaths, cases, init=dict(R=1 - 1/14), name='measles')
-    measles.stratify(district=ss.geo.geography(names=d.names, pop=d.popsize, lat=d.lat, lon=d.lon), mobility=ss.geo.Mobility(ss.geo.gravity(c=1.5), kind='visit', away=away))
+    measles.stratify(district=ss.geo.geography(names=d.names, populations=d.popsize, lat=d.lat, lon=d.lon), mobility=ss.geo.Mobility(ss.geo.gravity(distance_power=1.5), kind='visit', away=away))
     return measles
 
 
@@ -60,7 +60,7 @@ def test_measles_metapop_fit():
     sim = make_sim(make_measles(d, beta=beta, away=away, report=report), d)
     gof = lambda sim: np.mean((monthly(sim) - data)**2)
     start = gof(sim.new().run())
-    fit = sim.fit(gof=gof, method='optuna', n_trials=10)
+    fit = sim.fit(loss=gof, method='optuna', n_trials=10)
     assert gof(fit.sim.new().run()) < start, 'The fit should improve the loss'
     return fit
 

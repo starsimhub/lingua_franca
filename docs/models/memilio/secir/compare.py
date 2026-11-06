@@ -32,4 +32,4 @@ if __name__ == '__main__':
     res = sim.new(verbose=0).run().results.secir
     for key,name in names.items():
         compare(name, res[key].values, tolerance) # A stock at index k is the number on day k, in both
-    compare('Dead', res.death.cum.values, dead_tolerance) # Deaths up to each day
+    compare('Dead', np.append(0, res.death.cum.values[:-1]), dead_tolerance) # Deaths up to each day: a flow's row k is the step from day k

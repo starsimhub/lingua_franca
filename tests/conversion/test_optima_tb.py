@@ -27,7 +27,7 @@ def test_no_data():
     keywords = {kw.arg:kw.value for node in ast.walk(tree) if isinstance(node, ast.Call) for kw in node.keywords}
     numbers = lambda node: {sub.value for sub in ast.walk(node) if isinstance(sub, ast.Constant) and isinstance(sub.value, float)}
     assert len(numbers(keywords['init'])) == 1, 'initial values should be one placeholder'
-    assert len(numbers(keywords['split'])) == 1, 'the shares in each population should be one placeholder'
+    assert len(numbers(keywords['fractions'])) == 1, 'the shares in each population should be one placeholder'
     assert numbers(keywords['total_pop']) == {1e6}
     pars = [node.value for node in tree.body if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call) and ast.unparse(node.value.func) == 'ss.par']
     assert {arg.value for par in pars for arg in par.args} <= {0.0, 0.01, 1.0}, 'every parameter should be a default'

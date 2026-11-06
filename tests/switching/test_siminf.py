@@ -100,7 +100,7 @@ def make_herds(u0, register, stop, **kwargs):
     sir = ss.Disease(infection=ss.Transition(S, I, rate=ss.perday(0.16) * I), recovery=ss.Transition(I, R, rate=ss.perday(0.01)),
                      init_n=dict(I=ss.by(herd=u0.I.values)), name='sir')
     size = u0[['S', 'I', 'R']].sum(axis=1)
-    sir.stratify(herd=list(u0.node.astype(str)), kind='space', split=size/size.sum(), mobility=ss.geo.Mobility(data=register))
+    sir.stratify(herd=list(u0.node.astype(str)), kind='space', fractions=size/size.sum(), mobility=ss.geo.Mobility(data=register))
     return ss.Sim(sir, solver='gillespie', unit='day', start=0, stop=stop, total_pop=size.sum(), verbose=0, **kwargs)
 
 

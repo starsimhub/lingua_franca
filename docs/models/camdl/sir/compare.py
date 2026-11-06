@@ -21,8 +21,8 @@ tolerance = dict(ode=0.001, stochastic_I=0.03, stochastic_cases=0.04) # Of the l
 
 
 def weekly(cases):
-    """ Reported cases totaled over the week that ends at each reporting time (a flow at index k is the number during the step that ends there) """
-    return np.array([cases[..., week - 6:week + 1].sum(axis=-1) for week in weeks]).T
+    """ Reported cases totaled over the week that ends at each reporting time (a flow at index k is the number during the step from time k) """
+    return np.array([cases[..., week - 7:week].sum(axis=-1) for week in weeks]).T
 
 
 def worst(ours, key):
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     # The posterior (sampled by NUTS) of beta, gamma, and k, from weekly cases drawn around the original's ODE cases
     rng = np.random.default_rng(1)
     mean = np.array(ref['ode_cases'][1])
-    data = pd.DataFrame(dict(time=weeks, cases=rng.negative_binomial(10, 10/(10 + mean))))
+    data = pd.DataFrame(dict(time=weeks - 7, cases=rng.negative_binomial(10, 10/(10 + mean)))) # Each week dated by its first day, as a flow's data is read
     fit = sim.new(verbose=0, pars=dict(k=ss.par(3, bounds=[0.1, 100]))).fit(data=data, method='nuts', verbose=False)
     print('posterior from cases drawn with beta=0.4, gamma=0.15, k=10 (median and 95% interval):', ', '.join(f'{row.par}={row.median:.3g} ({row.lower:.3g} to {row.upper:.3g})' for row in fit.table.itertuples()))
     for row in fit.table.itertuples():

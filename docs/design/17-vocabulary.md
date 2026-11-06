@@ -124,7 +124,7 @@ Everything spatial is in the submodule `ss.geo`.
 
 ### Types you get back or subclass
 
-`ss.Result` and `ss.Timeline`, both Starsim's. Users rarely construct these. The base classes and machinery behind them are in their submodules (`ss.modules.Base`, `ss.loop.Loop`, `ss.time.Rate`, `ss.time.TimePar`, `ss.sim.SimPars`, `ss.parameters.Pars`).
+`ss.Result`, `ss.Timeline`, `ss.Rate`, `ss.TimePar`, all Starsim's. Users rarely construct these. The base classes and machinery behind them are in their submodules (`ss.modules.Base`, `ss.loop.Loop`, `ss.sim.SimPars`, `ss.parameters.Pars`).
 
 Fitting is the submodule `ss.fit`, which `import starsim` does not import (its first use does), so its names are not listed here: `ss.fit.Fit`, what `sim.fit()` returns (called `fit` below), `ss.fit.compare_models` (fit and compare by out-of-sample prediction), and `ss.fit.optimize` (reallocate spending between programs to maximize or minimize a result). (Starsim 3's `ss.Calibration` is removed.)
 

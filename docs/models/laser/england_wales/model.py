@@ -43,7 +43,7 @@ measles = ss.Disease(
     init      = dict(R=0.95),
     init_n    = dict(I=ss.by(patch=[3]*len(pop))),
 )
-towns = ss.geo.geography(names=names, pop=pop, distances=distances)
+towns = ss.geo.geography(names=names, populations=pop, distances=distances)
 with np.errstate(divide='ignore'):
     gravity = pop**0.251464/distances**1.563193 # LASER's gravity model, with a=0
 np.fill_diagonal(gravity, 0)

@@ -23,14 +23,14 @@ Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43
 
 ## What was declared and what was not
 
-Everything is declared: seven transitions, an outcome, the districts as a geography, and the mixing between them as visiting (`ss.geo.Mobility(ss.geo.gravity(c=2), kind='visit', away=0.01)`), which is the original's form: residents are exposed to the prevalence where they make their contacts, and do not change who is present there.
+Everything is declared: seven transitions, an outcome, the districts as a geography, and the mixing between them as visiting (`ss.geo.Mobility(ss.geo.gravity(distance_power=2), kind='visit', away=0.01)`), which is the original's form: residents are exposed to the prevalence where they make their contacts, and do not change who is present there.
 
 ## Findings
 
 - **Nothing was missing.** This model has places with latitudes and longitudes, gravity, seasonality, births into two states, deaths from every state, and a reporting share at onset, and each has a direct form.
 - **Importation is awkward to write.** The original adds a fixed number of infections per person in the population. A transition's rate is per person in its source, so this is written as `ss.peryear(0.01/1000) * (S + E + I + R).n / S.n`. An inflow into a state from outside the population would read better, but `ss.null >> E` would add people rather than move them.
 - **Whole days have to be asked for.** The original takes a binomial draw a day. Starsim's chain binomial takes smaller steps by default, so the model gives `substeps=1`.
-- **Results by district are kept weekly by default.** A run of 5,844 days over 260 districts would otherwise keep a lot, so Starsim keeps them by group every 7 days, and says so. `compare.py` needs daily onsets, so it asks for them with `results=['onset']`.
+- **Results by district are kept weekly by default.** A run of 5,844 days over 260 districts would otherwise keep a lot, so Starsim keeps them by group every 7 days, and says so. `compare.py` needs daily onsets, so it asks for them with `group_results=['onset']`.
 
 ## What it exercises
 

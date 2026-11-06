@@ -49,7 +49,7 @@ def seird():
         births    = ss.birth(S, rate=ss.peryear(0.02)),
         infection = ss.Transition(S, E, rate=ss.perday(0.4)*I),
         onset     = ss.Transition(E, I, dur=ss.days(4)),
-        outcome   = ss.Transition(I, [R, D], dur=ss.lognorm_ex(ss.days(8), ss.days(3)), p=[None, 0.1]),
+        outcome   = ss.Transition(I, [R, D], dur=ss.lognormal(mean=ss.days(8), std=ss.days(3)), p=[None, 0.1]),
         deaths    = ss.death([S, E, I, R], rate=ss.peryear(0.01)),
         init_prev = 0.01, name='seird')
     return ss.Sim(dis, total_pop=1e5, unit='day', stop=120, verbose=0)
@@ -103,18 +103,18 @@ def dated_seasonal():
     return ss.Sim(dis, total_pop=1000, unit='day', start='2020-04-01', stop='2021-04-01', verbose=0)
 
 
-def timeseries(mode, period=None):
+def timeseries(interpolation, period=None):
     """ A rate given at some times, in each way of going between them """
     def make():
         S, I, R = ss.states('S I R')
-        beta = ss.timeseries([0, 20, 40], [ss.perday(0.4), ss.perday(0.1), ss.perday(0.3)], mode=mode, period=period)
+        beta = ss.timeseries([0, 20, 40], [ss.perday(0.4), ss.perday(0.1), ss.perday(0.3)], interpolation=interpolation, period=period)
         dis = ss.Disease(infection=ss.Transition(S, I, rate=beta*I), recovery=ss.Transition(I, R, dur=ss.days(7)), init_prev=0.01, name='series')
         return ss.Sim(dis, total_pop=1000, unit='day', stop=100, verbose=0)
-    make.__name__ = f'timeseries_{mode}' + ('_period' if period else '')
+    make.__name__ = f'timeseries_{interpolation}' + ('_period' if period else '')
     return make
 
 
-timeseries_cases = [timeseries('constant'), timeseries('linear'), timeseries('cosine'), timeseries('linear', ss.days(50))]
+timeseries_cases = [timeseries('step'), timeseries('linear'), timeseries('cosine'), timeseries('linear', ss.days(50))]
 
 
 def route_betas():
@@ -128,7 +128,7 @@ def contact_matrix():
     """ Contacts by age, whose mean is written, with the groups summed """
     S, I, R = ss.states('S I R')
     dis = sir_disease()
-    return ss.Sim(dis, networks=ss.MixingPools(n_contacts=np.array([[4.0, 2.0], [2.0, 3.0]]), src=dict(young=ss.AgeGroup(0, 18), old=ss.AgeGroup(18, None)), dst=dict(young=ss.AgeGroup(0, 18), old=ss.AgeGroup(18, None))), total_pop=1000, stratify=dict(age=[0, 18]), unit='day', stop=30, verbose=0)
+    return ss.Sim(dis, networks=ss.networks.MixingPools(n_contacts=np.array([[4.0, 2.0], [2.0, 3.0]]), source=dict(young=ss.person.age < 18, old=ss.person.age >= 18), target=dict(young=ss.person.age < 18, old=ss.person.age >= 18)), total_pop=1000, stratify=dict(age=[0, 18]), unit='day', stop=30, verbose=0)
 
 
 exact = [sir, seird, weekly, yearly, two_diseases, math_rate, agents, seasonal, dated_seasonal, *timeseries_cases, route_betas] # An export carries these in full

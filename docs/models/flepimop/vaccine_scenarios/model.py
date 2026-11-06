@@ -23,7 +23,7 @@ recovery    = I >> R @ gamma
 vaccination = S >> V @ nu_pess + nu_opt
 waning      = V >> S @ omega_pess + omega_opt
 cases       = ss.outcome(p_case*onset, delay=ss.days(5))
-hosp        = ss.outcome(0.05*onset, delay=ss.days(7), duration=ss.constant(10, unit='days'))
+hosp        = ss.outcome(0.05*onset, delay=ss.days(7), stay=ss.constant(10, unit='days'))
 deaths      = ss.outcome(0.2*hosp, delay=ss.days(14))
 transitions = [infection, onset, recovery, vaccination, waning]
 seir = ss.Disease(*transitions, cases, hosp, deaths, init_n=dict(E=ss.by(patch=[5, 0])))

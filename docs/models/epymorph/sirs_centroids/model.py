@@ -12,7 +12,7 @@ import pandas as pd
 import starsim as ss
 
 counties = pd.read_csv(os.path.join(os.path.dirname(__file__), 'original', 'arizona_counties.csv'))
-places = ss.geo.geography(names=counties['name'], pop=counties['population'], lat=counties['latitude'], lon=counties['longitude'])
+places = ss.geo.geography(names=counties['name'], populations=counties['population'], lat=counties['latitude'], lon=counties['longitude'])
 kernel = np.exp(-places.distances/(20*1.609344)) # phi = 20 miles, in km
 commuting = ss.geo.Mobility(matrix=0.15*(1/3)*kernel/kernel.sum(axis=1, keepdims=True))
 

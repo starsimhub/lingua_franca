@@ -48,10 +48,10 @@ def make_seir(fitted=False):
     infection = S >> E @ beta * I
     cases = ss.outcome(rho * infection, likelihood=ss.nbinom(n=20)) # Compared with weekly data by its total over each week
     seir = ss.Disease(infection, E >> I @ ss.perday(0.2), I >> R @ gamma, cases, init_n=dict(I=ss.by(age=[10, 0, 0, 0])), name='seir')
-    seir.stratify(age=ages, split=pop/pop.sum())
+    seir.stratify(age=ages, fractions=pop/pop.sum())
     data = pd.DataFrame(dict(time=7*np.arange(1, 41), cases=ref_cases)) if fitted else None
     return ss.Sim(seir, networks=ss.contacts(m, ages=ages), total_pop=pop.sum(), unit='day', dt=0.25, stop=280 if fitted else 365,
-                  solver='binomial', use_aging=False, data=data, verbose=0)
+                  solver='binomial', aging=False, data=data, verbose=0)
 
 
 def test_odin_import(tmp_path):
@@ -107,7 +107,7 @@ def test_odin_delay():
         init_n    = dict(I=1),
         name      = 'seir',
     )
-    seir.stratify(age=[0, 1, 5, 15, 30], split=split)
+    seir.stratify(age=[0, 1, 5, 15, 30], fractions=split)
     sim = ss.Sim(seir, total_pop=1e7, unit='day', stop=365, verbose=0).init()
     sim.run()
     res = sim.results.seir
@@ -115,7 +115,7 @@ def test_odin_delay():
     assert n_I.argmax() == ref_delay['day'] and np.isclose(n_I.max(), ref_delay['peak'], rtol=0.003), f'Peak of {n_I.max():,.0f} on day {n_I.argmax()}, against odin\'s {ref_delay["peak"]:,} on day {ref_delay["day"]}'
     for state in 'SEIR':
         assert np.isclose(res[state][-1], ref_delay[state], rtol=0.005), f'{state} on day 365: {res[state][-1]:,.0f}, against odin\'s {ref_delay[state]:,}'
-    seconds, _ = timing.timed(lambda: sim.restart().run())
+    seconds, _ = timing.timed(lambda: sim.run()) # A finished sim runs again from the start
     timing.check(seconds, v4_delay_run, 'A run', other=(ref_delay_run, 'odin'))
     return sim
 

@@ -31,7 +31,7 @@ Everything is declared: five states, three transitions, a stratification by age,
 |---|---|
 | `mod_beta <- function(time, x, tmax = 365/4) x + x*sinpi(time/tmax)`, given as `time_dependence` | `ss.seasonal(amplitude=1, peak=ss.days(365/8), period=ss.days(365/2))`, the same curve as a cosine |
 | `intervention(type = "contacts", time_begin, time_end, reduction)`, three of them, combined with `c()` | `contacts(start, stop, reduction)`: `ss.modify()` of `seirv.rel_sus` and `seirv.rel_trans` by `ss.by(age=1 - reduction)` |
-| `vaccination(nu = matrix(0.001, nrow = 3), time_begin, time_end)`, with zero-length windows for the two younger groups | `ss.Delivery(move=S >> V, capacity=ss.perday(0.001*N[2]), who=ss.ppl.age >= 40, start=120, stop=220)` |
+| `vaccination(nu = matrix(0.001, nrow = 3), time_begin, time_end)`, with zero-length windows for the two younger groups | `ss.Delivery(move=S >> V, capacity=ss.perday(0.001*N[2]), who=ss.person.age >= 40, start=120, stop=220)` |
 | A call of `model_default()` for each scenario, and `new_infections()` of each | `baseline`, `sim`, and `vaccination`, with new infections as the result `seirv.infection` |
 
 ## Findings

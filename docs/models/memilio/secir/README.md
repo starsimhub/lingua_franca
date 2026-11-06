@@ -27,7 +27,7 @@ Everything is declared. Each severity step is one transition with two destinatio
 
 ## Findings
 
-- **Fixed: a value that varies in time was held for a whole step.** The original lowers contacts smoothly over day 29, along half a cosine. `ss.timeseries(..., mode='cosine')` says the same, and the ODE solver reads it at each stage of a step, so the translation no longer gives that day its average by hand.
+- **Fixed: a value that varies in time was held for a whole step.** The original lowers contacts smoothly over day 29, along half a cosine. `ss.timeseries(..., interpolation='cosine')` says the same, and the ODE solver reads it at each stage of a step, so the translation no longer gives that day its average by hand.
 - **Two states left out.** The original has two "confirmed" states that nothing flows into; they are not in the translation.
 - **The dead are a flow, not a state.** The number dead is `res.death.cum`.
 

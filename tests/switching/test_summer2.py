@@ -60,7 +60,7 @@ def sigmoid(t, xs=(1950, 1990, 2020), ys=(0, 0.5, 1), curvature=16):
 def make_tb(ages=True, data=None):
     """ The TB model as a summer2 user writes it in v4: detection is a fitted maximum times a scale-up over time """
     t = np.round(np.arange(1950, 2025.001, 0.1), 3)
-    scaleup = ss.timeseries(dict(zip(t, sigmoid(t))), mode='linear')
+    scaleup = ss.timeseries(dict(zip(t, sigmoid(t))), interpolation='linear')
     beta = ss.par(10.0, bounds=[2, 30])
     detect_max = ss.par(1.5, bounds=[0.2, 4])
     S, E, L, I, T, R = ss.states('S E L I T R')
@@ -69,20 +69,19 @@ def make_tb(ages=True, data=None):
                     detection=I >> T @ detect_max*scaleup, treatment_end=T >> R @ 2.0, tb_death=ss.death(I, rate=0.2),
                     death=ss.death(rate=1/70), birth=ss.birth(S, rate=0.02), init_n=dict(I=1000), name='tb')
     if ages:
-        tb.stratify(age=[0, 5, 15, 35, 50, 70], split=[1/6]*6, adjust={'early_activation': [3, 1.5, 1, 1, 1, 1], 'rel_trans': [0.1, 0.2, 1, 1, 1, 1]})
+        tb.stratify(age=[0, 5, 15, 35, 50, 70], fractions=[1/6]*6, adjust={'early_activation': [3, 1.5, 1, 1, 1, 1], 'rel_trans': [0.1, 0.2, 1, 1, 1, 1]})
     return ss.Sim(tb, networks=ss.contacts(mixing) if ages else None, total_pop=1e6, start=1950, stop=2025, unit='year', data=data, verbose=0)
 
 
 def notifications():
-    """ Notifications from 2000 to 2024, as whole numbers, from a run at the true values (those in a year are at the time point that ends it, as data by calendar year is read) """
+    """ Notifications from 2000 to 2024, as whole numbers, from a run at the true values (those in a year are the step from its start, as data by calendar year is read) """
     res = make_tb(ages=False).run().results.tb.detection
-    return pd.DataFrame(dict(year=range(2000, 2025), detection=np.round(np.asarray(res.values)[51:76])))
+    return pd.DataFrame(dict(year=range(2000, 2025), detection=np.round(np.asarray(res.values)[50:75])))
 
 
 def jax_logdensity(sim, x):
     """ The log-density that NUTS samples in JAX, and the one from a run of the sim, at the same values """
-    fitted = ss.gradients.find_pars(sim)
-    set_pars = lambda x: sim.restart(pars=dict(zip(fitted.keys(), map(float, x))))
+    fitted, set_pars, _, _ = ss.gradients.entries(sim) # The fitted parameters, and a function that restarts the sim with values of them
     density = ss.gradients.Density(sim, fitted, x, set_pars, likelihood=lik)
     jax = ss.gradients.jax()
     with jax.enable_x64(True):
@@ -98,7 +97,8 @@ def test_summer2_tb():
     for year,ref in ref_n_I.items():
         assert abs(res.I.values[year - 1950] - ref) < 5, f'Active TB in {year}: {res.I.values[year - 1950]:.1f} against summer2\'s {ref}'
     for year,ref in ref_notifications.items():
-        assert np.isclose(res.detection.values[year - 1950], ref, rtol=0.005), f'Notifications in {year}: {res.detection.values[year - 1950]:.0f} against {ref:.0f}'
+        ours = res.detection.values[year - 1951] # summer2's at a year is the flow during the step that ends there; ours at index k is the step from year 1950 + k
+        assert np.isclose(ours, ref, rtol=0.005), f'Notifications in {year}: {ours:.0f} against {ref:.0f}'
     return res
 
 

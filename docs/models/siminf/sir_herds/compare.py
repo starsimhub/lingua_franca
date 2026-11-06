@@ -19,7 +19,7 @@ times = [100, 200, 365, 500, 700, 1000, 1460]
 
 def one(seed):
     """ One run: the series the reference has, by day (a count at index t is the number on day t, with the transitions of SimInf's day t and, as in SimInf, that day's scheduled events) """
-    res = sim.new(rand_seed=seed, verbose=0, results=['I']).run().results.sir # Only I by herd, so that it is kept every day, not every week
+    res = sim.new(rand_seed=seed, verbose=0, group_results=['I']).run().results.sir # Only I by herd, so that it is kept every day, not every week
     out = {key:res[key].values for key in 'SIR'}
     I = res.I.strata # By herd
     out['nodes_infected'] = (I > 0).sum(axis=1)

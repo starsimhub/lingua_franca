@@ -2,7 +2,7 @@
 Switching demo for the EMULSION seat: the published herd model with minimum stays, offspring, and births between stages.
 
 Passes when: matches EMULSION's published output.
-Blocked today by: N11, and a quickstart herd that is too small; `after=`, `ss.birth(per=)`, and offspring by the mother's state (a split on the birth) exist.
+Blocked today by: N11, and a quickstart herd that is too small; `min_stay=`, `ss.birth(on=)`, and offspring by the mother's state (a split on the birth) exist.
 The published model is EMULSION's quickstart (100 animals, 105 weekly steps); the means are compared over 10 runs rather than EMULSION's 200.
 """
 import tempfile
@@ -57,34 +57,34 @@ def test_emulsion_quickstart():
     NG, G = ss.states('NG G')
     farrowing = ss.Transition(G, NG, dur=ss.constant(ss.days(240)))
     J, A = ss.states('J A')
-    growth = ss.Disease(maturity=ss.Transition(J, A, rate=ss.perday(1e9), where=ppl.age >= adult_age/365), newborns=ss.birth(J, per=farrowing), first='J')
+    growth = ss.Disease(maturity=ss.Transition(J, A, rate=ss.perday(1e9), where=ppl.age >= adult_age/365), newborns=ss.birth(J, on=farrowing), default_state='J')
     S, E, I, R, Q, M = ss.states('S E I R Q M')
-    newborns = ss.birth(M, per=farrowing)
+    newborns = ss.birth(M, on=farrowing)
     quarantine = ss.par(ss.timeseries({'2021-01-01': 0, '2021-04-01': 1, '2021-09-02': 0, '2022-04-01': 1, '2022-09-02': 0}))
     health = ss.Disease(
         infection   = S >> E @ ss.perday(0.1)*I.n/(S + E + I + R + Q + M).n,
-        onset       = ss.Transition(E, I, rate=ss.perday(0.3), after=ss.days(10)), # EMULSION's duration: a minimum stay
+        onset       = ss.Transition(E, I, rate=ss.perday(0.3), min_stay=ss.days(10)), # EMULSION's duration: a minimum stay
         recovery    = I >> R @ ss.perday(0.01),
         detection   = I >> Q @ ss.perday(0.01)*quarantine*(Q.n < 20),
         release     = Q >> R @ ss.constant(ss.days(30)),
         waning      = R >> S @ ss.perday(0.01),
-        loss        = ss.Transition(M, S, rate=ss.perday(0.04), after=ss.days(adult_age)),
+        loss        = ss.Transition(M, S, rate=ss.perday(0.04), min_stay=ss.days(adult_age)),
         deaths      = S + R >> ss.null @ ss.perday(0.002),
         sick_deaths = I + Q >> ss.null @ ss.perday(0.004),
-        M_deaths    = ss.Transition(M, ss.null, rate=ss.perday(0.002)*(M.time < ss.days(adult_age))), # EMULSION's escape
-        E_deaths    = ss.Transition(E, ss.null, rate=ss.perday(0.004)*(E.time < ss.days(10))),
+        M_deaths    = ss.Transition(M, ss.null, rate=ss.perday(0.002)*(M.time_in < ss.days(adult_age))), # EMULSION's escape
+        E_deaths    = ss.Transition(E, ss.null, rate=ss.perday(0.004)*(E.time_in < ss.days(10))),
         newborns    = newborns,
-        vertical    = ss.Transition(M, [I, M], where=newborns & ss.mother(E | I | Q, born=True), p=[0.3, 0.7]), # EMULSION's produce_offspring: (J, NG, I) with chance 0.3 from an infected mother
+        vertical    = ss.Transition(M, [I, M], on=newborns, where=ss.mother(E | I | Q, include_born=True), p=[0.3, 0.7]), # EMULSION's produce_offspring: (J, NG, I) with chance 0.3 from an infected mother
         init_n      = dict(I=10),
     )
     life = ss.Disease(
-        conception = ss.Transition(NG, G, rate=ss.perday(0.05), after=ss.days(90), where=growth.A),
+        conception = ss.Transition(NG, G, rate=ss.perday(0.05), min_stay=ss.days(90), where=growth.A),
         farrowing  = farrowing,
         abortion   = ss.Transition(G, NG, rate=ss.perday(-np.log(0.8)/240), where=health.I),
-        newborns   = ss.birth(NG, per=farrowing),
-        first      = 'NG',
+        newborns   = ss.birth(NG, on=farrowing),
+        default_state = 'NG',
     )
-    sim = ss.Sim([growth, life, health], people=ppl, unit='day', dt=dt, start='2021-01-01', stop=ss.days(735), use_aging=True, solver='abm', verbose=0)
+    sim = ss.Sim([growth, life, health], people=ppl, unit='day', dt=dt, start='2021-01-01', stop=ss.days(735), aging=True, solver='abm', verbose=0)
     check_quickstart(sim.run(n_runs=n_runs))
 
 
@@ -96,13 +96,13 @@ def make_metapop(staged=False):
         N = S + I + R
         sir = ss.Disease(infection=S >> I @ ss.perday(0.5)*I.n/N.n, recovery=I >> R @ ss.perday(0.1), births=ss.birth(S, rate=ss.by(stage=[0, 2*b])),
                          deaths=ss.death(rate=b*N.n/K), maturation=ss.transfer(stage=('J', 'A'), rate=ss.perday(1/20)), init_n=dict(I=ss.by(pop=[10] + [0]*9)), name='sir')
-        sir.stratify(stage=['J', 'A'], split=[1, 0])
+        sir.stratify(stage=['J', 'A'], fractions=[1, 0])
     else: # The two machines crossed by hand into six states
         SJ, IJ, RJ, SA, IA, RA = ss.states(6)
         N, I = SJ + IJ + RJ + SA + IA + RA, IJ + IA
         sir = ss.Disease(infection_J=SJ >> IJ @ ss.perday(0.5)*I.n/N.n, infection_A=SA >> IA @ ss.perday(0.5)*I.n/N.n, recovery_J=IJ >> RJ @ ss.perday(0.1),
                          recovery_A=IA >> RA @ ss.perday(0.1), mature_S=SJ >> SA @ ss.perday(1/20), mature_I=IJ >> IA @ ss.perday(1/20), mature_R=RJ >> RA @ ss.perday(1/20),
-                         births=ss.null >> SJ @ 2*b*(SA + IA + RA).n, deaths=ss.death(rate=b*N.n/K), init_n=dict(IJ=ss.by(pop=[10] + [0]*9)), first='SJ', name='sir')
+                         births=ss.null >> SJ @ 2*b*(SA + IA + RA).n, deaths=ss.death(rate=b*N.n/K), init_n=dict(IJ=ss.by(pop=[10] + [0]*9)), default_state='SJ', name='sir')
     sir.stratify(pop=[f'p{i}' for i in range(10)], kind='space')
     return ss.Sim(sir, solver='binomial', substeps=1, unit='day', start='2018-01-01', stop=ss.days(100), total_pop=1000, verbose=0).run(n_runs=20) # Whole days, as EMULSION takes them
 
@@ -128,7 +128,7 @@ def test_emulsion_metapop_stages():
     check_metapop(dict(total=total, J=sum(end(s, stage='J') for s in 'SIR'), A=sum(end(s, stage='A') for s in 'SIR'), I=end('I'), R=end('R')))
 
 
-@pytest.mark.xfail(reason='The import lists the untranslated parts (cond, when, on_cross, statevars, the calendar; minimum stays are now after=), and warns and hands them to the import-model skill when run (15 animals at the end against 66); a complete import needs after=, escapes, and offspring by prototype, as test_emulsion_quickstart', strict=False)
+@pytest.mark.xfail(reason='The import lists the untranslated parts (cond, when, on_cross, statevars, the calendar; minimum stays are now min_stay=), and warns and hands them to the import-model skill when run (15 animals at the end against 66); a complete import needs min_stay=, escapes, and offspring by prototype, as test_emulsion_quickstart', strict=False)
 def test_emulsion_import():
     sc.heading('Testing importing EMULSION\'s quickstart and matching its published output')
     sim = ss.import_from(paths.root/'docs/models/emulsion/quickstart/original/quickstart.yaml', format='emulsion', verbose=False)

@@ -22,7 +22,7 @@ keys = ['S_1', 'I_1', 'S_2', 'I_2', 'S_3', 'I_3', 'I', 'phi', 'nodes_infected', 
 
 def one(seed):
     """ One run: the series the reference has, by day (a count at index t is the number on day t, with the transitions of SimInf's day t and, as in SimInf, that day's scheduled events) """
-    res = sim.new(rand_seed=seed, verbose=0, results=['I_1', 'I_2', 'I_3', 'phi']).run().results.sise3 # By herd every day, as the days of the reference are not multiples of 7
+    res = sim.new(rand_seed=seed, verbose=0, group_results=['I_1', 'I_2', 'I_3', 'phi']).run().results.sise3 # By herd every day, as the days of the reference are not multiples of 7
     out = {key:res[key].values for key in keys[:6]}
     I = res.I_1.strata + res.I_2.strata + res.I_3.strata # By herd
     out['I'] = I.sum(axis=1)

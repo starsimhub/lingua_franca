@@ -11,7 +11,7 @@ names  = ['Central City'] + [f'Town {i+1}' for i in range(5)] + [f'Interim {i+1}
 pop    = [1_000_000] + [100_000]*5 + [25_000]*10
 dist   = [0] + [150]*5 + [50, 100]*5 # Distance from the city, in km
 angle  = [0] + list(angles) + list(np.repeat(angles, 2))
-places = ss.geo.geography(names=names, pop=pop, x=dist*np.cos(angle), y=dist*np.sin(angle))
+places = ss.geo.geography(names=names, populations=pop, x=dist*np.cos(angle), y=dist*np.sin(angle))
 
 S, E, I, R = ss.states(4)
 seir = ss.Disease(
@@ -20,7 +20,7 @@ seir = ss.Disease(
     recovery  = I >> R @ ss.normal(14, 2, unit='days'),
     init_n    = dict(I=ss.by(patch=[0, 100] + [0]*14)), # 100 infectious people in Town 1
 )
-seir.stratify(patch=places, mobility=ss.geo.Mobility(ss.geo.gravity(c=2.5), kind='force', away=3/32))
+seir.stratify(patch=places, mobility=ss.geo.Mobility(ss.geo.gravity(distance_power=2.5), kind='force', away=3/32))
 sim = ss.Sim(seir, total_pop=sum(pop), n_agents=175_000, stop=ss.days(365))
 
 if __name__ == '__main__':

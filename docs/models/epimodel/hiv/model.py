@@ -37,7 +37,7 @@ supp = [1, 1, 1, 0.5, 1] # Suppression halves progression
 hiv.stratify(
     care      = ['undx', 'dx', 'art', 'supp', 'off'], # Off is off ART after being on it
     states    = [A, C, D],
-    split     = [1, 0, 0, 0, 0],
+    fractions = [1, 0, 0, 0, 0],
     adjust    = dict(rel_trans=[1, 1, 0.3, 0.01, 1], chronic=supp, aids=supp, aids_death=[1, 1, 1, 0.1, 1]),
 )
 

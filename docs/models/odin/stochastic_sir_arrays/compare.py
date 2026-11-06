@@ -22,7 +22,7 @@ if __name__ == '__main__':
     quiet = sim.new(verbose=0).init()
     res = {state:[] for state in 'SIR'}
     for seed in range(n_runs):
-        sir = quiet.restart(rand_seed=seed).run().results.sir
+        sir = quiet.run(rand_seed=seed).results.sir
         for state in 'SIR':
             res[state].append(np.asarray(sir[state].by('run').values).T) # Replicates by times
     res = {state:np.concatenate(vals) for state,vals in res.items()}

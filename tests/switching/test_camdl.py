@@ -39,7 +39,7 @@ def make_polio(sia=False):
         init_n      = dict(I=ss.by(patch=[5, 0, 0, 0, 0])),
         name        = 'seir',
     )
-    seir.stratify(patch=patches, kind='space', split=N0/N0.sum())
+    seir.stratify(patch=patches, kind='space', fractions=N0/N0.sum())
     if sia: # camdl's transfer(S -> V), in each patch on its own days
         sia = [ss.vaccinate(move=seir.S >> seir.V, at=days, coverage=ss.by(patch=[0.8*(q == p) for q in patches]), name=f'sia_{p}') for p, days in sia_days.items()]
     return ss.Sim(seir, networks=ss.contacts(np.diag(R0*gamma) + kappa*W, dims='patch'), interventions=sia or None,
@@ -83,13 +83,13 @@ def test_camdl_units():
 
 def test_camdl_if2():
     sc.heading('Maximum likelihood by iterated filtering, as camdl fit run does')
-    beta  = ss.par(ss.perday(0.3), bounds=[0.05, 1.0], prior=ss.lognorm_im(mean=-1.0, sigma=0.5))
-    gamma = ss.par(ss.perday(0.1), bounds=[0.01, 0.5], prior=ss.lognorm_im(mean=-2.0, sigma=0.5))
+    beta  = ss.par(ss.perday(0.3), bounds=[0.05, 1.0], prior=ss.lognormal(log_mean=-1.0, log_std=0.5))
+    gamma = ss.par(ss.perday(0.1), bounds=[0.01, 0.5], prior=ss.lognormal(log_mean=-2.0, log_std=0.5))
     S, I, R = ss.states(3)
     infection = S >> I @ beta * I
     cases = ss.outcome(0.6 * infection, likelihood=ss.nbinom(n=10))
     sir = ss.Disease(infection, I >> R @ gamma, cases, init_n=dict(I=10), name='sir')
-    data = pd.DataFrame(dict(time=7*np.arange(1, 13), cases=ref_cases))
+    data = pd.DataFrame(dict(time=7*np.arange(0, 12), cases=ref_cases)) # Each week dated by its first day, as a flow's data is read (camdl dates it by its last)
     sim = ss.Sim(sir, total_pop=10_000, unit='day', stop=ss.weeks(12), solver='binomial', data=data, verbose=0)
     fit = sim.fit(method='if2')
     beta, gamma = fit.pars.beta.value, fit.pars.gamma.value # Per day

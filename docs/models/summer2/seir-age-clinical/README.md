@@ -32,7 +32,7 @@ Everything is declared: four transitions and two stratifications, as in the orig
 |---|---|
 | `Stratification('age', ...)` | `seir.stratify(age=['young', 'old'], adjust={'incidence': [1, 1.1]})` |
 | `Stratification('clinical', ..., ['I'])` | `seir.stratify(clinical=[...], states=['I'], ...)` |
-| `incidence` adjusted by clinical status, given age (`source_strata`) | `split=ss.by([[...], [...]], dims=['age', 'clinical'])`, a row for each age, with the old's rows summing to 1.1 given as the `adjust` on age |
+| `incidence` adjusted by clinical status, given age (`source_strata`) | `fractions=ss.by([[...], [...]], dims=['age', 'clinical'])`, a row for each age, with the old's rows summing to 1.1 given as the `adjust` on age |
 | `infection_death` with `Overwrite(0)` and `Multiply(2)` | `adjust={'infection_death': [0, 1, 1, 2]}` |
 | `add_infectiousness_adjustments` | `adjust={'rel_trans': [0.5, 1, 0.2, 0.1]}` |
 | `set_population_split` (everyone in `I` asymptomatic) | `init_n=dict(I=ss.by([[5, 0, 0, 0], [5, 0, 0, 0]], dims=['age', 'clinical']))` |
@@ -49,7 +49,7 @@ The stratification by clinical status is also written as four states (`Ia`, `Is`
 
 All of these were found in earlier versions of this translation and have been fixed in Starsim, except that the last is not a problem.
 
-1. **Fixed: entering a stratification by a split that depends on another dimension.** People entering a state with a dimension their old state lacked used to go to its levels by one `split` for everyone. Now `split=ss.by(table, dims=['age', 'clinical'])` gives one row per age. The rows for the old sum to 1.1 in the original; normalizing them, and giving the 1.1 as an `adjust` on age, is exact.
+1. **Fixed: entering a stratification by a split that depends on another dimension.** People entering a state with a dimension their old state lacked used to go to its levels by one `split` for everyone. Now `fractions=ss.by(table, dims=['age', 'clinical'])` gives one row per age. The rows for the old sum to 1.1 in the original; normalizing them, and giving the 1.1 as an `adjust` on age, is exact.
 2. **Fixed: infectiousness by level.** `adjust={'rel_trans': [...]}` on `stratify()` replaces a modifier for each level.
 3. **Fixed: outcomes.** A sum of flows given to a disease is now an outcome, can be selected by group, and can have a weight by level (`ss.outcome(ss.by(clinical=[0, 0, 1, 1]) * incidence)` would declare notifications). Selecting the groups of the incidence result does the same job here.
 4. **Fixed: an initial count by level of a dimension of some states.** It used to take the wrong number of people out of `S`. Now each level gets exactly that many people. Since `I`'s own split is the entry split, `ss.by(clinical=[10, 0, 0, 0])` would put 5.95 young and 4.05 old people in `I`, not 5 and 5 as in the original, so the vignette gives the count by both dimensions.

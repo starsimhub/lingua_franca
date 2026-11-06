@@ -31,8 +31,8 @@ tol_proj = 0.1 # Of the peak of projected weekly deaths: each side's posterior i
 
 
 def weekly(daily, times):
-    """ Sum daily flows over the weeks ending at each reference time (days to the end of the week's last day; a flow at index k is the number during the step ending then) """
-    return np.array([daily[..., max(0, int(t) - 6):int(t) + 1].sum(axis=-1) for t in times]).T
+    """ Sum daily flows over the weeks ending at each reference time (days to the end of the week's last day; a flow at index k is the number during the step from day k) """
+    return np.array([daily[..., max(0, int(t) - 7):int(t)].sum(axis=-1) for t in times]).T
 
 
 def show(label, ours, key):

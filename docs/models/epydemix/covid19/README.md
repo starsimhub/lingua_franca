@@ -26,7 +26,7 @@ The calibration is the same method in both: ABC-SMC with 200 particles for 5 gen
 
 ## What was declared and what was not
 
-Everything in the model is declared: nine states, seven transitions (the four stages of the delay to death written out, as in the original, and a split on leaving `I` with `p=ss.by(age=IFR)` in place of two competing rates), a stratification by age with a contact matrix, a time series and a seasonal factor in the transmission rate, the weekly deaths as data, four parameters with bounds (one inside the seasonal factor and one in the initial conditions), and the reopening scenarios as `ss.modify` from 1 June. The weekly totals line up with the data without being asked: a flow is summed over the week ending at each data date. Since a date is the time point at the start of that day, this is the week to the end of the Saturday, a day earlier than epydemix's weeks ending on Sunday (`compare.py` sums its own weeks to the end of each Sunday).
+Everything in the model is declared: nine states, seven transitions (the four stages of the delay to death written out, as in the original, and a split on leaving `I` with `p=ss.by(age=IFR)` in place of two competing rates), a stratification by age with a contact matrix, a time series and a seasonal factor in the transmission rate, the weekly deaths as data, four parameters with bounds (one inside the seasonal factor and one in the initial conditions), and the reopening scenarios as `ss.modify` from 1 June. The weekly totals line up with the data once each week is dated by its start: a flow is summed over the steps from each data date to the next, so `model.py` moves the data's dates, the Sundays that end epydemix's weeks, back a week. Since a date is the time point at the start of that day, this is the week to the end of the Saturday, a day earlier than epydemix's weeks ending on Sunday (`compare.py` sums its own weeks to the end of each Sunday).
 
 The mobility data is turned into the contact reduction with pandas, as in the original. The transmission rate's scaling by R0 and the leading eigenvalue of the contact matrix is written out, as in the original.
 
@@ -40,7 +40,7 @@ Not translated: the random split of the initial infections between age groups (S
 4. **Fixed: a posterior.** `sim.fit(method='abc-smc')` uses the original's method and distance (`wmape`), and `fit.project()` gives projections from it. Both now agree with the original. A form of `ss.seasonal` given by the minimum would still say what the original means more directly.
 5. **Fixed: plotting with dated data.**
 6. **Many runs with a modifier run in separate processes.** `sim.run(n_runs=)` is one call to the kernel for the persistence scenario, but with `ss.modify` it is a `MultiSim`, and `fit.project()` has no way to say `parallel=False`, so `compare.py` writes out what it does.
-7. **Population data for US states are not available yet.** Starsim bundles countries, but `ss.people('United States:Massachusetts')` cannot be downloaded yet, so the population of Massachusetts and its contact matrices are read from what epydemix downloaded, as a few of the lines.
+7. **Population data for US states are not available yet.** Starsim bundles countries, but `ss.population('United States:Massachusetts')` cannot be downloaded yet, so the population of Massachusetts and its contact matrices are read from what epydemix downloaded, as a few of the lines.
 
 ## What it exercises
 

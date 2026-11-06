@@ -24,22 +24,23 @@ for k,(t,v) in tools.read_results(example).items(): # Weeks 1 to 1040, with NaN 
     ref[k] = np.full(1040, np.nan)
     ref[k][np.array(t, dtype=int) - 1] = v
 n_runs = 6 # The reference has 10 of each scenario
-weeks = slice(1, 1040) # Weeks 2 to 1040: index k is week k+1 in both (the start is week 1), for a stock the number then and for a flow the number during the step ending then
+weeks = slice(1, 1040) # Weeks 2 to 1040: index k of a stock is week k+1 in both (the start is week 1)
+steps = slice(0, 1039) # The same weeks for a flow or a network's results, whose row k is the step from week k+1, which the original records at the week it ends in, k+2
 late = slice(519, 1039) # The second half (weeks 521 to 1040), as in the original's summary
 
 
 def ours(msim):
     """ The original's measures, for each run: one row a week, from week 2 to week 1040 """
     res = msim.results.hiv
-    get = lambda r: np.atleast_2d(r.values)[:, weeks]
+    get = lambda r, rows=weeks: np.atleast_2d(r.values)[:, rows]
     inf, sus = get(res.infected), get(res.S)
     care = {k:get(res.infected.select(care=k)) for k in ['undx', 'art', 'supp']}
-    out = sc.objdict(num=inf + sus, i=inf, s=sus, si=get(res.infection), dx=inf - care['undx'], art=care['art'] + care['supp'], supp=care['supp'])
+    out = sc.objdict(num=inf + sus, i=inf, s=sus, si=get(res.infection, steps), dx=inf - care['undx'], art=care['art'] + care['supp'], supp=care['supp'])
     if msim.sims[0].interventions: # The PrEP scenarios
         out.prep = get(res.S.select(has_prep=True))
     for name in ['main', 'casual']:
-        out[f'{name}_deg'] = np.array([sim.networks[name].results.mean_degree[weeks] for sim in msim.sims])
-        out[f'{name}_conc'] = np.array([sim.networks[name].results.concurrency[weeks] for sim in msim.sims])
+        out[f'{name}_deg'] = np.array([sim.networks[name].results.mean_degree[steps] for sim in msim.sims])
+        out[f'{name}_conc'] = np.array([sim.networks[name].results.concurrency[steps] for sim in msim.sims])
     return out
 
 

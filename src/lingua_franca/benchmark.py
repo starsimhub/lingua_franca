@@ -185,7 +185,7 @@ def worker(name, kernel, rebuilds):
         base = getattr(model, run.get('sim', 'sim'))
         built = [base.new(verbose=0)]
         first = lambda: built[0].run()
-        again = lambda: (built[0].restart(), built[0].run())
+        again = lambda: built[0].run() # A finished sim runs again from the start
         rebuild = lambda: base.new(verbose=0).run()
 
     if kernel.startswith('jax') and 'code' not in run: # Without a slow first run if JAX does not apply

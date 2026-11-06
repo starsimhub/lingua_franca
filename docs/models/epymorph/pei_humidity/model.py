@@ -16,7 +16,7 @@ states = pd.read_csv(os.path.join(folder, 'states.csv'), index_col='state')
 humidity = pd.read_csv(os.path.join(folder, 'humidity.csv'), index_col='date')
 commuters = states[states.index].values
 travel = (0.9*commuters + 0.1*((commuters + commuters.T)//2))/states.population.values[:, None]/3 # Shares of time away
-places = ss.geo.geography(names=states.index, pop=states.population)
+places = ss.geo.geography(names=states.index, populations=states.population)
 
 S, I, R = ss.states('S I R')
 H = ss.by(patch=[ss.timeseries(humidity[state].to_dict()) for state in states.index])

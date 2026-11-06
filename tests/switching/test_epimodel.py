@@ -45,7 +45,7 @@ def test_epimodel_risk_groups():
     for seed in range(2):
         net = ss.DegreeNet(n_contacts=ss.by(risk=[0.4, 1.6]), match=dict(risk=0.8), dur=50) # Targets 320 edges, 320 high-risk ends, 256 within group
         sim = ss.Sim(make_sis(), networks=net, n_agents=1000, stop=300, rand_seed=seed, verbose=0)
-        sim.stratify(risk=['low', 'high'], split=[0.8, 0.2])
+        sim.stratify(risk=['low', 'high'], fractions=[0.8, 0.2])
         prevs.append(prev_by_group(sim.run()))
     low, high = np.mean(prevs, axis=0)
     assert abs(low - ref_prev['low']) < ref_tol and abs(high - ref_prev['high']) < ref_tol, f'Prevalence by risk group {low:.1%}/{high:.1%}, not near EpiModel\'s 20.7%/77.4%'
@@ -77,7 +77,7 @@ def test_epimodel_from_r(tmp_path):
         sis <- ss$Disease(infection = ss$Transition(S, I, rate = ss$prob(0.64) * I), recovery = ss$Transition(I, S, rate = ss$prob(0.05)), init_n = list(I = 10L), name = "sis") # A list: dict() would take the variable I as its key
         net <- ss$DegreeNet(n_contacts = ss$by(risk = c(0.4, 1.6)), match = dict(risk = 0.8), dur = 50L)
         sim <- ss$Sim(sis, networks = net, n_agents = 1000L, stop = 300L, verbose = 0L)
-        sim$stratify(risk = c("low", "high"), split = c(0.8, 0.2))
+        sim$stratify(risk = c("low", "high"), fractions = c(0.8, 0.2))
         sim$run()
         n_I <- py_to_r(sim$results$sis$I$strata)[151:301, ]
         n_S <- py_to_r(sim$results$sis$S$strata)[151:301, ]

@@ -21,16 +21,16 @@ tolerance = dict(total=0.02, yearly=0.2, correlation=0.98, region=0.2, stock=0.0
 
 
 def monthly(res, key):
-    """ A daily flow summed by month (a flow at index k is the number during the step ending on day k, so during day k-1) """
-    months = [str(t)[:7] for t in res.timevec[:-1]]
-    return pd.Series(res[key].values[1:], index=months).groupby(level=0, sort=False).sum()
+    """ A daily flow summed by month (a flow at index k is the number during the step from day k, so during day k) """
+    months = [str(t)[:7] for t in res.timevec]
+    return pd.Series(res[key].values, index=months).groupby(level=0, sort=False).sum()
 
 
 def run(seed):
-    res = sim.new(verbose=0, rand_seed=seed, results=['onset']).run().results.measles # Onsets by district every day
+    res = sim.new(verbose=0, rand_seed=seed, group_results=['onset']).run().results.measles # Onsets by district every day
     by_district = res.onset.by('district')
-    after = np.array([str(t)[:4] >= '2020' for t in res.timevec[:-1]]) # By the day each step starts on, as in monthly()
-    regions = pd.Series(by_district.values[1:][after].sum(axis=0), index=[col.split(':')[0] for col in by_district.columns]).groupby(level=0).sum()
+    after = np.array([str(t)[:4] >= '2020' for t in res.timevec]) # By the day each step starts on, as in monthly()
+    regions = pd.Series(by_district.values[after].sum(axis=0), index=[col.split(':')[0] for col in by_district.columns]).groupby(level=0).sum()
     end = [str(t)[:10] for t in res.timevec].index('2025-12-01') # The original's last value is at the start of the last month
     return sc.objdict(infections=monthly(res, 'onset'), cases=monthly(res, 'cases'), regions=regions, S=res.S.values[end], R=res.R.values[end])
 

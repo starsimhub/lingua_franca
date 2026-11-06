@@ -68,7 +68,7 @@ def test_scenarios():
             for key,theirs in [('V', 'V'), ('I', 'I')]:
                 ours = np.mean([r[key].select(subpop=place).values[:-1] for r in res], axis=0)
                 assert np.abs(ours - reference(folder, f'{scen}_{place}_{theirs}')).max() < 1e-6
-            for key,theirs in [('incidCase', 'incidCase'), ('incidDeath', 'incidDeath'), ('n_incidHosp', 'currHosp')]: # A flow at index k is the number in the step ending on day k; the original's on day k is the number during day k
-                ours = np.mean([r[key].select(subpop=place).values[1:] for r in res], axis=0)
+            for key,theirs,rows in [('incidCase', 'incidCase', slice(None, -1)), ('incidDeath', 'incidDeath', slice(None, -1)), ('n_incidHosp', 'currHosp', slice(1, None))]: # A flow at index k is the number in the step from day k, as the original's on day k is the number during day k; currHosp is at the end of the day, our stock at index k + 1
+                ours = np.mean([r[key].select(subpop=place).values[rows] for r in res], axis=0)
                 assert np.abs(ours - reference(folder, f'{scen}_{place}_{theirs}')).max() < 1e-6, f'{scen} {place} {key} differs from the original' # Including the end date
     return sims

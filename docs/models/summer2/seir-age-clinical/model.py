@@ -17,7 +17,7 @@ seir.stratify(age=['young', 'old'], adjust={'incidence': [1, 1.1]}) # The old's 
 seir.stratify( # Clinical status, which those who fall ill take by age
     clinical = ['asymptomatic', 'symptomatic', 'isolated', 'hospital'],
     states   = ['I'],
-    split    = ss.by([[0.4, 0.3, 0.2, 0.1], [0.3, 0.3, 0.2, 0.3]], dims=['age', 'clinical']),
+    fractions = ss.by([[0.4, 0.3, 0.2, 0.1], [0.3, 0.3, 0.2, 0.3]], dims=['age', 'clinical']),
     adjust   = {'infection_death': [0, 1, 1, 2], 'rel_trans': [0.5, 1, 0.2, 0.1]},
 )
 sim = ss.Sim(seir, total_pop=1000, dt=0.1, stop=20)

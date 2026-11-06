@@ -87,7 +87,7 @@ def run_cases():
         dot512         = matvec(512, 20_000),
         dot2000        = matvec(2000, 500),
         matmul1000     = timed(lambda: [A @ A for _ in range(5)]),
-        parallel       = timed(lambda: ss.parallel([agent_sim(100_000) for _ in range(4)], n_cpus=min(4, os.cpu_count()), verbose=0)),
+        parallel       = timed(lambda: ss.parallel([agent_sim(100_000) for _ in range(4)], workers=min(4, os.cpu_count()), verbose=0)),
     )
 
 
@@ -130,7 +130,7 @@ def describe():
     """ What is being tested """
     import threadpoolctl
     info = dict(platform=platform.platform(), machine=platform.machine(), processor=platform.processor(), cpus=os.cpu_count(), python=platform.python_version(),
-                numpy=np.__version__, scipy=scipy.__version__, numba=__import__('numba').__version__, starsim=ss.__version__, kernels=ss.compile_status().engine if hasattr(ss, 'compile_status') else 'numba')
+                numpy=np.__version__, scipy=scipy.__version__, numba=__import__('numba').__version__, starsim=ss.__version__, kernels=ss.kernels.compile_status().engine)
     if sys.platform == 'linux':
         for line in pathlib.Path('/proc/cpuinfo').read_text().splitlines():
             if line.startswith('model name'):

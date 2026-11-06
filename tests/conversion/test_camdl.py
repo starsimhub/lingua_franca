@@ -33,7 +33,7 @@ def test_camdl_file():
         theirs = ref[ref.series == f'ode_{key}'].value.values # Written as whole numbers
         assert np.abs(res[key].values - theirs).max() <= 0.5, f'{key} should agree with camdl to its rounding'
     theirs = ref[ref.series == 'ode_cases'].value.values
-    weekly = res.cases.values[1:].reshape(-1, 7).sum(axis=1) # The cases of each week, as camdl reports them
+    weekly = res.cases.values[:-1].reshape(-1, 7).sum(axis=1) # The cases of each week, as camdl reports them (a flow at index k is the step from day k, and the last, from the stop, is past the weeks)
     assert np.allclose(weekly, theirs, atol=1e-4), 'the weekly cases should agree with camdl (written to 5 digits)'
     return sim
 

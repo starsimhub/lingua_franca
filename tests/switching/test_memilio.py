@@ -51,7 +51,7 @@ def make_secir(d, beta=None, damping=True):
     A = lambda v: ss.by(age=list(np.broadcast_to(v, 6)))
     D = lambda v: ss.by(age=[ss.days(x) for x in np.broadcast_to(v, 6)])
     beta = beta if beta is not None else A(P['beta'])
-    contacts = ss.timeseries({0: 1.0, 29: 1.0, 30: 0.5}, mode='cosine') if damping else 1.0 # Contacts halved from day 30
+    contacts = ss.timeseries({0: 1.0, 29: 1.0, 30: 0.5}, interpolation='cosine') if damping else 1.0 # Contacts halved from day 30
     S, E, INS, ISy, ISev, ICr, R = ss.states(7)
     secir = ss.Disease(
         infection = S >> E @ beta * contacts * (INS + 0.2*ISy),
@@ -69,8 +69,8 @@ def make_secir(d, beta=None, damping=True):
 
 def stratify(target, d):
     """ Ages, and counties with MEmilio's commuters away half the day """
-    target.stratify(age=ages, split=split)
-    target.stratify(patch=ss.geo.geography(names=d.names, pop=d.popsize, x=d.x, y=d.y), mobility=ss.geo.Mobility(matrix=0.5*d.M, kind='commute'))
+    target.stratify(age=ages, fractions=split)
+    target.stratify(patch=ss.geo.geography(names=d.names, populations=d.popsize, x=d.x, y=d.y), mobility=ss.geo.Mobility(matrix=0.5*d.M, kind='commute'))
     return target
 
 

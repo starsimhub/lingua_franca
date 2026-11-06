@@ -29,7 +29,7 @@ Everything is declared: four states, three transitions, a stratification by age 
 |---|---|
 | `socialmixr::contact_matrix(polymod, ...)` and `wpp2024`, 16 lines | `matrix` and `N`, as the vignette prints them |
 | `initial_conditions`, a row of proportions for each age group | `init_n=dict(I=1e-6*sum(N))`, which is split in proportion to the groups |
-| `population(...)` | `seir.stratify(age=[0, 20, 40], split=N)` and `networks=ss.contacts(matrix)` |
+| `population(...)` | `seir.stratify(age=[0, 20, 40], fractions=N)` and `networks=ss.contacts(matrix)` |
 | `model_default(population, time_end = 600)`, with its defaults `transmission_rate = 1.3/7`, `infectiousness_rate = 1/2`, `recovery_rate = 1/7` | The three transitions, with the defaults written in |
 | `V`, a compartment of the fixed model | Left out, since nothing reaches it |
 
