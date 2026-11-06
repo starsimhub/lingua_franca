@@ -77,7 +77,7 @@ p[e]      = 1 − exp(−hazard[e] · dt)            (= 1 − (1 − p[d])^(a[e]
 p[v]      = 1 − Π_e (1 − p[e])                    over all edges into v
 ```
 
-`rel_trans`, `rel_sus`, source weights, edge weights, and modifiers (of `beta`, of the transmission, with or without `network=`) all multiply the hazard of each act, so `beta=0.03` with `rel_trans=10` is `1 − 0.97^10 = 0.263` per act; the product never passes 1, and factors compose in any order. Over a year the edge transmits with `1 − (1 − p)^a`, whatever the step. A network written as code that overrides `net_beta()` keeps Starsim 3's contract instead (`net.custom_beta`): it is called once for each direction of the edges with the probability per act of each edge, and what it returns is the probability for the partnership in the step, which `rel_trans`, `rel_sus` and the modifiers on the route then multiply. A disease written as code (an `ss.Infection`) always has Starsim 3's contract, over the same mechanics (`ss.Network.transmit()`): a probability per act in each direction (`ss.peract(m2f=..., f2m=...)`) on any network with sides, and the modifiers of the network's contacts and of its `rel_sus` on the route.
+`rel_trans`, `rel_sus`, source weights, edge weights, and modifiers (of `beta`, of the transmission, with or without `network=`) all multiply the hazard of each act, so `beta=0.03` with `rel_trans=10` is `1 − 0.97^10 = 0.263` per act; the product never passes 1, and factors compose in any order. Over a year the edge transmits with `1 − (1 − p)^a`, whatever the step. A network written as code that overrides `net_beta()` keeps Starsim 3's contract instead (`net.custom_beta`): it is called once for each direction of the edges with the probability per act of each edge, and what it returns is the probability for the partnership in the step, which `rel_trans`, `rel_sus` and the modifiers on the route then multiply. A disease written as code (an `ss.AgentDisease`) always has Starsim 3's contract, over the same mechanics (`ss.Network.transmit()`): a probability per act in each direction (`ss.peract(m2f=..., f2m=...)`) on any network with sides, and the modifiers of the network's contacts and of its `rel_sus` on the route.
 
 On a network without acts, `β` is a probability (or rate) per contact: `p[e] = 1 − exp(−β·dt)` times the edge weight, `rel_trans[u]`, and `rel_sus[v]`.
 
@@ -123,7 +123,7 @@ This is how environmental and vector-borne transmission are written. There is no
 
 - **It is declared.** Every state is people unless it is declared a count with `ss.State(people=False)` (or `ss.states(3, people=False)`); it is not worked out from the transitions ([03-states-and-transitions.md](03-states-and-transitions.md)).
 - **A state that is not people holds a plain count.** It is never represented as agents, it is left out of `total_pop` and of `N`, and it is skipped by people dimensions (age, sex, risk) when the model is stratified. It is stratified by `patch`, or by its own dimensions with `states=` ([05-dimensions.md](05-dimensions.md#states-that-are-not-people)).
-- **Inflows and outflows use `ss.null`**, which stands for outside the model: `ss.null >> W @ rate` is an inflow and `W >> ss.null @ rate` an outflow ([03-states-and-transitions.md](03-states-and-transitions.md)). An inflow rate is a total per unit time, not a per-capita hazard.
+- **Inflows and outflows use the three places outside the model**, `ss.unborn`, `ss.dead`, and `ss.outside`: `ss.outside >> W @ rate` is an inflow (shedding) and `W >> ss.dead @ rate` an outflow (decay), and mosquitoes emerge from `ss.unborn` ([03-states-and-transitions.md](03-states-and-transitions.md#sstransition)). An inflow rate is a total per unit time, not a per-capita hazard.
 
 In a compartmental run none of this changes anything, because every state is a number anyway.
 
@@ -144,8 +144,8 @@ W = ss.State(people=False)                        # vibrios in the water: a coun
 cholera = ss.Disease(
     infection = S >> I @ ss.perday(0.2) * W.n / (W.n + 1e6),
     recovery  = I >> R @ ss.days(5),
-    shedding  = ss.null >> W @ ss.perday(10) * I.n,   # shed per infectious person per day
-    decay     = W >> ss.null @ ss.days(30),
+    shedding  = ss.outside >> W @ ss.perday(10) * I.n,   # shed per infectious person per day
+    decay     = W >> ss.dead @ ss.days(30),
 )
 
 sim = ss.Sim(cholera, n_agents=10_000, unit='day')
@@ -167,10 +167,10 @@ malaria = ss.Disease(
     infection  = Sh >> Eh @ a * b * Iv.n / Nh,
     latency    = Eh >> Ih @ ss.days(12),
     recovery   = Ih >> Rh @ ss.days(60),
-    emergence  = ss.null >> Sv @ ss.perday(5000),       # a total per unit time
+    emergence  = ss.unborn >> Sv @ ss.perday(5000),     # a total per unit time
     biting     = Sv >> Ev @ a * c * Ih.n / Nh,
     incubation = Ev >> Iv @ ss.days(10),
-    mortality  = Sv + Ev + Iv >> ss.null @ ss.days(14),
+    mortality  = Sv + Ev + Iv >> ss.dead @ ss.days(14),
 )
 
 sim = ss.Sim(malaria, n_agents=5_000, unit='day')

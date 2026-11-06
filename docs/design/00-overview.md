@@ -83,7 +83,7 @@ ss.Sim                          modules, a population, mixing, a timeline, a sol
  │     │     ├── ss.Transition      contact-mediated or spontaneous (derived from its rate)
  │     │     ├── ss.par             named parameters, in sir.pars
  │     │     ├── results            <state> (its count), one flow per transition, ss.outcome, ratios
- │     │     └── ss.Infection       a subclass that adds transmission written as code (beta over networks), as in Starsim 3
+ │     │     └── ss.AgentDisease    a subclass written as code, transmitted over networks, agents only (Starsim 3's ss.Infection)
  │     ├── ss.Demographics      births, deaths, pregnancy
  │     ├── ss.Intervention      deliveries: ss.vaccinate, ss.screen, ss.treat
  │     └── ss.Connector, ss.Analyzer

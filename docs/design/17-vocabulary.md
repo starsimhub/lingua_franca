@@ -19,7 +19,7 @@ The rule is Starsim's existing one (`ss.Dist` and `ss.normal`, `ss.Rate` and `ss
 
 > **Modules, containers, and base classes are CamelCase. The concrete pieces you put inside a module are lowercase.**
 
-So `ss.Sim`, `ss.MultiSim`, `ss.Disease`, `ss.RandomNet`, `ss.MixingPool`, and `ss.Intervention` are CamelCase, along with the two graph classes `ss.State` and `ss.Transition` and the products `ss.Vaccine`, `ss.Diagnostic`, `ss.Treatment`. Time values, distributions, `ss.par`, `ss.states`, `ss.null`, the transition constructors, `ss.modify`, `ss.outcome`, the parameter forms, the deliveries, and functions such as `ss.parallel` are lowercase. So are the loaders, which look up named data and return an ordinary object: `ss.population('Kenya')` returns an `ss.People`, and `ss.contacts('Kenya')` a set of `ss.MixingPools`. The tables they read are in `ss.data` (`ss.data.age('Kenya')`, `ss.data.population()`, `ss.data.rates()`, `ss.data.contacts()`, `ss.data.geography()`), which is not listed here, as `ss.geo`'s other names are not.
+So `ss.Sim`, `ss.MultiSim`, `ss.Disease`, `ss.RandomNet`, `ss.MixingPool`, and `ss.Intervention` are CamelCase, along with the two graph classes `ss.State` and `ss.Transition` and the products `ss.Vaccine`, `ss.Diagnostic`, `ss.Treatment`. Time values, distributions, `ss.par`, `ss.states`, the places outside the model (`ss.unborn`, `ss.dead`, `ss.outside`), the transition constructors, `ss.modify`, `ss.outcome`, the parameter forms, the deliveries, and functions such as `ss.parallel` are lowercase. So are the loaders, which look up named data and return an ordinary object: `ss.population('Kenya')` returns an `ss.People`, and `ss.contacts('Kenya')` a set of `ss.MixingPools`. The tables they read are in `ss.data` (`ss.data.age('Kenya')`, `ss.data.population()`, `ss.data.rates()`, `ss.data.contacts()`, `ss.data.geography()`), which is not listed here, as `ss.geo`'s other names are not.
 
 ## The names
 
@@ -36,7 +36,7 @@ So `ss.Sim`, `ss.MultiSim`, `ss.Disease`, `ss.RandomNet`, `ss.MixingPool`, and `
 | `ss.Module` | The one module abstraction; everything below is one |
 | `ss.Disease` | Any disease: declared states and the transitions between them, code (`define_states()`, `step()`), or both. Most states hold people; a reservoir or a vector population is a state that holds a count |
 | **`ss.Strains`** | The strains of a disease, `ss.Disease(..., strains=ss.Strains(['DS', 'RIF'], ...))`, giving `dis.strains`; unpacked into strain objects (`DS, RIF = strains`) for conditions and `move=DS >> (DS, RIF)`. States are shared (one course, sets carried up to `max_strains`) or each strain's own (`shared=False`, or `shared=['Ca']`); strains can also be diseases of their own sharing a natural history (`ss.Strains([hpv16, hpv18])`) |
-| `ss.Infection` | An `ss.Disease` with transmission written as code (`beta` over networks, `rel_sus`, `rel_trans`, `set_prognoses()`), as in Starsim 3 |
+| **`ss.AgentDisease`** | An `ss.Disease` written as code that runs only as agents, transmitted over the sim's networks (`beta`, `rel_sus`, `rel_trans`, `set_prognoses()`), with hooks overridable one at a time (`transmit()`, `transmissibility()`, `susceptibility()`, `route_betas()`, `transmit_route()`, `finalize_infections()`); Starsim 3's `ss.Infection` |
 | `ss.Demographics` | Births, deaths, pregnancy, migration |
 | `ss.Intervention` | Base class for interventions with custom `step()` code |
 | `ss.Connector` | Base class for cross-module `step()` code |
@@ -48,9 +48,9 @@ Starsim's library modules (`ss.SIR`, `ss.SIS`, `ss.SEIR`, `ss.Births`, `ss.Death
 
 | Name | What it is |
 |---|---|
-| **`ss.State`** | A state, with `people`, `init`, `rel_sus`, `rel_trans`, `label` |
+| **`ss.State`** | A state, with `people`, `init`, `rel_sus`, `rel_trans`, `infected` (counted in the results `infected` and `prevalence`), `label` |
 | **`ss.states`** | Several states at once, named from the variables they are assigned to: `S, I, R = ss.states(3)`. `ss.states('S I R')` when the names are wanted up front |
-| **`ss.null`** | Outside the model: the source of an inflow and the destination of an outflow (`ss.null >> W @ rate`, `I >> ss.null @ 0.1`) |
+| **`ss.unborn`**, **`ss.dead`**, **`ss.outside`** | Outside the model, the three instances of `ss.transitions.Outside`: where births come from (`ss.unborn >> S`), where deaths go (`I >> ss.dead @ 0.1`), and where people arrive from and leave to alive (`ss.outside >> S`, `S >> ss.outside`); for a count, the same three (mosquitoes emerge from `ss.unborn`, bacteria are shed from `ss.outside`) |
 | **`ss.stay`** | Staying where one is, as a destination of a split: `ss.Transition(N, [L, ss.stay], p=[p, None], on=...)` |
 | **`ss.Transition`** | The one transition class; also built by `a >> b @ x` |
 | **`ss.on`** | A transition taken when a condition starts to hold or an event happens: `S >> V @ ss.on(ss.person.female & (ss.person.age >= 9))`, the shorthand for `on=` |
@@ -68,7 +68,7 @@ Starsim's library modules (`ss.SIR`, `ss.SIS`, `ss.SEIR`, `ss.Births`, `ss.Death
 | **`ss.ref`** | A state or transition named by its module and name, before the module is made: `ss.ref('hiv.I')` |
 | **`ss.mother`** | A condition or value read on each unborn agent's mother (`include_born=True`: also on the mothers of those already born), e.g. `ss.mother(syph.I)` (agents) |
 
-The operators `>>`, `@`, `|`, and arithmetic on states are part of this group and add no names. A custom per-step function needs no name of its own: a plain function is given as a keyword, or written in `step()`.
+The operators `>>`, `@`, `|`, and arithmetic on states are part of this group and add no names. For whole states `|` and `+` are the same set of people (`(E | I) >> R`, `infected = E | I`, `(E | I).n`); `+` is also arithmetic (weights, rates, `N = S + E + I + R`), and `|` also joins conditions. A dict of destinations is a split (`I >> {ss.dead: p, R: None} @ dur`). A custom per-step function needs no name of its own: a plain function is given as a keyword, or written in `step()`.
 
 ### Time
 
@@ -158,7 +158,7 @@ Keywords are not listed above, but they are vocabulary too, so the main sets are
 | `ss.Sim` | the model (a module or a list of modules) as the first argument; `networks` `people` `total_pop` `n_agents` `start` `stop` `dt` `unit` `solver` `integrator` `substeps` `approximations` (`'note'`, `'allow'`, `'error'`) `stratify` `rand_seed` `verbose` `interventions` `connectors` `analyzers` `data` `pars` `group_results` `record_people` `aging` `require_kernels` `label`; plus `diseases`, `demographics`, `modules` as in Starsim. `solver` may also be given to `sim.run` before the sim is initialized, and `n_runs` to `sim.run` |
 | `ss.MultiSim`, `ss.parallel` | `n_runs` `pars` `priors`, and one keyword per scenario |
 | `ss.Disease` | `name` `dt` `init_prev` `init` `init_n` `default_state` `transitions` `results` `outcomes`, and one keyword per member |
-| `ss.State` | `name` `people` `init` `rel_sus` `rel_trans` `label` |
+| `ss.State` | `name` `people` `init` `init_n` `rel_sus` `rel_trans` `infected` `keep_time` `label` |
 | `ss.Transition` | `source` `dest` `rate` `dur` `p` `stages` `where` (only who it applies to) `on` (an event or condition that triggers it; `@ ss.on(...)` is its shorthand) `acquisition` `per_strain` `move` `increment` `min_stay` `before` `name` `label` |
 | `ss.birth`, `ss.immigration` | `rate` |
 | `ss.death`, `ss.emigration` | `rate` `dur`; `lifetable` (`ss.death`) |
@@ -201,7 +201,7 @@ A bare number in any of these slots takes the slot's type and the sim's unit ([0
 | `coverage=` | a fraction of the eligible people | deliveries, `ss.transfer` |
 | `capacity=` | a number per round (or step), or a rate per unit time (required for routine delivery) | deliveries |
 | `efficacy=`, `sensitivity=`, `specificity=` | a probability | products; `efficacy=` also on `ss.modify` (`multiply=1 - efficacy`) |
-| `waning=` | a duration: the product is lost at an exponentially distributed time with that mean; `ss.boxcar(plateau=, decay=)`, under every solver; a function of the time since delivery, `fn(t)` or `fn(t, sim, uids)` with `t` a duration, fades the efficacy instead, as agents only (a new dose restarts either); a dict gives each effect its own; other shapes are written as states ([08](08-interventions.md#products)) | products |
+| `waning=` | a duration: the product is lost at an exponentially distributed time with that mean; `ss.boxcar(plateau=, decay=)`, under every solver; a function of the time since delivery, `fn(t)` or `fn(t, sim, uids)` (or any of `t`, `self`, `sim`, `uids` by name) with `t` a duration, fades the efficacy instead, as agents only (a new dose restarts either); a dict gives each effect its own; other shapes are written as states ([08](08-interventions.md#products)) | products |
 | `during=` | the product is held, and acts, only while people are in these states | products |
 | `delay=`, `result_delay=` | a duration | `ss.outcome` and deliveries; `ss.Diagnostic` |
 | `every=`, `away=` | a duration; `away` is a fraction of time | deliveries, `ss.geo.Mobility` |
@@ -236,7 +236,7 @@ A bare number in any of these slots takes the slot's type and the sim's unit ([0
 | The dict tuple shorthand `dict(infection=('S -> I', 0.05))` | Ambiguous: it guesses the kind of transition from a bare value | The operator form |
 | `ss.transmission`, `ss.progression` (arrow strings) | A second spelling of a transition, with states made from their names and the source of infection guessed | `S >> I @ beta * I`, `ss.Transition(I, R, dur=10)` |
 | `rate=ss.on(...)`, `after=` an event, `undriven=` | Duplicates of `on=` (`on=event, dur=delay`), and a flag that only silenced a warning | `on=`; a transition with no driver |
-| Weighted destinations (`S >> (p*A + (1-p)*B)`), `p=` a function giving a row | Duplicates of the list form of branches | `ss.Transition(S, [A, B], p=[p, 1 - p])`, a function for each destination |
+| Weighted destinations (`S >> (p*A + (1-p)*B)`), `p=` a function giving a row | Duplicates of the list form of branches | `S >> {A: p, B: None} @ rate`, or `ss.Transition(S, [A, B], p=[p, 1 - p])`; a function for each destination |
 | `ss.any` | A reduce of `\|` | `a \| b`, or a list in `who=` |
 | `ss.Route` | Starsim's name; the base class is `ss.networks.Route`, not exported | `ss.Network`, passed with `networks=` |
 | `ss.stratify(sir, ...)`, `ss.RandomExactNet`, `birth_rate=`/`death_rate=` on `ss.Sim`, a delivery's `years=`/`dates=`/`eligible=`, `track_writes=` | Duplicates of other spellings (D34, D36, D38, D39) | `sir.stratify(...)`, `ss.RandomNet(method='exact')`, `demographics=[ss.birth(...), ss.death(...)]`, `at=`/`where=`, `sim.what_modifies()` |
@@ -248,7 +248,7 @@ The second draft's names that went in this revision:
 | Removed | Why | Use instead |
 |---|---|---|
 | `ss.Compartments` | A second module class for states that are not people. The states use the same syntax as the disease's, and the name was confusing, since `S`, `I`, and `R` are compartments too | An ordinary `ss.State` in the disease; `people=False` is inferred, or given |
-| `None` as a source or sink (`None >> W`) | Python evaluates `None @ 0.1` before it sees the arrow | `ss.null` |
+| `None` as a source or sink (`None >> W`) | Python evaluates `None @ 0.1` before it sees the arrow | `ss.null` (itself replaced on 2026-11-06 by `ss.unborn`, `ss.dead`, and `ss.outside`, below) |
 | `method=` on `ss.Sim` and `sim.run`, `methods()`, `'ctmc'` as the name | "Solver" is the word; `method=` stays on `sim.fit` for the fitting method | `solver=`, `'gillespie'`; `integrator=` for the ODE scheme |
 | `n_reps` on `ss.Sim`, `.trajectories`, `check_reps` | A sim is one run | `ss.MultiSim(sim, n_runs=100)` or `ss.parallel(sim, n_runs=100)`; `.values` and `.quantiles` on its results; `check_runs` (deferred) |
 | `crn_key` | No case found where keying common random numbers on agent attributes beats Starsim's slots | Slots; `ss.options.crn = False` to turn CRN off |
@@ -302,6 +302,18 @@ The vocabulary review of November 2026 ([starsim#1547](https://github.com/starsi
 | `ss.birth(per=)`, `ss.birth(sex=)`, `ss.Pregnancy(sex_ratio=)` | `per` is the rate type; three names for one share | `on=`; `p_female=` everywhere |
 | Deliveries' `what=`, `deliver=`, `interval=`; `ss.Diagnostic(results=, delay=)`; `ss.Treatment(to=, transition=)`; `ss.modify(route=)` | Words that didn't say what they hold; two meanings of `delay`; four keywords for one decision | `product=`, `who=`, `every=`; `outcomes=`, `result_delay=`; `cure=` and `moves=`; `network=` |
 | `split=` on `ss.Strains` and `stratify()`; `ss.timeseries(mode='constant')`; `sim.fit(gof=)`; `n_cpus=`; `sim.to_data()`; `sim.restart()` | Clearer words | `fractions=`; `interpolation='step'`; `loss=`; `workers=`; `sim.to_synthetic_data()`; `sim.run()` on a finished sim |
+
+The transitions review of November 6, 2026 replaced names that hid what they meant, and stopped guessing a result:
+
+| Removed | Why | Use instead |
+|---|---|---|
+| `ss.null` | One name for births, deaths, and migration, so a flow out of the model did not say whether people died or left, nor a flow in whether they were born or arrived | `ss.unborn` (births), `ss.dead` (deaths), `ss.outside` (arrivals and departures alive), the instances of `ss.transitions.Outside` |
+| `res.<transition>.null` | The flow of a branch out of the model | `res.<transition>.dead` |
+| A state `D` for deaths | It kept the dead among the living (in `N`, on networks) | `I >> ss.dead` |
+| `ss.Infection` | A declared `ss.SIR` is an infection too, so the name misled | `ss.AgentDisease` (written as code, agents only); a declared disease with its own `transmit(transition)` |
+| `validate_beta()` | Said what it checked, not what it gives | `route_betas()`, the beta of each network |
+| Prevalence worked out from the transitions (`Graph.resolve_prevalence()`) | A guess that missed states infected but not infectious (COVID's severe stages) | Mark the states, `ss.State(infected=True)`, for `infected` and `prevalence`; or declare `prevalence` |
+| `(S \| I) >> D` raising, and `\|` and `+` meaning different sets | Two spellings that read alike for one set of people | Either, for whole states; brackets with `\|` as sources, `(E \| I) >> R` |
 
 ## Adding to the vocabulary
 

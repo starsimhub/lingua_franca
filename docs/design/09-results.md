@@ -34,7 +34,8 @@ A build MUST generate, for every module with states and transitions:
 
 - `<state>` for every state: the number of people in it at each time point (a stock), named exactly as the state is;
 - `<transition>` for every named transition: the number of people who made that transition during each step (a flow, not a stock), named exactly as the transition is;
-- and `<transition>.<state>` for each destination of a transition with several (`cin = ss.Transition(C, [X, R], ...)` gives `cin.X` and `cin.R`): the number who made it and arrived in that state, whose sum is the transition's flow. It is read `res.cin.X` or `res['cin.X']`, and `res.cin.select(to='X')` is the same result; it is kept by group like the total, is a source of an outcome (`ss.outcome(0.8*cin.X)`) and a series in a result expression, and is matched by a data column named `cin.X`. A destination may not be named like an attribute of a result (`cum`, `values`, ...), which raises when the disease is made.
+- and `<transition>.<state>` for each destination of a transition with several (`cin = ss.Transition(C, {X: p, R: None}, ...)` gives `cin.X` and `cin.R`): the number who made it and arrived in that state, whose sum is the transition's flow. It is read `res.cin.X` or `res['cin.X']`, and `res.cin.select(to='X')` is the same result; it is kept by group like the total, is a source of an outcome (`ss.outcome(0.8*cin.X)`) and a series in a result expression, and is matched by a data column named `cin.X`. A destination may not be named like an attribute of a result (`cum`, `values`, ...), which raises when the disease is made. A branch to `ss.dead` is `<transition>.dead` (`res.outcome.dead`; it was `.null`);
+- and, if any of its states are marked infected (`ss.State(infected=True)`, [03-states-and-transitions.md](03-states-and-transitions.md#ssstate)), `infected`, the number in the marked states (a stock), and `prevalence`, that number over everyone in the disease's states of people (a ratio), unless the disease declares a result of either name itself. With no marked states there are neither: prevalence is never guessed from the transitions.
 
 Each flow's running total is `res.<transition>.cum`, a result (a stock) computed when it is asked for, not a second stored series.
 
@@ -42,13 +43,13 @@ Results follow one convention under every solver: a result has one value for eac
 
 **Decided 2026-11-05 (changed).** This is convention A, adopted at Cliff's request (issue #1548): "'2020' is implicitly taken to mean 2020-01-01 to 2020-12-31 ... 'prevalence' refers to some point during 2020, but 'infections' refers to the total during 2020, whereas B would attribute these infections to 2021". It replaced convention B, in which `<state>[0]` was a record-only start with no step, a flow at `ti` was over the step that ended at `ti` (0 at the start), and `R[ti] - R[ti-1]` was the net flow of step `ti`. Starsim 3 recorded stocks and flows together at the end of each step, labeled by its start (its stocks at row k were the state after step k); v4 records stocks at the step's start.
 
-A flow has one name, the transition's, which matches the model text, `ss.modify()` targets, `ss.outcome()`, and data columns. A declared disease has no other names for its flows: Starsim 3's `new_infections` is the flow of the transition that infects (`infection` in `ss.SIR`), and `cum_infections` is its running total (`res.infection.cum`). A ratio such as the prevalence is a result that the model declares (`prevalence = I / (S + I + R)`), which in a stratified run is by group as any declared ratio is (`res.prevalence.select(risk='high')`, ST20); the library's `ss.SIR`, `ss.SIS`, and `ss.SEIR` declare it this way, as the infected over everyone, so it is nothing special.
+A flow has one name, the transition's, which matches the model text, `ss.modify()` targets, `ss.outcome()`, and data columns. A declared disease has no other names for its flows: Starsim 3's `new_infections` is the flow of the transition that infects (`infection` in `ss.SIR`), and `cum_infections` is its running total (`res.infection.cum`). The prevalence is the ratio of the marked states to everyone, `(E | I) / N`, made from the marks; a disease whose prevalence means something else declares its own (`prevalence = I / (S + I + R)`, or TB's of active disease, malaria's parasite rate), as the explicit form. Either way it is a ratio like any other, by group in a stratified run (`res.prevalence.select(risk='high')`, ST20), so it is nothing special. The library's `ss.SIR`, `ss.SIS`, and `ss.SEIR`, and its diseases, mark their infected states; TB and malaria's immunity model keep an explicit prevalence (decided 2026-11-06; before, a prevalence was worked out from the states that acquisitions lead to, `Graph.resolve_prevalence()`, which missed states that are infected but not infectious, such as COVID's severe stages, and is removed). A disease written as code (`ss.AgentDisease`, `ssl.NCD`) defines its prevalence in its code.
 
 A state that is not people (a water reservoir, a mosquito population; [03-states-and-transitions.md](03-states-and-transitions.md)) gets the same results: `W` is the count it holds.
 
 A disease whose strains have courses of their own (`ss.Strains(shared=...)`, [05-dimensions.md](05-dimensions.md#strains)) has results made from its strains' results of the same name: for a state or a named sum of states that every member has (a stock), the number in it in at least one member, a union that counts each person once (`sim.results.hpv.infected` is the number infected with any genotype, where a sum would count the co-infected twice); for a transition (or outcome) that every member has (a flow), the sum, since each event belongs to one member (`sim.results.hpv.cancer`). `res.by('strain')` (the strains' name) gives each strain's own result (`sim.results.hpv.infected.by('strain')`). The strains keep their own results (`sim.results.hpv16.infected`). With strains in shared states carried together, `res.I` counts each person once and `res.I.by('strain')` counts each in every strain they carry; a set is `res.I.select(strain='DS+RIF')`. An outcome over unrelated diseases is still not declared.
 
-`ss.SIR`, `ss.SIS`, and `ss.SEIR` are declared diseases, so their results are named after their states and transitions (`sim.results.sir.I` and `sim.results.sir.infection`, not Starsim 3's `infected` and `new_infections`), with the `prevalence` they declare. Starsim 3's versions, written as code (`ssl.AgentSIR` and the others), keep Starsim 3's names.
+`ss.SIR`, `ss.SIS`, and `ss.SEIR` are declared diseases, so their results are named after their states and transitions (`sim.results.sir.I` and `sim.results.sir.infection`, not Starsim 3's `new_infections`), with the `infected` and `prevalence` that their marked states give (`infected` is the number in the marked states: `I` in an SIR, `E` and `I` in an SEIR). Starsim 3's versions, written as code (`ssl.AgentSIR` and the others), keep Starsim 3's names.
 
 ## `ss.Result`
 
@@ -109,7 +110,7 @@ infection = S >> I @ 0.3 * I
 recovery  = I >> R @ ss.days(10)
 
 prevalence    = I / N
-ever_infected = (I + R) / N
+ever_infected = (I | R) / N            # | and + are the same for whole states
 cases  = ss.outcome(0.5  * infection, delay=ss.days(5))
 hosp   = ss.outcome(0.05 * infection, delay=ss.days(7), stay=ss.days(10))
 deaths = ss.outcome(0.2  * hosp,      delay=ss.days(14))
@@ -128,7 +129,7 @@ sir = ss.Disease(
 sir = ss.Disease(infection, recovery, prevalence=I / N, cases=ss.outcome(0.5 * infection, delay=ss.days(5)), init_prev=0.01)
 ```
 
-Either way they end up in the same place: `sim.results.sir.prevalence`, `sim.results.sir.cases`, `sim.results.sir.n_hosp`.
+Either way they end up in the same place: `sim.results.sir.prevalence`, `sim.results.sir.cases`, `sim.results.sir.n_hosp`. `ss.Disease([infection, recovery, cases])` takes a list of transitions and outcomes as well. A result given by keyword must have one value for each time point: one that has a value for each person (a condition, such as `young = ss.person.age < 15`) raises a `ValueError` (before 2026-11-06 it was silently dropped), which suggests a share of the people in some states instead, e.g. `(E + I).frac`; in a class body such an expression can still be a helper that other members use.
 
 ### Ratios and combinations
 

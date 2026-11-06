@@ -37,7 +37,7 @@ Each document starts with a pointer to the `best-practices` document that justif
 
 - [01-objects.md](01-objects.md): the class hierarchy, capitalization, constructing a model, how things get their names, `ss.Sim` (one sim is one run; many runs are an `ss.MultiSim`), and `describe()`.
 - [02-types.md](02-types.md): Starsim's durations, rates, probabilities, and frequencies; how bare numbers get their units, and time in timesteps when nothing has a unit; time in a sim; distributions.
-- [03-states-and-transitions.md](03-states-and-transitions.md): the core. States, the one transition class and its three spellings, rates that mention states, dwell times, branching, functions in any slot, `ss.null`, and states that are not people (reservoirs and vector populations).
+- [03-states-and-transitions.md](03-states-and-transitions.md): the core. States, the one transition class and its three spellings, rates that mention states, dwell times, branching, functions in any slot, the places outside the model (`ss.unborn`, `ss.dead`, `ss.outside`), transmission written as code, and states that are not people (reservoirs and vector populations).
 - [04-parameters.md](04-parameters.md): `ss.par`, the forms a value can take, values by stratum, values kept outside the model, and named data.
 - [05-dimensions.md](05-dimensions.md): stratification by age, space, risk, or strain; `stratify` on a model or on the whole sim, in place by default; `ss.transfer`.
 - [06-routes.md](06-routes.md): who meets whom. The force of infection, networks and mixing pools, counts used literally, layers, mobility, and geography.

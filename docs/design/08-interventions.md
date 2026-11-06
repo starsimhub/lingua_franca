@@ -86,7 +86,7 @@ ss.Sim(diseases=[mal, prot], interventions=rounds, connectors=eff, start='2024',
 
 Protection that is lost from one stage to the next at random times gives the same mean protection over time as a fraction that fades for everyone (a box then `exp(-t/τ)`), but held by some rather than spread over all, so infections differ (malariasim's vaccine: prevalence about 5% lower after the box than with the fading function, as agents and as the ODE alike). A fade for everyone is written the same way, as stages of decreasing efficacy (`W1`, `W2`, ... each with its own `ss.modify`). The ODE tracks the protection module jointly with the disease it modifies ([12-backends.md](12-backends.md)). This is the public extension point for compartmental forms written outside Starsim; `compartmental_form(sim)` (as `ss.Pregnancy`'s) is a module's own approximation of itself, not a way to add forms.
 
-**A product's coverage is a quantity** (MS4): `itn.coverage` is the share of the people in the same place who hold it, each counted by the protection they have left, and `itn.coverage(fn)` by a function of the time since delivery, so a product can act on anything a rate reads, e.g. the mosquitoes its holders kill: `Sv >> ss.null @ 1/life + a*f_in*itn.coverage(kill)`. In a compartmental run it is worked out from the levels of holding the product (a function is read at the middle of each level of a box), once a step.
+**A product's coverage is a quantity** (MS4): `itn.coverage` is the share of the people in the same place who hold it, each counted by the protection they have left, and `itn.coverage(fn)` by a function of the time since delivery, so a product can act on anything a rate reads, e.g. the mosquitoes its holders kill: `Sv >> ss.dead @ 1/life + a*f_in*itn.coverage(kill)`. In a compartmental run it is worked out from the levels of holding the product (a function is read at the middle of each level of a box), once a step.
 
 **A product is realized as modifiers** on the people who hold it, so it follows the combination rules in [07-effects.md](07-effects.md): two vaccines against acquisition multiply, a vaccine and a stratification adjustment multiply, and all of them are listed by `sim.what_modifies()`.
 
@@ -353,7 +353,7 @@ Conditions, coverage functions, and `who=` functions are tried on what the solve
 | `where=` using a per-agent attribute | stops with a message naming the attribute | selects agents |
 | `capacity=` | a cap on the total flow, shared across groups in proportion to the eligible | a cap on the number of agents |
 | `queue=`, `delay=`, a test's `result_delay=` | agents only | who waits, and since when |
-| `who=fn(sim)` | works if the function returns numbers per group | returns UIDs |
+| `who=fn(sim)` (or any of `self`, `sim`, `uids` by name) | works if the function returns numbers per group; one that takes `uids` is agents only | returns UIDs |
 | `trace=`: delivery to specific contacts (contact tracing, partner notification) | not available | available on networks that keep contacts |
 
 ## Rejected

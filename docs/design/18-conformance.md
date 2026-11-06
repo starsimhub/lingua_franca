@@ -60,7 +60,7 @@ For each **simple** corpus model (marked below), every solver is run and compare
 
 | Contract | What is checked | Test |
 |---|---|---|
-| Conservation | Without births, deaths, or flows to `ss.null`, the number of people is constant, to 1e-9, under `ode`, `binomial`, `gillespie`, and `abm` | `test_contracts.py::test_conservation` |
+| Conservation | Without births, deaths, or flows from or to outside the model (`ss.unborn`, `ss.dead`, `ss.outside`), the number of people is constant, to 1e-9, under `ode`, `binomial`, `gillespie`, and `abm` | `test_contracts.py::test_conservation` |
 | Exact identities | Constant-rate decay under `ode` matches the exponential to 1e-5; a fixed branch share is `p` (exactly under `ode`, within 0.01 under `binomial` and `abm`) | `test_contracts.py::test_identities` |
 | Destinations | The flow to each destination of a transition with several sums to its total, by group too, under every solver; deaths by age along one destination agree with the ODE within 3 standard errors over 20 runs of `binomial`, `gillespie`, and `abm` | `test_results.py::test_destinations`, `test_contracts.py::test_destinations` |
 | Competing exits | Reordering three equal competing exits leaves a third leaving by each, under every solver (including tau-leaping) | `test_contracts.py::test_exit_order` |
@@ -202,7 +202,7 @@ The models are the functions of `tests/corpus.py`, each returning an unrun sim s
 | 8 | **Vaccination as a stratification plus a transfer** | The disease never mentions vaccination; coverage delivers `f`; capacity is a total |
 | 9 | **Two diseases with `ss.modify` in both directions** (HIV and syphilis) | Mutual dependence; combination rules; base and effective values; `what_modifies()` |
 | 10 | **A sexual-network model** (`ss.SexualNet`) | `'auto'` runs it as agents; `solver='ode'` uses the partner-change model, with a note, and `approximations='error'` raises `CapabilityError` |
-| 11 | **Cholera**: one disease whose states include a water reservoir `W` | Counts in rates; `W` declared a count (`ss.State(people=False)`); inflow from and outflow to `ss.null`; `'auto'` gives an ODE; adding `n_agents=` makes people agents while the water stays a count; `beta * W` raises a `ValueError` |
+| 11 | **Cholera**: one disease whose states include a water reservoir `W` | Counts in rates; `W` declared a count (`ss.State(people=False)`); inflow from `ss.outside` and outflow to `ss.dead`; `'auto'` gives an ODE; adding `n_agents=` makes people agents while the water stays a count; `beta * W` raises a `ValueError` |
 | 12 | **A vector-borne model** (Ross-Macdonald malaria): humans and mosquitoes as states of one disease | Two populations coupled by counts; a seasonal inflow; humans as agents with mosquitoes as three counts; mosquito states left out of `total_pop` and of an age stratification, and split by species with `states=` |
 | 13 | **Screening with follow-up treatment** | The within-step chain: a treatment triggered by the test's outcome (`on=screen.positive`), run after it in the same step; moving a module with `sim.loop.insert` |
 | 14 | **A model with custom code**: a function of the sim in a branch probability that works on age groups | The try-it rule; what `'auto'` chooses. A function that needs `uids` and a `step()` override are in `test_transitions.py::test_functions`, not the corpus |

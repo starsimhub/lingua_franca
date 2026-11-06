@@ -344,6 +344,11 @@ The port's notes are `tb_LAI_TPT/v4-ideas.md`; the evaluation is `ssv4/working/t
 - **Dwell draws keyed like the engine's in the compiled moves.** With the compiled moves, giving a state a nonzero competing rate (e.g. `mu=0` against `mu=0.01`) changes the dwell draws of that state's scheduled exits, since the engine then draws them instead of the kernel, from another stream. An undriven or zero-rate exit no longer does. Fixing it means the Numba and Rust kernels keying their draws by distribution and round as the engine does.
 - **`ss.box(dur, decay=...)` held for good as agents.** Its exponential tail never reaches 0, so as agents it is held for good (fading), while compartments leave its decaying level at rate `1/decay`, so `where=vx.held` differs between solvers. Matching would make agents lose it at random instead of fading.
 
+## From the transitions API refactor (2026-11-06)
+
+- **`ss.outside` as one branch of a split.** `I >> {ss.outside: p, R: None} @ dur` (some leave alive, the rest go on, decided by one draw) raises `ss.CapabilityError`; leaving is a transition of its own (`emigration = I >> ss.outside @ rate`), which competes as a hazard instead. `ss.dead` as a branch works (`res.<transition>.dead`). Supporting it means a branch's flow out of the model counted as departures (in `emigrated`, as agents) rather than deaths, in every solver and in the kernels' split. Worth it if a translated model splits on leaving.
+- **Finer transmission hooks for a declared disease** (e.g. `susceptibility(transition)`, `transmissibility(transition)`, a route of its own beside the solver's). A declared disease can now replace a whole transmission with `transmit(self, transition)` (`ss.Disease.transmit()`), and `ss.AgentDisease` has hooks for each piece (`transmissibility()`, `susceptibility()`, `route_betas()`, `transmit_route()`, `finalize_infections()`). Not done for declared diseases because the declared engine's transmission has strains, acts, mixing pools, and branching that the coded hooks don't map onto, and modifiers and products already reach `rel_sus` and `rel_trans`. Also not yet with compartments: a declared `transmit()` with strains, or for a transmission with several destinations (agents only).
+
 ## Won't do
 
 Work that was looked at and decided against, with why, so that it is not proposed again without a new reason.
