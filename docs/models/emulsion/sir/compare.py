@@ -18,7 +18,7 @@ tolerance = dict(compartment=(1.5, 2), ibm=(3, 6)) # Animals: the mean peak of i
 
 if __name__ == '__main__':
     for key,sim in dict(compartment=compartment, ibm=ibm).items():
-        res = ss.parallel(sim.new(verbose=0), n_runs=200, n_cpus=2).results.sir
+        res = ss.parallel(sim.new(verbose=0), n_runs=200, workers=2).results.sir
         n_I, n_R = res.I.values, res.R.values # A stock at index k is the number on day k, in both
         theirs_I, theirs_R = np.array(ref[f'{key}_I'][1]), np.array(ref[f'{key}_R'][1])
         died_out = (n_R[:, -1] < 10).mean()

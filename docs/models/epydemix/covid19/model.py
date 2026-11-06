@@ -12,7 +12,7 @@ import starsim as ss
 folder = sc.thispath(__file__)/'../../../models/epydemix/covid19'
 data = sc.loadjson(folder/'reference/population.json')
 matrix = sum(np.array(layer) for layer in data['contacts'].values()) # Four settings
-deaths = ss.simdata(str(folder/'original/data/MA_deaths.csv'), aliases=dict(deaths='data'))
+deaths = ss.SimData(str(folder/'original/data/MA_deaths.csv'), aliases=dict(deaths='data'))
 mob = pd.read_csv(folder/'original/data/MA_google.csv', index_col='date')
 
 # The contact reduction from mobility, from 23 February to 31 May, and held at its last value after
@@ -41,9 +41,9 @@ covid = ss.Disease(
     deaths    = D3 >> Dead @ 4/Delta,
     init_n    = dict(E=I0/2, I=I0/2),
 )
-covid.stratify(age=[0, 10, 20, 30, 40, 50, 60, 70, 80], split=data['Nk'])
+covid.stratify(age=[0, 10, 20, 30, 40, 50, 60, 70, 80], fractions=data['Nk'])
 sim = ss.Sim(covid, networks=ss.contacts(matrix), total_pop=sum(data['Nk']), data=deaths, unit='day',
-             start='2020-02-23', stop='2020-05-31', solver='binomial', substeps=1, use_aging=False) # The calibration period
+             start='2020-02-23', stop='2020-05-31', solver='binomial', substeps=1, aging=False) # The calibration period
 reopening = dict(moderate=1.3, high=1.5) # Contacts from 1 June, relative to their level on 31 May
 reopening = {k:ss.modify(covid.infection, multiply=v, start='2020-06-01') for k,v in reopening.items()}
 scenarios = dict(persistence=None, **reopening)

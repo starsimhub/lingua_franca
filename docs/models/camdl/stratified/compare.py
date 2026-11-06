@@ -35,7 +35,7 @@ def worst(res, prefix):
 if __name__ == '__main__':
     for label,interventions in [('novax', None), ('vax', vaccinate)]:
         ode = sim.new(verbose=0, interventions=interventions).run().results.seir
-        msim = ss.parallel(sim.new(verbose=0, interventions=interventions, solver='binomial', substeps=1), n_runs=200, n_cpus=2) # Whole days, as camdl's chain binomial takes them
+        msim = ss.parallel(sim.new(verbose=0, interventions=interventions, solver='binomial', substeps=1), n_runs=200, workers=2) # Whole days, as camdl's chain binomial takes them
         for kind,res in [('ode', ode), ('stochastic', msim.results.seir)]:
             diffs, peaks = worst(res, f'{kind}_{label}')
             print(f'{kind:10s} {label:5s} largest difference in I by cell: ' + ', '.join(f'{k} {v:.2%}' for k,v in diffs.items()))

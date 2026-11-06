@@ -39,7 +39,7 @@ if __name__ == '__main__':
     rows.append(('ode_cases', worst(weekly(res.cases.values), 'ode_cases')))
 
     # The stochastic solver, as the mean of many runs
-    msim = ss.parallel(sim.new(verbose=0, solver='binomial', substeps=1), n_runs=200, n_cpus=2) # Whole days, as camdl's chain binomial takes them
+    msim = ss.parallel(sim.new(verbose=0, solver='binomial', substeps=1), n_runs=200, workers=2) # Whole days, as camdl's chain binomial takes them
     res = msim.results.sir
     rows.append(('stochastic_I', worst(res.I.values.mean(axis=0), 'stochastic_I')))
     rows.append(('stochastic_cases', worst(weekly(res.cases.values).mean(axis=0), 'stochastic_cases')))

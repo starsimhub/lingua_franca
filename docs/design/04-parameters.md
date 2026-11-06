@@ -88,7 +88,7 @@ Every slot that takes a value accepts every form below. The slot fixes what the 
 ```python
 beta = 0.05                                          # a number; unit from the sim
 beta = ss.perday(0.05)                               # a typed quantity
-beta = ss.lognorm_ex(mean=0.05, std=0.01)            # a distribution: varies between agents
+beta = ss.lognormal(mean=0.05, std=0.01)            # a distribution: varies between agents
 beta = ss.timeseries({2020: 0.05, 2021: 0.02})       # varies in time
 beta = ss.timeseries('beta.csv', mode='linear')      # the same, from a file
 beta = ss.seasonal(mean=0.05, amplitude=0.3, peak='January')
@@ -103,7 +103,7 @@ beta = lambda sim: 0.05 if sim.now < ss.date('2020-03-15') else 0.03      # a fu
 - The forms combine: `ss.by(age=[...])` may hold time series, a time series or a seasonal value may be multiplied by a number or a parameter, and a function may return any of the others' values.
 - Any of these can be wrapped in `ss.par(...)` to give it a name, bounds, or a source.
 
-Every solver handles every form or says that it cannot, and no solver freezes a value that varies in time at its starting value. The ODE takes it at each stage of a step; the chain-binomial solver at the middle of each substep; and Gillespie holds it for a quarter of a step at a time, at its middle, with events exact within each quarter, and with a note (`approx=False` refuses it instead; [12-backends.md](12-backends.md)).
+Every solver handles every form or says that it cannot, and no solver freezes a value that varies in time at its starting value. The ODE takes it at each stage of a step; the chain-binomial solver at the middle of each substep; and Gillespie holds it for a quarter of a step at a time, at its middle, with events exact within each quarter, and with a note (`approximations='error'` refuses it instead; [12-backends.md](12-backends.md)).
 
 ### A distribution as a value, a distribution as a prior
 
@@ -111,8 +111,8 @@ A distribution means two different things depending on where it is put, and the 
 
 ```python
 I, R = ss.states('I R')
-ss.Transition(I, R, dur=ss.lognorm_ex(mean=10, std=3, unit='days'))    # variation between people
-ss.par(0.05, prior=ss.lognorm_ex(mean=0.05, std=0.01))                      # uncertainty about one number
+ss.Transition(I, R, dur=ss.lognormal(mean=10, std=3, unit='days'))    # variation between people
+ss.par(0.05, prior=ss.lognormal(mean=0.05, std=0.01))                      # uncertainty about one number
 ```
 
 The first gives each agent their own dwell time. The second is a prior over a single value and is used only by calibration.
@@ -124,15 +124,15 @@ A compartmental run has no individuals to draw for, so variation between people 
 | A dwell time (`dur=`) | Erlang stages matched to the distribution's mean and variance, with a note ([03-states-and-transitions.md](03-states-and-transitions.md)) | the same |
 | Anything else (`beta`, `rel_sus`, `rel_trans`) | the model runs as agents | the mean is used, with a note naming the parameter |
 
-To keep heterogeneity in `beta` or `rel_sus` in a compartmental run, bin it into a dimension (`sir.stratify(rel_sus=[...])`, [05-dimensions.md](05-dimensions.md)). Replacing a distribution by its mean is an approximation, so `approx=False` makes it `CapabilityError` and `approx=True` silences the note ([12-backends.md](12-backends.md)).
+To keep heterogeneity in `beta` or `rel_sus` in a compartmental run, bin it into a dimension (`sir.stratify(rel_sus=[...])`, [05-dimensions.md](05-dimensions.md)). Replacing a distribution by its mean is an approximation, so `approximations='error'` makes it `CapabilityError` and `approximations='allow'` silences the note ([12-backends.md](12-backends.md)).
 
-The distributions are Starsim's, under Starsim's names: `ss.normal`, `ss.lognorm_ex` (given the mean and standard deviation of the result), `ss.lognorm_im` (given those of the underlying normal), `ss.expon`, `ss.gamma`, `ss.weibull`, `ss.poisson`, `ss.nbinom`, `ss.uniform`, `ss.bernoulli`, `ss.constant`, and `ss.choice`. Starsim's other distributions, and any SciPy distribution through `ss.Dist`, remain available. Two are added: `ss.erlang(k=3, mean=...)`, which is `ss.gamma` with an integer shape (`ss.gamma(a=3, scale=...)`), given by its number of stages and its mean (sub-stages are also `stages=3` on the transition); and `ss.truncnorm`, a normal between `low` and `high`, as flepiMoP draws its parameters. `ss.choice` takes `p` as a row of probabilities per agent (a 2D array, or a function returning one; each row normalized), drawn with one random number per agent through the inverse CDF of that agent's row, so a choice whose probabilities differ by agent is one draw that keeps common random numbers.
+The distributions are Starsim's, under Starsim's names: `ss.normal`, `ss.lognorm_ex` (given the mean and standard deviation of the result), `ss.lognormal(log_mean=, log_std=)` (given those of the underlying normal), `ss.expon`, `ss.gamma`, `ss.weibull`, `ss.poisson`, `ss.nbinom`, `ss.uniform`, `ss.bernoulli`, `ss.constant`, and `ss.choice`. Starsim's other distributions, and any SciPy distribution through `ss.Dist`, remain available. Two are added: `ss.erlang(k=3, mean=...)`, which is `ss.gamma` with an integer shape (`ss.gamma(a=3, scale=...)`), given by its number of stages and its mean (sub-stages are also `stages=3` on the transition); and `ss.truncnorm`, a normal between `low` and `high`, as flepiMoP draws its parameters. `ss.choice` takes `p` as a row of probabilities per agent (a 2D array, or a function returning one; each row normalized), drawn with one random number per agent through the inverse CDF of that agent's row, so a choice whose probabilities differ by agent is one draw that keeps common random numbers.
 
 The unit of a distribution is given once, either with `unit=` or on one of its parameters; the other parameters of the same dimension take it:
 
 ```python
-ss.lognorm_ex(mean=10, std=3, unit='days')
-ss.lognorm_ex(mean=ss.days(10), std=3)        # the same
+ss.lognormal(mean=10, std=3, unit='days')
+ss.lognormal(mean=ss.days(10), std=3)        # the same
 ```
 
 ## Shapes
@@ -147,12 +147,12 @@ beta = ss.by(table)                            # a dataframe with a column per s
 pop  = ss.by([[3000, 1000], [5000, 2000]], dims=['age', 'patch'])   # an array with one axis per stratification
 mu   = ss.by(sex=dict(female=0.008, male=0.011))  # by label: from people.female, with or without a dimension by sex
 p    = ss.by(dict(age=range(15, 50), value=vals)) # a table over a property: a column of numbers holds lower bin edges
-dur  = ss.by(sex=dict(female=ss.lognorm_ex(6, 2), male=ss.lognorm_ex(12, 4)))  # a distribution for each level
+dur  = ss.by(sex=dict(female=ss.lognormal(6, 2), male=ss.lognormal(12, 4)))  # a distribution for each level
 ```
 
 `ss.by` names the stratification each axis belongs to, so values never depend on the order strata happen to be stored in. A value with fewer axes than the model is used for every level of the missing ones, and `describe()` prints the value with its axes (`beta = by(age=[0.08, 0.05, 0.03])`). Arithmetic works on `ss.by` values (over the same levels, or tables with the same rows; different numbers of levels raise an error), and any of their values can be a time series. Anything else is an expression in which the `ss.by` is one value, worked out where it is used, as for a parameter: tables by different bins (`p_a + p_b`), an `ss.by` with a count or a property of people, and NumPy functions of it (`np.minimum(p, 1)`, `np.log(p)`). Time series and seasonal values are expressions in the same way, and so is an `ss.by` holding them times a number or a typed value (`ss.perday(0.1) * ss.by(age=[school, 1, 1])`, as it is written inside a rate); an `ss.by` cannot hold an expression itself (`ss.by(age=[ss.perday(0.1)*school, ...])` raises a `TypeError` that says to put the factor outside). A value whose length does not match its stratification, such as four values for three age groups, raises a `ValueError` when the sim runs, naming the dimension and both lengths. A function of the sim may give the values of one dimension, `ss.by(patch=fn)` with `fn(sim)` one value per level (or one number), worked out once a step and read as a value by level is, by every solver and whatever other dimensions the sim has (MS2): a value for each place from code beside a declared model, e.g. the biting rate from mosquitoes written as code.
 
-**Values by a property of people.** `ss.by` may be over a property that is not a dimension of the sim, which is then read from each person, as agents: under `'auto'` the model runs as agents, with a note, and an explicit compartmental solver raises `CapabilityError` naming `stratify()` (the rule for a distribution across people, and for `ss.ppl.<name>` in a rate). Its values are given by label (`sex=dict(female=..., male=...)`, read from `people.female`) or as a table; values by position (`ss.by(sex=[a, b])`) need the dimension's order, so without the dimension they raise a `KeyError`, naming the keyed form or `stratify()`. In a table, a column of numbers holds lower bin edges, the last bin open-ended, so a table by single year of age works whatever the model's age groups: agents read each person's own age, and a compartmental run averages it over each group, weighting each bin by how much of the group it covers, with a note. A row whose key is `None` gives the value for people with no value of the property; without one, they get the mean over the levels, weighted by the people at each. Values by different dimensions multiply as their outer product (`ss.by(age=[...]) * ss.by(sex=dict(...))` is `ss.by(age=[...], sex=dict(...))`, and a table times a table or a value by label is a table of every combination of their rows), and a typed value times an `ss.by` applies to each of its values (`ss.peryear(0.0016) * ss.by(sex=dict(...))`). A distribution's parameter may be a property or an expression of properties (`ss.lognorm_ex(mean=0.2*ss.ppl.age + 1, std=0.1)`), read for each person as they draw, as agents. A dwell time may be an `ss.by` of distributions of one kind: as agents, each person draws from their level's; as compartments, each group has its level's mean, with one number of Erlang stages for all, noted.
+**Values by a property of people.** `ss.by` may be over a property that is not a dimension of the sim, which is then read from each person, as agents: under `'auto'` the model runs as agents, with a note, and an explicit compartmental solver raises `CapabilityError` naming `stratify()` (the rule for a distribution across people, and for `ss.person.<name>` in a rate). Its values are given by label (`sex=dict(female=..., male=...)`, read from `people.female`) or as a table; values by position (`ss.by(sex=[a, b])`) need the dimension's order, so without the dimension they raise a `KeyError`, naming the keyed form or `stratify()`. In a table, a column of numbers holds lower bin edges, the last bin open-ended, so a table by single year of age works whatever the model's age groups: agents read each person's own age, and a compartmental run averages it over each group, weighting each bin by how much of the group it covers, with a note. A row whose key is `None` gives the value for people with no value of the property; without one, they get the mean over the levels, weighted by the people at each. Values by different dimensions multiply as their outer product (`ss.by(age=[...]) * ss.by(sex=dict(...))` is `ss.by(age=[...], sex=dict(...))`, and a table times a table or a value by label is a table of every combination of their rows), and a typed value times an `ss.by` applies to each of its values (`ss.peryear(0.0016) * ss.by(sex=dict(...))`). A distribution's parameter may be a property or an expression of properties (`ss.lognormal(mean=0.2*ss.person.age + 1, std=0.1)`), read for each person as they draw, as agents. A dwell time may be an `ss.by` of distributions of one kind: as agents, each person draws from their level's; as compartments, each group has its level's mean, with one number of Erlang stages for all, noted.
 
 `ss.by` replaces the separate global and local parameter concepts of other frameworks (SimInf's `gdata`/`ldata`, MetaCast's `universal_params`/`subpop_params`) and replaces string-built parameter names such as `'beta_[high,vaccinated]'`, which are not part of the language.
 
@@ -177,14 +177,14 @@ sim = ss.Sim(sir, pars=sc.loadjson('params/kenya_2024.json'), unit='day')
 A reference to data is part of the model: not just a contact matrix, but which one, from which source, for which place.
 
 ```python
-ss.people('Kenya', year=2024)                     # size, age structure, sex ratio; returns an ss.People
+ss.population('Kenya', year=2024)                     # size, age structure, sex ratio; returns an ss.People
 ss.contacts('Kenya', source='prem2021')           # an age contact matrix; returns a set of ss.MixingPools (layer='home' for one setting)
 ss.geo.geography('Kenya', level=1)                          # its counties: names, populations, centroids, distances, borders
 ss.Sim(sir, data='weekly_cases.csv')              # observations, attached to results by column name
 ```
 
 ```python
-sim = ss.Sim(sir, people=ss.people('Kenya', year=2024), networks=ss.contacts('Kenya', source='prem2021'))
+sim = ss.Sim(sir, people=ss.population('Kenya', year=2024), networks=ss.contacts('Kenya', source='prem2021'))
 ```
 
 `ss.people`, `ss.contacts`, and `ss.geo.geography` are lowercase because they are loaders: each looks up named data and returns the ordinary object. `ss.People(n_agents=10_000)` remains the class.

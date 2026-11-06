@@ -87,7 +87,7 @@ A two-transition model can take its results and outcomes the same way, positiona
 ```python
 prevalence = I / (S + I + R)
 cases = ss.outcome(0.5 * infection, delay=ss.days(5))
-hosp  = ss.outcome(0.05 * infection, delay=ss.days(7), duration=ss.days(10))
+hosp  = ss.outcome(0.05 * infection, delay=ss.days(7), stay=ss.days(10))
 
 sir = ss.Disease(
     transitions = [infection, recovery],
@@ -126,7 +126,7 @@ The name is then used everywhere: `sir.infection`, the results, `ss.modify` targ
 
 ### The class form
 
-Class attributes that are states, transitions, parameters, or outcomes are collected in definition order and mean the same as the same keywords passed to the constructor. Subclasses inherit them, may replace one by rebinding its name, and may add behavior by defining methods; rebinding a declared parameter to something that is not one (a method, or a number) raises `CapabilityError`, since the transitions read the base class's parameter (a function as its value is given in `__init__()`, as any value is). A member that is an expression with a value for each person (it reads `ss.ppl`, a clock, an attribute, or a parameter by level), e.g. `age = ss.ppl.age` or `duration = affected.time`, is a helper used through the objects, not a result, and a parameter under another name (`A = saturation_age`) is the same parameter. A result of a parameter is an expression of it under a name of its own (`eir_now = 1*eir`); a parameter given by keyword under its own name and read by a transition, as if it were a result, raises a `ValueError`.
+Class attributes that are states, transitions, parameters, or outcomes are collected in definition order and mean the same as the same keywords passed to the constructor. Subclasses inherit them, may replace one by rebinding its name, and may add behavior by defining methods; rebinding a declared parameter to something that is not one (a method, or a number) raises `CapabilityError`, since the transitions read the base class's parameter (a function as its value is given in `__init__()`, as any value is). A member that is an expression with a value for each person (it reads `ss.person`, a clock, an attribute, or a parameter by level), e.g. `age = ss.person.age` or `duration = affected.time_in`, is a helper used through the objects, not a result, and a parameter under another name (`A = saturation_age`) is the same parameter. A result of a parameter is an expression of it under a name of its own (`eir_now = 1*eir`); a parameter given by keyword under its own name and read by a transition, as if it were a result, raises a `ValueError`.
 
 ```python
 class SEIR(ss.Disease):
@@ -203,7 +203,7 @@ ss.Sim(
     modules,                     # a module, transitions, or a list of them; diseases=, demographics=, etc. also work
     # --- who ---
     networks  = None,            # networks and mixing pools alike; none means homogeneous mixing
-    people    = None,            # an ss.People, e.g. ss.people('Kenya', year=2024)
+    people    = None,            # an ss.People, e.g. ss.population('Kenya', year=2024)
     stratify  = None,            # people dimensions for every module: dict(age=[0, 15, 65]) (05-dimensions.md)
     total_pop = None,            # size of the population represented
     n_agents  = None,            # number of simulated agents; giving it makes the run agent-based
@@ -221,7 +221,7 @@ ss.Sim(
     interventions = None,
     connectors    = None,
     analyzers     = None,
-    data      = None,            # a file, a dataframe, or ss.simdata(...), with columns named like results (09-results.md)
+    data      = None,            # a file, a dataframe, or ss.SimData(...), with columns named like results (09-results.md)
     pars      = None,            # parameter values by name (04-parameters.md)
     results   = None,            # the results to keep by group, e.g. ['I', 'cases']; the totals are always kept (09-results.md)
     label     = None,
@@ -255,7 +255,7 @@ Defaults, all printed by `describe()`:
 
 The names are `'ode'`, `'binomial'` (chain-binomial), `'gillespie'` (the exact continuous-time stochastic solver, which stays exact however many events a run takes), `'tau'` (tau-leaping: close to exact, and much faster for a run of many events), and `'abm'`. Any other name raises an error that lists them. `solver=` may also be given to `sim.run()`, before the sim is initialized; once it is, the solver is fixed, and `sim.new(solver=...)` makes a fresh copy with another. `sim.solvers()` (and `sir.solvers()` for one module) prints which solvers can run the model, before anything runs. See [12-backends.md](12-backends.md).
 
-`approx=` controls what happens when something is approximated: by default a one-line note is printed (and kept in `sim.notes`), `approx=True` says the approximation is intended and keeps the note without printing it, and `approx=False` makes any approximation an error (`CapabilityError`); under `solver='auto'` it means a model with a non-Erlang dwell time runs as agents instead ([12-backends.md](12-backends.md#approximations)).
+`approximations=` controls what happens when something is approximated: by default a one-line note is printed (and kept in `sim.notes`), `approximations='allow'` says the approximation is intended and keeps the note without printing it, and `approximations='error'` makes any approximation an error (`CapabilityError`); under `solver='auto'` it means a model with a non-Erlang dwell time runs as agents instead ([12-backends.md](12-backends.md#approximations)).
 
 `integrator=` is the scheme of the ODE, `'rk4'` (the default) or `'euler'` (for matching frameworks that take Euler steps); it is specified in [12-backends.md](12-backends.md). JAX is not chosen by it: `sim.gradient()`, `sim.log_density()`, gradient fits, and `ss.parallel()` with many sets of values use JAX by themselves.
 
@@ -380,7 +380,7 @@ Give the sim a unit (`unit='day'`, a typed `dt`, or dates) and the same lines re
 ## Equality, copying, and identity
 
 - Two models written in different forms are the same model if they give the same results; there is no hash or comparison function ([14-model-spec.md](14-model-spec.md)), and `==` on two modules is Python's identity.
-- `copy()` is deep for the model and shallow for data references, so a copied model that fetched `ss.people('Kenya')` does not fetch it again.
+- `copy()` is deep for the model and shallow for data references, so a copied model that fetched `ss.population('Kenya')` does not fetch it again.
 - `stratify()` changes the model in place and returns it, so it can be chained or passed straight to `ss.Sim`. `sir.stratify(age=..., inplace=False)` returns a stratified copy and leaves `sir` alone, for comparing the two side by side. Stratifying twice by the same dimension is an error ([05-dimensions.md](05-dimensions.md)).
 
 ## Not included

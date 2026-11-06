@@ -18,7 +18,7 @@ flows = dict(
     quarantine = I >> X @ (1/5),
 )
 siarx = ss.Disease(**flows, init_n=dict(I=100), name='siarx')
-tracing = ss.Delivery(move=I >> X, who=siarx.quarantine, trace='contacts', coverage=0.25)
+tracing = ss.Delivery(move=I >> X, on=siarx.quarantine, trace='contacts', coverage=0.25)
 sim = ss.Sim(siarx, networks=ssl.StaticNet(n_contacts=50, name='contacts'), interventions=tracing, n_agents=10_000, unit='day', stop=40, dt=0.1, verbose=0)
 well_mixed = sim.new(networks=ss.RandomNet(n_contacts=50, name='contacts'))
 mean_field = ss.Disease(**flows, traced=I >> X @ 0.25/5*I*I/(S + I + A + R + X), init_n=dict(I=100), name='siarx') # The whole flow, kappa*p*k0*I*I/N

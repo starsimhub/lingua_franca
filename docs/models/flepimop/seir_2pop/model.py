@@ -16,7 +16,7 @@ seir = ss.Disease(
     init_n    = dict(E=ss.by(patch=[5, 0])),
 )
 away = [[0.5*share for share in row] for row in commute] # Travelers are away for half the day
-seir.stratify(patch=list(pop.keys()), split=list(pop.values()), mobility=ss.geo.Mobility(matrix=away, kind='visit'))
+seir.stratify(patch=list(pop.keys()), fractions=list(pop.values()), mobility=ss.geo.Mobility(matrix=away, kind='visit'))
 sim = ss.Sim(seir, total_pop=sum(pop.values()), start='2020-02-01', stop='2020-08-31', substeps=1) # One RK4 step a day, as in the original
 
 if __name__ == '__main__':

@@ -33,5 +33,5 @@ def check(name, which, res, tol, every=1):
 if __name__ == '__main__':
     check('Deterministic', 'ode', deterministic.run().results.siarx, tolerances['deterministic'])
     every = 10 # Steps of a tenth of a day
-    check('On the network, mean of 100 runs', 'network', ss.parallel(sim, n_runs=n_runs, n_cpus=2).results.siarx, tolerances['network'], every=every)
-    check('Well mixed, mean of 100 runs', 'well_mixed', ss.parallel(well_mixed, n_runs=n_runs, n_cpus=2).results.siarx, tolerances['well_mixed'], every=every)
+    check('On the network, mean of 100 runs', 'network', ss.parallel(sim, n_runs=n_runs, workers=2).results.siarx, tolerances['network'], every=every)
+    check('Well mixed, mean of 100 runs', 'well_mixed', ss.parallel(well_mixed, n_runs=n_runs, workers=2).results.siarx, tolerances['well_mixed'], every=every)

@@ -30,7 +30,7 @@ The difference is only in that conversion, which a module written as code asks f
 
 `ss.datedur` is kept alongside `ss.months` because calendar durations are not fixed multiples of days. It is a thin wrapper of `pd.DateOffset`: whole numbers of years, months, weeks, and days, added to a date as the calendar does, and approximate as a number (a year of 365 days). The time between two dates (`date - date`) is `ss.days`.
 
-Counts are plain numbers. `I.n` is the number of people in a state (the same number as the result `I`) and `I.frac` its fraction ([03-states-and-transitions.md](03-states-and-transitions.md)). `P.time`, the time each person has spent in a state, is a number in the sim's unit, as a bare number returned by a function is.
+Counts are plain numbers. `I.n` is the number of people in a state (the same number as the result `I`) and `I.frac` its fraction ([03-states-and-transitions.md](03-states-and-transitions.md)). `P.time_in`, the time each person has spent in a state, is a number in the sim's unit, as a bare number returned by a function is.
 
 ## Conversion
 
@@ -178,7 +178,7 @@ A run has N + 1 time points, from `start` to `stop`, and a step is taken from ev
 - **One index and one time per step.** Throughout step k, in every phase and every module, `self.ti == k` and `self.now` is time point k, so `self.results.x[self.ti] = v` is right wherever it is written. The first step is `ti == 0`; there is no time point without a step.
 - **A row is a period.** At row k, a stock is the state at time point k, the step's start (recorded by `record_stocks()`, before any module's step), and a flow is the total over the step from k to k + 1 (recorded by `record_flows()`, after them, or where it happens). Nothing is 0 or NaN at row 0: its flows are the first step's. The state after the last step is not recorded, so after a run `sim.people` (and an engine's compartments) is one step past the last row.
 - **Inputs are read at the step's start.** `self.now` is time point k: values by year, `ss.timeseries`, data labeled by period, and dates (`start=2020` is the first step that starts on or after 2020) are taken there, as in Starsim 3. Code in a step reads this step's stocks at `[self.ti]`; its flows are not known until its end, so `res.x[self.ti - 1]` is the last step's.
-- **An infection is dated at the end of its step** (time point `ti + 1`; `ti_I` still reads `ti`, the step it happened in), since it has happened by then. What follows it (a latent period, a recovery) starts then (a disease written as code schedules from `self.ti + 1`, e.g. `self.ti_recovered[uids] = self.ti + 1 + dur`; its seeds are dated by the step before the first, as `self.ti` is -1 while `init_post()` sets their prognoses), so durations ported unchanged from a model that dates infections at the start put the epidemic about a step later (CV5: 11 days on Covasim's daily model, from its latent period). Other moves are taken at the step's start. Either way, `ti_X` reads as the step the move happened in, so `ti_X == self.ti` is "entered this step"; the time spent in a state is its clock, `X.time`, not `self.ti - ti_X`, which counts a step more for an infection.
+- **An infection is dated at the end of its step** (time point `ti + 1`; `ti_I` still reads `ti`, the step it happened in), since it has happened by then. What follows it (a latent period, a recovery) starts then (a disease written as code schedules from `self.ti + 1`, e.g. `self.ti_recovered[uids] = self.ti + 1 + dur`; its seeds are dated by the step before the first, as `self.ti` is -1 while `init_post()` sets their prognoses), so durations ported unchanged from a model that dates infections at the start put the epidemic about a step later (CV5: 11 days on Covasim's daily model, from its latent period). Other moves are taken at the step's start. Either way, `ti_X` reads as the step the move happened in, so `ti_X == self.ti` is "entered this step"; the time spent in a state is its clock, `X.time_in`, not `self.ti - ti_X`, which counts a step more for an infection.
 - **A state's count includes people from the time point that ends the step they enter it**, and people stay for their whole dwell, so `X` carries one extra step per stay (ST4: it cost STIsim's trichomoniasis about 14% of its infections against Starsim 3, since people reinfected as soon as they clear are counted per stay).
 - **Dwells are whole steps for agents.** A drawn dwell is rounded at random to the step before or after (0.2 steps is 0 steps 80% of the time), which keeps its mean; `dur=0` is instant. The compartmental solvers take dwells as continuous, or as whole slots for a fixed delay.
 
@@ -200,14 +200,14 @@ There are no sub-step offsets. Commuting, which the first draft handled with dep
 
 ## Distributions
 
-Distributions use Starsim's names: `ss.normal`, `ss.lognorm_ex` (given the mean and standard deviation of the lognormal itself), `ss.lognorm_im` (given those of the underlying normal), `ss.expon`, `ss.gamma`, `ss.weibull`, `ss.poisson`, `ss.nbinom`, `ss.uniform`, `ss.bernoulli`, `ss.constant`, `ss.choice`, and the rest of Starsim's set. Any SciPy distribution can be wrapped with `ss.Dist(dist=...)`. There are two additions: `ss.erlang(k=, mean=)`, an Erlang distribution given by its number of stages and its mean, which is `ss.gamma` with an integer shape (`stages=` on the transition says the same thing); and `ss.truncnorm(loc=, scale=, low=, high=)`, a normal distribution truncated to an interval.
+Distributions use Starsim's names: `ss.normal`, `ss.lognorm_ex` (given the mean and standard deviation of the lognormal itself), `ss.lognormal(log_mean=, log_std=)` (given those of the underlying normal), `ss.expon`, `ss.gamma`, `ss.weibull`, `ss.poisson`, `ss.nbinom`, `ss.uniform`, `ss.bernoulli`, `ss.constant`, `ss.choice`, and the rest of Starsim's set. Any SciPy distribution can be wrapped with `ss.Dist(dist=...)`. There are two additions: `ss.erlang(k=, mean=)`, an Erlang distribution given by its number of stages and its mean, which is `ss.gamma` with an integer shape (`stages=` on the transition says the same thing); and `ss.truncnorm(loc=, scale=, low=, high=)`, a normal distribution truncated to an interval.
 
 A distribution is accepted wherever a quantity of the same type is. **Units are given once per distribution**:
 
 ```python
-ss.lognorm_ex(mean=10, std=3, unit='days')       # the unit applies to both parameters
-ss.lognorm_ex(mean=ss.days(10), std=3)           # std inherits the unit of mean
-ss.lognorm_ex(mean=10, std=3)                    # no unit: typed by its slot, like a bare number
+ss.lognormal(mean=10, std=3, unit='days')       # the unit applies to both parameters
+ss.lognormal(mean=ss.days(10), std=3)           # std inherits the unit of mean
+ss.lognormal(mean=10, std=3)                    # no unit: typed by its slot, like a bare number
 ```
 
 Putting the unit on one parameter is enough; the other parameters of the same dimension inherit it. Shape parameters (`a` in `ss.gamma`, `c` in `ss.weibull`) have no unit.

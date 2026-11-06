@@ -111,7 +111,7 @@ recovery  = I >> R @ ss.days(10)
 prevalence    = I / N
 ever_infected = (I + R) / N
 cases  = ss.outcome(0.5  * infection, delay=ss.days(5))
-hosp   = ss.outcome(0.05 * infection, delay=ss.days(7), duration=ss.days(10))
+hosp   = ss.outcome(0.05 * infection, delay=ss.days(7), stay=ss.days(10))
 deaths = ss.outcome(0.2  * hosp,      delay=ss.days(14))
 
 sir = ss.Disease(
@@ -156,14 +156,14 @@ ss.outcome(
 - **The source is a weighted sum of flows.** A number times a flow means that fraction of those events: `0.5 * infection` is half of infections. There is no `p=` argument; the weight is the probability. Reporting that depends on severity is a sum, `ss.outcome(0.01 * asymptomatic + 0.3 * symptomatic + 0.8 * severe, delay=ss.days(3))`, where the three names are the transitions into those states. A weight follows the parameter ladder ([04-parameters.md](04-parameters.md)): it can be an `ss.par` with `bounds` and be fitted like any other parameter, or `ss.by(age=[...])`.
 - **Outcomes chain.** The source of `deaths` above is the outcome `hosp`, so infection → hospitalization → death is three lines. A chain that loops back on itself raises a `ValueError`. Where a transition was declared as a keyword and there is no variable to refer to, the source may be its name (`ss.outcome('infection', delay=ss.days(5))`); a name that matches nothing raises a `KeyError`.
 - **`delay=`** is a duration, a distribution (reporting delays are not a single number), or a function of the sim for anything irregular.
-- **`duration=` gives both series.** `hosp` is admissions per step and `n_hosp` is the number currently in hospital.
+- **`stay=` gives both series.** `hosp` is admissions per step and `n_hosp` is the number currently in hospital.
 - **There is no reporting period.** An outcome is a flow on the sim's time step, like a transition. Weekly data is compared with its total over each week automatically (see [Data](#data)), and `res.cases.resample('week')` gives the weekly series to plot.
 
 An outcome belongs to one disease, and its source is made of that disease's flows. There is no outcome on the sim for results that span modules (all-cause deaths, a syndromic count over several diseases): arithmetic on the results after the run gives the series (`0.3 * (sim.results.flu.infection + sim.results.rsv.infection)` is an `ss.Result`), but it is not a declared result, so data cannot be matched to it.
 
 An outcome is worked out from the counts of the flows it comes from, in each group, under every solver (it records no individuals, as agents or otherwise). How the weight and the delay are realized depends on whether the run counts whole people:
 
-| Solver | A weight on a flow | `delay=` and `duration=` |
+| Solver | A weight on a flow | `delay=` and `stay=` |
 |---|---|---|
 | `ode` | multiplies the flow | the flow convolved with the delay distribution, taken in whole steps |
 | `binomial`, `gillespie`, `abm` | a weight between 0 and 1 is a binomial draw from the step's events (any other weight multiplies) | each step's reports are spread over the following steps by a multinomial draw from the delay distribution |
@@ -205,8 +205,8 @@ sim = ss.Sim(sir, data='kenya_2020.csv', start='2020-01-01', stop='2020-12-31').
 sim.plot()
 ```
 
-- `data=` takes a file name, a data frame, or an `ss.simdata(...)` object (below). It has a time column (`date`, `year`, `t`, or `time`) and one column per data series, **named like the result it corresponds to** (`cases`, `deaths`, `prevalence`, or `cin.X` for the flow to one destination of a transition). With several modules, a column is matched to the one module that has a result of that name, or is written `sir.cases` when the name is ambiguous. This works the same for modules written as code (Starsim 3's diseases among them), so it is a way into fitting for a Starsim 3 model.
-- A column that matches no result is noted when the sim is initialized, with the result names closest to it, since data on a sim can be just for plotting (or read by a fit's own `gof=`); when a fit compares every column with its result, it is an error (a `KeyError`), so a typo in a header is caught. `ss.simdata(..., ignore_extra=True)` drops such columns. Data entirely outside the simulated period raises a `ValueError` when it is compared with the results (by `sim.fit()`, for instance); data partly outside is used where it overlaps.
+- `data=` takes a file name, a data frame, or an `ss.SimData(...)` object (below). It has a time column (`date`, `year`, `t`, or `time`) and one column per data series, **named like the result it corresponds to** (`cases`, `deaths`, `prevalence`, or `cin.X` for the flow to one destination of a transition). With several modules, a column is matched to the one module that has a result of that name, or is written `sir.cases` when the name is ambiguous. This works the same for modules written as code (Starsim 3's diseases among them), so it is a way into fitting for a Starsim 3 model.
+- A column that matches no result is noted when the sim is initialized, with the result names closest to it, since data on a sim can be just for plotting (or read by a fit's own `loss=`); when a fit compares every column with its result, it is an error (a `KeyError`), so a typo in a header is caught. `ss.SimData(..., ignore_extra=True)` drops such columns. Data entirely outside the simulated period raises a `ValueError` when it is compared with the results (by `sim.fit()`, for instance); data partly outside is used where it overlaps.
 - Data for particular strata is given in long form: extra columns named after dimensions (`age`, `patch`) say which stratum each row belongs to, by the level's label (or position). Each result and stratum is then one data series, named like `cases[age=0-14]` and compared with `cases.select(age='0-14')`; a likelihood or weight given for `cases` applies to every stratum of it.
 - For a disease whose strains have courses of their own, a strain's own result is its column (`hpv16.cancer`), and in long form a column named after the strains (`strain`, or the name given to `ss.Strains`) gives it: `cancer` in a row for `strain=hpv16` is `hpv16.cancer`. `hpv.cancer[strain=hpv16]` is an error naming `hpv16.cancer`.
 - The data need not be on the model's time step. A flow (weekly reported cases) is compared with the model's flow summed over each data interval; a stock or ratio (a prevalence survey) is compared with the model's value at the data's time. The result already knows which it is. Data at a time is read as starting its period, as a result's time point is: a flow at a data time is compared with the model's flow summed over the steps that start in [t, the next data time), and the last data point covers one spacing of the data, so "the cases of the week starting 2020-03-02" is dated 2020-03-02. Data labeled by the end of its period ("week ending") MUST be shifted to its start by the user; this is the one place where the change to convention A (above) can silently change a fit. Data by calendar year, an integer `year` column (as in UNAIDS-style data and `res.resample('year')`), is the year each row names, not 1 January of it: a flow is summed over the year and a stock or ratio averaged over it, with a note; only whole years inside the run are compared. A result of a module with a timestep of its own is compared on that module's timeline.
@@ -215,7 +215,7 @@ sim.plot()
 Real files rarely arrive with matching headers, so `ss.data` renames on the way in:
 
 ```python
-ss.simdata(
+ss.SimData(
     source,                 # a file name or a data frame
     aliases      = None,    # dict of result (or time-column) name -> the column that holds it
     ignore_extra = False,   # True: drop columns that match no result instead of raising
@@ -223,7 +223,7 @@ ss.simdata(
 ```
 
 ```python
-data = ss.simdata('kenya_moh_2020.csv', aliases=dict(cases='Reported Cases (weekly)', date='Week starting'), ignore_extra=True)
+data = ss.SimData('kenya_moh_2020.csv', aliases=dict(cases='Reported Cases (weekly)', date='Week starting'), ignore_extra=True)
 sim  = ss.Sim(sir, data=data, start='2020-01-01', stop='2020-12-31')
 ```
 

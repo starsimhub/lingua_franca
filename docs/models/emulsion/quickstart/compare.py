@@ -22,7 +22,7 @@ window = ss.timeseries({'2021-01-01': 0, '2021-03-19': 1, '2021-08-21': 0, '2022
 
 def run_many(**kwargs):
     """ The mean over the runs of each count; a stock at index k is the state after k steps, as is EMULSION's row k """
-    res = ss.parallel(sim.new(verbose=0, **kwargs), n_runs=n_runs, n_cpus=2).results
+    res = ss.parallel(sim.new(verbose=0, **kwargs), n_runs=n_runs, workers=2).results
     return {state:np.asarray(res[mod][state].values).mean(axis=0) for mod,names in modules.items() for state in names.split()}
 
 

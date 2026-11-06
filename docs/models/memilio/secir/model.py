@@ -4,7 +4,7 @@ increasingly severe states, each of which some people leave by recovering
 """
 import starsim as ss
 
-contacts = ss.timeseries({0: 1.0, 29: 1.0, 30: 0.1}, mode='cosine') # Cut by 90% over day 29, as MEmilio's damping
+contacts = ss.timeseries({0: 1.0, 29: 1.0, 30: 0.1}, interpolation='cosine') # Cut by 90% over day 29, as MEmilio's damping
 S, E, INS, ISy, ISev, ICr, R = ss.states(7)
 
 secir = ss.Disease(

@@ -68,7 +68,7 @@ Rules 2 and 3 are guesses about what the source meant, and the difference matter
 
 | Source | `format=` | What it reads |
 |---|---|---|
-| **EMULSION** | `'emulsion'` (YAML) | Each state machine as a disease, with its numbers in EMULSION's time unit; the solver follows the aggregation type (`binomial` for compartments, `abm` for individuals and hybrid models); minimum stays as `after=` |
+| **EMULSION** | `'emulsion'` (YAML) | Each state machine as a disease, with its numbers in EMULSION's time unit; the solver follows the aggregation type (`binomial` for compartments, `abm` for individuals and hybrid models); minimum stays as `min_stay=` |
 | **odin** | `'odin'` (the R DSL) | `deriv()` and `update()` equations split into signed terms and paired into flows; `rbinom()` draws as a chain binomial; `lambda`, `if`, contact matrices, seasonality, and counts |
 | **SBML** | `'sbml'` (XML) | Species as states, reactions as transitions, classified by the rules above |
 | **SimInf** | `'siminf'` (an R script with `mparse()` or a predefined model) | The transitions, run by `gillespie`; several nodes as a stratification of places, with the scheduled events as a movement register (`ss.geo.Mobility(data=...)`); the continuous state `v` as a state that is not people |

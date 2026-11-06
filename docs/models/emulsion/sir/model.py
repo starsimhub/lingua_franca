@@ -14,5 +14,5 @@ compartment = ss.Sim(sir, total_pop=100, stop=ss.days(100), solver='binomial', s
 ibm         = ss.Sim(sir, total_pop=100, stop=ss.days(100), solver='abm')
 
 if __name__ == '__main__':
-    msim = ss.parallel(compartment=compartment, ibm=ibm, n_runs=20, n_cpus=2)
+    msim = ss.parallel(compartment=compartment, ibm=ibm, n_runs=20, workers=2)
     msim.plot()

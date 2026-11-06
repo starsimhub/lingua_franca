@@ -50,7 +50,7 @@ np.fill_diagonal(gravity, 0)
 gravity *= 0.044565/gravity.sum(axis=1).mean() # Scaled so that the mean share exported is 0.0446,
 gravity *= np.minimum(1, 0.2/gravity.sum(axis=1))[:, None] # and no place exports more than 0.2
 measles.stratify(patch=towns, mobility=ss.geo.Mobility(matrix=gravity, kind='force'))
-importation = ss.Delivery(move=S >> I, capacity=3, start=ss.days(30), interval=ss.days(30)) # 3 people every 30 days, chosen from everyone susceptible
+importation = ss.Delivery(move=S >> I, capacity=3, start=ss.days(30), every=ss.days(30)) # 3 people every 30 days, chosen from everyone susceptible
 people = ss.People(int(pop.sum()), age_data=np.array([ages, pyramid]).T)
 sim = ss.Sim(measles, people=people, interventions=importation, unit='day', stop=years*365)
 

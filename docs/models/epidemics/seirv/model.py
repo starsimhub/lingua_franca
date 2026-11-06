@@ -16,7 +16,7 @@ seir = ss.Disease(
     recovery  = I >> R @ ss.days(7),
     init_n    = dict(I=1e-6*sum(N)),
 )
-seir.stratify(age=[0, 20, 40], split=N)
+seir.stratify(age=[0, 20, 40], fractions=N)
 sim = ss.Sim(seir, networks=ss.contacts(matrix), total_pop=sum(N), unit='day', stop=600)
 
 if __name__ == '__main__':

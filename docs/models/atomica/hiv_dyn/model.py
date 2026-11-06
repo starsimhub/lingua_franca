@@ -66,7 +66,7 @@ hiv = ss.Disease(
     treated    = tx + vs,
     init_n     = {k: sex(*v) for k,v in init.items()},
 )
-hiv.stratify(sex=['females', 'males'], kind='space', split=cascade[0]) # A place, so that .n is the count in each sex
+hiv.stratify(sex=['females', 'males'], kind='space', fractions=cascade[0]) # A place, so that .n is the count in each sex
 # One step a year, in which Atomica moves at most everyone out of a compartment
 sim = ss.Sim(hiv, total_pop=cascade[0].sum(), start=2016, stop=2035, integrator='euler', substeps=1)
 

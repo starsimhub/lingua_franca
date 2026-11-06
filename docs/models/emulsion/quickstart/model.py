@@ -41,16 +41,16 @@ dates = {'2021-01-01': 0, '2021-04-01': 1, '2021-09-02': 0, '2022-04-01': 1, '20
 quarantine = ss.par(ss.timeseries(dates))
 health = ss.Disease(
     infection   = S >> E @ ss.perday(0.1)*I.n/(S + E + I + R + Q + M).n,
-    onset       = ss.Transition(E, I, rate=ss.perday(0.3), after=whole(10)),
+    onset       = ss.Transition(E, I, rate=ss.perday(0.3), min_stay=whole(10)),
     recovery    = I >> R @ ss.perday(0.01),
     detection   = I >> Q @ ss.perday(0.01)*quarantine*(Q.n < 20),
     release     = Q >> R @ ss.constant(ss.days(30)),
     waning      = R >> S @ ss.perday(0.01),
-    loss        = ss.Transition(M, S, rate=ss.perday(0.04), after=whole(adult_age)),
+    loss        = ss.Transition(M, S, rate=ss.perday(0.04), min_stay=whole(adult_age)),
     deaths      = S + R >> ss.null @ ss.perday(0.002),
     sick_deaths = I + Q >> ss.null @ ss.perday(0.004),
-    M_deaths    = ss.Transition(M, ss.null, rate=ss.perday(0.002)*(M.time < whole(adult_age))), # EMULSION's escape
-    E_deaths    = ss.Transition(E, ss.null, rate=ss.perday(0.004)*(E.time < whole(10))),
+    M_deaths    = ss.Transition(M, ss.null, rate=ss.perday(0.002)*(M.time_in < whole(adult_age))), # EMULSION's escape
+    E_deaths    = ss.Transition(E, ss.null, rate=ss.perday(0.004)*(E.time_in < whole(10))),
     newborns    = newborns,
     vertical    = ss.Transition(M, [I, M], p=[0.3, 0.7], where=newborns & ss.mother(E | I | Q, born=True)), # EMULSION's produce_offspring
     init_n      = dict(I=10),
@@ -59,14 +59,14 @@ health = ss.Disease(
 
 abortion = -np.log(1 - 0.2)/240 # Per day, for infectious mothers only: a 20% chance over a gestation
 life = Life(
-    conception = ss.Transition(NG, G, rate=ss.perday(0.05), after=whole(90), where=growth.A),
+    conception = ss.Transition(NG, G, rate=ss.perday(0.05), min_stay=whole(90), where=growth.A),
     farrowing  = farrowing,
     abortion   = ss.Transition(G, NG, rate=ss.perday(abortion), where=health.I),
     newborns   = ss.birth(NG, per=farrowing),
     first      = 'NG',
     name       = 'life',
 )
-sim = ss.Sim([life, growth, health], people=ppl, unit='day', dt=dt, start='2021-01-01', stop=ss.days(735), use_aging=True, solver='abm')
+sim = ss.Sim([life, growth, health], people=ppl, unit='day', dt=dt, start='2021-01-01', stop=ss.days(735), aging=True, solver='abm')
 
 if __name__ == '__main__':
     sim.run()

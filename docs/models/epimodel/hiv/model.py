@@ -60,7 +60,7 @@ main   = ss.DegreeNet(n_contacts=0.5, concurrency=0.04, max_contacts=2, dur=200,
 casual = ss.DegreeNet(n_contacts=0.3, concurrency=0.10, dur=26, acts=ss.freqperday(1))
 prep   = ss.Vaccine(efficacy=0.95, waning=-1/np.log(1 - 0.015)) # Stopped with a probability of 0.015 a week
 preps  = [ss.vaccinate(prep, at=[0], coverage=0.5, where=indicated, name='start_prep'), # Half of those indicated at the start
-          ss.vaccinate(prep, interval=1, coverage=0.015, where=indicated, name='take_prep')] # And then 0.015 a week
+          ss.vaccinate(prep, every=1, coverage=0.015, where=indicated, name='take_prep')] # And then 0.015 a week
 sim = ss.Sim(hiv, networks=dict(main=main, casual=casual), n_agents=1500, stop=1040) # A step is a week
 scenarios = dict(none=sim, cascade=sim.new(pars=dict(cascade=1)), prep=sim.new(interventions=preps), both=sim.new(pars=dict(cascade=1), interventions=preps))
 

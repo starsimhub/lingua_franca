@@ -30,5 +30,5 @@ def check(name, which, res, pop, tol, every=1):
 
 if __name__ == '__main__':
     check('ODE', 'ode', sim.run().results.sirs, 1000, tolerances['ode'])
-    check('Gillespie, mean of 1,000 runs', 'gillespie', ss.parallel(gillespie, n_runs=1000, n_cpus=2).results.sirs, 1000, tolerances['gillespie'])
-    check('On the network, mean of 100 runs', 'network', ss.parallel(network, n_runs=100, n_cpus=2).results.sirs, 10_000, tolerances['network'], every=40)
+    check('Gillespie, mean of 1,000 runs', 'gillespie', ss.parallel(gillespie, n_runs=1000, workers=2).results.sirs, 1000, tolerances['gillespie'])
+    check('On the network, mean of 100 runs', 'network', ss.parallel(network, n_runs=100, workers=2).results.sirs, 10_000, tolerances['network'], every=40)

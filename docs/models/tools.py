@@ -78,7 +78,7 @@ def write_timing(folder, rerun, what, first=None):
     """ Write the time of a first run (by default, the first call of the latest time_run()) and of a rerun, with what was timed and where """
     path = os.path.join(folder, 'reference', 'timing.json')
     first = first_run['seconds'] if first is None else first
-    info = dict(first=round(first, 5), rerun=round(rerun, 5), what=what, machine=platform.processor() or platform.machine(), cpus=os.cpu_count(), system=platform.platform())
+    info = dict(first=round(first, 5), rerun=round(rerun, 5), product=what, machine=platform.processor() or platform.machine(), cpus=os.cpu_count(), system=platform.platform())
     with open(path, 'w') as f:
         json.dump(info, f, indent=2)
         f.write('\n')
