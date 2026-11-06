@@ -24,7 +24,10 @@ jobs:
         with:
           python-version: '3.13'
       - run: pip install sciris jupyter
-      - uses: ./.github/actions/quarto
+      - uses: sciris/quarto-cli/.github/actions/setup@main
+      - name: Install quartopydoc's Quarto extensions (the authorship badge)
+        working-directory: docs
+        run: quarto add sciris/quartopydoc --no-prompt
       - run: quarto render docs --jobs 4
       - uses: actions/upload-pages-artifact@v3
         with:
