@@ -1,6 +1,6 @@
 ---
 name: linguafranca.copy-prompts
-description: Use when the user asks to update prompts.md, record or extract the prompts from recent sessions, or copy/archive new Claude Code transcripts for the lingua franca design repo.
+description: Use when the user asks to update prompts.md, record or extract the prompts from recent sessions, or copy/archive new Claude Code transcripts for the lingua_franca repo.
 ---
 
 # Copy prompts and transcripts
@@ -17,7 +17,7 @@ This repo (the design record, which was the `v4_design/` folder of the Starsim r
    - One `### Prompt N (HH:MM)` heading per prompt, numbered consecutively across the whole document, with the time in UTC. Add the date wherever it differs from the session before.
    - The prompt in a ` ```text ` fenced block, copied exactly as typed, typos included. Do not tidy it. The script recognizes a prompt as recorded by matching the text of these blocks exactly, so a changed prompt will be reported as new again.
    - A `**Response.**` paragraph, plus bullets where useful, summarizing what the reply said and which files were created or changed. Write the summary from the extracted reply and from `git log --stat`; do not copy the reply wholesale.
-   - A new row in the summary table at the top, with the commit that holds the result if there is one, marked `Starsim` or `LFD` for the repo it is in.
+   - A new row in the summary table at the top, with the commit that holds the result if there is one, marked `Starsim` or `lingua_franca` for the repo it is in.
 5. Rerun `status` and check that the `new` column is zero for every session that was recorded.
 
 ## Judgement calls

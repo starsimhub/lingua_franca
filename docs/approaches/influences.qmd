@@ -32,4 +32,4 @@ print(influences.heatmap())
 ```
 :::
 
-The numbers are in [influences.yaml](https://github.com/starsimhub/lingua_franca_design/blob/main/approaches/influences.yaml), with a note on what was taken for each one.
+The numbers are in [influences.yaml](https://github.com/starsimhub/lingua_franca/blob/main/approaches/influences.yaml), with a note on what was taken for each one.

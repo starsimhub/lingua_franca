@@ -10,13 +10,13 @@ import starsim as ss
 import paths
 from starsim.converters.epydemix import load_epydemix
 
-lfd = paths.root/'docs/models' # The original examples
+lf = paths.root/'docs/models' # The original examples
 kw = dict(verbose=False)
 
 
 def test_kenya():
     sc.heading('Testing importing the epydemix SIR in Kenya against the original')
-    folder = f'{lfd}/epydemix/sir_kenya/reference'
+    folder = f'{lf}/epydemix/sir_kenya/reference'
     if not os.path.exists(folder):
         pytest.skip('needs the reference results of the example')
     pop = sc.loadjson(f'{folder}/population.json')

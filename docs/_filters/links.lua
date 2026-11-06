@@ -47,7 +47,7 @@ end
 
 -- A file named in the text (`original/sir.py`, `reference/`) links to that file on GitHub, if it is
 -- there next to the page. Markdown files are left alone: they are pages of the site.
-local repo = 'https://github.com/starsimhub/lingua_franca_design/'
+local repo = 'https://github.com/starsimhub/lingua_franca/'
 
 function Code(code)
   local name = code.text

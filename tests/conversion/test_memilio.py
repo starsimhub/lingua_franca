@@ -9,8 +9,8 @@ import sciris as sc
 import starsim as ss
 import paths
 from starsim.converters.memilio import load_memilio
-lfd = paths.root
-python = lfd / '_envs/memilio/bin/python' # MEmilio's environment
+lf = paths.root
+python = lf / '_envs/memilio/bin/python' # MEmilio's environment
 dump = sc.path(ss.converters.__file__).parent / 'memilio.py' # Run as a script in MEmilio's environment, it writes the model as JSON
 kw = dict(verbose=False)
 graph_script = '''
@@ -145,7 +145,7 @@ def test_secirvvs(tmp_path):
 @pytest.mark.parametrize('example', ['secir', 'secir_ageres'])
 def test_examples(example, tmp_path):
     sc.heading(f'Testing importing the MEmilio example {example} against the original')
-    folder = lfd / 'docs/models/memilio' / example
+    folder = lf / 'docs/models/memilio' / example
     script = next((folder / 'original').glob('*.py'))
     path = tmp_path / 'model.json'
     subprocess.run([str(python), '-I', str(dump), str(script), str(path)], check=True, cwd=tmp_path, capture_output=True)

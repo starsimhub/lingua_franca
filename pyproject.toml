@@ -22,7 +22,7 @@ starsim = ['starsim @ git+https://github.com/starsimhub/starsim@v4'] # pip insta
 lingua_franca = 'lingua_franca.cli:main'
 
 [project.urls]
-Repository = 'https://github.com/starsimhub/lingua_franca_design'
+Repository = 'https://github.com/starsimhub/lingua_franca'
 
 [tool.setuptools.packages.find]
 where = ['src']

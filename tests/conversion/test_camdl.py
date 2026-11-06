@@ -11,10 +11,10 @@ import pytest
 import paths
 from starsim.converters.camdl import load_camdl
 
-lfd = paths.root
-camdlc = lfd / '_envs/camdl/bin/camdlc' if (lfd / '_envs/camdl/bin/camdlc').exists() else shutil.which('camdlc') or 'camdlc' # The one built for the examples; another on the PATH may be older
-camdl = lfd / '_envs/camdl/bin/camdl' if (lfd / '_envs/camdl/bin/camdl').exists() else shutil.which('camdl') or 'camdl' # Likewise
-golden = lfd / '_envs/camdl/src/ocaml/golden' # camdl's library of models, as compiled IR
+lf = paths.root
+camdlc = lf / '_envs/camdl/bin/camdlc' if (lf / '_envs/camdl/bin/camdlc').exists() else shutil.which('camdlc') or 'camdlc' # The one built for the examples; another on the PATH may be older
+camdl = lf / '_envs/camdl/bin/camdl' if (lf / '_envs/camdl/bin/camdl').exists() else shutil.which('camdl') or 'camdl' # Likewise
+golden = lf / '_envs/camdl/src/ocaml/golden' # camdl's library of models, as compiled IR
 kw = dict(verbose=False)
 
 
@@ -25,7 +25,7 @@ sir_pars = dict(beta=0.4, gamma=0.15, rho=0.6, k=10)
 def test_camdl_file():
     """ A .camdl file, compiled with camdlc, against camdl's own ODE run """
     sc.heading('Testing camdl import from a .camdl file')
-    folder = lfd / 'docs/models/camdl/sir'
+    folder = lf / 'docs/models/camdl/sir'
     sim = load_camdl(folder / 'original/sir.camdl', pars=sir_pars, camdlc=str(camdlc), **kw).run()
     ref = pd.read_csv(folder / 'reference/results.csv')
     res = sim.results.sir
@@ -63,7 +63,7 @@ def test_camdl_golden():
 def test_camdl_stratified(tmp_path):
     """ An SEIR by age and patch, with aging and movement, as a .camdl file: against camdl's own ODE run of it, and the saved reference """
     sc.heading('Testing camdl import of a stratified model')
-    folder = lfd / 'docs/models/camdl/stratified'
+    folder = lf / 'docs/models/camdl/stratified'
     model, pars = folder / 'stratified.camdl', dict(beta=0.04, gamma=0.1, move=0.01)
     traj = tmp_path / 'traj.tsv'
     cmd = [str(camdl), 'simulate', str(model), '--backend', 'ode', '--no-progress', '--output-dir', str(tmp_path / 'store'), '-o', str(traj)]

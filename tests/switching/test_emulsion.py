@@ -13,7 +13,7 @@ import starsim as ss
 import paths
 
 dt, adult_age, n_runs = 7, 30, 10 # Days, days (the YAML's second value, as EMULSION uses), and runs to average
-ref_quickstart = { # Mean of 200 EMULSION 1.1.1 runs after 53 and 105 steps: LFD docs/models/emulsion/quickstart/reference/results.csv (switching/emulsion.md, "The first day", gives the 66 at the end)
+ref_quickstart = { # Mean of 200 EMULSION 1.1.1 runs after 53 and 105 steps: lingua_franca docs/models/emulsion/quickstart/reference/results.csv (switching/emulsion.md, "The first day", gives the 66 at the end)
     53:  dict(total=76.83, J=15.83, M=21.48, I=18.84),
     105: dict(total=65.89, J=6.16, M=10.98, I=18.43),
 }

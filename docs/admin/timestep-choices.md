@@ -86,7 +86,7 @@ Pros: one index per step, and a stock and a flow in the same row refer to the sa
 
 ## 3. What each influence does
 
-The frameworks are those reviewed in `lingua_franca_design/docs/approaches/` and counted in `influences.yaml`, plus the three "other" frameworks named there (Covasim, MIRA, PyRoss). All were read from source; most were also run on a two- or three-step SIR. Answers are as of the versions in `lingua_franca_design/_envs/`, or shallow clones of each project's default branch (2026-11-04). The full write-ups, with file and line citations for each answer, are in the session scratchpad (`working/timestep/group1.md` to `group4.md`; see the end).
+The frameworks are those reviewed in `lingua_franca/docs/approaches/` and counted in `influences.yaml`, plus the three "other" frameworks named there (Covasim, MIRA, PyRoss). All were read from source; most were also run on a two- or three-step SIR. Answers are as of the versions in `lingua_franca/_envs/`, or shallow clones of each project's default branch (2026-11-04). The full write-ups, with file and line citations for each answer, are in the session scratchpad (`working/timestep/group1.md` to `group4.md`; see the end).
 
 "IC" is the initial condition. "Inputs" is when values that vary in time (forcing, schedules, interventions) are read. "Within step" is whether processes in one step all see the state at the step's start (simultaneous) or later ones see earlier ones' changes (sequential).
 
@@ -276,4 +276,4 @@ With an accurate update, getting the label wrong costs a lot at a weekly step (2
 
 - Framework findings, with file and line citations for each answer: `working/timestep/group1.md` (Atomica, summer2, epipack, epydemix, epymorph, flepiMoP), `group2.md` (odin, epidemics, EpiModel, SimInf, epiworld, individual), `group3.md` (Starsim v3 and v4, Covasim, LASER, EMOD, TLO, Vivarium), and `group4.md` (camdl, MEmilio, EMULSION, EoN, EpiHiper, MetaCast, PandemicSimulator, MIRA, PyRoss). The check scripts and shallow clones of the frameworks with no local copy are in `group1/` to `group4/` beside them, and the brief the agents worked from is `BRIEF.md`.
 - Numerical comparisons: `working/timestep/numerics.py` (`python numerics.py`; about a minute, single-threaded), and `expomid.py` (an exponential update with midpoint hazards, which did not reduce the bias).
-- v4's convention: `lingua_franca_design/docs/design/02-types.md` ("The timing contract"), `09-results.md`, and `10-execution.md` ("One time index"); `starsim/internals/loop.py:78-86`; `starsim/results.py:857-913`.
+- v4's convention: `lingua_franca/docs/design/02-types.md` ("The timing contract"), `09-results.md`, and `10-execution.md` ("One time index"); `starsim/internals/loop.py:78-86`; `starsim/results.py:857-913`.

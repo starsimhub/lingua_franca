@@ -90,7 +90,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: starsimhub/lingua_franca_design
+          repository: starsimhub/lingua_franca
           ref: ${{ env.DESIGN_REF }}
       - uses: actions/checkout@v4
         with:

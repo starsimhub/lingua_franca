@@ -25,7 +25,7 @@ The nine build steps from [models/README.md](../models/README.md).
 
 ## Held-out set
 
-- [x] Wave 1: for each framework, the simplest example that shows what it is for. The originals, their environments, and the Starsim versions are kept in the `lingua_franca_design` repository (`examples/`, `_envs/`, and `vignettes/`), not here.
+- [x] Wave 1: for each framework, the simplest example that shows what it is for. The originals, their environments, and the Starsim versions are kept in the `lingua_franca` repository (`examples/`, `_envs/`, and `vignettes/`), not here.
     - [x] camdl: SIR with weekly reported cases, and a negative-binomial likelihood
     - [x] summer2: SIR by age and location, with a mixing matrix for each
     - [x] epydemix: SIR in Kenya's population, with contact matrices by age
@@ -420,7 +420,7 @@ The work from [the review's plan](../review_oct17/implementation.md), by phase. 
 - [x] `sim.stratify()` survives `sim.new()` (N18).
 - [x] `sim.save()` after a run (R15): `Loop.shrink()` no longer makes the plan, the engines have a `shrink()`, and copying a sim no longer leaves its parameters and states referring to the original's modules (the custom `__deepcopy__` of `ss.par` and `ss.State` kept the old module when the parameter was reached before its module, through `sim.pars.<name>`).
 - [x] The headline examples run (P1a, P1b): the two-line SIR is `beta=0.3` with `init_prev=0.01` throughout the spec, best practices, and docstrings; `AlreadyRunError` names `sim.new()`; `msim.plot()` of declared runs draws the median and a 95% interval of each scenario (`MultiResults.plot()`).
-- [x] Portable test paths (P12): `tests/paths.py` finds the design repo from `STARSIM_LFD` (and camdl from `STARSIM_CAMDL`), next to this repo by default, and the tests that need it skip with a message naming the variable; `test_samples` uses `tmp_path`.
+- [x] Portable test paths (P12): `tests/paths.py` finds the design repo from `STARSIM_LF` (and camdl from `STARSIM_CAMDL`), next to this repo by default, and the tests that need it skip with a message naming the variable; `test_samples` uses `tmp_path`.
 
 ### Phase 2: contract tests
 
