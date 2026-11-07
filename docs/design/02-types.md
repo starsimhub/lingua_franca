@@ -15,20 +15,20 @@ Justified by [best-practices/time-and-units.md](../best-practices/time-and-units
 
 | Type | Dimension | Means | Constructors |
 |---|---|---|---|
-| `ss.dur` | time | an elapsed duration | `ss.days`, `ss.weeks`, `ss.months`, `ss.years`, `ss.datedur` |
+| `ss.Duration` | time | an elapsed duration | `ss.days`, `ss.weeks`, `ss.months`, `ss.years` |
 | `ss.per` | time⁻¹ | a hazard: events per unit time, continuously | `ss.perday`, `ss.perweek`, `ss.permonth`, `ss.peryear` |
 | `ss.prob` | probability per period | the chance of an event within a period | `ss.probperday`, `ss.probperweek`, `ss.probpermonth`, `ss.probperyear` (the same as `ss.prob(0.1, 'day')` and so on) |
 | `ss.freq` | time⁻¹ | an expected number of events per unit time | `ss.freqperday`, `ss.freqperweek`, `ss.freqpermonth`, `ss.freqperyear` |
 
 One more value type is not a time value: **`ss.peract(p)`**, a probability per act, for a transmission over a network that defines acts (`ss.SexualNet`, `ss.DegreeNet(acts=...)`). It has no unit and no conversion, so it means the same at any step: a partnership with `a` acts per unit time transmits over a step with probability `1 − (1 − p)^(a·dt)`. It takes one value, or one for each of the network's directions (`ss.peract(m2f=0.3, f2m=0.15)`; see [06-routes.md](06-routes.md#beta-per-route-and-direction)); each value is a number in [0, 1] (else a `ValueError`), an `ss.par` or an expression of them, an `ss.timeseries`, or an `ss.by`. A typed rate inside it raises a `TypeError`.
 
-`ss.per`, `ss.prob`, and `ss.freq` share the base class `ss.Rate`; all four types share `ss.TimePar`. `ss.per` is the hazard type and keeps its Starsim name. A typed value needs its unit: `ss.dur(3)` and `ss.per(2)` with no unit raise (they were years in Starsim 3).
+`ss.per`, `ss.prob`, and `ss.freq` share the base class `ss.Rate`; all four types share `ss.TimePar`. `ss.per` is the hazard type and keeps its Starsim name. A typed value needs its unit: `ss.Duration(3)` and `ss.per(2)` with no unit raise (they were years in Starsim 3). The one-unit instances `ss.day`, `ss.week`, `ss.month`, and `ss.year` (`ss.days(1)` and so on) stand for a unit where one is wanted, e.g. `ss.prob(0.1, ss.year)`.
 
-`ss.per` and `ss.freq` have the same dimension and are different types. A hazard is the parameter of an exponential clock and converts to a per-step probability by `1 − exp(−r·dt)`; a frequency is an expected count and converts by `f·dt`. Mixing them up is a common quiet error, so adding one to the other raises a `TypeError`, as Starsim does today.
+`ss.per` and `ss.freq` have the same dimension and are different types. A hazard is the parameter of an exponential clock and converts to a per-step probability by `1 − exp(−r·dt)`; a frequency is an expected count and converts by `f·dt`. So a rate times a duration is a probability, and a frequency times a duration a number of events. Mixing them up is a common quiet error, so adding one to the other raises a `TypeError`. A count per time that is not a hazard takes a frequency (or a rate): a network's `acts=`, whose default is `ss.lognormal(ss.freqperyear(80), ss.freqperyear(30))`.
 
 The difference is only in that conversion, which a module written as code asks for (`to_prob()` for a chance this step, `* dt` for a count this step). A declared transition never asks for it: its rate is always a hazard, which the solver turns into a step itself (the ODE integrates it; the stochastic solvers and agents use `1 − exp(−r·dt)`, except that the chain binomial takes `r·dt` for the exits from a source of infection: see [12-backends.md](12-backends.md)). So in a declared transition `ss.freqperday(0.1)` and `ss.perday(0.1)` give the same result, while `ss.probperday(0.1)` is the hazard that gives a 10% chance a day, `−ln(0.9) = 0.105` a day, and gives a different result (10 days of recovery from 1,000: 368 left at `perday(0.1)` or `freqperday(0.1)`, 349 at `probperday(0.1)`).
 
-`ss.datedur` is kept alongside `ss.months` because calendar durations are not fixed multiples of days. It is a thin wrapper of `pd.DateOffset`: whole numbers of years, months, weeks, and days, added to a date as the calendar does, and approximate as a number (a year of 365 days). The time between two dates (`date - date`) is `ss.days`.
+Calendar durations are not fixed multiples of days, so a whole number of months or years added to a date follows the calendar, as a `pd.DateOffset` does (every month is the same day of the month); as a number, a month or a year is approximate (a year of 365 days). There is no separate calendar-duration type for users (`ss.dates.datedur` is internal). The time between two dates (`date - date`) is `ss.days`.
 
 Counts are plain numbers. `I.n` is the number of people in a state (the same number as the result `I`) and `I.frac` its fraction ([03-states-and-transitions.md](03-states-and-transitions.md)). `P.time_in`, the time each person has spent in a state, is a number in the sim's unit, as a bare number returned by a function is.
 
@@ -41,11 +41,11 @@ Converting to a timestep is the type's job, not the user's. For a step of length
 | `ss.per(r)` | `1 − exp(−r·dt)` | `r·dt` |
 | `ss.prob(p)` per period `T` | `1 − (1 − p)^(dt/T)` | |
 | `ss.freq(f)` | | `f·dt` |
-| `ss.dur(d)` | through the rate `1/d` | |
+| `ss.Duration(d)` | through the rate `1/d` | |
 
 How a solver turns a declared rate into a step is the solver's own choice, made for its accuracy (e.g. the chain binomial takes `r·dt` for the exits from a source of infection: see [12-backends.md](12-backends.md)). **Decided 2026-11-05 (changed):** this was "A solver MUST NOT substitute `r·dt` for `1 − exp(−r·dt)`", removed at Cliff's request ("the spec's 'MUST NOT' is dumb and should be removed"), since the exponential, exact for a single decay, keeps people in a source of infection half a step too long on average, raising R0 by about `r·dt/2`.
 
-**Large steps.** In a run that takes whole steps (`'binomial'`, `'abm'`, or the ODE with Euler steps of a given size), when `rate × dt > 0.1` for a dwell time, the build gives a note, naming the transition, `rate × dt`, the share of people who leave in a step, and what to do (a smaller `dt`, `substeps=`, or `solver='gillespie'`). Under the other solvers, which follow the rates within a step, it is given only for a mean dwell time shorter than the step, which is usually a rate meant as a duration (`rate=10`). It is a note, not an error; `sim.check_dt()` shows how much the results change with a smaller step ([10-execution.md](10-execution.md)).
+**Large steps.** In a run that takes whole steps (`'binomial'`, `'abm'`, or the ODE with Euler steps of a given size), when `rate × dt > 0.1` for a dwell time, the build gives a note, naming the transition, `rate × dt`, the share of people who leave in a step, and what to do (a smaller `dt`, `ss.solvers.ode(substeps=)` or `ss.solvers.binomial(substeps=)`, or `solver='gillespie'`). Under the other solvers, which follow the rates within a step, it is given only for a mean dwell time shorter than the step, which is usually a rate meant as a duration (`rate=10`). It is a note, not an error; `sim.check_dt()` shows how much the results change with a smaller step ([10-execution.md](10-execution.md)).
 
 Continuous-time solvers (`'ode'`, `'gillespie'`) have no `dt` in this sense and do no conversion at all.
 
@@ -101,7 +101,7 @@ I >> R @ 0.1                              # after @, a bare number is always a r
 
 A bare number after `@` is a rate, never a duration, because "at" reads as "at rate" and `@ 0.1` and `@ 10` cannot both be guessed from their size. A bare-number duration uses the keyword, `dur=10`.
 
-A slot that can be filled in more than one way (`ss.progression` takes `dur=` or `rate=`) is decided by which keyword was used, never by the value. The slots and their types are listed in [17-vocabulary.md](17-vocabulary.md).
+A slot that can be filled in more than one way (`ss.Transition` takes `dur=` or `rate=`) is decided by which keyword was used, never by the value. The slots and their types are listed in [17-vocabulary.md](17-vocabulary.md).
 
 A typed value (`ss.perday(0.05)`) keeps its own unit and is converted to the sim's. A bare number takes the sim's unit.
 
@@ -114,16 +114,16 @@ A typed value (`ss.perday(0.05)`) keeps its own unit and is converted to the sim
 | 1 | `unit='day'` | what it says |
 | 2 | typed values in the model's diseases, declared or written as code (`dur=ss.days(10)`, or a disease's typed `dt`) | their unit; if they differ, the finest, with a warning when nothing gives the step; if they differ and the model has bare numbers, the unit of the diseases that have them, when those agree (a disease's bare `beta` is in the days of its own durations, beside births per year), else an error asking for `unit=` (which unit the bare numbers are in cannot be guessed). Births and deaths of the whole population (`demographics=`, held by a disease) count only when the disease has no other typed values |
 | 3 | `start=` or `stop=` as a date, such as `start='2020-01-01'` | days |
-| 4 | a typed `dt` or a typed `start`, `stop`, or `dur`, such as `dt=ss.weeks(1)` | its unit |
+| 4 | a typed `dt` or a typed `start` or `stop`, such as `dt=ss.weeks(1)` | its unit |
 | 5 | `start=` or `stop=` as a year, such as `start=2020, stop=2030` | years |
 | 6 | typed values in the other modules (networks, demographics, interventions, `ss.Pregnancy`) | the finest of them |
 | 7 | none of these | none: time is in timesteps |
 
-The model's unit is a property of the model, so its own typed values come before how the run is written; `dt` then sets only the step. Only `start` and `stop` supply a unit from dates: a date on an intervention or in the data does not. A year-like number for `start` or `stop` (`stop=2020`) is a calendar year, since Starsim 3 sims are written that way, unless `unit=` gives another unit. The unit is never guessed from the size of the numbers: 0.05 is plausible per day and per year.
+The model's unit is a property of the model, so its own typed values come before how the run is written; `dt` then sets only the step. Only `start` and `stop` supply a unit from dates: a date on an intervention or in the data does not. Whether a bare `start` or `stop` is a year is decided as in [Time in a sim](#time-in-a-sim). The unit is never guessed from the size of the numbers: 0.05 is plausible per day and per year.
 
 A function that gives a rate or a duration (`rate=fn`, `dur=fn`) and returns a bare number, in a model whose unit comes from its typed values (rule 2), raises a `TypeError` when the sim runs, saying to return a typed value or give `unit=`: which unit the function meant cannot be guessed, and reading it in the inferred unit gave silent wrong answers when a typed value elsewhere was in weeks (ST33, decided 2026-10-22). Zero is accepted, and with `unit=` given (or no typed values) a bare number is in the sim's unit, as elsewhere.
 
-The rule is the same whether a disease is declared or written as code. The other modules' typed values are their own defaults or settings, which say nothing of the unit of the model's bare numbers, so they count only when nothing else gives a unit. A bare number given for a parameter of a module written as code (`ss.RandomNet(dur=5)`) keeps the unit of its default, as in Starsim 3, with a warning when that differs from the sim's.
+The rule is the same whether a disease is declared or written as code. The other modules' typed values are their own defaults or settings, which say nothing of the unit of the model's bare numbers, so they count only when nothing else gives a unit. A bare number given for a parameter of a module written as code keeps the unit of its default, as in Starsim 3, with a warning when that differs from the sim's; the networks' `dur=` is in the sim's unit (`ss.RandomNet(dur=5)`, `ss.SexualNet(dur=5)`).
 
 Whenever the unit comes from rules 2 to 6 it is a guess about what the bare numbers meant, so the sim says where it came from, at `init()` and in `describe()`:
 
@@ -135,7 +135,7 @@ solver: ode (every part of the model has a compartmental form)
 
 and `describe()` shows `unit  day  [from start and stop dates]`.
 
-The default timestep is one unit: one day, one year, or one step; when that comes to more than 3,000 steps and `dt` was not given (ten years in days, say), a warning says so. With no `stop`, a sim runs for 50 units (or 50 steps) from its start. With no `start`, a sim in years starts in the year 2000, and one in any other unit at 0.
+The default timestep is one unit: one day, one year, or one step; when that comes to more than 3,000 steps and `dt` was not given (ten years in days, say), a warning says so. With no `stop`, a sim runs for 50 units (or 50 steps) from its start. With no `start`, a sim with a calendar in years starts in the year 2000, and any other at 0. There is no `dur=` on the sim: `stop=` takes a duration, the length of the run (`stop=ss.years(10)`).
 
 ### Time in timesteps
 
@@ -167,7 +167,15 @@ ss.Sim(sir, stop=100, unit='day')                                   # relative t
 ss.Sim(sir, stop=100)                                               # relative time, in steps
 ```
 
-All four are supported. A string is a calendar date; a bare number in `start=` or `stop=` is read as a year if it looks like one (`2020`) and as a relative time otherwise (`0`), and the reading is printed (`unit='year' (from start and stop years)`). Relative time works with or without a unit.
+All four are supported. **Whether the sim has a calendar is decided once, from `start`:** a date (a string or an `ss.date`) or a year (a bare number from 1800 on) gives it one; any other number, or a duration (`start=ss.years(2000)`), is a time in the sim's unit from 0, with no calendar. With no `start`, a bare `stop` from 1800 on is a year only if `unit=` is years or not given: `ss.Sim(unit='day', stop=3650)` runs 3,650 days from 0, since the unit is explicit and the stop is not (`unit='day', start=2020` is still a daily sim from 2020). The reading is printed (`unit='year' (from start and stop years)`). Relative time works with or without a unit.
+
+Every other time given to the sim or a module (a bare `stop`, `when=`, the times of `ss.schedule()` and `ss.timeseries()`, `ss.modify()`'s window, a module's `start=`, `sim.run(until=)`) is read on that axis:
+
+- **A bare number** is a calendar year in a sim with a calendar, and a time in the sim's unit from 0 in one without. One above 1000 and below 1800 is read as a time from 0, with a warning that it is ambiguous (for a year that early, give a date). The threshold is 1800 so that a burn-in can start in the 19th century.
+- **A duration given as a time** is a point on the sim's own axis, counted from 0 as `start=ss.years(2000)` and `sim.t.tvec` are, the same in a list or not: `when=ss.days(10)` is day 10, and every 10 days is `when=ss.schedule(every=ss.days(10))`. It is for a sim with no calendar, rounded to a step as dates are, and must fall inside the run. In a sim with a calendar it is a `ValueError` (except, in a sim of calendar years, a duration of 1800 years or more, such as a value of `sim.t.tvec`, which is that year) that suggests a date or `sim.pars.start + ss.days(10)` (a date or a calendar year plus a duration is a date). In a unit other than the sim's or the module's, it warns.
+- **As `stop=`**, a duration is the length of the run from its start (`stop=ss.days(100)`).
+
+`ss.years(2000)` is not `ss.date(2000)`, though they are close: the first is 2,000 years from 0 on a float axis with no calendar (fine for `dt=ss.years(0.1)`), the second the calendar date 2000-01-01, whose steps fall on the calendar's days. `ss.years()` takes a number, not a date string. `ss.date(2020.5)`, a float, is the middle of 2020 and `ss.date('2020-05')` is May; `ss.date('2020.5')` is a `ValueError`, since a string with a decimal point could be either.
 
 The sim's `Timeline` provides the parallel time vectors Starsim already has (`tvec`, `yearvec`, `datevec`, `timevec`, and so on), so output can be requested in the frame the data are in. Nothing is added to it; whether it can be reduced is an open question below.
 
@@ -200,7 +208,9 @@ There are no sub-step offsets. Commuting, which the first draft handled with dep
 
 ## Distributions
 
-Distributions use Starsim's names: `ss.normal`, `ss.lognorm_ex` (given the mean and standard deviation of the lognormal itself), `ss.lognormal(log_mean=, log_std=)` (given those of the underlying normal), `ss.expon`, `ss.gamma`, `ss.weibull`, `ss.poisson`, `ss.nbinom`, `ss.uniform`, `ss.bernoulli`, `ss.constant`, `ss.choice`, and the rest of Starsim's set. Any SciPy distribution can be wrapped with `ss.Dist(dist=...)`. There are two additions: `ss.erlang(k=, mean=)`, an Erlang distribution given by its number of stages and its mean, which is `ss.gamma` with an integer shape (`stages=` on the transition says the same thing); and `ss.truncnorm(loc=, scale=, low=, high=)`, a normal distribution truncated to an interval.
+Distributions use Starsim's names: `ss.normal`, `ss.lognormal` (given the mean and standard deviation of the lognormal itself, `ss.lognormal(mean=, std=)`, or those of its logarithm, `ss.lognormal(log_mean=, log_std=)`), `ss.expon`, `ss.gamma`, `ss.weibull`, `ss.poisson`, `ss.nbinom`, `ss.beta_dist`, `ss.uniform`, `ss.bernoulli`, `ss.constant`, `ss.choice`, and the rest of Starsim's set. Any SciPy distribution can be wrapped with `ss.Dist(dist=...)`. There are two additions: `ss.erlang(k=, mean=)`, an Erlang distribution given by its number of stages and its mean, which is `ss.gamma` with an integer shape (`stages=` on the transition says the same thing); and `ss.truncnorm(mean=, std=, low=, high=)`, a normal distribution truncated to an interval.
+
+**Parameters are named by their moments** where a distribution has them (`ss.normal(mean, std)`, `ss.expon(mean)`, `ss.poisson(mean)`, `ss.gamma(mean=, std=)`), and otherwise by their usual names (`ss.gamma(shape, scale)`, `ss.weibull(shape, scale)`), translated to SciPy's names inside. `loc=` means what it does in SciPy, a shift of the whole distribution (e.g. a shortest duration), and is keyword-only on `ss.gamma` and `ss.weibull`; with a shift, `mean=` is the mean of the whole distribution, shift included (`ss.gamma(mean=, std=, loc=)`, `ss.erlang(k=, mean=, loc=)`). A keyword a distribution does not take is a `TypeError` when it is made, naming those it does (and the moment name for a SciPy one, e.g. `std=` for `scale=` on `ss.normal`).
 
 A distribution is accepted wherever a quantity of the same type is. **Units are given once per distribution**:
 
@@ -210,7 +220,7 @@ ss.lognormal(mean=ss.days(10), std=3)           # std inherits the unit of mean
 ss.lognormal(mean=10, std=3)                    # no unit: typed by its slot, like a bare number
 ```
 
-Putting the unit on one parameter is enough; the other parameters of the same dimension inherit it. Shape parameters (`a` in `ss.gamma`, `c` in `ss.weibull`) have no unit.
+Putting the unit on one parameter is enough; the other parameters of the same dimension inherit it. Shape parameters (`shape` in `ss.gamma` and `ss.weibull`) have no unit.
 
 **In a compartmental run** there are no individuals to draw for, so a distribution is realized in one of two ways. A dwell-time distribution becomes Erlang sub-stages ([03-states-and-transitions.md](03-states-and-transitions.md#dwell-time)). A distribution on a quantity that varies between people, such as `beta` or `rel_sus`, makes the model agent-based under `solver='auto'`; under an explicit `solver='ode'` the mean is used, with a note, and a user who wants the spread kept bins it into a dimension ([05-dimensions.md](05-dimensions.md), [12-backends.md](12-backends.md)).
 

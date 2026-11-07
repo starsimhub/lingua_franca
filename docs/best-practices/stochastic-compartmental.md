@@ -42,7 +42,7 @@ Gillespie's method is exact, and its cost grows with the number of events. Tau-l
 
 ## The specification
 
-[12-backends.md](../design/12-backends.md) specifies the solvers (`'auto'`, `'ode'`, `'ide'`, `'binomial'`, `'gillespie'`, `'tau'`, and `'abm'`), how a value that varies in time is followed within a step, Erlang stages for dwell times, and the notes on small counts, possible extinction, and large steps. States that hold a count (a reservoir, a vector population) are in [03-states-and-transitions.md](../design/03-states-and-transitions.md), and many runs in [09-results.md](../design/09-results.md). The docs show how to use these in [Solvers and backends](https://starsim.org/v4/user_guide/running_solvers.html) and [Branching and rescaling](https://starsim.org/v4/user_guide/running_branching.html).
+[12-backends.md](../design/12-backends.md) specifies the solvers (`'auto'`, `'ode'`, `'binomial'`, `'gillespie'`, `'tau'`, and `'abm'`, with their options as `ss.solvers.ode(dwells='exact')` and the like), how a value that varies in time is followed within a step, Erlang stages for dwell times, and the notes on small counts, possible extinction, and large steps. States that hold a count (a reservoir, a vector population) are in [03-states-and-transitions.md](../design/03-states-and-transitions.md), and many runs in [09-results.md](../design/09-results.md). The docs show how to use these in [Solvers and backends](https://starsim.org/v4/user_guide/running_solvers.html) and [Branching and rescaling](https://starsim.org/v4/user_guide/running_branching.html).
 
 ## Trade-offs
 

@@ -61,17 +61,17 @@ The reasons for this order are Starsim's: new agents exist before diseases initi
 
 A disease built from declared transitions ([03-states-and-transitions.md](03-states-and-transitions.md)) needs no `step()` written by the user. All of its transitions run in row 9, `step()`, after networks and interventions have run, under every solver; within the row, as agents, they are taken in two parts by their kind, which is derived from the rate:
 
-- **Not contact-mediated** (the rate mentions no state), first. This covers `ss.progression`, branching, dwell times that elapse this step, `ss.transfer`, `ss.death` and `ss.birth` declared on the disease, and the transitions into and out of states that are not people (a water reservoir, a mosquito population; [03-states-and-transitions.md](03-states-and-transitions.md)): `shedding = ss.outside >> W @ shed * I.n` and `decay = W >> ss.dead @ rate` mention no bare state. See [States that are not people](#states-that-are-not-people).
+- **Not contact-mediated** (the rate mentions no state), first. This covers progression, branching, dwell times that elapse this step, `ss.transfer`, `ss.death` and `ss.birth` declared on the disease, and the transitions into and out of states that are not people (a water reservoir, a mosquito population; [03-states-and-transitions.md](03-states-and-transitions.md)): `shedding = ss.outside >> W @ shed * I.n` and `decay = W >> ss.dead @ rate` mention no bare state. See [States that are not people](#states-that-are-not-people).
 - **Contact-mediated** (the rate mentions a state), then.
 - **A plain function passed to `ss.Disease(...)`** as a keyword is called at the end of that disease's row 9. A subclass that overrides `step()` replaces the row, as in Starsim (and so has to call `super().step()`).
 
 ### Where `ss.modify` is evaluated
 
-A modifier ([07-effects.md](07-effects.md)) acts where the engine uses the quantity, so a modifier with a `where=` on a state reflects that state as it is when the quantity is used, whatever the module order. A `when=` function is called once per step, at the modifier's place among the connectors. A modifier that depends only on time, and on who it applies to only through states and stratifications, is worked out before a compartmental run, so the run stays in one call to the kernels. Because the base value is never overwritten, the original value comes back when a modifier ends.
+A modifier ([07-effects.md](07-effects.md)) acts where the engine uses the quantity, so a modifier with a `who=` on a state reflects that state as it is when the quantity is used, whatever the module order. A `when=` function (of the date) is called once per step, at the modifier's place among the connectors. A modifier that depends only on time, and on who it applies to only through states and stratifications, is worked out before a compartmental run, so the run stays in one call to the kernels. Because the base value is never overwritten, the original value comes back when a modifier ends.
 
 Direct writes by custom code are a different matter: the loop does not record them. `sim.what_modifies(x)` lists the declared modifiers on `x` ([07-effects.md](07-effects.md)).
 
-Example: `ss.modify(hiv.rel_trans, multiply=2.0, where=syphilis.active)`. If syphilis is listed before HIV, a person who acquires syphilis at row 9 of this step has doubled HIV transmissibility when HIV transmission runs later in row 9 of the same step. If syphilis is listed after HIV, the doubling is first used one step later. Both are valid; the difference is O(dt).
+Example: `ss.modify(hiv.rel_trans, multiply=2.0, who=syphilis.active)`. If syphilis is listed before HIV, a person who acquires syphilis at row 9 of this step has doubled HIV transmissibility when HIV transmission runs later in row 9 of the same step. If syphilis is listed after HIV, the doubling is first used one step later. Both are valid; the difference is O(dt).
 
 ## A within-step chain
 
@@ -87,7 +87,7 @@ sir    = ss.Disease(
 test   = ss.Diagnostic(sensitivity=0.9, specificity=0.98)
 drug   = ss.Treatment(cure=0.95)
 screen = ss.screen(test, coverage=0.2)
-treat  = ss.treat(drug, on=screen.positive)
+treat  = ss.treat(drug, when=screen.positive)
 
 sim = ss.Sim(sir, interventions=[screen, treat], unit='day', dt=1, stop=100)
 ```
@@ -247,7 +247,7 @@ Problems are reported at the earliest step that can detect them ([15-errors.md](
 
 ## Finishing
 
-After the last step, `sim.finalize()` calls each module's `finalize()` once, in module order, and then finalizes the results (scaling, summary statistics). This is Starsim's behavior. Calling `run()` again on a completed sim runs it again from the start, built again as `sim.new()` would: a copy of the sim as it was before it was initialized, so changes made since belong to that run only (setting `sim.pars` once it is initialized raises, pointing to `sim.new()`); stepping or finalizing it again raises `AlreadyRunError`.
+After the last step, `sim.finalize()` calls each module's `finalize()` once, in module order, and then finalizes the results (scaling, summary statistics). This is Starsim's behavior. Calling `run()` again on a completed sim runs it again from the start, built again as `sim.new()` would: a copy of the sim as it was before it was initialized, so changes made since belong to that run only (setting `sim.pars` once it is initialized raises, pointing to `sim.new()`); stepping or finalizing it again raises `AlreadyRunError`. `sim.run()` takes only `until=` and `verbose=` and always returns the sim; other values for a run are given before it: `sim.restart(pars=, rand_seed=)` takes the sim back to its start without running it, `sim.new(solver=)` makes a new one, and many runs are `ss.parallel()` ([09-results.md](09-results.md#one-run-many-runs)).
 
 ## Rejected
 

@@ -40,7 +40,7 @@ The JSON form is for moving a model between programs and people without Python: 
       "states": ["S", "I", "R"],
       "transitions": {"infection": "S >> I @ R0 * gamma * I", "recovery": "I >> R @ gamma"},
       "init_n": {"I": {"by": {"patch": {"urban": 10, "rural": 1}}}},
-      "stratify": [{"patch": ["urban", "rural"]}]
+      "stratify": {"patch": ["urban", "rural"]}
     }
   ],
   "networks": [{"type": "RandomNet", "n_contacts": 5}]
@@ -48,13 +48,13 @@ The JSON form is for moving a model between programs and people without Python: 
 ```
 
 - **The top level** has `"starsim"`, the version that wrote it (which also tells `ss.import_from()` the format), the sim's settings as they were given (`start`, `stop`, `dt`, `unit`, `total_pop`, `n_agents`, `solver`, `rand_seed`, ...), `"diseases"`, and the other modules (`"networks"`, `"demographics"`, `"interventions"`, `"analyzers"`, `"connectors"`).
-- **A declared disease** has its `name`, `pars`, `states`, `transitions`, `results`, starting values (`init`, `init_n`, `init_prev`), `first`, and `stratify`.
+- **A declared disease** has its `name`, `pars`, `states`, `transitions`, `results`, starting values (`init`, `init_n`, `init_prev`), `default_state`, and `stratify` (one dict of dimensions, as `stratify()` takes them).
 - **A parameter** is its value, or `{"value": ..., "bounds": ..., "prior": ..., "doc": ...}` if it has more. A value is a JSON number, list, or object; a typed value, distribution, or other Starsim value as its code (`"days(10)"`, `"gamma(a=4, scale=days(2.5))"`, `"seasonal(mean=0.26, amplitude=0.3, peak='January')"`); and a value by group as `{"by": {"patch": {...}}}`, the arguments of `ss.by()`.
 - **A state** is its name, or `{"name": ..., "people": false, "label": ...}`.
-- **A transition** is one line, as the operators write it (`"I >> R @ dur_inf"`, `"unborn >> S @ birth_rate * N"`, `"[S, I, R] >> dead @ mu"`; the three places outside the model are `unborn`, `dead`, and `outside`), if it has only its ends and a rate or a dwell time with a unit; otherwise it is the arguments of `ss.Transition()` (`{"src": "I", "dst": ["P", "R"], "dur": "dur_inf", "p": ["p_paralysis", null]}`).
+- **A transition** is one line, as the operators write it (`"I >> R @ dur_inf"`, `"unborn >> S @ birth_rate * N"`, `"[S, I, R] >> dead @ mu"`; the three places outside the model are `unborn`, `dead`, and `outside`), if it has only its ends and a rate or a dwell time with a unit; otherwise it is the arguments of `ss.Transition()` (`{"source": "I", "dest": ["P", "R"], "dur": "dur_inf", "p": ["p_paralysis", null]}`, read as `ss.Transition(I, {P: p_paralysis, R: None}, dur=dur_inf)`).
 - **A result** is its expression; a result that a rate uses is written there by its name (`"y2 >> x1 @ R1"`), as the code would.
 - **Another module** (a network, an intervention, a disease written as code) is its type and the parameters that differ from its defaults, as Starsim 3's dict input gave them: `{"type": "RandomNet", "n_contacts": 5}`, or `"ssl.HouseholdNet"` for one of the library's. A module of the user's own class cannot be written, and is listed.
 
 Reading a file runs no code from it: each expression is parsed and checked, with only the model's own names, Starsim's typed values, distributions, and values, and NumPy's functions allowed, and a module's type must be one of Starsim's or its library's. An unknown name or a part that is not allowed is an error that says where it is.
 
-What the form does not carry yet is listed as `LossyExport` like any other export's: outcomes, modifiers (`ss.modify()`), functions, attributes, strains, transfers, conditions (`where=`), changes of level (`move=`, `increment=`), the sim's own stratification, named populations and geographies (a stratification by places is written as their names), and modules of the user's own classes (`docs/admin/deferred.md`). The test is the round trip: a sim exported and imported again gives the same results, for each model in the library (`tests/devtests/io/test_io_json.py` in Starsim).
+What the form does not carry yet is listed as `LossyExport` like any other export's: outcomes, modifiers (`ss.modify()`), functions, attributes, strains, transfers, conditions (`who=`), changes of level (`move=`, `increment=`), the sim's own stratification, named populations and geographies (a stratification by places is written as their names), and modules of the user's own classes (`docs/admin/deferred.md`). The test is the round trip: a sim exported and imported again gives the same results, for each model in the library (`tests/devtests/io/test_io_json.py` in Starsim).

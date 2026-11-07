@@ -13,7 +13,7 @@ Justified by [best-practices/stochasticity-and-reproducibility.md](../best-pract
 
 ## Streams
 
-**Every distribution has its own random number stream**, seeded from the sim's `rand_seed` and the distribution's full name (a hash of the two together). In a stochastic compartmental run (`binomial`, `gillespie`), each module draws from a generator of its own, seeded from the sim's `rand_seed` and the module's name, and draws its flows in an order set by the names of their states and transitions, so the order the states are declared in does not change the draws. Each of several runs (`sim.run(n_runs=)`, `ss.parallel()`) draws everything, its outcomes included, from its own seed, as it would on its own.
+**Every distribution has its own random number stream**, seeded from the sim's `rand_seed` and the distribution's full name (a hash of the two together). In a stochastic compartmental run (`binomial`, `gillespie`), each module draws from a generator of its own, seeded from the sim's `rand_seed` and the module's name, and draws its flows in an order set by the names of their states and transitions, so the order the states are declared in does not change the draws. Each of several runs (`ss.parallel(sim, n_runs=)`) draws everything, its outcomes included, from its own seed, as it would on its own.
 
 Consequences:
 
@@ -27,7 +27,7 @@ This is Starsim's mechanism, kept. One shared stream would make every scenario c
 
 **How a draw is made.** Every draw goes through one exact library (`ss.solvers.backends.draws`, compiled by Numba, hidden from users): each count or value is a function of one uniform, by inversion of its CDF where that is cheap (binomial and Poisson up to a mean of 30, negative binomial, exponential, Weibull, normal, lognormal, uniform, discrete choices), so it is monotone in the uniform, which suits common random numbers; otherwise (larger means, gamma, beta) by a rejection sampler whose own uniforms come from a stream seeded by that uniform, so the same uniform still gives the same draw. Uniforms are counter-based (SplitMix64 of a key and an index, the same hash as an agent's CRN uniform). A stochastic compartmental run draws one uniform a count from its generator, and for many groups (`ss.kernels.row_groups`, 50) a row of counts from one key, with vectorized code. A per-agent draw with CRN is the inverse CDF at the agent's uniform, compiled for the common distributions, and SciPy's for the rest (gamma, beta) and above a mean of 30, so it stays monotone. None of the common distributions is much slower than NumPy's own sampler (measured 2026-10-22; [oct25/backlog/perf_jax.md](../oct25/backlog/perf_jax.md)).
 
-The name MUST come from the declaration's path in the model (its module and attribute names), not from a Python object identity or the order of construction, so that the same model written in any of the three spellings produces the same draws.
+The name MUST come from the declaration's path in the model (its module and attribute names), not from a Python object identity or the order of construction, so that the same model written in either spelling, or in the class form, produces the same draws.
 
 ## Common random numbers
 
@@ -52,7 +52,7 @@ Each built-in module says in its docstring whether it keeps CRN. A module is CRN
 |---|---|
 | Declared diseases (`ss.Disease`, `ss.SIR`, `ss.SEIR`, `ss.SIS`), `ss.Pregnancy`, declared births, deaths, and migration, `ss.geo.Mobility`, mixing pools, deliveries (`ss.Delivery`, `ss.vaccinate()`, `ss.screen()`, `ss.treat()`) and their products | Safe as agents (a compartmental run has no agents to pair) |
 | Diseases written as code (`ss.AgentDisease`, `ssl.AgentSIR` and the other `ssl` diseases), `ss.Births`, `ss.Deaths`, `ss.modify`, analyzers, `ssl.mnch` modules, `ssl.ART` | Safe |
-| `ss.PrenatalNet`, `ss.MaternalNet`, `ss.PostnatalNet`, `ss.BreastfeedingNet`, `ss.RandomNet(method='safe')`, `ssl.ErdosRenyiNet`, `ssl.DiskNet`, `ssl.StaticNet`, `ssl.NullNet`, `ss.Network` with its edges given | Safe |
+| `ss.PrenatalNet`, `ss.PostnatalNet`, `ss.BreastfeedingNet`, `ss.RandomNet(method='safe')`, `ssl.DiskNet`, `ssl.StaticNet`, `ssl.NullNet`, `ss.Network` with its edges given | Safe |
 | `ssl.ClusterNet`, `ssl.HybridNet` | Safe, unless `dynamic=True` and people are born or die |
 | `ss.RandomNet` | Not safe when people are born or die, unless `dynamic=False`: one death rewires almost every edge (pairing by position in a list of all agents) |
 | `ss.SexualNet`, `ss.DegreeNet` | Not safe when people are born or die: people are paired in turn, so one fewer shifts the partners of those after them |

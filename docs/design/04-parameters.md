@@ -74,8 +74,8 @@ KeyError: "dur_inff=3" was given to "sir", but it has no parameter called "dur_i
 A value given for a parameter (as a keyword, in `pars=`, or by `pars.update()`) replaces it. There are three exceptions, and each keeps the parameter rather than changing what it means:
 
 - **A declared parameter** (an `ss.par`) takes the new value and keeps its name and bounds (`sir.pars.beta = 0.1`), since the module's transitions use that same object. A new `ss.par` gives its bounds, prior and description as well.
-- **A bare number for a typed value** keeps the unit of the default: `ss.SexualNet(dur=5)` on a default in years is `ss.years(5)`, with a warning if the sim runs in another unit.
-- **A single value for a distribution** sets its main parameter and keeps the rest, as in Starsim 3: for `ss.bernoulli` its probability (`init_prev=0.05`), for `ss.lognorm_ex` its mean (`dur=5` is a lognormal of mean 5 with the default's standard deviation), in the default's unit if the value is a bare number (a network of partnerships is the exception: `ss.SexualNet(dur=ss.months(6))` is a mean, with partnerships ending at a constant rate, as for `ss.DegreeNet`); for `ss.choice` it is that value always (`embryos_per_pregnancy=2` is `ss.constant(2)`). A typed value (`dur=ss.days(200)`) does the same, with a warning that says it set the mean of the default distribution and how to replace the distribution instead (`ss.expon(ss.days(200))`), since in a declared model a duration alone is an exponential (MS8); a bare number does not warn. In a declared model a single value for a parameter whose default is a distribution (other than an exponential) replaces it, with a warning that says how to keep the distribution. A fixed value is `ss.constant(...)`. A dict with a `type` is a distribution (`n_contacts=dict(type='poisson', lam=4)`).
+- **A bare number for a typed value** of a module written as code keeps the unit of the default: on a default in years, `5` is `ss.years(5)`, with a warning if the sim runs in another unit. (The networks' `dur=` is the exception: a bare number there is in the sim's unit.)
+- **A single value for a distribution** sets its main parameter and keeps the rest, as in Starsim 3: for `ss.bernoulli` its probability (`init_prev=0.05`), for `ss.lognormal` its mean (`dur=5` is a lognormal of mean 5 with the default's standard deviation), in the default's unit if the value is a bare number (a network of partnerships is the exception: `ss.SexualNet(dur=ss.months(6))` or `dur=5` is a mean, in the sim's unit if bare, with partnerships ending at a constant rate, as for `ss.DegreeNet`); for `ss.choice` it is that value always (`ss.Pregnancy(children=2)` is `ss.constant(2)`). A typed value (`dur=ss.days(200)`) does the same, with a warning that says it set the mean of the default distribution and how to replace the distribution instead (`ss.expon(ss.days(200))`), since in a declared model a duration alone is an exponential (MS8); a bare number does not warn. In a declared model a single value for a parameter whose default is a distribution (other than an exponential) replaces it, with a warning that says how to keep the distribution. A fixed value is `ss.constant(...)`. A dict with a `type` is a distribution (`n_contacts=dict(type='poisson', mean=4)`).
 
 To change one parameter of a distribution and keep the others, use the distribution's own method, `pars.dur_inf.set(mean=8)`. A list or another dict given for a distribution raises `TypeError` and names that method, since it could mean the distribution's arguments or the values themselves.
 
@@ -90,14 +90,14 @@ beta = 0.05                                          # a number; unit from the s
 beta = ss.perday(0.05)                               # a typed quantity
 beta = ss.lognormal(mean=0.05, std=0.01)            # a distribution: varies between agents
 beta = ss.timeseries({2020: 0.05, 2021: 0.02})       # varies in time
-beta = ss.timeseries('beta.csv', mode='linear')      # the same, from a file
+beta = ss.timeseries('beta.csv', interpolation='linear')  # the same, from a file
 beta = ss.seasonal(mean=0.05, amplitude=0.3, peak='January')
 beta = ss.by(age=[0.08, 0.05, 0.03])                 # one value per stratum
 beta = lambda sim: 0.05 if sim.now < ss.date('2020-03-15') else 0.03      # a function
 ```
 
 - `ss.timeseries(..., period=ss.years(1))` repeats with the period given, as a seasonal pattern written out over one year does.
-- `ss.timeseries` interpolates with `mode='constant'`, `'linear'`, or `'cosine'` (an S-shaped change between each value and the next). A bare number for a time is a time in the sim's unit counted from the start ([02-types.md](02-types.md#bare-numbers)).
+- `ss.timeseries` interpolates with `interpolation='step'` (each value holds until the next), `'linear'`, or `'cosine'` (an S-shaped change between each value and the next). Its times are read as every time is ([02-types.md](02-types.md#time-in-a-sim)): a bare number is a calendar year in a sim with a calendar, and otherwise a time in the sim's unit from 0; a duration is a time from 0, for a sim with no calendar.
 - `ss.seasonal(mean=, amplitude=, peak=, period=)` is `mean × (1 + amplitude × cos(2π(t − peak)/period))` with `t` in years and the period a year by default (`period=ss.years(0.5)` for two peaks a year); a peak given as a month is the middle of that month, and in a sim with no dates time starts at the beginning of a year. Its `mean` and `amplitude` may be an `ss.par`, which is then fitted or set like any other; one with no name or variable of its own is named after the parameter it is in and its field, e.g. `beta_mean`.
 - A function takes any of `self` (the module), `sim`, and `uids`, by name (`lambda self, sim: self.pars.beta * self.I.n / sim.people.n_alive`), as distributions' functions do; other names are taken by position, as before (`fn(s)`, `fn(s, u)`, `fn(m, s, u)`). One that takes `uids` is agent-only logic. It is tried on whatever the solver provides, agents or groups, and if it needs something that only exists per agent the compartmental run stops and says what it asked for. The rule is in [03-states-and-transitions.md](03-states-and-transitions.md#functions-in-any-slot).
 - The forms combine: `ss.by(age=[...])` may hold time series, a time series or a seasonal value may be multiplied by a number or a parameter, and a function may return any of the others' values.
@@ -126,7 +126,7 @@ A compartmental run has no individuals to draw for, so variation between people 
 
 To keep heterogeneity in `beta` or `rel_sus` in a compartmental run, bin it into a dimension (`sir.stratify(rel_sus=[...])`, [05-dimensions.md](05-dimensions.md)). Replacing a distribution by its mean is an approximation, so `approximations='error'` makes it `CapabilityError` and `approximations='allow'` silences the note ([12-backends.md](12-backends.md)).
 
-The distributions are Starsim's, under Starsim's names: `ss.normal`, `ss.lognorm_ex` (given the mean and standard deviation of the result), `ss.lognormal(log_mean=, log_std=)` (given those of the underlying normal), `ss.expon`, `ss.gamma`, `ss.weibull`, `ss.poisson`, `ss.nbinom`, `ss.uniform`, `ss.bernoulli`, `ss.constant`, and `ss.choice`. Starsim's other distributions, and any SciPy distribution through `ss.Dist`, remain available. Two are added: `ss.erlang(k=3, mean=...)`, which is `ss.gamma` with an integer shape (`ss.gamma(a=3, scale=...)`), given by its number of stages and its mean (sub-stages are also `stages=3` on the transition); and `ss.truncnorm`, a normal between `low` and `high`, as flepiMoP draws its parameters. `ss.choice` takes `p` as a row of probabilities per agent (a 2D array, or a function returning one; each row normalized), drawn with one random number per agent through the inverse CDF of that agent's row, so a choice whose probabilities differ by agent is one draw that keeps common random numbers.
+The distributions are Starsim's, under Starsim's names, with their parameters named by their moments where they have them ([02-types.md](02-types.md#distributions)): `ss.normal(mean, std)`, `ss.lognormal(mean=, std=)` (given the mean and standard deviation of the result) or `ss.lognormal(log_mean=, log_std=)` (given those of the underlying normal), `ss.expon`, `ss.gamma`, `ss.weibull`, `ss.poisson`, `ss.nbinom`, `ss.uniform`, `ss.bernoulli`, `ss.constant`, and `ss.choice`. Starsim's other distributions, and any SciPy distribution through `ss.Dist`, remain available. Two are added: `ss.erlang(k=3, mean=...)`, which is `ss.gamma` with an integer shape (`ss.gamma(shape=3, scale=...)`), given by its number of stages and its mean (sub-stages are also `stages=3` on the transition); and `ss.truncnorm`, a normal between `low` and `high`, as flepiMoP draws its parameters. `ss.choice` takes `p` as a row of probabilities per agent (a 2D array, or a function returning one; each row normalized), drawn with one random number per agent through the inverse CDF of that agent's row, so a choice whose probabilities differ by agent is one draw that keeps common random numbers.
 
 The unit of a distribution is given once, either with `unit=` or on one of its parameters; the other parameters of the same dimension take it:
 
@@ -170,7 +170,7 @@ sir  = ss.Disease(
 sim = ss.Sim(sir, pars=sc.loadjson('params/kenya_2024.json'), unit='day')
 ```
 
-`pars=` takes a dict of values by name (`beta`, or `sir.beta` when there is more than one module); values kept in a file are read into one first (`sc.loadjson()`, `pd.read_csv()`), since reading files is not the sim's job. One level of a value per level is named with brackets (`beta[a]`). Names it does not recognize raise a `KeyError`.
+`pars=` takes a dict of values of the model's parameters by name (`beta`, or `sir.beta` when there is more than one module), and nothing else: a setting of the sim is given by keyword (`stop=2030`), and in `pars=` is an error; values kept in a file are read into one first (`sc.loadjson()`, `pd.read_csv()`), since reading files is not the sim's job. One level of a value per level is named with brackets (`beta[a]`). Names it does not recognize raise a `KeyError`.
 
 ## Named data
 
@@ -178,23 +178,23 @@ A reference to data is part of the model: not just a contact matrix, but which o
 
 ```python
 ss.population('Kenya', year=2024)                     # size, age structure, sex ratio; returns an ss.People
-ss.contacts('Kenya', source='prem2021')           # an age contact matrix; returns a set of ss.MixingPools (layer='home' for one setting)
+ss.contacts('Kenya', study='prem2021')            # an age contact matrix; returns a set of ss.MixingPools (layer='home' for one setting)
 ss.geo.geography('Kenya', level=1)                          # its counties: names, populations, centroids, distances, borders
 ss.Sim(sir, data='weekly_cases.csv')              # observations, attached to results by column name
 ```
 
 ```python
-sim = ss.Sim(sir, people=ss.population('Kenya', year=2024), networks=ss.contacts('Kenya', source='prem2021'))
+sim = ss.Sim(sir, people=ss.population('Kenya', year=2024), networks=ss.contacts('Kenya', study='prem2021'))
 ```
 
-`ss.people`, `ss.contacts`, and `ss.geo.geography` are lowercase because they are loaders: each looks up named data and returns the ordinary object. `ss.People(n_agents=10_000)` remains the class.
+`ss.population`, `ss.contacts`, and `ss.geo.geography` are lowercase because they are loaders: each looks up named data and returns the ordinary object. `ss.People(n_agents=10_000)` remains the class.
 
 A named population gives the sim its size and the split of an age stratification that does not have one of its own, so it serves a compartmental model as well as agents; it makes the model agent-based only if it is given `n_agents=`. Without `year=`, it is the population in the year the sim starts, if the sim has dates, and otherwise in the year of the data's revision.
 
 **Bundled and pulled.** The data comes from [`starsim_data`](https://github.com/starsimhub/starsim_data) (`import starsim_data as ssd`), which does some of each:
 
 - **Bundled**: what is small and common. UN World Population Prospects population, birth, death, and migration rates for every country; the Prem (2021) age contact matrices by setting (`all`, `home`, `work`, `school`, `community`), for 177 countries (with Prem 2017 for the ten it lacks); and the first two administrative levels of every country, with their populations, centroids, areas, and borders. Reading it (`ssd.load('kenya', which='prem2021', kind='home')`) never touches the network, so it works offline and is reproducible from a pinned version. The bundled birth and death rates are estimates for single years, every ten years, so `ss.Births` and `ss.Deaths` given a place's name interpolate them linearly between those years (holding each for its decade overshot the UN's population of Kenya by 4–5% from 2000 to 2030); rates given as data of one's own hold each row until the next, as for data by period.
-- **Pulled**: everything else, fetched on demand and cached locally (`ssd.fetch('kenya', which='deaths', years=(2000, 2025))`): annual resolution, life tables, other projection variants, the earlier Prem (2017) and the Mistry (2021, by single year of age) contact matrices (`ss.contacts('Japan', source='mistry2021')`), and finer administrative levels or other years of population (which need the geospatial extra). The cache key includes the source and its version.
+- **Pulled**: everything else, fetched on demand and cached locally (`ssd.fetch('kenya', which='deaths', years=(2000, 2025))`): annual resolution, life tables, other projection variants, the earlier Prem (2017) and the Mistry (2021, by single year of age) contact matrices (`ss.contacts('Japan', study='mistry2021')`), and finer administrative levels or other years of population (which need the geospatial extra). The cache key includes the source and its version.
 - **Versioned**: each UN revision is kept as a separate store, so a new release adds data and does not change what an existing model loads; `revision=` pins one.
 - **Provenance**: every data set records its source and license (`ssd.provenance('prem2017')`).
 

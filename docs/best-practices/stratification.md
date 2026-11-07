@@ -12,8 +12,8 @@ authorship:
 1. **One concept covers age, space, risk, strain, and vaccination status.** They are all dimensions; the difference is which structure they carry, not what kind of thing they are.
 2. **Every dimension is an agent property; not every agent property is a dimension.** A property becomes a dimension when you stratify by it. Continuous properties (age, CD4 count) are binned for that purpose and stay continuous in an agent-based run.
 3. **Stratification is an operator applied to a finished model.** `sir.stratify(age=[0, 15, 65])` stratifies `sir`; `inplace=False` returns a stratified copy and leaves the original untouched, so the two can be compared. A property of people (age, sex, place) is usually stratified once for the whole sim, `sim.stratify(age=[0, 15, 65])`; a dimension that belongs to one disease (strain, resistance) on that disease.
-4. **The base model does not mention strata; the stratification supplies multiplicative adjustments.**
-5. **Some dimensions carry structure.** Age implies aging (where people are born and die, or with `use_aging=True`). Space may have movement between patches, or none. Strain changes who can infect whom.
+4. **The base model does not mention strata; values by level are multipliers** (`ss.by()`, in a rate or in a modifier).
+5. **Some dimensions carry structure.** Age implies aging (where people are born and die, or with `aging=True`). Space may have movement between patches, or none. Strain changes who can infect whom.
 6. **Strain can be a dimension or a second disease.** Support both, and say when each fits.
 7. **Check the restrictions that follow from the structure**, with errors that say what to do.
 
@@ -61,7 +61,7 @@ summer2 has `Multiply` and `Overwrite`. Its own implications section asks "consi
 
 ## The specification
 
-[05-dimensions.md](../design/05-dimensions.md) specifies `stratify` on a model or on the sim (in place by default, `inplace=False` for a copy), its keywords (`split=`, `adjust=`, `states=`, `where=`, `kind=`, `mobility=`), the kinds of dimension, `ss.transfer`, strains carried together (`ss.Strains`, with `ss.immunity`), the agent-based and compartmental readings of one declaration, and reading stratified results (`select()`, `by()`). Values by stratum are `ss.by` ([04-parameters.md](../design/04-parameters.md)), and places and mobility are in [06-routes.md](../design/06-routes.md). The docs show how to use these in [Stratification](https://starsim.org/v4/user_guide/building_stratification.html).
+[05-dimensions.md](../design/05-dimensions.md) specifies `stratify` on a model or on the sim (in place by default, `inplace=False` for a copy), its dimensions and their options (`ss.levels()`, with `states=`, `who=`, `kind=`, `mobility=`, and `fractions=`), the kinds of dimension, `ss.transfer`, strains carried together (`ss.Strains`, with `ss.immunity`), the agent-based and compartmental readings of one declaration, and reading stratified results (`select()`, `by()`). Values by stratum are `ss.by` ([04-parameters.md](../design/04-parameters.md)), and places and mobility are in [06-routes.md](../design/06-routes.md). The docs show how to use these in [Stratification](https://starsim.org/v4/user_guide/building_stratification.html).
 
 ## Trade-offs
 

@@ -21,11 +21,11 @@ There are two ways to write an interaction, and both are first-class:
 ```python
 ss.modify(target, multiply=None, add=None, set=None,     # exactly one of these three (or efficacy=, which is multiply=1 - efficacy)
           efficacy=None, share=None, network=None,
-          where=None, start=None, stop=None, when=None, hold=None, name=None)
+          who=None, when=None, until=None, name=None)
 ```
 
 ```python
-ss.modify(hiv.rel_trans, multiply=2.0, where=syphilis.active)
+ss.modify(hiv.rel_trans, multiply=2.0, who=syphilis.active)
 ```
 
 Read as: *for people with active syphilis, multiply HIV transmissibility by 2.*
@@ -36,11 +36,10 @@ Read as: *for people with active syphilis, multiply HIV transmissibility by 2.*
 | `multiply=`, `add=`, `set=` | what to do to it; exactly one |
 | `efficacy=` | for protection (a condom, a needle program, a microbicide), the share of the risk it removes: the same as `multiply=1 - efficacy`; giving both raises |
 | `share=` | with `multiply=` or `efficacy=`, the share of acts (or, on a route without acts, of contacts) it acts on: since hazards add, the hazard is multiplied by `1 − share·(1 − multiply)`, exactly. A number, an `ss.timeseries`, an `ss.by`, or, with `network=` and as agents only, a function of the network returning one value per edge (`lambda net: net.edges.condoms`) |
-| `network=` | for a modifier of a transmission, the network or networks (by name) it applies on, e.g. condoms on the sexual network and not the needle-sharing one; a name that is not a route raises a `ValueError`, and a target that is not a transmission raises. `where=` is then of the people who would be infected. Under the compartmental solvers it multiplies the contacts through that route's term of the mixing, by group |
-| `where=` | who it applies to: a [condition](#conditions). Omitted means everyone |
-| `start=`, `stop=` | the period it applies in: from the first step that starts at or after `start` (step 0 for the start of the run) up to, but not including, the first that starts at or after `stop`. Times are dates, durations since the start of the sim, or numbers in the sim's unit, as for `at=` of a delivery ([08-interventions.md](08-interventions.md#delivery)). A `start` outside the sim raises a `ValueError`; a `stop` after the end never stops it. Omitted means always |
-| `when=` | a function of the sim returning `True` or `False`, for anything `start`/`stop` cannot say. The modifier applies on exactly the steps where it returns `True` |
-| `hold=` | once `where=` (or `when=`) selects someone, the modifier stays on for them for at least this long (a bare number is in the sim's unit). This is the one memory a modifier has; any other rule with memory is `step()` code ([08-interventions.md](08-interventions.md#triggers)) |
+| `network=` | for a modifier of a transmission, the network or networks (by name) it applies on, e.g. condoms on the sexual network and not the needle-sharing one; a name that is not a route raises a `ValueError`, and a target that is not a transmission raises. `who=` is then of the people who would be infected. Under the compartmental solvers it multiplies the contacts through that route's term of the mixing, by group |
+| `who=` | who it applies to: a [condition](#conditions) on people (or a state by its path, `who='sir.I'`), a condition on a count (`sir.I.n > 1000`), or a function of the sim. Omitted means everyone |
+| `when=` | when it applies, on time alone, so it can be read before the run: `ss.schedule(start=, stop=)` for a window, from the first step that starts at or after `start` up to, but not including, the first that starts at or after `stop`; `ss.schedule()` with times or `every=` for those steps only; or a function of the date of each step (`lambda now: now.month in [6, 7, 8]`). Times are as for any `ss.schedule()` ([08-interventions.md](08-interventions.md#delivery)): a date or a bare year in a sim with a calendar, a duration from 0 in one without. A `start` outside the sim raises a `ValueError`; a `stop` after the end never stops it. A bare time or list given to `when=` raises, suggesting `ss.schedule(start=...)`. Omitted means always; a condition on anything other than time goes in `who=` |
+| `until=` | how long it stays on once `who=` (or `when=`) selects someone: a duration, at least this long (a bare number is in the sim's unit), or a condition, until it holds (a lockdown that starts at one level of cases and ends at a lower one). This is the one memory a modifier has; any other rule with memory is `step()` code ([08-interventions.md](08-interventions.md#triggers)) |
 | `name=` | used in `describe()` and `what_modifies()`; defaults to the variable name, else to what it does (`beta_multiply`) |
 
 Condoms and similar per-act protection are modifiers of each disease's transmission on a route, with the share of acts they are used in; the efficacy differs by pathogen, so there is one modifier for each disease:
@@ -49,16 +48,16 @@ Condoms and similar per-act protection are modifiers of each disease's transmiss
 use = ss.timeseries({2000: 0.05, 2020: 0.3})                                       # share of acts with a condom
 condoms = [ss.modify(ng.infection, efficacy=0.9, share=use, network='sexualnet'),    # gonorrhea
            ss.modify(ct.infection, efficacy=0.4, share=use, network='sexualnet')]    # chlamydia
-nsp = ss.modify(hiv.infection, multiply=0.2, share=0.5, network='needles', start=2005)   # needle and syringe programs
+nsp = ss.modify(hiv.infection, multiply=0.2, share=0.5, network='needles', when=ss.schedule(start=2005))   # needle and syringe programs
 ```
 
 A modifier is passed to the sim like any other module, in `connectors=` (interactions that are part of the biology) or `interventions=` (policy). Which list holds it does not change what it does, `when=` included: a modifier is evaluated where the engine reads the quantity it acts on in a step, whichever list it is in (the lists differ in order only for modules with a `step()` of their own). There is no separate `modifiers=` list.
 
 ```python
 coinfection = [
-    ss.modify(hiv.rel_trans,      multiply=2.0, where=syphilis.active),
-    ss.modify(hiv.rel_sus,        multiply=2.7, where=syphilis.active),
-    ss.modify(syphilis.rel_sus,   multiply=1.5, where=hiv.infected & ~hiv.on_art),
+    ss.modify(hiv.rel_trans,      multiply=2.0, who=syphilis.active),
+    ss.modify(hiv.rel_sus,        multiply=2.7, who=syphilis.active),
+    ss.modify(syphilis.rel_sus,   multiply=1.5, who=hiv.infected & ~hiv.on_art),
 ]
 sim = ss.Sim(diseases=[hiv, syphilis], networks=ss.SexualNet(), connectors=coinfection)
 ```
@@ -81,11 +80,11 @@ targets = [
 ]
 ```
 
-A target is a reference to the quantity, not a copy of its current value: `ss.modify(sir.pars.beta, ...)` refers to the parameter, and the string path is the same reference spelled as text, for when the object is not in scope. A transfer ([05-dimensions.md](05-dimensions.md#moving-between-coordinates-sstransfer)) is a target as a transition is. The contacts of a network are a target only as a path, since `school.pars.n_contacts` is a plain value. It works under every solver; as agents, a multiplier below 1 makes each contact happen with that probability in a step. A parameter of a disease written as code is a target as a declared one is. Its code reads a plain value, `self.pars.x`, which is one number, so while the sim runs that value is the modified one for everyone (the base value is kept, and is back in `pars` once the run ends); this takes a number or a rate, probability, or duration, and a distribution or a value by level raises a `ValueError`. A modifier that differs between people (`where=`, or an amount with one value per person) needs a value per person, which code reads with `self.current_value('x', uids)`, in the parameter's own type, and says so in its class, `allow_modifiers = ('x',)`, as for `rel_sus`. `current_value()` means the same for a declared disease. It has no transmission to name, so a modifier on a route is of its `rel_sus` (`ss.modify(hiv.rel_sus, efficacy=0.8, share=lambda net: net.edges.condoms, network='mf')`), of the people who would be infected over it, as for a declared disease's transmission; the modifiers of a network's contacts apply to it as well.
+A target is a reference to the quantity, not a copy of its current value: `ss.modify(sir.pars.beta, ...)` refers to the parameter, and the string path is the same reference spelled as text, for when the object is not in scope. A transfer ([05-dimensions.md](05-dimensions.md#moving-between-coordinates-sstransfer)) is a target as a transition is. The contacts of a network are a target only as a path, since `school.pars.n_contacts` is a plain value. It works under every solver; as agents, a multiplier below 1 makes each contact happen with that probability in a step. A parameter of a disease written as code is a target as a declared one is. Its code reads a plain value, `self.pars.x`, which is one number, so while the sim runs that value is the modified one for everyone (the base value is kept, and is back in `pars` once the run ends); this takes a number or a rate, probability, or duration, and a distribution or a value by level raises a `ValueError`. A modifier that differs between people (`who=`, or an amount with one value per person) needs a value per person, which code reads with `self.current_value('x', uids)`, in the parameter's own type, and says so in its class, `allow_modifiers = ('x',)`, as for `rel_sus`. `current_value()` means the same for a declared disease. It has no transmission to name, so a modifier on a route is of its `rel_sus` (`ss.modify(hiv.rel_sus, efficacy=0.8, share=lambda net: net.edges.condoms, network='mf')`), of the people who would be infected over it, as for a declared disease's transmission; the modifiers of a network's contacts apply to it as well.
 
 A modifier on a transition chosen with `p=`, one of several branches out of a state, changes its probability, and the other branches share the rest. If the target cannot be resolved when the sim is built (a plain number, a boolean state, a name that does not exist), a `KeyError` is raised, listing the quantities that can be modified. Boolean flips and anything else that is not "change a number" belong in `step()` code.
 
-Nothing is accepted and then ignored. When the sim is built, after every modifier, change, and efficacy of a product has been registered against the quantity it changes, one pass asks the module each quantity belongs to whether it reads it, and raises a `ValueError` if not, naming the modifier, the quantity, and why. A declared module answers from its graph: a plain parameter (not an `ss.par` of its model, so only its own code reads it), the `rel_sus` or `rel_trans` of a module with no acquisition or transmission, a condition on people (`where=`, or holding a product) on an inflow or a transition of counts, and an efficacy on a transition with several destinations (name the destination, e.g. `'precin.C'`) are refused. A disease written as code reads its `rel_sus` and `rel_trans` only if it is a transmitted `ss.AgentDisease`; they are applied in `transmit_route()`, so a disease that overrides `transmit()` (e.g. to loop over variants), `transmissibility()`, or `susceptibility()` has them too. A declared disease's own `transmit(transition)` that calls `super()` has them as the solver applies them; what it adds to or takes from that is its own. It reads a parameter for each person only if it says so in `allow_modifiers`; otherwise a modifier that differs between people raises a `ValueError` (`where=` when the sim is built; an amount with one value per person raises `CapabilityError` on the first step it applies), since `self.pars.x` is one number. A modifier of an inflow (`ss.change(mal.emergence, by=0.5)`) applies under every solver. Likewise `stratify()` on a disease written as code, and a sim stratification that nothing uses (no declared module, no module with values by it, and no result kept by group, `ss.Result(..., groups=True)`), raise a `ValueError`.
+Nothing is accepted and then ignored. When the sim is built, after every modifier, change, and efficacy of a product has been registered against the quantity it changes, one pass asks the module each quantity belongs to whether it reads it, and raises a `ValueError` if not, naming the modifier, the quantity, and why. A declared module answers from its graph: a plain parameter (not an `ss.par` of its model, so only its own code reads it), the `rel_sus` or `rel_trans` of a module with no acquisition or transmission, a condition on people (`who=`, or holding a product) on an inflow or a transition of counts, and an efficacy on a transition with several destinations (name the destination, e.g. `'precin.C'`) are refused. A disease written as code reads its `rel_sus` and `rel_trans` only if it is a transmitted `ss.AgentDisease`; they are applied in `transmit_route()`, so a disease that overrides `transmit()` (e.g. to loop over variants), `transmissibility()`, or `susceptibility()` has them too. A declared disease's own `transmit(transition)` that calls `super()` has them as the solver applies them; what it adds to or takes from that is its own. It reads a parameter for each person only if it says so in `allow_modifiers`; otherwise a modifier that differs between people raises a `ValueError` (`who=` when the sim is built; an amount with one value per person raises `CapabilityError` on the first step it applies), since `self.pars.x` is one number. A modifier of an inflow (`ss.modify(mal.emergence, multiply=0.5)`) applies under every solver. Likewise `stratify()` on a disease written as code, and a sim stratification that nothing uses (no declared module, no module with values by it, and no result kept by group, `ss.Result(..., groups=True)`), raise a `ValueError`.
 
 ### How modifiers combine
 
@@ -103,7 +102,7 @@ that is, **set, then multiply, then add**. The rule does not depend on the order
 - A rate, duration, or multiplier that the modifiers make negative is set to 0 where it is, and branch probabilities that they make sum to more than 1 are scaled to sum to 1, with a note (once per quantity); `what_modifies()` says so too.
 - `add=` and `set=` are for parameters only. On a per-person quantity (`sir.rel_sus`, `sir.rel_trans`) or a transition, the modifier acts on a multiplier of each person's own value, which `set=` or `add=` would replace, so they raise and only `multiply=` is accepted. One exception: `add=` on an inflow (a transition from `ss.unborn` or `ss.outside`, whose rate is the whole flow) adds an amount per unit time from outside the model, e.g. CFUs added to a reservoir (`ss.modify(typhoid.shedding, add=ss.perday(4e6))`), under every solver; when the sim is built the inflow's rate gets a parameter `<inflow>_added` of 0, which the modifier adds to (TY15).
 
-Stratification adjustments ([05-dimensions.md](05-dimensions.md)), product efficacies ([08-interventions.md](08-interventions.md)), and protection between strains (`ss.immunity`, below) are multipliers of this kind and combine with `ss.modify` by the same rule.
+Values by level (`ss.by()`, [05-dimensions.md](05-dimensions.md)), product efficacies ([08-interventions.md](08-interventions.md)), and protection between strains (`ss.immunity`, below) are multipliers of this kind and combine with `ss.modify` by the same rule.
 
 ### Protection between strains: `ss.immunity`
 
@@ -144,7 +143,7 @@ A quantity with no active modifier has the same base and effective value. Three 
 
 Per-person values exist only in an agent-based run, so `current_value()` of `rel_sus`, `rel_trans`, or some agents needs agents; in a compartmental run the modifiers act on the groups' rates inside the solver, and only a parameter's value as a whole can be read.
 
-A modifier never changes the base, which is why nothing has to be restored when it ends. One person, followed through a campaign that halves susceptibility (`ss.modify(sir.rel_sus, multiply=0.5, where=campaign.protected)`):
+A modifier never changes the base, which is why nothing has to be restored when it ends. One person, followed through a campaign that halves susceptibility (`ss.modify(sir.rel_sus, multiply=0.5, who=campaign.protected)`):
 
 ```python
 sir.rel_sus[uid] = 0.8              # assign: the base is 0.8
@@ -169,7 +168,7 @@ A quantity with no modifiers behaves exactly as in Starsim.
 
 ### Time-varying multipliers
 
-`multiply=`, `add=`, and `set=` accept everything a parameter accepts ([04-parameters.md](04-parameters.md)): a number, a typed quantity, an `ss.par` (which can then be fitted, or set by name with `pars=`), `ss.timeseries(...)`, `ss.seasonal(...)`, `ss.by(age=[...])`, or a function of the sim returning a scalar or one value per agent or group. An expression of people's properties or of states, of this module or another, is read for each person as `where=` reads them, a state being 1 for those in it (`multiply=ss.person.age/50`, `multiply=1 - 0.9*contraception.on`). A value that is set or added is in the target's own type.
+`multiply=`, `add=`, and `set=` accept everything a parameter accepts ([04-parameters.md](04-parameters.md)): a number, a typed quantity, an `ss.par` (which can then be fitted, or set by name with `pars=`), `ss.timeseries(...)`, `ss.seasonal(...)`, `ss.by(age=[...])`, or a function of the sim returning a scalar or one value per agent or group. An expression of people's properties or of states, of this module or another, is read for each person as `who=` reads them, a state being 1 for those in it (`multiply=ss.person.age/50`, `multiply=1 - 0.9*contraception.on`). A value that is set or added is in the target's own type.
 
 ```python
 school   = ss.RandomNet(n_contacts=10, name='school')
@@ -180,11 +179,11 @@ sim = ss.Sim(sir, networks=school, interventions=[seasonal, closures, caution], 
 sim.run()
 ```
 
-A modifier that depends only on time, and on who it applies to only through states and stratifications (`where=hiv.acute`), is worked out before the run, so a compartmental run stays in one call to the kernels; one with `when=`, `hold=`, or a function as its amount is applied step by step.
+A modifier that depends only on time, and on who it applies to only through states and stratifications (`who=hiv.acute`), is worked out before the run, so a compartmental run stays in one call to the kernels, and so is a condition on a count where it can be part of the rates; one with a function of the date in `when=`, `until=`, or a function as its amount is applied step by step.
 
 Protection that wanes with time since a dose is a property of a product (`waning=`, [08-interventions.md](08-interventions.md#products)).
 
-A change at given times is a modifier whose amount is a step function of time, starting at its first time: `ss.modify(sir.pars.beta, multiply=ss.timeseries({'2020-03-15': 0.5, '2020-06-01': 1.0}), start='2020-03-15')` (with `set=` for values rather than multipliers). Each value holds from its time until the next (`mode='constant'`, the default), and `stop=`, `when=`, and `where=` work as for any modifier. (`ss.change(at=, by=, to=)` was a shorthand for this; it was removed as no shorter, and `ss.converters.migrate` rewrites it.)
+A change at given times is a modifier whose amount is a step function of time, starting at its first time: `ss.modify(sir.pars.beta, multiply=ss.timeseries({'2020-03-15': 0.5, '2020-06-01': 1.0}), when=ss.schedule(start='2020-03-15'))` (with `set=` for values rather than multipliers). Each value holds from its time until the next (`interpolation='step'`, the default), and `when=`, `who=`, and `until=` work as for any modifier.
 
 ### `sim.what_modifies()`
 
@@ -197,7 +196,7 @@ For `rel_sus` in an agent-based sim:
 ```text
 sir.rel_sus
   modifiers
-    masks            multiply=0.6   where=sir.S   start=5
+    masks            multiply=0.6   who=sir.S   when=ss.schedule(start=5)
 ```
 
 Modifiers are declared, so they are always listed: every `ss.modify` and product efficacy on the target, with its operation, condition, and period. The list MUST be complete; it is available before the sim has run (`what_modifies()` initializes the sim if needed). If the modifiers took the quantity out of its range during a run, a line says so. Code that assigns the base value directly (`hiv.rel_trans[uids] = ...`) is not a modifier, and is not tracked.
@@ -206,7 +205,7 @@ Scaling a shared quantity through `ss.modify` (or `*=`) is preferred to overwrit
 
 ## Conditions
 
-A condition says who something applies to. It is used for `where=` here and in the deliveries of [08-interventions.md](08-interventions.md). There are no global condition names (`ss.age`, `ss.sex`, `ss.time` and the like do not exist): conditions are written against the real attributes of the people and modules in the sim.
+A condition says who something applies to. It is used for `who=` here and in the events and deliveries of [08-interventions.md](08-interventions.md). There are no global condition names (`ss.age`, `ss.sex`, `ss.time` and the like do not exist): conditions are written against the real attributes of the people and modules in the sim.
 
 ### A function of the sim
 
@@ -236,7 +235,7 @@ This works because a state array that has not been initialized builds an express
 - **A lazy condition is evaluated each time it is needed during a run**, against the sim it is running in, using the current values at that point in the loop. It refers to arrays by module and name, so the same condition works in every copy of a sim made by `ss.parallel` or calibration.
 - **On an initialized array, the same operations evaluate immediately**, as in Starsim today. Inside `step()`, `self.sim.people.age > 65` is an ordinary boolean array.
 - Using a lazy condition where Python needs a single truth value (`if cond:`, `and`, `or`, `not`) is an error that says to use `&`, `|`, `~` instead. Anything the operators above cannot express is written as a function of the sim.
-- A boolean state on its own is a condition (`where=syphilis.active`), and a lazy condition (an `ss.Cond`) prints as the expression it was built from, which is what `describe()` shows.
+- A boolean state on its own is a condition (`who=syphilis.active`), and a lazy condition (an `ss.Cond`) prints as the expression it was built from, which is what `describe()` shows.
 - **A condition in a rate is 1 or 0** for each person (as compartments, the share of each group it holds for), and a property is the person's value, so `0.3*(ss.person.age > 65)` and `b*ss.person.urban` are rates ([03](03-states-and-transitions.md)). Arithmetic with a parameter makes an expression, not a condition.
 - `tr.incidence(over=, by=)` is a condition on how many went through a transition over a window, as a share of the people at the same level of a stratification, so that each place can apply a rule on its own: `sir.infection.incidence(over=ss.days(7), by='patch') > 200e-5`.
 
@@ -258,7 +257,7 @@ CapabilityError: a condition uses people.age and 70, but the model's age bins ar
 
 The lazy form is checked this way. A function of the sim that compares ages with a number that is not a bin edge is not: it runs, with each group at the age of its midpoint.
 
-A condition on another module's state (`where=syphilis.active` on an HIV quantity) needs the two modules' states tracked jointly. In an agent-based run that is free. In a compartmental run the two diseases' states are tracked jointly, each as a dimension of the other (so `hiv.results.I.by('syph')` splits HIV by syphilis state), and the model grows to the product. The crossed diseases then run as one model ([12-backends.md](12-backends.md)), and each disease's results are its view of the product. There is one copy of the product: each disease's compartments are a view of it, so a change made in code to one disease's people (an intervention, `ss.move()`) is the others' at once, and the crossing is stepped and run by the same code as one disease, with the last disease to step taking the step for all of them (decided 2026-10-27). Diseases are also tracked jointly when people are born or die ([03-states-and-transitions.md](03-states-and-transitions.md)) or die of one of them (a transition to `ss.dead`), since those people leave every disease; the members of a family (`ss.Strains`) already have people who die of one die in the others, so dying of a member crosses the family only with diseases outside it. The product is counted before anything is made, including the stages of dwell times, the slots of fixed delays, and a copy of each count for each combination of the others: above `ss.options.max_joint` compartments (10,000 by default, counting the joint states in each group of the other dimensions), `auto` runs agents, and a compartmental solver that was asked for raises `CapabilityError` naming the limit, which can be raised where there is the memory. `describe()` shows why the diseases are tracked jointly, the product's size, the memory of a whole run, and what is assumed: the diseases start independent of each other, and step together at one timestep.
+A condition on another module's state (`who=syphilis.active` on an HIV quantity) needs the two modules' states tracked jointly. In an agent-based run that is free. In a compartmental run the two diseases' states are tracked jointly, each as a dimension of the other (so `hiv.results.I.by('syph')` splits HIV by syphilis state), and the model grows to the product. The crossed diseases then run as one model ([12-backends.md](12-backends.md)), and each disease's results are its view of the product. There is one copy of the product: each disease's compartments are a view of it, so a change made in code to one disease's people (an intervention, `ss.move()`) is the others' at once, and the crossing is stepped and run by the same code as one disease, with the last disease to step taking the step for all of them (decided 2026-10-27). Diseases are also tracked jointly when people are born or die ([03-states-and-transitions.md](03-states-and-transitions.md)) or die of one of them (a transition to `ss.dead`), since those people leave every disease; the members of a family (`ss.Strains`) already have people who die of one die in the others, so dying of a member crosses the family only with diseases outside it. The product is counted before anything is made, including the stages of dwell times, the slots of fixed delays, and a copy of each count for each combination of the others: above `ss.options.max_joint` compartments (10,000 by default, counting the joint states in each group of the other dimensions), `auto` runs agents, and a compartmental solver that was asked for raises `CapabilityError` naming the limit, which can be raised where there is the memory. `describe()` shows why the diseases are tracked jointly, the product's size, the memory of a whole run, and what is assumed: the diseases start independent of each other, and step together at one timestep.
 
 ## Plain code in `step()`
 
@@ -287,7 +286,7 @@ anc_testing = ss.screen(hiv_test,
     coverage = p_test,
 )
 diagnosed = hiv_test.positive.ever                  # remembered per person by the test's outcome, so no state is written
-treatment = ss.treat(art, on=anc_testing.positive) # what a positive test leads to is a step of its own
+treatment = ss.treat(art, when=anc_testing.positive) # what a positive test leads to is a step of its own
 ```
 
 **As a module with `step()`**:
@@ -315,7 +314,7 @@ The two are the same model. The first is shorter and also runs under a compartme
 Two pieces of guidance for custom code, neither of them enforced:
 
 - **For booleans and events, write directly.** `hiv.diagnosed[positive] = True` has no combination problem.
-- **For scaling a number another module owns, use a modifier and flip a flag.** Declare `ss.modify(hiv.rel_trans, multiply=0.04, where=self.suppressed)` once, and have `step()` set and clear `self.suppressed`. The base stays intact, other modules' modifiers still apply, and there is nothing to restore. Writing `hiv.rel_trans[uids] = 0.04` directly is allowed, and sets the base.
+- **For scaling a number another module owns, use a modifier and flip a flag.** Declare `ss.modify(hiv.rel_trans, multiply=0.04, who=self.suppressed)` once, and have `step()` set and clear `self.suppressed`. The base stays intact, other modules' modifiers still apply, and there is nothing to restore. Writing `hiv.rel_trans[uids] = 0.04` directly is allowed, and sets the base.
 
 The same pattern is how a rule with memory is written: `step()` keeps whatever it needs to remember and sets a flag, and a modifier reads the flag ([08-interventions.md](08-interventions.md#triggers)).
 
@@ -332,7 +331,7 @@ Order is Starsim's ordered loop ([10-execution.md](10-execution.md)). Each step,
 What this means for interactions:
 
 - **Each module sees the current values when it runs.** A chain can therefore complete within one step: infection, testing, and treatment all happen in the same step if the modules are ordered that way.
-- **A modifier follows the state it depends on.** A `where=` condition is evaluated where the quantity is used, against the current values ([10-execution.md](10-execution.md#where-ssmodify-is-evaluated)). A `when=` function is a function of the sim as it is at that moment and nothing else; apart from `hold=`, the modifier keeps no record of what it returned on earlier steps.
+- **A modifier follows the state it depends on.** A `who=` condition is evaluated where the quantity is used, against the current values ([10-execution.md](10-execution.md#where-ssmodify-is-evaluated)). A `when=` function is a function of the date of the step and nothing else; apart from `until=`, the modifier keeps no record of what it returned on earlier steps.
 - **Mutual dependence is fine.** HIV raises syphilis susceptibility while syphilis raises HIV transmissibility; each reads the other's current value, and the order decides which goes first. There are no cycle errors. Where the order matters, the convention is to run last the module whose accuracy matters most.
 - **Any effect of ordering is of order `dt`.** `sim.check_dt()` reruns with a smaller step and shows how much the results change.
 
@@ -345,7 +344,7 @@ What this means for interactions:
 - **Queued updates, named phases, and ordering derived from declarations.** The ordered loop is simpler, allows within-step chains, and handles mutual dependence.
 - **Last-write-wins as the only way to share a quantity.** `ss.modify` keeps the base and combines by a stated rule; direct writes are still allowed, and are not tracked.
 - **Additive combination as the default.** Available as `add=`.
-- **`min_duration=` on `ss.modify`, or any other memory inside a modifier.** A modifier is a function of the current state of the sim, plus `hold=` (stay on for at least this long once selected, as MEmilio's dynamic NPIs do). Any other rule that remembers is a few lines of `step()`, where the memory is visible.
+- **`min_duration=` on `ss.modify`, or any other memory inside a modifier.** A modifier is a function of the current state of the sim, plus `until=` (stay on for at least this long once selected, as MEmilio's dynamic NPIs do, or until a condition holds). Any other rule that remembers is a few lines of `step()`, where the memory is visible.
 - **Write tracking on by default.** It has a cost on every assignment, and most runs never ask the question.
 - **A separate object for protective measures** (a "tool" carrying fixed multipliers). A product's efficacy is a modifier on the people who hold it.
 - **`add=` on `rel_sus` for cross-immunity.** It would replace each person's own value; the combination rule is in `ss.immunity`.

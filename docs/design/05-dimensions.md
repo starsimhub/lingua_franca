@@ -15,9 +15,9 @@ Justified by [best-practices/stratification.md](../best-practices/stratification
 
 Every stratification dimension is a property of a person (age, sex, patch, risk group, CD4 count). Not every property is a dimension: a property becomes one when a model is stratified by it.
 
-- In an agent-based run, the property is a per-agent array on `sim.people`, exactly as in Starsim. If it already exists (`age`, `female`, a float state such as `hiv.cd4`), stratifying uses it. If it does not (`risk`), stratifying creates it and assigns values using `split`.
+- In an agent-based run, the property is a per-agent array on `sim.people`, exactly as in Starsim. If it already exists (`age`, `female`, a float state such as `hiv.cd4`), stratifying uses it. If it does not (`risk`), stratifying creates it and assigns values by the shares of its levels.
 - In a compartmental run, the property becomes an axis: every state it applies to is split into one compartment per level. The split compartments are internal; results are read by dimension ([below](#reading-stratified-results)), never by a compartment's generated name.
-- A continuous property is binned for the purpose of stratifying. In an agent-based run it stays continuous, and the bins are used only for adjustments, group-level conditions, and results.
+- A continuous property is binned for the purpose of stratifying. In an agent-based run it stays continuous, and the bins are used only for values by level, group-level conditions, and results.
 
 A dimension name refers to one property across the whole sim, so two modules stratified by `patch` share the same patches, and two diseases stratified by `age` use the same age groups ([below](#stratifying-the-sim-or-the-disease)).
 
@@ -28,16 +28,18 @@ sir.stratify(age=[0, 15, 65])        # a disease; the same as ss.Disease(..., st
 sim.stratify(age=[0, 15, 65])        # every disease in the sim; the same as ss.Sim(..., stratify=dict(age=[0, 15, 65]))
 ```
 
-The share of people in each level can be given with the levels, as a dict (`age={0: 0.3, 15: 0.6, 65: 0.1}`), or as `fractions=` (`age=[0, 15, 65], fractions=[0.3, 0.6, 0.1]`).
+Every keyword is a dimension, with its levels: bin edges or labels as a list, or a dict of the share of people in each level (`age={0: 0.3, 15: 0.6, 65: 0.1}`). Several dimensions can be given in one call, whatever their options (`sir.stratify(age=[0, 15, 65], risk={'low': 0.8, 'high': 0.2})`), and a dimension may be called anything, `states` and `kind` included. The options needed less often go with the levels in `ss.levels()` ([below](#the-full-form-sslevels)).
 
 `stratify()` **stratifies the model it is given, in place, and returns it**. In place is the default because it is what is wanted nearly every time, and a line like `sir.stratify(age=...)` that left `sir` unchanged would be the more common mistake. Because the model is returned, the call can go straight into the sim, and calls chain, each one stratifying the result of the one before:
 
 ```python
 sim = ss.Sim(sir.stratify(age=[0, 15, 65]), networks=ss.contacts('Kenya'))
 
-sir.stratify(age=[0, 15, 65], adjust={'recovery': [1.5, 1.0, 0.5]})
-sir.stratify(risk={'low': 0.8, 'high': 0.2}, adjust={'infection': [1.0, 3.0]})
+sir.stratify(risk={'low': 0.8, 'high': 0.2})
+ss.modify(sir.infection, multiply=ss.by(risk=[1.0, 3.0]))      # a value by level, for a disease already written
 ```
+
+A value by level is `ss.by()` ([04-parameters.md](04-parameters.md)), where the rate is written (`S >> I @ beta*ss.by(risk=[1, 3])*I`) or, for a disease already written, in a modifier ([07-effects.md](07-effects.md)); the two give the same results. `stratify()` has no `adjust=`.
 
 `inplace=False` returns a stratified copy and leaves the original untouched, for running the two side by side:
 
@@ -46,39 +48,41 @@ sir_age = sir.stratify(age=[0, 15, 65], inplace=False)     # sir is unchanged
 ss.parallel(plain=ss.Sim(sir), by_age=ss.Sim(sir_age, networks=ss.contacts('Kenya')))
 ```
 
-Stratifying a model again in the same way (the same levels, split, and adjustments) does nothing, with a note: this is what a notebook cell that is run twice does. Stratifying it by a dimension it already has in another way raises a `ValueError`.
+Stratifying a model again in the same way (the same levels and options) does nothing, with a note: this is what a notebook cell that is run twice does. Stratifying it by a dimension it already has in another way raises a `ValueError`.
 
-The full signature:
+### The full form: `ss.levels`
 
 ```python
 model.stratify(
-    age      = [0, 15, 65],  # the dimension, by name: bin edges, labels, or a geography; or a dict of the share in each level
-    split    = None,       # share of the population in each level
-    adjust   = None,       # {transition_name: [multiplier per level]}; also rel_trans and rel_sus
-    states   = None,       # which states the dimension applies to (default: every state that is people)
-    where    = None,       # which existing groups are split, e.g. dict(sex='female') (default: all)
-    mobility = None,       # movement between levels (space only)
-    kind     = None,       # the kind, if not the one its value gives: 'space', 'age', or 'plain' (strains are ss.Strains on the disease)
-    inplace  = True,       # False returns a stratified copy and leaves the model unchanged
-    **transitions,         # extra transitions that only exist once the dimension does
+    age      = [0, 15, 65],  # each dimension, by name: bin edges, labels, a geography, a dict of the share in each level, or ss.levels()
+    inplace  = True,         # False returns a stratified copy and leaves the model unchanged
+    **transitions,           # extra transitions that only exist once the dimension does
+)
+
+ss.levels(
+    levels,                  # bin edges, labels, a dict of the share in each level, or an ss.geo.geography
+    states    = None,        # which states the dimension applies to (default: every state that is people)
+    who       = None,        # which groups it applies to: a condition on other dimensions, e.g. ss.person.female (default: all)
+    kind      = None,        # the kind, if not the one its value gives: 'space', 'age', or 'plain' (strains are ss.Strains on the disease)
+    mobility  = None,        # movement between levels (space only)
+    fractions = None,        # shares that depend on other dimensions: an ss.by over them and this one
 )
 ```
 
-Several dimensions MAY be given in one call when none of them needs options (`sir.stratify(age=[0, 15, 65], sex=['f', 'm'])`). When `split`, `adjust`, or the other options are used, give one dimension per call so it is clear which dimension they belong to. A keyword whose value is an `ss.Transition` (usually an `ss.transfer`) is added to the new model under that name; this is how transitions that move people along the new dimension are declared ([below](#moving-between-coordinates-sstransfer)).
+`sir.stratify(severity=ss.levels({'mild': 0.9, 'severe': 0.1}, states=[I]))` splits only `I`, with those shares. An option given to `stratify()` itself with a value of the option's kind (`adjust=` a dict of lists, `where=` a dict, `fractions=` shares, `states=` states, ...) raises a `TypeError` naming what replaces it; with any other value, it is a dimension of that name. A keyword whose value is an `ss.Transition` (usually an `ss.transfer`) is added to the new model under that name; this is how transitions that move people along the new dimension are declared ([below](#moving-between-coordinates-sstransfer)).
 
 ### What it does
 
 After `stratify()`, the model is one in which:
 
-1. Every state in `states` is split into one state per level (within the groups selected by `where=`, if given).
+1. Every state in `states` is split into one state per level (within the groups selected by `who=`, if given).
 2. Every transition touching those states is split, keeping its name and its rate or dwell-time declaration.
-3. Each `adjust` multiplier is applied to the named transition in the corresponding level, or to one destination of a transition with several (`adjust={'outcome.dead': [...]}`), whose probability it scales as a modifier on it does ([03](03-states-and-transitions.md)). `adjust={'rel_trans': [...]}` and `adjust={'rel_sus': [...]}` multiply the infectiousness and susceptibility of the people in each level (of the states the dimension applies to), as summer2's infectiousness adjustments do.
-4. The transitions implied by the dimension's kind are generated ([below](#kinds)).
-5. Any extra transitions passed as keywords are added.
+3. The transitions implied by the dimension's kind are generated ([below](#kinds)).
+4. Any extra transitions passed as keywords are added.
 
-The base model says "recovery takes `dur_inf`"; the stratification says "1.5 times faster in children". Neither refers to the other, which is what lets one disease definition be used with many structures.
+The base model says "recovery takes `dur_inf`"; a modifier with a value by level says "1.5 times faster in children" (`ss.modify(sir.recovery, multiply=ss.by(age=[1.5, 1.0, 0.5]))`). Neither refers to the other, which is what lets one disease definition be used with many structures.
 
-An `adjust` naming a transition that does not exist raises a `KeyError` and lists the transitions that do. A `split` of the wrong length raises a `ValueError`; a split that does not sum to 1 is normalized, and `describe()` says so. If `split` is omitted, it is taken from the population where the property already exists (age from a named population, sex, patch populations from a geography); otherwise age groups follow the world's population by age (the UN's for 2024, also the agents' ages when nothing else gives them), a boolean dimension (`[False, True]`) or one that a transfer, a transition's `move=`, or a delivery moves people along starts with everyone at its first level, and any other is equal across levels, each printed as a guess.
+Shares that do not sum to 1 are normalized, and `describe()` says so. If no shares are given, they are taken from the population where the property already exists (age from a named population, sex, patch populations from a geography); otherwise age groups follow the world's population by age (the UN's for 2024, also the agents' ages when nothing else gives them), a boolean dimension (`[False, True]`) or one that a transfer, a transition's `move=`, or a delivery moves people along starts with everyone at its first level, and any other is equal across levels, each printed as a guess.
 
 ### Stratifying the sim or the disease
 
@@ -91,44 +95,43 @@ sim.stratify(age=[0, 5, 18, 65])
 sim = ss.Sim([flu, rsv], networks=ss.contacts('Kenya'), stratify=dict(age=[0, 5, 18, 65]))    # the same
 ```
 
-`sim.stratify()` takes the same arguments as `model.stratify()`, applies them to every module in the sim, and returns the sim. `ss.Sim(stratify=...)` takes a dict of the same keyword arguments and is the same call made when the sim is created. All three go through one parser with the same checks: an option (`split`, `adjust`, `kind`, `states`, `where`, `mobility`) is never taken for a dimension, a call with no dimension raises, and `adjust=` on the sim names a transition by its name if only one module has it, or as `'flu.infection'` (an unknown or ambiguous one is a `KeyError`). A dimension belongs to the sim either way; where it is declared decides only the default `states=` and which transitions `adjust=` names.
+`sim.stratify()` takes the same arguments as `model.stratify()`, applies them to every module in the sim, and returns the sim. `ss.Sim(stratify=...)` takes a dict of the same keyword arguments and is the same call made when the sim is created. All three go through one parser with the same checks: every keyword is a dimension, and a call with no dimension raises. `ss.Sim(stratify=)` and `ss.Disease(stratify=)` are one dict of dimensions. A dimension belongs to the sim either way; where it is declared decides only the default `states=`.
 
-A dimension that belongs to one disease (vaccination status against one pathogen; strains are part of the disease, see [Strains](#strains)) is stratified on that disease, and so are per-disease adjustments:
+A dimension that belongs to one disease (vaccination status against one pathogen; strains are part of the disease, see [Strains](#strains)) is stratified on that disease, and values by level for one disease are in its own rates or modifiers:
 
 ```python
 sim.stratify(age=[0, 5, 18, 65])
-flu.stratify(age=[0, 5, 18, 65], adjust={'infection': [1.5, 1.2, 1.0, 0.8]})    # adds the adjustments; the age groups are the sim's
+flu_by_age = ss.modify(flu.infection, multiply=ss.by(age=[1.5, 1.2, 1.0, 0.8]))   # by the sim's age groups
 ```
 
 Rules:
 
-- Stratifying a disease by a people property the sim is already stratified by, with the same levels, adds the `adjust` and extra transitions and does not split anything again. This is the one case in which naming an existing dimension is not an error. A `fractions=` given on either is used; two different ones raise a `ValueError`.
+- Stratifying a disease by a people property the sim is already stratified by, with the same levels, adds any extra transitions and does not split anything again. This is the one case in which naming an existing dimension is not an error. Shares given on either are used; two different ones raise a `ValueError`.
 - Two modules in one sim stratified by the same people property with different levels raise a `ValueError` when the sim is built; the message names both sets of levels and suggests stratifying the sim.
 - In a sim with one disease, stratifying the disease by age and stratifying the sim by age do the same thing.
 
 ### Stratifying part of the model
 
-By default a dimension applies to every state that is people, in every group. Two keywords narrow that:
+By default a dimension applies to every state that is people, in every group. Two options of `ss.levels()` narrow that:
 
 ```python
-hiv.stratify(cd4=[0, 200, 350, 500], states=[I])               # only the infected have a CD4 stage
-sir.stratify(sex=['female', 'male'])
-sir.stratify(age=[15, 25, 35, 50], where=dict(sex='female'))   # age groups for women only
+hiv.stratify(cd4=ss.levels([0, 200, 350, 500], states=[I]))                                     # only the infected have a CD4 stage
+sir.stratify(sex=['female', 'male'], age=ss.levels([15, 25, 35, 50], who=ss.person.female))    # age groups for women only
 ```
 
 - **`states=`** restricts which states are split. It takes state objects or their names.
-- **People entering a state with the dimension** from one without it (an infection entering `I`, above) take a level in proportion to `split`. A split that depends on another dimension is an `ss.by` over both, read as the share in each level for each level of the other: `sir.stratify(clinical=['mild', 'severe'], states=[I], fractions=ss.by([[0.9, 0.1], [0.7, 0.3], [0.2, 0.8]], dims=['age', 'clinical']))` makes the old more often severe, as summer2's `source_strata` do. Each row is normalized, so the other dimension's own split is unchanged: the same rule as for a population split over several dimensions ([below](#adjustments-multiply)). An `adjust` on a transition out of states that have no level of the dimension raises a `ValueError`, since there is no level to apply it in.
-- **`where=`** restricts which existing groups are split, as a dict of dimension and level (or list of levels). The result is a ragged model: four age groups of women and one group of men. The dimension can be one the sim is stratified by, or another `where=` dimension (`parity` where `age` is `'25-34'` or `'35-49'`, so women of those ages only).
+- **People entering a state with the dimension** from one without it (an infection entering `I`, above) take a level in proportion to its shares. Shares that depend on another dimension are an `ss.by` over both, read as the share in each level for each level of the other: `sir.stratify(clinical=ss.levels(['mild', 'severe'], states=[I], fractions=ss.by([[0.9, 0.1], [0.7, 0.3], [0.2, 0.8]], dims=['age', 'clinical'])))` makes the old more often severe, as summer2's `source_strata` do. Each row is normalized, so the other dimension's own shares are unchanged: the same rule as for a population split over several dimensions ([below](#values-by-level-multiply)).
+- **`who=`** restricts which existing groups are split, as a condition on other dimensions (`ss.person.female`, `ss.person.age >= 15`, `ss.person.region.isin(['north', 'east'])`, several joined with `&`). The result is a ragged model: four age groups of women and one group of men. The dimension can be one the sim is stratified by, or another narrowed one (`parity` with `who=ss.person.female & (ss.person.age >= 25)`, so women of those ages only).
 
-People outside `where=` have no level of the dimension. Everything that refers to a level follows from that:
+People outside `who=` have no level of the dimension. Everything that refers to a level follows from that:
 
 - **Results.** Selecting a level selects the people who have one: `res.I.select(age='15-24')` is women aged 15 to 24, and `res.I.by('age')` has a column for each age group of women, summing to the women and not to everyone. Men are in the totals and in `select(sex='male')`, and in no column of a result split by age: their age is missing, not "all ages".
-- **Conditions.** `sir.age == '15-24'` is false for men, so `where=sir.age == '15-24'` reaches women only, and `~(sir.age == '15-24')` includes every man.
-- **Adjustments and movement.** `adjust=` applies to the people with a level; for the others the multiplier is 1. People outside `where=` do not move between its levels (by aging or by a transfer), and someone who moves into a group outside it (a woman aging out of the `where=` of `parity`) leaves its levels.
-- **Values by level.** A value given for each level (`init=dict(I=ss.by(age=[...]))`, or a parameter by age) gives the people with no level the mean over the levels, weighted by the split; a number of people at each level gives them none. An `init=` at levels where the split puts nobody (`ever=True` with `fractions=[1, 0]`) starts nobody there: a note, or a `ValueError` if that is all of it.
+- **Conditions.** `sir.age == '15-24'` is false for men, so `who=sir.age == '15-24'` reaches women only, and `~(sir.age == '15-24')` includes every man.
+- **Values by level and movement.** A multiplier by level (`ss.by()`) applies to the people with a level; for the others it is 1. People outside `who=` do not move between its levels (by aging or by a transfer), and someone who moves into a group outside it (a woman aging out of the `who=` of `parity`) leaves its levels.
+- **Values by level.** A value given for each level (`init=dict(I=ss.by(age=[...]))`, or a parameter by age) gives the people with no level the mean over the levels, weighted by the shares; a number of people at each level gives them none. An `init=` at levels where the shares put nobody (`ever={False: 1, True: 0}`) starts nobody there: a note, or a `ValueError` if that is all of it.
 - **Mixing.** A contact matrix by the dimension has no level for the others to mix as, which is a `ValueError` (below).
 
-In an agent-based run neither keyword changes the model, since every agent has an age and a sex regardless; they decide the number of compartments in a compartmental run. The groups there are still a grid of every combination of levels: the people outside `where=` are all counted at the first level, and the groups at the other levels stay empty.
+In an agent-based run neither option changes the model, since every agent has an age and a sex regardless; they decide the number of compartments in a compartmental run. The groups there are still a grid of every combination of levels: the people outside `who=` are all counted at the first level, and the groups at the other levels stay empty.
 
 ### States that are not people
 
@@ -167,7 +170,7 @@ sir.stratify(patch=ss.geo.geography('Kenya', level=1))          # a named source
 
 A list of numbers is bin edges when the property is continuous and labels otherwise; `kind=` settles any ambiguity. The last bin is open-ended. Levels can be referred to by label (`'15-64'`, `'500+'`) or by position.
 
-The CD4 example shows the general rule for continuous properties. `hiv.cd4` is a float per agent, updated by the HIV module's own code. In an agent-based run nothing about that changes: CD4 stays continuous, and the bins let you write `adjust={'death': [8, 3, 1.5, 1]}`, select `sim.results.hiv.I.select(cd4='0-200')`, and target interventions by CD4 group. In a compartmental run there are no per-agent values, so the model needs transitions that move people between bins (`decline = ss.transfer(cd4=('500+', '350-500'), rate=...)` and so on); without them the bins are static, and `describe()` says so.
+The CD4 example shows the general rule for continuous properties. `hiv.cd4` is a float per agent, updated by the HIV module's own code. In an agent-based run nothing about that changes: CD4 stays continuous, and the bins let you write a death rate by group, `ss.by(cd4=[8, 3, 1.5, 1])`, select `sim.results.hiv.I.select(cd4='0-200')`, and target interventions by CD4 group. In a compartmental run there are no per-agent values, so the model needs transitions that move people between bins (`decline = ss.transfer(dict(cd4=('500+', '350-500')), rate=...)` and so on); without them the bins are static, and `describe()` says so.
 
 ## Kinds
 
@@ -192,11 +195,11 @@ A **counter** is a dimension with whole-number levels that events move people up
 sim.stratify(parity=list(range(8)))            # 0, 1, ..., 7+
 delivery = ss.Transition(P, PP, dur=ss.months(9), p=0.98, increment='parity')
 twins    = ss.Transition(P, PP, dur=ss.months(9), p=0.02, increment=dict(parity=2))
-campaign = ss.Delivery(increment='doses', coverage=0.6, at=[2025, 2026, 2027])
+campaign = ss.Delivery(increment='doses', coverage=0.6, when=[2025, 2026, 2027])
 waning   = ss.transfer(increment=dict(immunity=-1), rate=ss.peryear(0.5))
 ```
 
-The time since an event is the event's memory, `.since` (e.g. `where=preg.since_birth < ss.months(6)`), kept by agents.
+The time since an event is the event's memory, `.since` (e.g. `who=preg.since_birth < ss.months(6)`), kept by agents.
 
 ### Space
 
@@ -206,7 +209,7 @@ Space is a dimension, not a separate kind of model. It is valid with or without 
 kenya = ss.geo.geography('Kenya', level=1)
 
 sir.stratify(patch=kenya)                                # patches; nobody moves
-sir.stratify(patch=kenya, mobility=ss.geo.gravity(away=0.1, a=1.0, b=1.0, c=2.0))    # or: patches coupled by travel
+sir.stratify(patch=ss.levels(kenya, mobility=ss.geo.gravity(away=0.1, distance_power=2.0)))    # or: patches coupled by travel
 ```
 
 Patches without mobility are an ordinary model (wastewater catchments, malaria driven by local rainfall, the same disease with per-patch parameters) and produce no warning. `describe()` lists the mobility, or "none". Mobility itself is specified in [06-routes.md](06-routes.md#mobility).
@@ -215,7 +218,7 @@ A state that is not people is split by the same geography, which gives one count
 
 ### Strains
 
-Strains are part of the disease, not a stratification: `ss.Disease(..., strains=ss.Strains(...))`, which is then `dis.strains` (decided 2026-10-22, D1). Internally a strain set is still a dimension of the disease (kind `strain`, named `strain` unless `ss.Strains(name=)` says otherwise), so results are split by it (`res.infection.by('strain')`) and conditions read it (`where=RIF`, the people carrying RIF). `stratify(kind='strain')`, `immunity=` on a stratification, and levels written as `'A+B'` raise, pointing to `ss.Strains`.
+Strains are part of the disease, not a stratification: `ss.Disease(..., strains=ss.Strains(...))`, which is then `dis.strains` (decided 2026-10-22, D1). Internally a strain set is still a dimension of the disease (kind `strain`, named `strain` unless `ss.Strains(name=)` says otherwise), so results are split by it (`res.infection.by('strain')`) and conditions read it (`who=RIF`, the people carrying RIF). `stratify(kind='strain')`, `immunity=` on a stratification, and levels written as `'A+B'` raise, pointing to `ss.Strains`.
 
 **One concept, ownership.** Every state of a disease with strains has an owner. A state is **shared** (the default): the person is in it once, carrying a set of strains, with one course and one clock. Or it is each strain's **own**: each strain the person carries has its own copy of it, with its own course and clock (`shared=False`, or a list of the states that are shared, e.g. `shared=['Ca']`). With every state shared and no `immunity=`, a person carries one strain at a time, being infected (or recovered) protects against every strain, and a new infection takes its source's strain. Pathogens with different natural histories are different diseases, connected with `ss.modify` ([07-effects.md](07-effects.md)).
 
@@ -226,10 +229,10 @@ strains = ss.Strains(
          RIF = dict(rel_trans=0.575, cure=1/3)),
     immunity    = ss.immunity(due_to=L, protection=0.79), # latent infection protects in part against another strain; the rest is superinfection
     max_strains = 2,
-    split       = [0.9, 0.1],
+    fractions   = [0.9, 0.1],
 )
 DS, RIF = strains
-treatment = ss.Transition(Tx, [R, I], p='cure', dur=ss.months(6), per_strain=True) # treatment ends; each strain is cured with its own chance; anyone left with one goes back to I
+treatment = ss.Transition(Tx, {R: 'cure', I: None}, dur=ss.months(6), per_strain='each') # treatment ends; each strain is cured with its own chance; anyone left with one goes back to I
 failure   = ss.Transition(Tx, I, rate=ss.peryear(0.1), move=DS >> (DS, RIF))   # treatment fails, and DS acquires resistance (emergence)
 tb = ss.Disease(..., treatment, failure, strains=strains)
 
@@ -239,15 +242,15 @@ hpv = ss.Disease(name='hpv', init_prev=0.1, strains=ss.Strains([hpv16, hpv18, hi
               ss.immunity(due_to=Cleared, dur=dict(In=m_sev, Ic=m_sev))]))        # shorter stays in In and Ic: severity immunity
 ```
 
-**Values for each strain** multiply the disease's transitions (by name: the rate, a duration divided, or a branch's probability, as `adjust=` does) and `rel_trans`. They are one container read two ways: by strain, as a dict of dicts; or by parameter, as keyword lists (`ss.Strains(['DS', 'RIF'], rel_trans=[1, 0.575])`). Several strains with long definitions can be written as diseases of their own that share one natural history (`ss.Strains([hpv16, hpv18])`, D2); each then has its own course, and the disease that holds them takes only `name=`, `label=`, and `init_prev=`. A member whose structure differs is deferred.
+**Values for each strain** multiply the disease's transitions (by name: the rate, a duration divided, or a branch's probability, as a modifier does) and `rel_trans`. They are one container read two ways: by strain, as a dict of dicts; or by parameter, as keyword lists (`ss.Strains(['DS', 'RIF'], rel_trans=[1, 0.575])`). Several strains with long definitions can be written as diseases of their own that share one natural history (`ss.Strains([hpv16, hpv18])`, D2); each then has its own course, and the disease that holds them takes only `name=`, `label=`, and `init_prev=`. A member whose structure differs is deferred.
 
 **Sets carried.** With `max_strains` above 1 (the default is 1), people in shared states carry sets of strains, which are the levels of the strain dimension: each strain alone, then each set up to `max_strains` (`'DS+RIF'`, made by `ss.Strains`, never written by hand). For a transition that is not per strain, a set takes the largest of its strains' values (the worst strain sets the course, D6). A full set that takes another strain loses its oldest, and the new strain's clock starts fresh (D4); the sets are then ordered by when each strain was acquired (`'A+B'` and `'B+A'` are different levels), so the oldest is known. With `max_strains=1`, a new strain replaces the one carried. Superinfection is counted in its own flow.
 
 **Transmission from a carrier of several strains** (`transmit=`, D5): `'one'` (the default) passes one strain per transmission, chosen in proportion to the strains' `rel_trans`, at the infectiousness of the most infectious (tbsim's default); `'each'` passes each strain at its own rate. When several strains reach one person in a step over a network, each contact is as likely as the others to be the one that infects (the first to happen), not the first in the network's order.
 
-**Events of each strain in a shared course.** A transition with `per_strain=True` has an outcome for each strain carried. With `p=`, each strain takes the first destination with its own chance (`p=` times the strain's value for the transition, or `p='<value>'`, the strains' values of that name, when the strains' values for the transition multiply its rate instead), and anyone left with a strain takes the second, carrying those left: cure by treatment, as above. With `single_strain=True` and a rate, each strain has its own rate (the rate times its value), and the first to happen progresses alone, dropping the others (tbsim's `p_multi`; the same as writing a transition for each set with `move=`, D7, but one line). The engine works out the set-to-set outcomes for each level, as the ODE and agents alike.
+**Events of each strain in a shared course.** A transition with `per_strain=` has an outcome for each strain carried. With `per_strain='each'` and a split, each strain takes the first destination with its own chance (the first destination's probability times the strain's value for the transition, or `'<value>'`, the strains' values of that name, when the strains' values for the transition multiply its rate instead), and anyone left with a strain takes the second, carrying those left: cure by treatment, as above. With `per_strain='first'` and a rate, each strain has its own rate (the rate times its value), and the first to happen progresses alone, dropping the others (tbsim's `p_multi`; the same as writing a transition for each set with `move=`, D7, but one line). The engine works out the set-to-set outcomes for each level, as the ODE and agents alike.
 
-**Changes of strain** are written with the strain objects and `>>`, on the transition (or delivery) that causes them: `move=DS >> RIF` (replacement), `move=DS >> (DS, RIF)` (emergence), `move=(A, B) >> A` (of someone carrying both, only A goes on). A move applies to everyone who carries all of its source strains, whose source is replaced by its destination, and the transition applies only to them. It is not a transmission and not an infection. A move on a transition triggered by a product's event (`ss.Transition(I, I, on=drug.failed, move=sens >> res)`) applies as on any other (ST30).
+**Changes of strain** are written with the strain objects and `>>`, on the transition (or delivery) that causes them: `move=DS >> RIF` (replacement), `move=DS >> (DS, RIF)` (emergence), `move=(A, B) >> A` (of someone carrying both, only A goes on). A move applies to everyone who carries all of its source strains, whose source is replaced by its destination, and the transition applies only to them. It is not a transmission and not an infection. A move on a transition triggered by a product's event (`ss.Transition(I, I, when=drug.failed, move=sens >> res)`) applies as on any other (ST30).
 
 **Protection, `ss.immunity(due_to=...)`** ([07-effects.md](07-effects.md#protection-between-strains-ssimmunity)), by what protects:
 
@@ -257,9 +260,9 @@ hpv = ss.Disease(name='hpv', init_prev=0.1, strains=ss.Strains([hpv16, hpv18, hi
 | a shared state people are not infected in (`R`) | protection while in it, by the strains carried there (the last); people in it can be infected again, moving on as from the first state; a transmission of its own out of it (`R >> I`) is protected too | levels × states | all |
 | a state or attribute of each strain's own course (`R`, `'nab'`) | protection by each strain's row | courses side by side | agents (coupled) |
 
-The endpoints are `rel_sus` (acquisition, against the incoming strain, on networks too, HP14), `rel_trans`, and `dur=dict(state=...)`. Protection due to a shared state lowers `rel_sus` only; the others are for courses of their own. Protection by the strains a person has had, wherever they are now, is a state that remembers (`R_k`, or a dimension the model moves people along) with `ss.immunity(due_to=R_k)`, or code. Products protect by strain too: `ss.Vaccine(efficacy=ss.by(strain=[0.9, 0.3]))` acts on acquiring each strain, under every solver. A strain introduced on a date is a delivery that moves people into an infection with it, `ss.Delivery(move=S >> E, strain='alpha', at=['2021-01-01'], capacity=20)`, under every solver; `dis.infect(uids, strain='alpha')` does the same from code, as agents.
+The endpoints are `rel_sus` (acquisition, against the incoming strain, on networks too, HP14), `rel_trans`, and `dur=dict(state=...)`. Protection due to a shared state lowers `rel_sus` only; the others are for courses of their own. Protection by the strains a person has had, wherever they are now, is a state that remembers (`R_k`, or a dimension the model moves people along) with `ss.immunity(due_to=R_k)`, or code. Products protect by strain too: `ss.Vaccine(efficacy=ss.by(strain=[0.9, 0.3]))` acts on acquiring each strain, under every solver. A strain introduced on a date is a delivery that moves people into an infection with it, `ss.Event(S >> E, strain='alpha', when='2021-01-01', n=20)`, under every solver; `dis.infect(uids, strain='alpha')` does the same from code, as agents.
 
-**Results** count each person once (`res.I` is a union), `res.I.by('strain')` is by level (a set is its own level), acquisitions (by strain acquired), superinfections, moves and new episodes are separate flows. With own courses, `res.hpv.I.by('strain')` is each strain's own, and `where=hpv.infected` and `hpv.infected.count() >= 2` are conditions over them.
+**Results** count each person once (`res.I` is a union), `res.I.by('strain')` is by level (a set is its own level), acquisitions (by strain acquired), superinfections, moves and new episodes are separate flows. With own courses, `res.hpv.I.by('strain')` is each strain's own, and `who=hpv.infected` is a condition over them.
 
 **Own courses** run as one declared disease per strain, copied from the natural history (named after the strains, beside the disease in `sim.diseases`), with each strain's values; with `init_prev=` on the disease, each person seeded gets one strain. Entering a shared state in one course ends the others (the person moves to the state with no way out in them, e.g. `X`; one cancer per person), counted once. Independent courses are k copies of the states side by side, not `2^k`, and run under every solver; courses coupled by `immunity=` or a shared state run as agents only (a compartmental solver raises `CapabilityError`, and `solver='auto'` chooses agents), since then the combination a person carries matters ([12-backends.md](12-backends.md)).
 
@@ -269,7 +272,7 @@ Drug resistance acquired at a rate during treatment, rather than at an event, is
 
 ```python
 tb = ss.Disease(..., strains=ss.Strains(['DS', 'MDR'], name='resistance', fractions=[1, 0], infection=[1.0, 0.7], cure=[1.0, 0.3]))
-tb.stratify(acquired=ss.transfer(resistance=('DS', 'MDR'), rate=ss.peryear(0.02), states=['on_treatment']))
+tb.stratify(acquired=ss.transfer(dict(resistance=('DS', 'MDR')), rate=ss.peryear(0.02), states=['on_treatment']))
 ```
 
 ## Moving between coordinates: `ss.transfer`
@@ -277,22 +280,22 @@ tb.stratify(acquired=ss.transfer(resistance=('DS', 'MDR'), rate=ss.peryear(0.02)
 `ss.transfer` moves people between levels of a dimension without changing their disease state.
 
 ```python
-ss.transfer(risk=('low', 'high'), rate=ss.peryear(0.1))     # a pair of levels: from, to
-ss.transfer(vaccinated=True, rate=ss.peryear(0.2))          # a target value: everyone not at it moves to it
-ss.transfer(resistance=('DS', 'MDR'), rate=ss.peryear(0.02), states=['on_treatment'])
+ss.transfer(dict(risk=('low', 'high')), rate=ss.peryear(0.1))     # a pair of levels: from, to
+ss.transfer(dict(vaccinated=True), rate=ss.peryear(0.2))          # a target value: everyone not at it moves to it
+ss.transfer(dict(resistance=('DS', 'MDR')), rate=ss.peryear(0.02), states=['on_treatment'])
 ss.transfer(increment=dict(immunity=-1), rate=ss.peryear(0.5)) # a counter, down a level at a time
 ```
 
-- The keyword is the dimension. Its value is a pair of levels, `(from, to)` (the levels are strings, not objects, so a pair rather than `>>`; an arrow string raises with the pair to write), or a single target level, meaning "from every other level to this one". A boolean dimension is written with its target value (`vaccinated=True`). For a counter, `increment=` gives the dimension and the amount instead, and everyone who can move that far does.
+- The first argument is a dict, as for `ss.Event(dict(...))` and `move=` (a dimension as a keyword raises, naming the dict): its key is the dimension, and its value a pair of levels, `(from, to)` (the levels are strings, not objects, so a pair rather than `>>`; an arrow string raises with the pair to write), or a single target level, meaning "from every other level to this one". A boolean dimension is written with its target value (`dict(vaccinated=True)`). For a counter, `increment=` gives the dimension and the amount instead, and everyone who can move that far does.
 - `rate=` is a per-person hazard; `dur=` and `p=` are as for any transition ([03-states-and-transitions.md](03-states-and-transitions.md)). A scalar `dur=` is the mean of an exponential. A distribution (`dur=ss.lognormal(ss.years(15), ss.years(5))`) is drawn for each person when they reach a level the transfer moves them from (and are in its `states=`), and they move when it is up; someone who leaves that level or those states first forgets it, and a counter draws again after each move. As agents this is exact, at the step nearest the time drawn, as for a dwell time. Under the compartmental solvers it is Erlang stages that keep its mean and standard deviation (exact for a gamma with a whole shape), held as a dimension `<transfer>_stage` of the people at the levels it moves from, with the same note as a dwell time in stages; a distribution whose parameters are by group (`ss.by`) or functions has no compartmental form yet, so `solver='auto'` runs it as agents and a compartmental solver raises `CapabilityError`.
-- With several levels to move to (`ss.transfer(method=('none', ['pill', 'iud']), p=[0.6, 0.4], dur=...)`), `p=` gives the probability of each, one of which may be `None` for the rest, decided as people move, as for one transition with several destinations. `p=` with one level to move to raises a `ValueError`: for only some people to move, give a rate.
+- With several levels to move to (`ss.transfer(dict(method=('none', ['pill', 'iud'])), p=[0.6, 0.4], dur=...)`), `p=` gives the probability of each, one of which may be `None` for the rest, decided as people move, as for one transition with several destinations. `p=` with one level to move to raises a `ValueError`: for only some people to move, give a rate.
 - `states=[...]` restricts the transfer to people in the named disease states. Without it, people in every state move.
 - A transfer is an `ss.Transition`. It gets a flow result like any other, and it can be the target of `ss.modify`.
 
 A transfer can be declared in two places: in the `ss.Disease(...)` constructor with the other transitions, or as a keyword to `stratify()` (as in the TB example). A transfer always happens at a rate; a move delivered to some people at some times is a delivery, with the keywords of [08-interventions.md](08-interventions.md):
 
 ```python
-ss.Delivery(move=dict(vaccinated=True), coverage=0.7, at=[2021, 2022])
+ss.Delivery(dict(vaccinated=True), coverage=0.7, when=[2021, 2022])
 ```
 
 A transfer naming a dimension the model does not have when the sim is built raises a `KeyError`.
@@ -306,15 +309,11 @@ Two mistakes are easy to make when a delivery meets a stratified model, and the 
 
 Realized coverage and doses delivered are reported as results of the delivery, in total and per stratum, so either can be checked. These two rules are tested in [18-conformance.md](18-conformance.md).
 
-## Adjustments multiply
+## Values by level multiply
 
-`adjust` values are multipliers on the named transition's rate (for a transmission, on `beta`; for a transition given as a duration, the duration is divided; for a branch chosen with `p=`, its probability, and the other branches share the rest, as for a modifier on it in [07-effects.md](07-effects.md)). On one transition with several destinations chosen with `p=` and a dwell time, an adjustment (or a modifier) divides the dwell time, as [03](03-states-and-transitions.md#branching) says, and a note says to name a destination (`'ga31.PT31'`) to change its probability instead. There is no overwrite form: multipliers commute, so the result does not depend on the order in which dimensions were added, and someone who needs a different value in one stratum can get it with a multiplier.
+A value by level, `ss.by()`, is written where the value is: in the base model's rate (`S >> I @ beta*ss.by(risk=[1, 3])*I`, [04-parameters.md](04-parameters.md)), or, when the base model should not know about the dimension, as a modifier's multiplier on the named transition (`ss.modify(sir.infection, multiply=ss.by(risk=[1, 3]))`): for a transmission, on `beta`; for a transition given as a duration, the duration is divided; for a branch chosen with `p=`, its probability, and the other branches share the rest ([07-effects.md](07-effects.md)). On one transition with several destinations chosen with `p=` and a dwell time, a modifier divides the dwell time, as [03](03-states-and-transitions.md#branching) says, and a note says to name a destination (`'ga31.PT31'`) to change its probability instead. Multipliers commute, so the result does not depend on the order in which dimensions were added, and they combine with other modifiers on the same quantity by the rule of [07-effects.md](07-effects.md).
 
-A negative multiplier raises a `ValueError`. A multiplier that makes the branch probabilities out of a state add up to more than 1 scales them to sum to 1, with a note. Adjustments combine with `ss.modify` multipliers on the same quantity by multiplication ([07-effects.md](07-effects.md)).
-
-Parameters that differ by level can also be given directly in the base model with `ss.by(age=[...])` ([04-parameters.md](04-parameters.md)); `adjust` is for when the base model should not know about the dimension.
-
-A population that is not the product of a split by each dimension (more children in one patch than another) is given as one split over several dimensions: `sir.stratify(patch=ss.geo.geography(names=['north', 'south']), fractions=ss.by(pop, dims=['age', 'patch']))`, where `pop` has a row for each age group and a column for each patch. Each dimension's own split is then the total over the others. A split given to one of them as well must agree with that total, or a `ValueError` is raised (rows of shares given one dimension, as in a table of P(wealth | urban), are multiplied by that dimension's split first). A split over age and other dimensions whose row for each age group sums to 1 (`ss.by([[0, 1], [1, 0], [1, 0]], dims=['age', 'wealth'])`) is instead the share within each age group: people keep their ages, and the age groups their own split (noted as guessed). People born into the model (as agents, from `ss.Births` or `ss.Pregnancy`) take the youngest age group's share of the other dimensions, and the place of their parent for a dimension of places.
+A population that is not the product of a split by each dimension (more children in one patch than another) is given as one split over several dimensions: `sir.stratify(patch=ss.levels(ss.geo.geography(names=['north', 'south']), fractions=ss.by(pop, dims=['age', 'patch'])))`, where `pop` has a row for each age group and a column for each patch. Each dimension's own split is then the total over the others. A split given to one of them as well must agree with that total, or a `ValueError` is raised (rows of shares given one dimension, as in a table of P(wealth | urban), are multiplied by that dimension's split first). A split over age and other dimensions whose row for each age group sums to 1 (`ss.by([[0, 1], [1, 0], [1, 0]], dims=['age', 'wealth'])`) is instead the share within each age group: people keep their ages, and the age groups their own split (noted as guessed). People born into the model (as agents, from `ss.Births` or `ss.Pregnancy`) take the youngest age group's share of the other dimensions, and the place of their parent for a dimension of places.
 
 ## Mixing over a dimension
 
@@ -325,20 +324,20 @@ sir.stratify(age=[0, 15, 65])
 ss.Sim(sir, networks=ss.contacts('Kenya'))
 ```
 
-`ss.contacts()` takes a contact matrix and what it is over: a country's, by name (`ss.contacts('Kenya')`, by five-year age group, from `starsim_data`); a matrix with the lower edge of each of its own age groups (`ss.contacts(matrix, ages=[0, 15, 65])`); a matrix over the levels of one of the model's own dimensions (`ss.contacts(matrix)` for its age groups, the default, or `ss.contacts([[2, 1], [1, 8]], dims='risk')`, used whatever the dimension is called); a matrix for each of several, by name (`ss.contacts(dict(age=..., risk=...))`), where the contacts between two groups are the product of the entries for each; or one matrix over several dimensions together, for mixing that is not such a product (men mix with women, and by risk differently for each sex): `ss.contacts(matrix, dims=['sex', 'risk'])`, with `matrix[i, k, j, l]` the contacts per unit time of one person at levels `(i, k)` with people at `(j, l)`, or the same as a square matrix over the combinations of levels, the first dimension slowest. Its shape is checked against the dimensions' levels when the sim is built (a `ValueError`, naming each dimension's levels), and it is used as given, not balanced; a separable matrix given whole gives the same results as the product form. A matrix by age with its own age groups combines with matrices over other dimensions (`ss.contacts(dict(age=..., area=...), ages=[0, 15, 65])`): the age matrix is regrouped to the model's age groups (as below, under every solver), and the contacts between two groups are the product. A matrix by age need not have the model's age groups: the Prem matrices come in five-year bands whatever the model uses. A matrix carries its unit of time: a country's is contacts a day, whatever the sim's unit (S7.8: it was read in the sim's unit, so a sim in years or months had 365 or 30 times too few contacts), and `unit='week'` says it for any matrix; without `unit=`, a matrix given as numbers is per unit of the sim's time, as any bare number is.
+`ss.contacts()` takes a contact matrix and what it is over: a country's, by name (`ss.contacts('Kenya')`, by five-year age group, from `starsim_data`); a matrix with the lower edge of each of its own age groups (`ss.contacts(matrix, ages=[0, 15, 65])`); a matrix over the levels of one of the model's own dimensions (`ss.contacts(matrix)` for its age groups, the default, or `ss.contacts(risk=[[2, 1], [1, 8]])`, used whatever the dimension is called); a matrix for each of several, by name (`ss.contacts(age=A, risk=B)`), where the contacts between two groups are the product of the entries for each; or one matrix over several dimensions together, for mixing that is not such a product (men mix with women, and by risk differently for each sex): `ss.contacts(matrix, dims=['sex', 'risk'])`, with `matrix[i, k, j, l]` the contacts per unit time of one person at levels `(i, k)` with people at `(j, l)`, or the same as a square matrix over the combinations of levels, the first dimension slowest. Its shape is checked against the dimensions' levels when the sim is built (a `ValueError`, naming each dimension's levels), and it is used as given, not balanced; a separable matrix given whole gives the same results as the product form. A matrix by age with its own age groups combines with matrices over other dimensions (`ss.contacts(age=A, area=B, ages=[0, 15, 65])`): the age matrix is regrouped to the model's age groups (as below, under every solver), and the contacts between two groups are the product. A matrix by age need not have the model's age groups: the Prem matrices come in five-year bands whatever the model uses. A matrix carries its unit of time: a country's is contacts a day, whatever the sim's unit (S7.8: it was read in the sim's unit, so a sim in years or months had 365 or 30 times too few contacts), and `unit='week'` says it for any matrix; without `unit=`, a matrix given as numbers is per unit of the sim's time, as any bare number is.
 
 - **In a compartmental run** the matrix is aggregated to the model's groups, weighted by population. Where a model group cuts through a matrix band, the band is split in proportion to population. A one-line note says the matrix was aggregated, or split when the model has more groups, once for all the matrices regrouped alike (e.g. the layers of a country's).
 - **Reciprocity.** A matrix given as numbers, over the model's levels (`age=`, `risk=`, ...) or over its own age groups (`ages=`), is checked for reciprocity against the population in each level, `N_i·C_ij = N_j·C_ji`; if it is far from it, a note says so, once for each matrix, and the matrix is used as given.
 - **In an agent-based run** the matrix is used with its own groups: each agent has an exact age and is counted in whichever band the matrix uses.
-- **With places**, a contact matrix acts within each place, under every solver ([06-routes.md](06-routes.md#mobility)); a matrix over the places themselves (`ss.contacts(..., dims='patch')`) says who meets whom across them, and is how a force of infection shared between places (LASER's coupling) is written.
+- **With places**, a contact matrix acts within each place, under every solver ([06-routes.md](06-routes.md#mobility)); a matrix over the places themselves (`ss.contacts(patch=M)`) says who meets whom across them, and is how a force of infection shared between places (LASER's coupling) is written.
 - **The data is optional.** A matrix given as numbers needs nothing else: only a country's matrix by name (and `ss.geo.geography` and `ss.people` by name) reads `starsim_data`, the optional `data` extra, and a model with no named data never imports it.
 
 With no mixing given, people mix homogeneously across the levels of every dimension except space, where the default is to mix within the patch ([06-routes.md](06-routes.md)).
 
-Every state that is people is stratified by default, so the following cannot arise unless the stratification was narrowed with `states=` or `where=`. States that a dimension does not apply to take no part in mixing over it. If such a state is the origin or the source of a transmission, there is no coordinate for those people to mix as, and the build raises a `ValueError` naming the state. The same holds for people outside a dimension's `where=` (men, for age groups of women), so a contact matrix by a dimension with `where=` is a `ValueError` too:
+Every state that is people is stratified by default, so the following cannot arise unless the stratification was narrowed with `states=` or `who=`. States that a dimension does not apply to take no part in mixing over it. If such a state is the origin or the source of a transmission, there is no coordinate for those people to mix as, and the build raises a `ValueError` naming the state. The same holds for people outside a dimension's `who=` (men, for age groups of women), so a contact matrix by a dimension with `who=` is a `ValueError` too:
 
 ```text
->>> seir.stratify(age=[0, 15, 65], states=[S, E, I])
+>>> seir.stratify(age=ss.levels([0, 15, 65], states=[S, E, I]))
 >>> ss.Sim(seir, networks=ss.contacts('Kenya')).run()
 ValueError: the contacts "contacts" are given by "age", but "seir" is stratified by it in S, E, I only, so there is no level of it for the people in Ia to mix as.
      Fix: leave out states= to stratify every state, or use contacts that do not depend on "age".
@@ -350,8 +349,8 @@ A state that is not people is never the origin of a transmission through the rou
 
 | Solver | Realization |
 |---|---|
-| Compartmental (`ode`, `binomial`, `gillespie`) | Splits every state the dimension applies to into one per level, splits every transition, applies the adjustments |
-| Agent-based | Uses (or adds) a per-agent property; scales the per-agent rate by the adjustment for the agent's level; continuous properties stay continuous |
+| Compartmental (`ode`, `binomial`, `gillespie`) | Splits every state the dimension applies to into one per level, splits every transition, applies the values by level |
+| Agent-based | Uses (or adds) a per-agent property; scales the per-agent rate by the value for the agent's level; continuous properties stay continuous |
 
 A categorical agent attribute that interventions can target (EMOD's Individual Properties, EpiHiper's traits) is the same thing as a stratification dimension, seen from the agent side.
 
@@ -362,7 +361,7 @@ Strata multiply: age (16) × risk (2) × strain (3) × patch (47) is 4,512 compa
 ## Rejected
 
 - **Manual array indexing as the mechanism.** General, laborious, and it leaves the model impossible to restratify. Indices are an implementation detail.
-- **Overwrite adjustments.** They make the result depend on the order of stratification.
+- **Overwrite values by level, and `adjust=` on `stratify()`.** An overwrite makes the result depend on the order of stratification, and `adjust=` was a second spelling of `ss.by()` in a modifier, with the same results.
 - **Always returning a new model.** In place is the common use, and `inplace=False` covers the comparison.
 - **Per-stratum result names** (`I_0_female_low`). A result has dimensions; `.select()` and `.by()` read them.
 - **Every agent property as a dimension.** Dimensions multiply compartments; properties do not have to.

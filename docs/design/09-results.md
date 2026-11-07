@@ -53,7 +53,7 @@ A disease whose strains have courses of their own (`ss.Strains(shared=...)`, [05
 
 ## `ss.Result`
 
-A result carries its name, label, module, values, time vector, unit, and what kind of quantity it is (`kind`): `'flow'` (a number of events in each step, e.g. infections), `'stock'` (a quantity at each time point, e.g. the number infected), `'ratio'` (one quantity divided by another, e.g. prevalence), or `None` for a result with no meaning over time. If not given, the kind is guessed from the name, as in Starsim 3. The kind decides how the result behaves: how it is summarized and resampled, whether it has a cumulative total (only a flow does), and how it is compared with data (a flow is summed over each period of the data). How it is summarized over time (`summarize_by`) follows from the kind (`'sum'` for a flow, `'last'` for a stock, `'mean'` for a ratio, `None` for none), and can be given to summarize it another way without changing what it is (e.g. a flow averaged over time with `kind='flow', summarize_by='mean'`); other summarizers can be added to `ss.Result.summarizers`. This is Starsim's `ss.Result`, with two additions: selection by stratum, and a run dimension when it holds the results of many runs.
+A result carries its name, label, module, values, time vector, unit, and what kind of quantity it is (`kind`): `'flow'` (a number of events in each step, e.g. infections), `'stock'` (a quantity at each time point, e.g. the number infected), `'ratio'` (one quantity divided by another, e.g. prevalence), or `None` for a result with no meaning over time. If not given, the kind is guessed from the name, as in Starsim 3 (`new_...` is a flow, `n_...` and `cum_...` are stocks, `...prevalence` is a ratio), or else from the dtype, with a warning, since a wrong guess (a count taken for a ratio) is not scaled by the people each agent stands for: `ss.Result('cases')` warns and is taken as a ratio, so give `kind=`. A declared module makes its results with their kind. The kind decides how the result behaves: how it is summarized and resampled, whether it has a cumulative total (only a flow does), and how it is compared with data (a flow is summed over each period of the data). How it is summarized over time (`summarize_by`) follows from the kind (`'sum'` for a flow, `'last'` for a stock, `'mean'` for a ratio, `None` for none), and can be given to summarize it another way without changing what it is (e.g. a flow averaged over time with `kind='flow', summarize_by='mean'`); other summarizers can be added to `ss.Result.summarizers`. This is Starsim's `ss.Result`, with two additions: selection by stratum, and a run dimension when it holds the results of many runs.
 
 During a run, a result is read from inside the sim (by a trigger, a modifier, or custom code) as in Starsim: the storage is preallocated for the whole run, and during a step `sim.ti` is the step's own index, where its results go. Its stocks are recorded before any module's step, so code in the step reads the state at its start as `res.I[sim.ti]`; its flows are recorded at its end, so the flows so far (those of the steps before it) are `res.infection[:sim.ti]`, the last step's is `res.infection[sim.ti - 1]`, and a result written by the step itself is `res.x[sim.ti]`. A shorter spelling for "the steps so far" (`res.I.so_far`, or a slicing helper) would be convenient in triggers; it is listed as open and not specified here ([19-open-questions.md](19-open-questions.md)).
 
@@ -112,7 +112,7 @@ recovery  = I >> R @ ss.days(10)
 prevalence    = I / N
 ever_infected = (I | R) / N            # | and + are the same for whole states
 cases  = ss.outcome(0.5  * infection, delay=ss.days(5))
-hosp   = ss.outcome(0.05 * infection, delay=ss.days(7), stay=ss.days(10))
+hosp   = ss.outcome(0.05 * infection, delay=ss.days(7), dur=ss.days(10))
 deaths = ss.outcome(0.2  * hosp,      delay=ss.days(14))
 
 sir = ss.Disease(
@@ -123,7 +123,7 @@ sir = ss.Disease(
 )
 ```
 
-`transitions=`, `results=`, and `outcomes=` each take a list and keep the three kinds of thing apart; the members take their names from the variables, as transitions do ([03-states-and-transitions.md](03-states-and-transitions.md)). In a short model the same things can be given to the disease directly, as positional transitions and keywords:
+`transitions=`, `results=`, and `outcomes=` each take a list and keep the three kinds of thing apart; the members take their names from the variables, as transitions do ([03-states-and-transitions.md](03-states-and-transitions.md)). Each is the keyword alternative to giving them by position: in a short model the same things can be given to the disease directly, as positional transitions and keywords:
 
 ```python
 sir = ss.Disease(infection, recovery, prevalence=I / N, cases=ss.outcome(0.5 * infection, delay=ss.days(5)), init_prev=0.01)
@@ -149,7 +149,7 @@ An outcome is a reported quantity: a flow worked out from other flows. It covers
 ss.outcome(
     source,               # a transition, another outcome, or a weighted sum of them
     delay      = None,    # time from the source event to this one: a duration, a distribution, or a function of the sim
-    duration   = None,    # if given, also produces n_<name>: the number currently in this outcome; a duration (an exponential stay) or a distribution (ss.constant for a fixed stay)
+    dur        = None,    # if given, also produces n_<name>: the number currently in this outcome; a duration (an exponential stay) or a distribution (ss.constant for a fixed stay)
     likelihood = None,    # optional; see below
 )
 ```
@@ -157,14 +157,14 @@ ss.outcome(
 - **The source is a weighted sum of flows.** A number times a flow means that fraction of those events: `0.5 * infection` is half of infections. There is no `p=` argument; the weight is the probability. Reporting that depends on severity is a sum, `ss.outcome(0.01 * asymptomatic + 0.3 * symptomatic + 0.8 * severe, delay=ss.days(3))`, where the three names are the transitions into those states. A weight follows the parameter ladder ([04-parameters.md](04-parameters.md)): it can be an `ss.par` with `bounds` and be fitted like any other parameter, or `ss.by(age=[...])`.
 - **Outcomes chain.** The source of `deaths` above is the outcome `hosp`, so infection → hospitalization → death is three lines. A chain that loops back on itself raises a `ValueError`. Where a transition was declared as a keyword and there is no variable to refer to, the source may be its name (`ss.outcome('infection', delay=ss.days(5))`); a name that matches nothing raises a `KeyError`.
 - **`delay=`** is a duration, a distribution (reporting delays are not a single number), or a function of the sim for anything irregular.
-- **`stay=` gives both series.** `hosp` is admissions per step and `n_hosp` is the number currently in hospital.
+- **`dur=` gives both series.** `hosp` is admissions per step and `n_hosp` is the number currently in hospital.
 - **There is no reporting period.** An outcome is a flow on the sim's time step, like a transition. Weekly data is compared with its total over each week automatically (see [Data](#data)), and `res.cases.resample('week')` gives the weekly series to plot.
 
 An outcome belongs to one disease, and its source is made of that disease's flows. There is no outcome on the sim for results that span modules (all-cause deaths, a syndromic count over several diseases): arithmetic on the results after the run gives the series (`0.3 * (sim.results.flu.infection + sim.results.rsv.infection)` is an `ss.Result`), but it is not a declared result, so data cannot be matched to it.
 
 An outcome is worked out from the counts of the flows it comes from, in each group, under every solver (it records no individuals, as agents or otherwise). How the weight and the delay are realized depends on whether the run counts whole people:
 
-| Solver | A weight on a flow | `delay=` and `stay=` |
+| Solver | A weight on a flow | `delay=` and `dur=` |
 |---|---|---|
 | `ode` | multiplies the flow | the flow convolved with the delay distribution, taken in whole steps |
 | `binomial`, `gillespie`, `abm` | a weight between 0 and 1 is a binomial draw from the step's events (any other weight multiplies) | each step's reports are spread over the following steps by a multinomial draw from the delay distribution |
@@ -241,7 +241,7 @@ cases = ss.outcome(0.5 * infection, delay=ss.days(5),
                    likelihood=ss.nbinom(n=ss.par(10, bounds=[0.1, 100])))
 ```
 
-The model's value is the mean of the distribution and the user supplies the rest (here the dispersion, which is fitted). The likelihoods are `ss.poisson`, `ss.nbinom`, `ss.binom`, `ss.bernoulli`, `ss.normal`, and `ss.lognorm_ex`; any other is a function `fn(observed, model)` returning the log-likelihood of each value ([13-inference.md](13-inference.md#likelihoods-when-wanted)). A result that is not an outcome (a ratio such as `prevalence = I / N`) is given one at calibration time, `sim.fit(likelihood=dict(prevalence=ss.normal(scale=0.02)))`, keyed by the result's name or by the data column (`sir.prevalence`, or one stratum, `prevalence[age=0-14]`); a stratum without one of its own takes its result's. Where a likelihood for such a result should be declared with the model is open. A likelihood makes posterior methods available; [13-inference.md](13-inference.md) says what is done with it.
+The model's value is the mean of the distribution and the user supplies the rest (here the dispersion, which is fitted). The likelihoods are `ss.poisson`, `ss.nbinom`, `ss.binom`, `ss.bernoulli`, `ss.normal`, and `ss.lognormal`; any other is a function `fn(observed, model)` returning the log-likelihood of each value ([13-inference.md](13-inference.md#likelihoods-when-wanted)). A result that is not an outcome (a ratio such as `prevalence = I / N`) is given one at calibration time, `sim.fit(likelihood=dict(prevalence=ss.normal(std=0.02)))`, keyed by the result's name or by the data column (`sir.prevalence`, or one stratum, `prevalence[age=0-14]`); a stratum without one of its own takes its result's. Where a likelihood for such a result should be declared with the model is open. A likelihood makes posterior methods available; [13-inference.md](13-inference.md) says what is done with it.
 
 ## One run, many runs
 
@@ -249,7 +249,7 @@ A sim is one trajectory, whatever the solver. Many runs are a MultiSim, as in St
 
 ```python
 sim  = ss.Sim(sir, solver='gillespie', total_pop=1000, unit='day')
-msim = ss.parallel(sim, n_runs=100)          # or sim.run(n_runs=100), the shortcut for one sim
+msim = ss.parallel(sim, n_runs=100)
 
 msim.plot()                                  # median and interval
 msim.plot(lines=True)                        # every run
@@ -261,10 +261,10 @@ n_I.values                                   # the full array, runs by time
 - `n_runs` belongs to the MultiSim, not to the sim. `ss.Sim` has no replicate count, and `sim.results` always holds one series per result. Each run has its own seed ([11-random.md](11-random.md)), which `msim.runs` (one row per run: its scenario, any values swept or drawn, and its `rand_seed`) gives. A set of values swept with `pars=` is a scenario of its own, and has the same seeds as every other set, so they are compared with the same chance events; seeds swept (`pars=dict(rand_seed=[1, 5, 9])`) and draws (`priors=`, `fit.project()`) are runs of their scenario, and each draw has a seed of its own.
 - **A MultiSim is its results, and a MultiSim result is the same `ss.Result` with a `run` dimension first.** `.select()` and `.by()` work as on a single sim (`msim.results.sir.I.select(age=0).quantiles([0.5])`), `.select(run=3)` is one run (a result of one sim), and arithmetic, `.resample()`, `.to_df()`, and `.plot()` work on it as on any result. `len(msim)` is the number of runs, whichever way they were taken (restarted compartmental runs, runs in one call to the kernels or to JAX, or sims run in parallel).
 - `.quantiles(q)` takes a list of quantiles and returns a result with one series per quantile (for each scenario), over the runs; `.median()` and `.mean()` return the series over the runs (of each scenario). `.values` is the full array with one row per run.
-- `msim.summarize()` is a table of each result over the whole of each run (a flow's total, a stock's final value), across the runs: the median, an interval (95% by default, as `msim.plot()` draws), the mean, and the standard deviation, for each scenario, rounded for reading. `msim.diff()` and `msim.compare()` work from the results too. `ss.converters.to_hub(msim, ...)` writes them as a submission to a forecast hub.
+- `msim.summarize()` is a table of each result over the whole of each run (a flow's total, a stock's final value), across the runs: the median, an interval (95% by default, as `msim.plot()` draws), the mean, and the standard deviation, for each scenario, rounded for reading. `msim.summarize(each=True)` has a column for each run (`t=` for the values at one time point), and `msim.diff()` works from the results too. `ss.converters.to_hub(msim, ...)` writes them as a submission to a forecast hub.
 - `msim.plot()` draws the median and an interval. `msim.plot(lines=True)` draws every run, because extinction, bimodality, and threshold behavior cannot be seen in a median.
-- `ss.parallel({'Baseline': sim_a, 'With vaccine': sim_b}, n_runs=100)` (or `ss.parallel(baseline=sim_a, vaccine=sim_b)`, for labels that are names) returns one object whose results are indexed by scenario, run, and time ([08-interventions.md](08-interventions.md)): `msim.results.sir.I.select(scenario='With vaccine')`. A sweep, `ss.parallel(sim, pars=dict(beta=[0.2, 0.4]), n_runs=10)`, has the values as coordinates of the runs: `msim.results.sir.I.select(beta=0.2).quantiles()`.
-- `ss.parallel()` is the one way to run many sims, and `sim.run(n_runs=100)` is its shortcut for running one sim many times; both end in the same results.
+- `ss.parallel({'Baseline': sim_a, 'With vaccine': sim_b}, n_runs=100)` (labels from a dict, so that the keywords of `ss.parallel()` are only how to run them) returns one object whose results are indexed by scenario, run, and time ([08-interventions.md](08-interventions.md)): `msim.results.sir.I.select(scenario='With vaccine')`. A sweep, `ss.parallel(sim, pars=dict(beta=[0.2, 0.4]), n_runs=10)`, has the values as coordinates of the runs: `msim.results.sir.I.select(beta=0.2).quantiles()`.
+- `ss.parallel()` is the one way to run many sims; `sim.run()` runs one and returns it. `ss.MultiSim` is what the runs give and the class to subclass, and one sim given to it is one run. `workers=` is the number of worker processes (`workers=1` runs them one after another in this process).
 
 
 How often a disease died out, or caused a major outbreak, is read from the runs' results, for each declared disease and scenario. A disease that nobody can catch again dies out in every run that is long enough, after a major outbreak as after a minor one, so for it the question is how often there was a major outbreak, counted from the acquisitions over the run (so the people infected at the start are not counted):
@@ -288,12 +288,12 @@ Every infection event in an agent-based run, as a table. It supports transmissio
 ## Requesting fewer results
 
 ```python
-ss.Sim(sir, results=['I', 'cases'])
+ss.Sim(sir, group_results=['I', 'cases'])
 ```
 
 keeps only the named results by group (by name, or as `'sir.I'`); every other result keeps only its total over the groups, which is small. A name that is not a result is an error. The default is everything, which is the right default until stratification multiplies it: a result per state and per transition, for every stratum, at every step, can be a lot of memory.
 
-So by default the values by group are kept at every step only while they fit in about 100 MB for a module in one run (500 MB over all the runs of `sim.run(n_runs=)`). Beyond that, they are kept every few steps: the shortest of a week, two weeks, four weeks, a quarter, half a year, or a year that fits. A row of values by group then holds a flow added up over its steps and a state as it is at the first of them, so `res.I.select(district='north')` is a series at those times, its flows add up to the totals, and `resample()` works to periods no shorter than those. The totals are still kept at every step. This is a guess, so it is said in a note and marked in `describe()`; naming fewer results with `results=` keeps those more often. Data by group given to the sim keep every step, since they are compared with the results at their own times.
+So by default the values by group are kept at every step only while they fit in about 100 MB for a module in one run (500 MB over all the runs of `ss.parallel(sim, n_runs=)`). Beyond that, they are kept every few steps: the shortest of a week, two weeks, four weeks, a quarter, half a year, or a year that fits. A row of values by group then holds a flow added up over its steps and a state as it is at the first of them, so `res.I.select(district='north')` is a series at those times, its flows add up to the totals, and `resample()` works to periods no shorter than those. The totals are still kept at every step. This is a guess, so it is said in a note and marked in `describe()`; naming fewer results with `group_results=` keeps those more often. Data by group given to the sim keep every step, since they are compared with the results at their own times.
 
 ## Rejected
 

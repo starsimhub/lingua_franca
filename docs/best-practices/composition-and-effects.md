@@ -11,7 +11,7 @@ How one module changes a quantity owned by another, and what runs when.
 
 ## Recommendation
 
-1. **The simple case is one line.** `ss.modify(target, multiply=, where=)` says "while this condition holds, scale that quantity". It replaces the hand-written connector for the common case.
+1. **The simple case is one line.** `ss.modify(target, multiply=, who=)` says "while this condition holds, scale that quantity". It replaces the hand-written connector for the common case.
 2. **Anything more complex is ordinary Python in a module's `step()`.** This is a normal way to write an interaction, not a fallback. Real interactions often have several sources, several targets, probabilities, and scheduling, and a short `step()` is the clearest way to say that.
 3. **A modifier never overwrites the base value.** A modified quantity has a base value and an effective value (base with the active modifiers applied), and the modifiers act where the library uses the quantity. Reading it from custom code gives the base, and assigning to it sets the base; `.effective` gives the value with the modifiers applied (agents only). When a modifier ends, the original value comes back by itself.
 4. **Say how modifiers combine, because it is a modeling decision.** Multiplicative by default; `add=` and `set=` are available, applied in a fixed order (`set`, then `multiply`, then `add`).
@@ -102,7 +102,7 @@ The reasons for an ordered loop over queued updates:
 - **`sim.what_modifies()` does not see direct writes.** A module that assigns to a quantity in its `step()` is not listed.
 - **Base and effective values are an implementation cost.** Every modifiable array needs a base, a stored effective value, and an update when a modifier switches on or off. Unmodified quantities should cost no more than before, which should be benchmarked.
 - **Results depend on module order**, by an amount that shrinks with the timestep. This is accepted in exchange for within-step chains and for a loop that is easy to explain. `sim.check_dt()` measures it.
-- **Custom code reads the base, not what the library uses.** Reading and writing both act on the base, so a read-modify-write (`x[uids] *= 0.5`) does what it looks like and never counts a modifier twice. The cost is that code which wants the modified value has to ask for it (`.effective`), and that is available only as agents.
+- **Custom code reads the base, not what the library uses.** Reading and writing both act on the base, so a read-modify-write (`x[uids] *= 0.5`) does what it looks like and never counts a modifier twice. The cost is that code which wants the modified value has to ask for it (`current_value()`), and that is available only as agents.
 - **Two `set=` modifiers active at once: the last one wins.** That is the one place where modifiers depend on order, which is why it is noted.
 - **`set` then `multiply` then `add` is a convention.** Someone will want a different order. A function passed to `multiply=`, or a `step()`, covers it.
 

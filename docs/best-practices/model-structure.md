@@ -64,7 +64,7 @@ Because the model is data, a grid of transitions (Atomica's transition matrix, w
 
 ## The specification
 
-[03-states-and-transitions.md](../design/03-states-and-transitions.md) specifies states, the one transition class and its two spellings (`S >> I @ beta * I` and `ss.Transition`), what may follow `@`, rates that mention states, the source of infection, dwell times, branching, functions in any slot, `ss.null`, states that are not people, and what is guessed. Names from variables, `describe()`, `diagram()`, `equations()`, and `transitions` are in [01-objects.md](../design/01-objects.md); what a state in a rate means under each kind of mixing is in [06-routes.md](../design/06-routes.md). The docs show how to write a model in [Writing models](https://starsim.org/v4/user_guide/building_writing.html) and [Diseases](https://starsim.org/v4/user_guide/building_diseases.html).
+[03-states-and-transitions.md](../design/03-states-and-transitions.md) specifies states, the one transition class and its two spellings (`S >> I @ beta * I` and `ss.Transition`), what may follow `@`, rates that mention states, the source of infection, dwell times, branching, functions in any slot, the places outside the model (`ss.unborn`, `ss.dead`, `ss.outside`), states that are not people, and what is guessed. Names from variables, `describe()`, `diagram()`, `equations()`, and `transitions` are in [01-objects.md](../design/01-objects.md); what a state in a rate means under each kind of mixing is in [06-routes.md](../design/06-routes.md). The docs show how to write a model in [Writing models](https://starsim.org/v4/user_guide/building_writing.html) and [Diseases](https://starsim.org/v4/user_guide/building_diseases.html).
 
 ## Trade-offs
 

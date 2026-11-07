@@ -36,11 +36,11 @@ sim.plot()                                  # results, with the data drawn over 
 fit = sim.fit()
 
 # --- an intervention, and scenarios ----------------------------------------
-masks = ss.modify(sir.pars.beta, multiply=0.6, start='2020-03-15')
-sims  = ss.parallel(
-    baseline = fit.sim,                     # the calibrated sim
-    masks    = ss.Sim(sir, pars=fit.pars, interventions=masks, **kw),
-)
+masks = ss.modify(sir.pars.beta, multiply=0.6, when=ss.schedule(start='2020-03-15'))
+sims  = ss.parallel({
+    'Baseline': fit.sim,                    # the calibrated sim
+    'Masks':    ss.Sim(sir, pars=fit.pars, interventions=masks, **kw),
+})
 sims.plot()                                 # ss.parallel runs the sims
 
 # --- chance: a sim is one run; many runs are a MultiSim --------------------
@@ -65,13 +65,13 @@ ss.Sim(sir, stop=100).run().plot()          # nothing has a unit, so time is in 
 | Thing | Written as | Answers | Specified in |
 |---|---|---|---|
 | **State** | `ss.State`, `ss.states(3)` | What can someone be? (For a reservoir or a vector population: what is being counted?) | [03](03-states-and-transitions.md) |
-| **Transition** | `S >> I @ rate`, or `ss.transmission`, `ss.progression`, `ss.birth`, `ss.death`, `ss.transfer`; all are `ss.Transition` | How do they move between states? | [03](03-states-and-transitions.md) |
+| **Transition** | `S >> I @ rate`, or `ss.Transition`, `ss.birth`, `ss.death`, `ss.migration`, `ss.transfer`; all are `ss.Transition` | How do they move between states? | [03](03-states-and-transitions.md) |
 | **Parameter** | a number, or `ss.par(...)` when it needs a name, bounds, or a source | How fast, how likely, how long? | [02](02-types.md), [04](04-parameters.md) |
 | **Stratification** | `sim.stratify(age=...)` for a property of people; `sir.stratify(strain=...)` for one disease's own dimension | What else varies: age, place, risk, strain? | [05](05-dimensions.md) |
 | **Mixing** | `ss.Sim(networks=...)` | Who contacts whom, and how often? | [06](06-routes.md) |
 | **Interaction** | `ss.modify(...)`, or Python in a module's `step()` | What changes what? | [07](07-effects.md) |
 
-Interventions ([08](08-interventions.md)) are a product or a change to a quantity, plus a delivery. Results ([09](09-results.md)) are automatic for every state and transition, extra ones are declared with the model, and data attaches to them by name. A sim is one run; many runs are an `ss.MultiSim`, made by `ss.parallel(sim, n_runs=100)` or its shortcut `sim.run(n_runs=100)`. Calibration ([13](13-inference.md)) fits parameters that have bounds to results that have data.
+Interventions ([08](08-interventions.md)) are a product or a change to a quantity, plus a delivery. Results ([09](09-results.md)) are automatic for every state and transition, extra ones are declared with the model, and data attaches to them by name. A sim is one run; many runs are an `ss.MultiSim`, made by `ss.parallel(sim, n_runs=100)`. Calibration ([13](13-inference.md)) fits parameters that have bounds to results that have data.
 
 ## The object model
 
@@ -85,7 +85,7 @@ ss.Sim                          modules, a population, mixing, a timeline, a sol
  │     │     ├── results            <state> (its count), one flow per transition, ss.outcome, ratios
  │     │     └── ss.AgentDisease    a subclass written as code, transmitted over networks, agents only (Starsim 3's ss.Infection)
  │     ├── ss.Demographics      births, deaths, pregnancy
- │     ├── ss.Intervention      deliveries: ss.vaccinate, ss.screen, ss.treat
+ │     ├── ss.Intervention      events and deliveries: ss.Event, ss.Delivery, ss.vaccinate, ss.screen, ss.treat
  │     └── ss.Connector, ss.Analyzer
  ├── people:   ss.People        size, demography, per-agent attributes
  ├── stratifications            dimensions such as age and place (sim.stratify), with ss.geo.Mobility between places
@@ -126,7 +126,7 @@ Subclassing adds behavior. It does not add vocabulary.
 ## Four properties the design aims for
 
 1. **The model is data.** States and transitions are objects, so the diagram, the equations, the stratified model, and the exports are all derived from them. The model itself is its code; besides a saved sim, a declared model can be written as JSON, Starsim's own format, which is read by writing its code ([14-model-spec.md](14-model-spec.md#the-json-form)).
-2. **The solver is chosen for you, and can be changed.** `solver='auto'` picks the simplest, fastest representation that runs the model faithfully: an ODE if every part has a compartmental form, agents otherwise. `solver='ode' | 'binomial' | 'gillespie' | 'abm'` asks for one. For simple models this is a free run-time choice; for complex models the solver is effectively part of the specification. [12-backends.md](12-backends.md)
+2. **The solver is chosen for you, and can be changed.** `solver='auto'` picks the simplest, fastest representation that runs the model faithfully: an ODE if every part has a compartmental form, agents otherwise. `solver='ode' | 'binomial' | 'gillespie' | 'tau' | 'abm'` asks for one, and a solver with options is given as one from `ss.solvers` (`solver=ss.solvers.ode(integrator='euler')`). For simple models this is a free run-time choice; for complex models the solver is effectively part of the specification. [12-backends.md](12-backends.md)
 3. **Approximations are stated.** `'auto'` never approximates the mixing and never drops individual-level structure; the one thing it does unasked is represent a non-exponential dwell time by Erlang sub-stages, and it says so. When a solver is asked for that the model does not natively fit, the library uses the standard approximation where one exists and says so in one line; it stops only when there is no sensible approximation. `approximations='error'` makes any approximation an error, and `approximations='allow'` keeps the note in `sim.notes` without printing it. `sir.solvers()` shows which solvers can run a model before anything runs.
 4. **Defaults are guessed and printed.** `describe()` shows every guessed dwell-time distribution, unit, and mixing assumption, and which states are people and which are counts. [01-objects.md §`describe()`](01-objects.md#describe)
 

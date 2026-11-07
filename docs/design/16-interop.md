@@ -50,7 +50,7 @@ An incomplete import is not refused. It runs without the listed parts, warning a
 
 ### Classifying rates on import
 
-Most frameworks write a transition as a general rate expression: `beta * S * I / N`, `gamma * I`, `mu * N`. There is one transition class here, so the importer's job is to write each one as `src >> dst @ rate` with the right kind of rate. The rules, in order:
+Most frameworks write a transition as a general rate expression: `beta * S * I / N`, `gamma * I`, `mu * N`. There is one transition class here, so the importer's job is to write each one as `source >> dest @ rate` with the right kind of rate. The rules, in order:
 
 1. **Strip the source state.** A flow written as a total (`gamma * I` out of `I`) becomes a per-person rate (`gamma`).
 2. **A rate that mentions another state, divided by a population total, is exposure to that state.** `beta * S * I / N` out of `S` becomes `S >> I @ beta * I`. The bare `I` means exposure through the model's routes, which with no network is `I / N` ([06-routes.md](06-routes.md)).
@@ -73,7 +73,7 @@ Rules 2 and 3 are guesses about what the source meant, and the difference matter
 | **SBML** | `'sbml'` (XML) | Species as states, reactions as transitions, classified by the rules above |
 | **SimInf** | `'siminf'` (an R script with `mparse()` or a predefined model) | The transitions, run by `gillespie`; several nodes as a stratification of places, with the scheduled events as a movement register (`ss.geo.Mobility(data=...)`); the continuous state `v` as a state that is not people |
 | **flepiMoP** | `'flepimop'` (the config YAML) | Compartment products, `proportional_to` rates, the outcomes chain as `ss.outcome`, `seir_modifiers` (every scenario kept in `sim.imported.scenarios`), and drawn parameters with their distributions as priors |
-| **summer2** | `'summer2'` (a JSON dump, or the model) | Each flow kind as one transition, `stratify_with` as `stratify`, adjustments as `adjust=`, and the mixing matrix; the derived outputs are worked out from the results by `ss.converters.summer2.outputs()` |
+| **summer2** | `'summer2'` (a JSON dump, or the model) | Each flow kind as one transition, `stratify_with` as `stratify`, adjustments as a modifier by level (`ss.modify(multiply=ss.by(...))`), and the mixing matrix; the derived outputs are worked out from the results by `ss.converters.summer2.outputs()` |
 | **Atomica** | `'atomica'` (the framework, databook, and program book workbooks) | Compartments, transitions, characteristics, and the databook's values (a series without the points equal to those on either side, which change nothing); the program book's spending as parameters whose coverage moves the parameters they affect; a junction whose shares change (with the counts, or in time) as a transition to each destination with its share as a factor of the rate, which is the same flow, since people pass through a junction at once |
 | **Starsim** | `'json'` (Starsim's own JSON form, [14-model-spec.md](14-model-spec.md#the-json-form)) | A declared model as written: its settings, parameters, states, transitions, results, starting values, stratifications, and other modules by type; no rate is classified, since the rates are Starsim's own |
 | **camdl** | `'camdl'` (a `.camdl` file, or camdlc's JSON) | The model, with the parameter values of one of its scenarios (`scenario=`), as an ODE or a chain binomial as camdl's backends run it |
@@ -106,7 +106,7 @@ The code is the complete form of a model ([14-model-spec.md](14-model-spec.md)).
 >>> ss.export_to(sim, 'sbml', filename='model.xml')    # stratified by age, with a lognormal dwell time and a random network
 LossyExport: exported to SBML: 3 states, 2 transitions, as 13 species and 12 reactions (rates per day)
   changed: the agent-based sim was written as its compartmental form (an ODE)
-  changed: the lognorm_ex dwell time "dur" written as 11 exponential stages (Erlang) with its mean, 10 days
+  changed: the lognormal dwell time "dur" written as 11 exponential stages (Erlang) with its mean, 10 days
   changed: "sir" is stratified (age: 0-14, 15-64, 65+), written as one group, the sum of its groups, with the base values of its parameters
   not exported: network "randomnet" (written as homogeneous mixing with 10 contacts per day)
 ```

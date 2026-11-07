@@ -9,8 +9,8 @@ authorship:
 
 ## Recommendation
 
-1. **Keep Starsim's time types and their names.** `ss.dur` / `ss.per` / `ss.prob` as distinct types, each doing its own conversion, is an idea that many frameworks reached independently. Nothing is renamed (a probability per period is `ss.prob(0.1, 'day')` or `ss.probperday(0.1)`, and a count per unit time is `ss.freq`).
-2. **Calendar dates wherever they are wanted.** Interventions have dates, data has dates, and converting them to step indices is a recurring source of error, so a sim's start and stop, the times of interventions, and data can all be dates.
+1. **Keep Starsim's time types and their names.** `ss.Duration` / `ss.per` / `ss.prob` / `ss.freq` as distinct types, each doing its own conversion, is an idea that many frameworks reached independently. The names are kept (a probability per period is `ss.prob(0.1, 'day')` or `ss.probperday(0.1)`, a count per unit time is `ss.freq` or `ss.freqperyear(80)`, and the one-unit instances are `ss.day` to `ss.year`); only the class of a duration is spelled out, `ss.Duration` (it was `ss.dur`).
+2. **Calendar dates wherever they are wanted, and one reading of a bare time.** Interventions have dates, data has dates, and converting them to step indices is a recurring source of error, so a sim's start and stop, the times of interventions, and data can all be dates. Whether a sim has a calendar is decided once, from its start, and every bare time in it is read on that axis (a year, or a time from 0).
 3. **Do not assume a global timestep.** Per-module timelines interleaved by absolute time already work.
 4. **Accept a bare number; it takes the sim's unit.** A type system that makes `beta=0.05` an error will lose the audience. If nothing in the model has a unit, time is counted in timesteps and no unit is invented.
 5. **Print the conversion.** odin's transparency and Starsim's safety are not in conflict when the library can print what it resolved.
@@ -22,7 +22,7 @@ This is finding 2 of the [landscape review](../approaches/README.md#cross-cuttin
 
 | Framework | Medium | Vocabulary |
 |---|---|---|
-| [Starsim](../approaches/starsim.md) | Python class hierarchy | `dur` / `per` / `prob` / `freq` |
+| [Starsim](../approaches/starsim.md) | Python class hierarchy | `Duration` / `per` / `prob` / `freq` |
 | [camdl](../approaches/camdl.md) | Compiler dimensional types | `rate` / `probability` / `count` / `time` |
 | [Atomica](../approaches/atomica.md) | A spreadsheet column | Probability / Duration / Rate / Number / Proportion |
 | [EMULSION](../approaches/emulsion.md) | Three alternative YAML keys | `rate:` / `proba:` / `duration:` |
@@ -52,16 +52,16 @@ camdl's `error[E300]: transition 'infection' rate has wrong dimension` with `rat
 
 ## The specification
 
-[02-types.md](../design/02-types.md) specifies the time types (`ss.dur`, `ss.per`, `ss.prob`, `ss.freq`, with `ss.days` to `ss.years`, `ss.perday` to `ss.peryear`, `ss.prob(0.1, 'day')`, `ss.datedur`, and `ss.date`), arithmetic between them (meaningless arithmetic and wrong dimensions raise a `TypeError` naming the two types), bare numbers and where the unit comes from, and time in a sim. Per-module timesteps and the ordered loop are in [10-execution.md](../design/10-execution.md). The docs show how to use these in [Time](https://starsim.org/v4/user_guide/building_time.html).
+[02-types.md](../design/02-types.md) specifies the time types (`ss.Duration`, `ss.per`, `ss.prob`, `ss.freq`, with `ss.days` to `ss.years`, `ss.perday` to `ss.peryear`, `ss.prob(0.1, 'day')`, `ss.freqperday` to `ss.freqperyear`, `ss.day` to `ss.year`, and `ss.date`), arithmetic between them (meaningless arithmetic and wrong dimensions raise a `TypeError` naming the two types), bare numbers and where the unit comes from, and time in a sim. Per-module timesteps and the ordered loop are in [10-execution.md](../design/10-execution.md). The docs show how to use these in [Time](https://starsim.org/v4/user_guide/building_time.html).
 
 ## Trade-offs
 
 - **`ss.perday(0.05)` is more to type than `0.05`.** Which is why bare numbers work; the typed form is for when the model spans timescales or the units are not obvious.
-- **Rate-to-probability conversion has corners at large `dt`.** Starsim's review flags this, particularly around calendar durations and `datedur` versus float-year arithmetic. The mitigation is a note when a step is large for a transition, where the exponential conversion starts to matter and people's intuitions stop being reliable.
+- **Rate-to-probability conversion has corners at large `dt`.** Starsim's review flags this, particularly around calendar durations versus float-year arithmetic. The mitigation is a note when a step is large for a transition, where the exponential conversion starts to matter and people's intuitions stop being reliable.
 - **Per-module timesteps make the execution order harder to reason about.** Starsim's loop is an object that can be printed and plotted (`sim.loop`), which helps, but the printout is the fully unrolled list of every call at every time and is hard to read. So `describe()` shows the loop as a schedule instead: one line for each step size, with the modules in the order they run (`schedule  every day: randomnet, sir`), and the unrolled list is `sim.loop`.
 - **Bare numbers skip the dimension check**, and an inferred unit can be the wrong one. Both are handled by printing: `describe()` shows every resolved value with its unit, and a unit taken from `dt`, the dates, or the typed values is announced when the sim is built. Typed values in different units alongside bare numbers are a `TypeError` asking for `unit=`, since the unit of the bare numbers would be a guess.
 - **A unitless model cannot be compared with dated data or given a dated intervention.** Doing either supplies a unit, at which point the bare numbers that were "per step" become "per day" (or whatever the dates imply), and the note says so.
-- **Starsim's time classes are a lot** (its review says so). Avoid adding more. If a new one seems necessary, check whether it is really a `datedur`.
+- **Starsim's time classes are a lot** (its review says so). Avoid adding more. If a new one seems necessary, check whether an existing one already covers it.
 
 ## Rejected
 
@@ -70,7 +70,7 @@ camdl's `error[E300]: transition 'infection' rate has wrong dimension` with `rat
 - **Making the user write `1 - exp(-r*dt)`** (odin, `individual`). Transparent, with no check on the formula; here the transparency comes from the printout.
 - **Units as an optional annotation** ([SBML](../approaches/notes.md#sbml-systems-biology-markup-language)'s `unitDefinition`, which is in the standard and "widely ignored in practice"). Here the kind of quantity comes from the argument slot and the unit from the sim, so every value ends up with both whether or not the user typed them.
 - **Renaming Starsim's types** (`ss.per` to `ss.rate`, for example). The current names work and existing code uses them.
-- **Guessing the unit from the size of the numbers.** A default that depends on the values is harder to predict than one that does not. (One exception is kept from Starsim: a year-like `start` or `stop`, such as `stop=2030`, is a calendar year.)
+- **Guessing the unit from the size of the numbers.** A default that depends on the values is harder to predict than one that does not. (One exception is kept from Starsim: a bare `start` from 1800 on, such as `start=2000`, or with no start a bare `stop`, such as `stop=2030`, unless `unit=` says otherwise, is a calendar year, and gives the sim a calendar.)
 - **A sub-step mechanism** (epymorph's tick offsets). See above.
 - **A general dimensional algebra** (mass, length, currency). Epidemiology needs time⁻¹, dimensionless, and counts. Cost per unit of the intervention is a number with a currency label, not a dimension to check.
 

@@ -96,11 +96,11 @@ By contrast, [summer2](../approaches/summer2.md), [epipack](../approaches/epipac
 ## Trade-offs
 
 - **Automatic method selection can be wrong.** It is printed, and it is one keyword to override. The alternative, where the user chooses from five methods on their first day, is worse.
-- **The normalized absolute error is not a statistical model of the data.** It treats every point in a series as equally noisy, and dividing by the mean behaves badly for a series that is mostly zeros. It is the default because it is simple, needs no decisions, and is hard to throw off; the summary says which measure was used, and `gof=` or a likelihood is one keyword away.
-- **An absolute error is not smooth where the model passes through a data point.** Gradient-based optimizers cope with this in practice, somewhat less cleanly than with a squared error. `gof='rmse'` is the smooth alternative, and it is more sensitive to outliers.
+- **The normalized absolute error is not a statistical model of the data.** It treats every point in a series as equally noisy, and dividing by the mean behaves badly for a series that is mostly zeros. It is the default because it is simple, needs no decisions, and is hard to throw off; the summary says which measure was used, and `loss=` or a likelihood is one keyword away.
+- **An absolute error is not smooth where the model passes through a data point.** Gradient-based optimizers cope with this in practice, somewhat less cleanly than with a squared error. `loss='rmse'` is the smooth alternative, and it is more sensitive to outliers.
 - **Weights are arbitrary.** Equal weights across series is a convention, not a truth. A joint likelihood is the principled alternative and needs the correlation between series, which is rarely known. Weights are the v1 answer.
 - **Optuna is not an inference method.** It gives a point estimate and a search history, not a posterior. The summary gives the range of its best trials as an indication of uncertainty and says that it is not an interval.
-- **ABC needs many runs** (by default up to 8 generations of particles). Fine for a compartmental model that runs in milliseconds, slow for an agent-based one, so it is asked for (`method='abc-smc'`) and never chosen by default.
+- **ABC needs many runs** (by default 8 generations of samples). Fine for a compartmental model that runs in milliseconds, slow for an agent-based one, so it is asked for (`method='abc-smc'`) and never chosen by default.
 - **Gradients are an implementation project, and they constrain how functions are written.** camdl gets them from symbolic differentiation; summer2 gets them from JAX. Here the ODE runs in fast kernels (Rust or Numba), and JAX runs the same steps only when a gradient is wanted. A rate written as a Python function of the sim has no gradient, so a model with one is fitted by Nelder-Mead; one written with NumPy functions of counts keeps it.
 
 ## Rejected
