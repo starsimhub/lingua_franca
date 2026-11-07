@@ -349,6 +349,10 @@ The port's notes are `tb_LAI_TPT/v4-ideas.md`; the evaluation is `ssv4/working/t
 - **`ss.outside` as one branch of a split.** `I >> {ss.outside: p, R: None} @ dur` (some leave alive, the rest go on, decided by one draw) raises `ss.CapabilityError`; leaving is a transition of its own (`emigration = I >> ss.outside @ rate`), which competes as a hazard instead. `ss.dead` as a branch works (`res.<transition>.dead`). Supporting it means a branch's flow out of the model counted as departures (in `emigrated`, as agents) rather than deaths, in every solver and in the kernels' split. Worth it if a translated model splits on leaving.
 - **Finer transmission hooks for a declared disease** (e.g. `susceptibility(transition)`, `transmissibility(transition)`, a route of its own beside the solver's). A declared disease can now replace a whole transmission with `transmit(self, transition)` (`ss.Disease.transmit()`), and `ss.AgentDisease` has hooks for each piece (`transmissibility()`, `susceptibility()`, `route_betas()`, `transmit_route()`, `finalize_infections()`). Not done for declared diseases because the declared engine's transmission has strains, acts, mixing pools, and branching that the coded hooks don't map onto, and modifiers and products already reach `rel_sus` and `rel_trans`. Also not yet with compartments: a declared `transmit()` with strains, or for a transmission with several destinations (agents only).
 
+## From the infected states (2026-11-07)
+
+- **Flags on states other than `infected`.** `ss.State` takes only the flags Starsim reads (`infected`, `people`, `keep_time`); `ss.State(alien=True)` is a `TypeError`. A named group already covers most uses: `alien = Sa + Ia + Ra` given to the disease is a result, `Sa | Ia | Ra` a condition for `where=`, and a population of two kinds is better a stratification. Cliff isn't sure users will never need another flag; it would take `ss.State(**flags)` kept on the state and a way to read them (e.g. a group of the states with a flag), and waits until a model needs one.
+
 ## Won't do
 
 Work that was looked at and decided against, with why, so that it is not proposed again without a new reason.
