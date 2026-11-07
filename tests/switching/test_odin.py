@@ -103,7 +103,7 @@ def test_odin_delay():
         waning    = R >> S @ ss.days(60),
         births    = ss.birth(S, rate=ss.peryear(b)),
         deaths    = ss.death(rate=ss.peryear(b)),
-        history   = ss.null >> I @ ss.timeseries({0: ss.perday(surv), 14: 0}), # odin's delay() takes the first 14 days from before the start (see the model's README)
+        history   = ss.unborn >> I @ ss.timeseries({0: ss.perday(surv), 14: 0}), # odin's delay() takes the first 14 days from before the start (see the model's README)
         init_n    = dict(I=1),
         name      = 'seir',
     )

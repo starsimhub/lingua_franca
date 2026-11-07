@@ -49,7 +49,7 @@ fail      = switch(0.16, outcome([0.3, 0.4], advanced=[0.1, 0.15], whatsapp=[0.1
 
 
 hiv = ss.Disease(
-    birth      = ss.null >> sus @ births,
+    birth      = ss.unborn >> sus @ births,
     acq        = sus >> undx @ acq,
     diag       = undx >> dx @ diag,
     link       = dx + lost >> linked @ 1/link_time,

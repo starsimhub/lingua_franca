@@ -19,7 +19,7 @@ seir = ss.Disease(
     waning    = R >> S @ ss.days(60),
     births    = ss.birth(S, rate=ss.peryear(b)),
     deaths    = ss.death(rate=ss.peryear(b)),
-    history   = ss.null >> I @ ss.timeseries({0: ss.perday(surv), 14: 0}), # Workaround: see README
+    history   = ss.unborn >> I @ ss.timeseries({0: ss.perday(surv), 14: 0}), # Workaround: see README
     init_n    = dict(I=1),
 )
 seir.stratify(age=[0, 1, 5, 15, 30], fractions=split)

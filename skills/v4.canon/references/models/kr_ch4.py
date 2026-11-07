@@ -22,8 +22,8 @@ def p41(**kw):
         inf21  = R1 >> J2 @ ss.perday(b2*(1-sig)) * (I2 + J2), # J2: had strain 1, now infected with strain 2
         inf12  = R2 >> J1 @ ss.perday(b1*(1-sig)) * (I1 + J1),
         rec12  = J1 + J2 >> R12 @ ss.perday(g),
-        births = ss.null >> S @ ss.perday(mu) * (S + I1 + I2 + R1 + R2 + J1 + J2 + R12).n,
-        deaths = S + I1 + I2 + R1 + R2 + J1 + J2 + R12 >> ss.null @ ss.perday(mu),
+        births = ss.unborn >> S @ ss.perday(mu) * (S + I1 + I2 + R1 + R2 + J1 + J2 + R12).n,
+        deaths = S + I1 + I2 + R1 + R2 + J1 + J2 + R12 >> ss.dead @ ss.perday(mu),
         init   = y041,
         name = 'two',
     )
@@ -143,8 +143,8 @@ def p44(**kw):
         human_inf = SH >> IH @ ss.perday(a*bh) * IV.n / NH,
         recovery  = IH >> RH @ ss.perday(gh),
         vector_inf = SV >> IV @ ss.perday(a*bv) * IH.n / NH,
-        emergence = ss.null >> SV @ ss.perday(muv*NV),
-        mortality = SV + IV >> ss.null @ ss.perday(muv),
+        emergence = ss.unborn >> SV @ ss.perday(muv*NV),
+        mortality = SV + IV >> ss.dead @ ss.perday(muv),
         init = dict(IH=10, SV=NV),
         name = 'vb',
     )

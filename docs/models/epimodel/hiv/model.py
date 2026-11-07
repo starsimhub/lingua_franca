@@ -20,8 +20,8 @@ hiv = ss.Disease(
     infection  = ss.Transition(S, A, rate=week(0.0025) * (A + C + D)), # Per act
     chronic    = A >> C @ week(1/12),
     aids       = C >> D @ week(1/520),
-    aids_death = D >> ss.null @ week(1/104),
-    departure  = S + A + C >> ss.null @ week(depart),
+    aids_death = D >> ss.dead @ week(1/104),
+    departure  = S + A + C >> ss.outside @ week(depart),
     arrival    = ss.birth(S, rate=0.00065),
     test       = care(('undx', 'dx'), 0.015, states=['A', 'C']),
     test_aids  = care(('undx', 'dx'), 0.05, states=['D']),

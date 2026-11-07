@@ -60,7 +60,7 @@ def make_secir(d, beta=None, damping=True):
         severe    = ss.Transition(ISy, [ISev, R], dur=D(P['tISy']), p=[A(P['mu_ISev']), A(1 - np.array(P['mu_ISev']))]),
         critical  = ss.Transition(ISev, [ICr, R], dur=D(P['tISev']), p=[A(P['mu_ICr']), A(1 - np.array(P['mu_ICr']))]),
         recovery  = ss.Transition(ICr, R, dur=D(P['tICr']), p=A(1 - np.array(P['mu_D']))),
-        death     = ss.Transition(ICr, ss.null, dur=D(P['tICr']), p=A(P['mu_D'])),
+        death     = ss.Transition(ICr, ss.dead, dur=D(P['tICr']), p=A(P['mu_D'])),
         init_n    = dict(E=ss.by(np.outer(np.full(6, 50), d.seeds), dims=['age', 'patch'])),
         name      = 'secir',
     )

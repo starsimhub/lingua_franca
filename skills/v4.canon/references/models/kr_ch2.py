@@ -30,8 +30,8 @@ def p22(**kw):
     sir = ss.Disease(
         infection = S >> I @ ss.perday(520/365) * I,
         recovery  = I >> R @ ss.perday(1/7),
-        births    = ss.null >> S @ ss.perday(mu22) * (S + I + R).n,
-        deaths    = S + I + R >> ss.null @ ss.perday(mu22),
+        births    = ss.unborn >> S @ ss.perday(mu22) * (S + I + R).n,
+        deaths    = S + I + R >> ss.dead @ ss.perday(mu22),
         init      = dict(S=0.1, I=1e-4, R=1-0.1-1e-4),
         name = 'sir',
     )
@@ -51,9 +51,9 @@ def p23(**kw):
     sir = ss.Disease(
         infection = X >> Y @ ss.perday(b) * Y,                # beta X Y / N
         recovery  = Y >> Z @ ss.perday(g),
-        dying     = Y >> ss.null @ ss.perday(rho/(1-rho)*(g+m)),
-        births    = ss.null >> X @ ss.perday(nu),
-        deaths    = X + Y + Z >> ss.null @ ss.perday(m),
+        dying     = Y >> ss.dead @ ss.perday(rho/(1-rho)*(g+m)),
+        births    = ss.unborn >> X @ ss.perday(nu),
+        deaths    = X + Y + Z >> ss.dead @ ss.perday(m),
         init      = dict(X=0.2, Y=1e-4, Z=1-0.2-1e-4),
         name = 'sir',
     )
@@ -76,9 +76,9 @@ def p24(**kw):
     sir = ss.Disease(
         infection = X >> Y @ ss.perday(1e-4) * Y.n,
         recovery  = Y >> Z @ ss.perday(g),
-        dying     = Y >> ss.null @ ss.perday(rho/(1-rho)*(g+m)),
-        births    = ss.null >> X @ ss.perday(nu),
-        deaths    = X + Y + Z >> ss.null @ ss.perday(m),
+        dying     = Y >> ss.dead @ ss.perday(rho/(1-rho)*(g+m)),
+        births    = ss.unborn >> X @ ss.perday(nu),
+        deaths    = X + Y + Z >> ss.dead @ ss.perday(m),
         init      = dict(X=5e3, Y=1, Z=5e3-1),
         name = 'sir',
     )
@@ -114,8 +114,8 @@ def p26(**kw):
         infection = S >> E @ ss.perday(b) * I,
         latency   = E >> I @ ss.perday(s),
         recovery  = I >> R @ ss.perday(g),
-        births    = ss.null >> S @ ss.perday(m) * (S + E + I + R).n,
-        deaths    = S + E + I + R >> ss.null @ ss.perday(m),
+        births    = ss.unborn >> S @ ss.perday(m) * (S + E + I + R).n,
+        deaths    = S + E + I + R >> ss.dead @ ss.perday(m),
         init      = dict(S=0.1, E=1e-4, I=1e-4, R=1-0.1-2e-4),
         name = 'sir',
     )
@@ -140,8 +140,8 @@ def p27(**kw):
         recovery  = I >> R @ ss.perday((1-q)*g),
         carriage  = I >> C @ ss.perday(q*g),
         clearance = C >> R @ ss.perday(G),
-        births    = ss.null >> S @ ss.perday(m) * (S + I + C + R).n,
-        deaths    = S + I + C + R >> ss.null @ ss.perday(m),
+        births    = ss.unborn >> S @ ss.perday(m) * (S + I + C + R).n,
+        deaths    = S + I + C + R >> ss.dead @ ss.perday(m),
         init      = dict(S=0.1, I=1e-4, C=1e-3, R=1-0.1-1e-4-1e-3),
         name = 'sir',
     )

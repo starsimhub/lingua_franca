@@ -22,7 +22,7 @@ def sir_demog(births, extra=None, **kw):
     trans = dict(
         infection = S >> I @ ss.perday(beta) * I,
         recovery  = I >> R @ ss.perday(gamma),
-        deaths    = S + I + R >> ss.null @ ss.perday(mu),
+        deaths    = S + I + R >> ss.dead @ ss.perday(mu),
     )
     trans.update(births(S, I, R, N))
     if extra:
@@ -37,7 +37,7 @@ p81 = 0.7
 
 def p81_(**kw):
     """ 8.1: a share p of newborns are vaccinated (born into R) """
-    births = lambda S, I, R, N: dict(births=ss.null >> S @ ss.perday(mu*(1-p81)) * N, vaccinated=ss.null >> R @ ss.perday(mu*p81) * N)
+    births = lambda S, I, R, N: dict(births=ss.unborn >> S @ ss.perday(mu*(1-p81)) * N, vaccinated=ss.unborn >> R @ ss.perday(mu*p81) * N)
     return ss.Sim(sir_demog(births), **(dict(unit='day', stop=years*365, total_pop=1.0) | kw))
 
 def r81(sim, p=p81, v=0.0):
@@ -55,7 +55,7 @@ v82 = 0.1/365
 
 def p82(**kw):
     """ 8.2: susceptibles are vaccinated at rate v per day """
-    births = lambda S, I, R, N: dict(births=ss.null >> S @ ss.perday(mu) * N)
+    births = lambda S, I, R, N: dict(births=ss.unborn >> S @ ss.perday(mu) * N)
     extra  = lambda S, I, R, N: dict(vaccination=S >> R @ ss.perday(v82))
     return ss.Sim(sir_demog(births, extra), **(dict(unit='day', stop=years*365, total_pop=1.0) | kw))
 
@@ -69,7 +69,7 @@ T83, p83 = 3, 0.5
 
 def p83_(**kw):
     """ 8.3: pulses of vaccination of susceptibles every 3 years, starting at year 3 """
-    births = lambda S, I, R, N: dict(births=ss.null >> S @ ss.perday(mu) * N)
+    births = lambda S, I, R, N: dict(births=ss.unborn >> S @ ss.perday(mu) * N)
     sir = sir_demog(births)
     pulse = ss.Delivery(move='S -> R', coverage=p83, start=T83*365, interval=T83*365, name='pulse')
     return ss.Sim(sir, interventions=pulse, **(dict(unit='day', stop=years*365, total_pop=1.0) | kw))

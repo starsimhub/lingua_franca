@@ -86,7 +86,7 @@ def test_odin_examples():
     sim = load_odin(ex / 'original' / 'seir_array_odin.R', stop=365, **kw)
     assert '.stratify(age=[0, 1, 5, 15, 30]' in sim.imported.code
     assert [name for name,why in sim.imported.incomplete] == ['lag_inf (history)']
-    code = sim.imported.code.replace('    init', f'    history = ss.null >> I @ ss.timeseries({{0: ss.perday({np.exp(-14/(365*50))}), 14: 0}}),\n    init', 1)
+    code = sim.imported.code.replace('    init', f'    history = ss.unborn >> I @ ss.timeseries({{0: ss.perday({np.exp(-14/(365*50))}), 14: 0}}),\n    init', 1)
     ns = {}
     exec(code, ns) # With the workaround that the import lists
     res = ns['sim'].run().results[ns['sim'].diseases[0].name]

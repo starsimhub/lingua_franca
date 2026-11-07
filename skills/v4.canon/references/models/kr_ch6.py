@@ -65,8 +65,8 @@ def sir_model(beta, gamma, I0, mu=0.0, eps=0.0, S0=None, N=None):
         infection = S >> I @ ss.perday(beta) * I + ss.perday(eps) # Imports: a force of infection that does not depend on I
     trans = dict(infection=infection, recovery=I >> R @ ss.perday(gamma))
     if mu:
-        trans['births'] = ss.null >> S @ ss.perday(mu) * (S + I + R).n
-        trans['deaths'] = S + I + R >> ss.null @ ss.perday(mu)
+        trans['births'] = ss.unborn >> S @ ss.perday(mu) * (S + I + R).n
+        trans['deaths'] = S + I + R >> ss.dead @ ss.perday(mu)
     init = dict(I=I0) if S0 is None else dict(S=S0, I=I0, R=N-S0-I0)
     return ss.Disease(**trans, init=init, name='sir')
 

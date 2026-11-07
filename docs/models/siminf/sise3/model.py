@@ -41,8 +41,8 @@ sise3 = ss.Disease(
     recovery_2  = I_2 >> S_2 @ gamma,
     infection_3 = S_3 >> I_3 @ upsilon * phi.n,
     recovery_3  = I_3 >> S_3 @ gamma,
-    shedding    = ss.null >> phi @ shed * (I_1 + I_2 + I_3).n / (S_1 + I_1 + S_2 + I_2 + S_3 + I_3).n,
-    decay       = phi >> ss.null @ beta,
+    shedding    = ss.outside >> phi @ shed * (I_1 + I_2 + I_3).n / (S_1 + I_1 + S_2 + I_2 + S_3 + I_3).n,
+    decay       = phi >> ss.dead @ beta,
     init_n      = {key:ss.by(herd=u0[key].values) for key in ['I_1', 'S_2', 'S_3']}, # The rest in S_1
 )
 size = u0[['S_1', 'I_1', 'S_2', 'S_3']].sum(axis=1)

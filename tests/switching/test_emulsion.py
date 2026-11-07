@@ -69,10 +69,10 @@ def test_emulsion_quickstart():
         release     = Q >> R @ ss.constant(ss.days(30)),
         waning      = R >> S @ ss.perday(0.01),
         loss        = ss.Transition(M, S, rate=ss.perday(0.04), min_stay=ss.days(adult_age)),
-        deaths      = S + R >> ss.null @ ss.perday(0.002),
-        sick_deaths = I + Q >> ss.null @ ss.perday(0.004),
-        M_deaths    = ss.Transition(M, ss.null, rate=ss.perday(0.002)*(M.time_in < ss.days(adult_age))), # EMULSION's escape
-        E_deaths    = ss.Transition(E, ss.null, rate=ss.perday(0.004)*(E.time_in < ss.days(10))),
+        deaths      = S + R >> ss.dead @ ss.perday(0.002),
+        sick_deaths = I + Q >> ss.dead @ ss.perday(0.004),
+        M_deaths    = ss.Transition(M, ss.dead, rate=ss.perday(0.002)*(M.time_in < ss.days(adult_age))), # EMULSION's escape
+        E_deaths    = ss.Transition(E, ss.dead, rate=ss.perday(0.004)*(E.time_in < ss.days(10))),
         newborns    = newborns,
         vertical    = ss.Transition(M, [I, M], on=newborns, where=ss.mother(E | I | Q, include_born=True), p=[0.3, 0.7]), # EMULSION's produce_offspring: (J, NG, I) with chance 0.3 from an infected mother
         init_n      = dict(I=10),
@@ -102,7 +102,7 @@ def make_metapop(staged=False):
         N, I = SJ + IJ + RJ + SA + IA + RA, IJ + IA
         sir = ss.Disease(infection_J=SJ >> IJ @ ss.perday(0.5)*I.n/N.n, infection_A=SA >> IA @ ss.perday(0.5)*I.n/N.n, recovery_J=IJ >> RJ @ ss.perday(0.1),
                          recovery_A=IA >> RA @ ss.perday(0.1), mature_S=SJ >> SA @ ss.perday(1/20), mature_I=IJ >> IA @ ss.perday(1/20), mature_R=RJ >> RA @ ss.perday(1/20),
-                         births=ss.null >> SJ @ 2*b*(SA + IA + RA).n, deaths=ss.death(rate=b*N.n/K), init_n=dict(IJ=ss.by(pop=[10] + [0]*9)), default_state='SJ', name='sir')
+                         births=ss.unborn >> SJ @ 2*b*(SA + IA + RA).n, deaths=ss.death(rate=b*N.n/K), init_n=dict(IJ=ss.by(pop=[10] + [0]*9)), default_state='SJ', name='sir')
     sir.stratify(pop=[f'p{i}' for i in range(10)], kind='space')
     return ss.Sim(sir, solver='binomial', substeps=1, unit='day', start='2018-01-01', stop=ss.days(100), total_pop=1000, verbose=0).run(n_runs=20) # Whole days, as EMULSION takes them
 

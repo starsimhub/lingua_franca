@@ -79,8 +79,8 @@ def p33(**kw):
         age_S   = SC >> SA @ ss.perday(l33),
         age_I   = IC >> IA @ ss.perday(l33),
         age_R   = RC >> RA @ ss.perday(l33),
-        births  = ss.null >> SC @ ss.perday(nu33),
-        deaths  = SA + IA + RA >> ss.null @ ss.perday(mu33),
+        births  = ss.unborn >> SC @ ss.perday(nu33),
+        deaths  = SA + IA + RA >> ss.dead @ ss.perday(mu33),
         init    = dict(SC=y033[0], IC=y033[1], RC=nC-y033[0]-y033[1], SA=y033[2], IA=y033[3], RA=1-nC-y033[2]-y033[3]),
         name = 'sir',
     )

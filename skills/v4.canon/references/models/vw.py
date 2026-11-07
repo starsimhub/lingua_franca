@@ -42,8 +42,8 @@ def p41(**kw):
         infection = S >> E @ ss.perday(bm) * I,
         latency   = E >> I @ ss.days(De),
         recovery  = I >> R @ ss.days(Di),
-        births    = ss.null >> S @ ss.perday(1/L) * (S + E + I + R).n,
-        deaths    = S + E + I + R >> ss.null @ ss.perday(1/L),
+        births    = ss.unborn >> S @ ss.perday(1/L) * (S + E + I + R).n,
+        deaths    = S + E + I + R >> ss.dead @ ss.perday(1/L),
         init      = dict(S=y041[0], E=y041[1], I=y041[2], R=N-sum(y041)),
         name = 'seir',
     )
@@ -65,8 +65,8 @@ def p51(p=0.0, **kw):
         infection = S >> E @ ss.perday(bm) * I,
         latency   = E >> I @ ss.days(De),
         recovery  = I >> R @ ss.days(Di),
-        births    = ss.null >> M @ ss.perday(1/L) * (M + S + E + I + R).n,
-        deaths    = M + S + E + I + R >> ss.null @ ss.perday(1/L),
+        births    = ss.unborn >> M @ ss.perday(1/L) * (M + S + E + I + R).n,
+        deaths    = M + S + E + I + R >> ss.dead @ ss.perday(1/L),
         init      = dict(M=N*180/L, S=y041[0], E=y041[1], I=y041[2], R=N-sum(y041)-N*180/L),
         name = 'seir',
     )

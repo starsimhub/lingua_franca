@@ -47,10 +47,10 @@ health = ss.Disease(
     release     = Q >> R @ ss.constant(ss.days(30)),
     waning      = R >> S @ ss.perday(0.01),
     loss        = ss.Transition(M, S, rate=ss.perday(0.04), min_stay=whole(adult_age)),
-    deaths      = S + R >> ss.null @ ss.perday(0.002),
-    sick_deaths = I + Q >> ss.null @ ss.perday(0.004),
-    M_deaths    = ss.Transition(M, ss.null, rate=ss.perday(0.002)*(M.time_in < whole(adult_age))), # EMULSION's escape
-    E_deaths    = ss.Transition(E, ss.null, rate=ss.perday(0.004)*(E.time_in < whole(10))),
+    deaths      = S + R >> ss.dead @ ss.perday(0.002),
+    sick_deaths = I + Q >> ss.dead @ ss.perday(0.004),
+    M_deaths    = ss.Transition(M, ss.dead, rate=ss.perday(0.002)*(M.time_in < whole(adult_age))), # EMULSION's escape
+    E_deaths    = ss.Transition(E, ss.dead, rate=ss.perday(0.004)*(E.time_in < whole(10))),
     newborns    = newborns,
     vertical    = ss.Transition(M, [I, M], p=[0.3, 0.7], on=newborns, where=ss.mother(E | I | Q, include_born=True)), # EMULSION's produce_offspring
     init_n      = dict(I=10),

@@ -47,8 +47,8 @@ def as_states():
         i          = E >> Ii @ 0.5 * ss.by(age=[0.2, 0.2]),
         h          = E >> Ih @ 0.5 * ss.by(age=[0.1, 0.3]),
         recovery   = Ia + Is + Ii + Ih >> R @ 0.3,
-        death      = Is + Ii >> ss.null @ 0.05,
-        hosp_death = Ih >> ss.null @ 0.1,
+        death      = Is + Ii >> ss.dead @ 0.05,
+        hosp_death = Ih >> ss.dead @ 0.1,
         init_n     = init,
         name       = 'seir',
     )

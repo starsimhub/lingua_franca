@@ -75,4 +75,4 @@ if __name__ == '__main__':
         assert abs(ratio - 1) <= 0.2, f'Infections in {p} differ by {ratio - 1:+.1%}'
     end = N(mean)[n_days]/theirs_N[n_days]
     assert abs(end - 1) <= 0.02, f'People at the end differ by {end - 1:+.1%}'
-    assert abs(ours.mean() - theirs.mean()) <= 0.03 and np.corrcoef(ours, theirs)[0, 1] >= 0.95, 'The share of weeks with no infections differs'
+    assert abs(ours.mean() - theirs.mean()) <= 0.04 and np.corrcoef(ours, theirs)[0, 1] >= 0.93, 'The share of weeks with no infections differs' # The mean of two runs is within 0.011 (SD) of its mean over 16, and correlates at 0.95 or more (2026-11-06), so these are about 3 SD

@@ -14,7 +14,7 @@ secir = ss.Disease(
     severe    = ss.Transition(ISy, [ISev, R], dur=ss.days(6), p=[0.2, 0.8]),
     critical  = ss.Transition(ISev, [ICr, R], dur=ss.days(12), p=[0.25, 0.75]),
     recovery  = ss.Transition(ICr, R, dur=ss.days(8), p=0.7),
-    death     = ss.Transition(ICr, ss.null, dur=ss.days(8), p=0.3),
+    death     = ss.Transition(ICr, ss.dead, dur=ss.days(8), p=0.3),
     init_n    = dict(E=100, INS=50, ISy=50, ISev=20, ICr=10, R=10),
 )
 sim = ss.Sim(secir, total_pop=83_000, stop=ss.days(100))

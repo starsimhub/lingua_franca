@@ -20,8 +20,8 @@ def p51(beta1=b1, yrs=20, **kw):
     sir = ss.Disease(
         infection = S >> I @ ss.seasonal(mean=ss.perday(b0), amplitude=beta1, peak=0.25) * I,
         recovery  = I >> R @ ss.perday(g),
-        births    = ss.null >> S @ ss.perday(m) * (S + I + R).n,
-        deaths    = S + I + R >> ss.null @ ss.perday(m),
+        births    = ss.unborn >> S @ ss.perday(m) * (S + I + R).n,
+        deaths    = S + I + R >> ss.dead @ ss.perday(m),
         init      = dict(S=1/17, I=1e-4, R=1-1/17-1e-4),
         name = 'sir',
     )
@@ -48,8 +48,8 @@ def p51b(beta1=0.35, yrs=10, **kw):
         infection = S >> E @ ss.seasonal(mean=ss.perday(beta0), amplitude=beta1, peak=0.25) * I,
         latency   = E >> I @ ss.perday(sig),
         recovery  = I >> R @ ss.perday(gam),
-        births    = ss.null >> S @ ss.perday(mu) * (S + E + I + R).n,
-        deaths    = S + E + I + R >> ss.null @ ss.perday(mu),
+        births    = ss.unborn >> S @ ss.perday(mu) * (S + E + I + R).n,
+        deaths    = S + E + I + R >> ss.dead @ ss.perday(mu),
         init      = dict(S=0.06, E=1e-4, I=1e-4, R=1-0.06-2e-4),
         name = 'sir',
     )
@@ -85,8 +85,8 @@ def p52(yrs=20, **kw):
         infection = S >> E @ (lambda sim: ss.perday(t_b0*term(sim.ti))) * I,
         latency   = E >> I @ ss.perday(t_sig),
         recovery  = I >> R @ ss.perday(t_gam),
-        births    = ss.null >> S @ ss.perday(t_mu) * (S + E + I + R).n,
-        deaths    = S + E + I + R >> ss.null @ ss.perday(t_mu),
+        births    = ss.unborn >> S @ ss.perday(t_mu) * (S + E + I + R).n,
+        deaths    = S + E + I + R >> ss.dead @ ss.perday(t_mu),
         init      = dict(S=0.06, E=1e-4, I=1e-4, R=1-0.06-2e-4),
         name = 'sir',
     )
@@ -101,8 +101,8 @@ def p52b(yrs=20, **kw):
         infection = S >> E @ ss.perday(t_b0) * calendar * I,
         latency   = E >> I @ ss.perday(t_sig),
         recovery  = I >> R @ ss.perday(t_gam),
-        births    = ss.null >> S @ ss.perday(t_mu) * (S + E + I + R).n,
-        deaths    = S + E + I + R >> ss.null @ ss.perday(t_mu),
+        births    = ss.unborn >> S @ ss.perday(t_mu) * (S + E + I + R).n,
+        deaths    = S + E + I + R >> ss.dead @ ss.perday(t_mu),
         init      = dict(S=0.06, E=1e-4, I=1e-4, R=1-0.06-2e-4),
         name = 'sir',
     )
@@ -129,8 +129,8 @@ def p53(yrs=20, **kw):
     sir = ss.Disease(
         infection = S >> I @ ss.perday(b0) * I,
         recovery  = I >> R @ ss.perday(g),
-        births    = ss.null >> S @ ss.seasonal(mean=ss.perday(m), amplitude=0.5, peak=0.25) * (S + I + R).n,
-        deaths    = S + I + R >> ss.null @ ss.perday(m),
+        births    = ss.unborn >> S @ ss.seasonal(mean=ss.perday(m), amplitude=0.5, peak=0.25) * (S + I + R).n,
+        deaths    = S + I + R >> ss.dead @ ss.perday(m),
         init      = dict(S=1/17, I=1e-4, R=1-1/17-1e-4),
         name = 'sir',
     )
