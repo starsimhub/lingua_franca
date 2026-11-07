@@ -59,7 +59,7 @@ Starsim's library modules (`ss.SIR`, `ss.SIS`, `ss.SEIR`, `ss.Births`, `ss.Death
 | **`ss.immigration`** | Shorthand: an inflow of a number of people per unit time (`n=ss.peryear(100)`), at ages like the population's |
 | **`ss.emigration`** | Shorthand: an outflow, recorded as people who left rather than died |
 | **`ss.migration`** | Net migration of everyone at a rate per person of either sign, e.g. `ss.migration(rate='Albania')` for the UN's rates |
-| **`ss.move`** | A move made now, from code: `ss.move(I >> R, p)`, with `n=` people or `p=` each, among `who=`; not checked against the declared transitions |
+| **`ss.move`** | A move made now, from code: `ss.move(I >> R, p=0.5)` (or `ss.move(I, R, p=0.5)`), with `n=` people or `p=` each, among `who=`; not checked against the declared transitions |
 | **`ss.lifetable`** | A life table (ages and deaths) for `ss.death(lifetable=...)`, or by year and sex for `ss.Deaths(lifetable=...)` |
 | **`ss.transfer`** | Movement between levels of a stratification: `ss.transfer(dict(risk=('low', 'high')), rate=)` |
 | **`ss.par`** | A named parameter with `bounds`, `prior`, `source`, `doc` |

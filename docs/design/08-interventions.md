@@ -168,7 +168,7 @@ Each delivery reports the number delivered and the realized coverage as results,
 
 ### `who=` as a function
 
-When who is eligible depends on more than a condition can say, write one function of the sim. It is called every step and returns who is eligible: UIDs, a mask, or `True` or `False` for everyone. `coverage=` and `capacity=` then apply to them as to any eligible people, and `when=` says when; to reach exactly the people it returns at each step, give `when=` every step.
+When who is eligible depends on more than a condition can say, write one function of the sim. It is called every step and returns who is eligible: UIDs, a mask, or `True` or `False` for everyone. A function that reads only the time (`lambda sim: sim.ti > 20`) says when, not who, so it is an error pointing to `when=`; this holds for `who=` everywhere (`ss.modify`, transitions, `ss.move`). A bare `who=True`, `False`, or number is an error too: leave `who=` out for everyone. `coverage=` and `capacity=` then apply to them as to any eligible people, and `when=` says when; to reach exactly the people it returns at each step, give `when=` every step.
 
 ```python
 def to_busiest_clinics(sim):
