@@ -72,7 +72,7 @@ After `stratify()`, the model is one in which:
 
 1. Every state in `states` is split into one state per level (within the groups selected by `where=`, if given).
 2. Every transition touching those states is split, keeping its name and its rate or dwell-time declaration.
-3. Each `adjust` multiplier is applied to the named transition in the corresponding level. `adjust={'rel_trans': [...]}` and `adjust={'rel_sus': [...]}` multiply the infectiousness and susceptibility of the people in each level (of the states the dimension applies to), as summer2's infectiousness adjustments do.
+3. Each `adjust` multiplier is applied to the named transition in the corresponding level, or to one destination of a transition with several (`adjust={'outcome.dead': [...]}`), whose probability it scales as a modifier on it does ([03](03-states-and-transitions.md)). `adjust={'rel_trans': [...]}` and `adjust={'rel_sus': [...]}` multiply the infectiousness and susceptibility of the people in each level (of the states the dimension applies to), as summer2's infectiousness adjustments do.
 4. The transitions implied by the dimension's kind are generated ([below](#kinds)).
 5. Any extra transitions passed as keywords are added.
 

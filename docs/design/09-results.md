@@ -28,7 +28,7 @@ res.infection, res.recovery      # one flow per transition: the number of events
 res.infection.cum                # its cumulative total, computed when asked for
 ```
 
-Nothing was declared. Results live under the module that produced them, `sim.results.<module>.<result>`, as in Starsim, and this access form is used throughout the specification. A module's results are the same under every solver. The sim's own results about people (`sim.results.alive`, `female`, `new_deaths`, and the rest) exist only in an agent-based run, since a compartmental run has no people of its own.
+Nothing was declared. Results live under the module that produced them, `sim.results.<module>.<result>`, as in Starsim, and this access form is used throughout the specification. A module's results are the same under every solver. The sim's own results about people (`sim.results.alive`, `female`, `died`, and the rest) are recorded by `ss.People` in an agent-based run. A compartmental run has no people of its own, so it has `alive`, `died`, and `emigrated` only, worked out from the declared states and flows: they exist from `sim.init()`, as with agents, and are filled in as each step is recorded (`alive[ti]` at the step's start), so code in a run (a function of the sim in `ss.modify`) reads them as it would with agents (decided 2026-11-06).
 
 A build MUST generate, for every module with states and transitions:
 
