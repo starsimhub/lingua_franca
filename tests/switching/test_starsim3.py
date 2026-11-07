@@ -26,9 +26,9 @@ def make_hiv_sis(*interventions, where=None):
     S, I = ss.states('S I')
     sis = ss.Disease(infection=ss.Transition(S, I, rate=ss.peract(0.05) * I), recovery=ss.Transition(I, S, dur=ss.years(2)), init_prev=0.025, name='sis') # Per act on ss.SexualNet (a rate there is an error); about what ss.peryear(0.6) gave at monthly steps
     where = where if where is not None else hiv.cd4 < 200 # A condition on a v3 array
-    intvs = [ssl.ART(year=[2000, 2010], coverage=[0, 0.4])] + [i(hiv) for i in interventions]
+    intvs = [ssl.ART(coverage=ss.timeseries({2000: 0, 2010: 0.4}, interpolation='linear'))] + [i(hiv) for i in interventions]
     return ss.Sim([hiv, sis], networks=ss.SexualNet(), n_agents=1000, start=2000, stop=2015, dt=ss.years(1/12), interventions=intvs,
-                  connectors=ss.modify(sis.rel_sus, multiply=5, where=where), verbose=0)
+                  connectors=ss.modify(sis.rel_sus, multiply=5, who=where), verbose=0)
 
 
 def test_starsim3_unchanged():
@@ -42,8 +42,8 @@ def test_starsim3_unchanged():
 
 def test_starsim3_verbs():
     sc.heading('Starsim 3: v4 verbs on the HIV module written as code')
-    halve = lambda hiv: ss.modify(hiv.rel_trans, multiply=0.5, start=2005) # A v4 verb on the v3 disease
-    msim = ss.parallel(baseline=make_hiv_sis(), prep=make_hiv_sis(halve), n_runs=2)
+    halve = lambda hiv: ss.modify(hiv.rel_trans, multiply=0.5, when=ss.schedule(start=2005)) # A v4 verb on the v3 disease
+    msim = ss.parallel({"baseline": make_hiv_sis(), "prep": make_hiv_sis(halve)}, n_runs=2)
     averted = -msim.diff('baseline').prep.hiv.infection.cum.values[:, -1].mean()
     assert averted > 0, f'Halving HIV infectiousness from 2005 should avert infections, not {averted}'
     return msim
@@ -51,16 +51,16 @@ def test_starsim3_verbs():
 
 def test_starsim3_fit():
     sc.heading('Starsim 3: fit ss.SIS (now declared), with bounds given as Starsim 3 gave the value')
-    truth = ss.Sim(diseases=ss.SIS(beta=ss.peryear(0.2)), rand_seed=1, **kw()).run()
+    truth = ss.Sim(diseases=ss.SIS(beta=ss.peryear(0.2), dur_inf=ss.years(10)), rand_seed=1, **kw()).run() # Starsim 3's dur_inf, in years: ss.SIS's default is now 10 days
     data = truth.to_df()[['time', 'sis_prevalence']].iloc[1:].rename(columns=dict(time='t', sis_prevalence='sis.prevalence'))
-    sis = ss.SIS(beta=ss.par(ss.peryear(0.1), bounds=[0.05, 1]))
-    fit = ss.Sim(diseases=sis, data=data, **kw()).fit(n_trials=10, rand_seed=1)
+    sis = ss.SIS(beta=ss.par(ss.peryear(0.1), bounds=[0.05, 1]), dur_inf=ss.years(10))
+    fit = ss.Sim(diseases=sis, data=data, **kw()).fit(method=ss.fit.method('optuna', n_trials=10), rand_seed=1)
     beta = fit.pars.beta.value
     assert np.isclose(beta, 0.2, rtol=0.3), f'The fitted beta, {beta:.3f}, should be near the true 0.2'
 
     # The same for the SIS written as code: bounds on a parameter of a module written as code are fitted too
     agents = ssl.AgentSIS(name='sis', beta=ss.par(ss.peryear(0.1), bounds=[0.05, 1]), waning=ss.peryear(1e6))
-    fit = ss.Sim(diseases=agents, data=data, **kw()).fit(n_trials=10, rand_seed=1)
+    fit = ss.Sim(diseases=agents, data=data, **kw()).fit(method=ss.fit.method('optuna', n_trials=10), rand_seed=1)
     beta = fit.pars.beta.value
     assert np.isclose(beta, 0.2, rtol=0.3), f'The fitted beta of the SIS written as code, {beta:.3f}, should be near the true 0.2'
     return fit
