@@ -14,5 +14,5 @@ partners = ss.DegreeNet(n_contacts=0.7, concurrency=0.22, max_contacts=3, dur=50
 sim = ss.Sim(sis, networks=partners, n_agents=500, stop=500)
 
 if __name__ == '__main__':
-    msim = sim.run(n_runs=10)
+    msim = ss.parallel(sim, n_runs=10)
     msim.plot()

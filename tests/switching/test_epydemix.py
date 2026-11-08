@@ -49,8 +49,8 @@ def weekly_data():
 
 def test_epydemix_kenya():
     sc.heading('epydemix: the Kenya tutorial, 100 chain-binomial runs, against epydemix')
-    sim = ss.Sim(make_kenya(), networks=ss.contacts('Kenya'), people=ss.population('Kenya', year=2020), solver='binomial', substeps=1, **kenya) # Whole days, as epydemix takes them
-    res = sim.run(n_runs=100).results.sir
+    sim = ss.Sim(make_kenya(), networks=ss.contacts('Kenya'), people=ss.population('Kenya', year=2020), solver=ss.solvers.binomial(substeps=1), **kenya) # Whole days, as epydemix takes them
+    res = ss.parallel(sim, n_runs=100).results.sir
     I, R = [np.asarray(res[key].values).mean(axis=0) for key in ['I', 'R']]
     N = I[0] + R[0] + np.asarray(res.S.values).mean(axis=0)[0]
     assert abs(I.max()/N - ref_peak) < 0.005, f'Peak {I.max()/N:.2%} against epydemix\'s {ref_peak:.2%}'
@@ -63,7 +63,7 @@ def test_epydemix_vaccine_by_age():
     sc.heading('epydemix: a vaccine for the under-5s and the over-50s, written on the disease\'s age groups')
     def delivered(eligible):
         sir = make_kenya(beta=0)
-        vax = ss.vaccinate(ss.Vaccine(efficacy=0.9), coverage=1.0, at=['2019-12-02'], where=eligible(sir))
+        vax = ss.vaccinate(ss.Vaccine(efficacy=0.9), coverage=1.0, when=['2019-12-02'], who=eligible(sir))
         sim = ss.Sim(sir, people=ss.population('Kenya', year=2020), interventions=vax, solver='ode', **sc.mergedicts(kenya, stop='2019-12-05')).run()
         return np.nansum(sim.results.vax.delivered.values)
     under5 = delivered(lambda sir: sir.age < 5)
@@ -79,7 +79,7 @@ def test_epydemix_filter():
     loglik = {}
     for b in [0.4, true_b, 0.6]:
         filt = ss.fit.ParticleFilter(sim.new(pars=dict(b=b), rand_seed=0).init(), likelihood=dict(infection=ss.poisson())) # The filter starts from the sim as initialized
-        loglik[b] = filt(n_particles=100, seed=0)
+        loglik[b] = filt(n_particles=100, rand_seed=0)
     assert max(loglik, key=loglik.get) == true_b, f'Expected the filter to peak at b = {true_b}: {loglik}'
     return loglik
 
@@ -87,11 +87,11 @@ def test_epydemix_filter():
 def test_epydemix_posterior_projection():
     sc.heading('epydemix: a posterior with no likelihood, then projections from it')
     sim = make_seasonal(data=weekly_data())
-    fit = sim.fit(method='abc-smc', particles=50, generations=3, verbose=0) # A distance (wmape), no likelihood
+    fit = sim.fit(method=ss.fit.method('abc-smc', samples=50, generations=3), verbose=0) # A distance (wmape), no likelihood
     lo, hi = np.quantile(fit.samples.b, [0.025, 0.975])
     assert lo <= true_b <= hi, f'Expected the posterior of b ({lo:.3f} to {hi:.3f}) to cover {true_b}'
-    vaccine = ss.vaccinate(ss.Vaccine(efficacy=0.9), capacity=ss.perday(20_000), start='2020-04-01')
-    proj = fit.project(dict(baseline=None, vaccine=vaccine), n=20) # One run per posterior draw
+    vaccine = ss.vaccinate(ss.Vaccine(efficacy=0.9), capacity=ss.perday(20_000), when=ss.schedule(start='2020-04-01'))
+    proj = fit.project(dict(baseline=None, vaccine=vaccine), n_runs=20) # One run per posterior draw
     df = proj.to_df(quantiles=[0.05, 0.5, 0.95])
     assert set(df.scenario) == {'baseline', 'vaccine'}, f'The draws should be runs of each scenario, not scenarios: {df.scenario.unique()[:4]}'
     peak = df[(df.result == 'I') & (df.scenario == 'baseline')].groupby('quantile').value.max()

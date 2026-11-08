@@ -97,8 +97,8 @@ if __name__ == '__main__':
     long = sim.new(verbose=0, stop=100).run().results.seir.R[-1]
     for solver,n_runs in [('binomial', 100), ('abm', 20)]:
         pars = dict(n_agents=1000) if solver == 'abm' else {}
-        at_20 = ss.parallel(sim.new(verbose=0, solver=solver, **pars), n_runs=100, parallel=False).results.seir.R.values[:, -1]
-        at_100 = ss.parallel(sim.new(verbose=0, solver=solver, stop=100, **pars), n_runs=n_runs, parallel=False).results.seir.R.values[:, -1]
+        at_20 = ss.parallel(sim.new(verbose=0, solver=solver, **pars), n_runs=100, workers=1).results.seir.R.values[:, -1]
+        at_100 = ss.parallel(sim.new(verbose=0, solver=solver, stop=100, **pars), n_runs=n_runs, workers=1).results.seir.R.values[:, -1]
         print(f'{solver}: recovered at time 20 {at_20.mean():.0f} ± {at_20.std()/10:.0f} (ODE {res.R[-1]:.0f}); at time 100 {at_100.mean():.0f} (ODE {long:.0f})')
         assert abs(at_100.mean()/long - 1) < 0.01, f'{solver} ends with {at_100.mean():.0f} recovered, the ODE {long:.0f}'
         assert at_20.min() > 0 and abs(at_20.mean()/res.R[-1] - 1) < 0.1, f'{solver} has {at_20.mean():.0f} recovered at time 20, the ODE {res.R[-1]:.0f}'

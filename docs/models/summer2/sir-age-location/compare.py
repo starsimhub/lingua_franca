@@ -31,7 +31,7 @@ if __name__ == '__main__':
     ode = res.R[-1] # At the stop
     for solver in ['binomial', 'abm']:
         run = sim.new(verbose=0, solver=solver, **(dict(n_agents=1000) if solver == 'abm' else {}))
-        runs = ss.parallel(run, n_runs=100, parallel=False).results.sir
+        runs = ss.parallel(run, n_runs=100, workers=1).results.sir
         recovered = runs.R.values.mean(axis=0)[-1]
         print(f'{solver}: recovered at the end {recovered:.0f} (ODE {ode:.0f})')
         assert abs(recovered/ode - 1) < 0.01, f'{solver} gives {recovered:.0f} recovered, the ODE {ode:.0f}'

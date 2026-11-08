@@ -66,9 +66,9 @@ hiv = ss.Disease(
     treated    = tx + vs,
     init_n     = {k: sex(*v) for k,v in init.items()},
 )
-hiv.stratify(sex=['females', 'males'], kind='space', fractions=cascade[0]) # A place, so that .n is the count in each sex
+hiv.stratify(sex=ss.levels(dict(zip(['females', 'males'], cascade[0]/cascade[0].sum())), kind='space')) # A place, so that .n is the count in each sex
 # One step a year, in which Atomica moves at most everyone out of a compartment
-sim = ss.Sim(hiv, total_pop=cascade[0].sum(), start=2016, stop=2035, integrator='euler', substeps=1)
+sim = ss.Sim(hiv, total_pop=cascade[0].sum(), start=2016, stop=2035, solver=ss.solvers.ode(integrator='euler', substeps=1))
 
 # The budget scenarios: the programs act from 2019, and the budget is doubled or cut to nothing from 2020
 on = ss.timeseries({2016: 0, 2019: 1})
@@ -76,5 +76,5 @@ budgets = dict(default=1, doubled=2, zero=0)
 scenarios = {f'{k}_budget': dict(programs=on, budget=ss.timeseries({2016: 1, 2020: v})) for k,v in budgets.items()}
 
 if __name__ == '__main__':
-    msim = ss.parallel(baseline=sim, **{k:sim.new(pars=v) for k,v in scenarios.items()}, parallel=False)
+    msim = ss.parallel(dict(baseline=sim, **{k:sim.new(pars=v) for k,v in scenarios.items()}), workers=1)
     msim.plot()

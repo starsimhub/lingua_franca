@@ -23,7 +23,7 @@ def test_seir_2pop():
     folder = examples / 'seir_2pop'
     sim = load_flepimop(folder / 'original' / 'config_sample_2pop.yml', **kw)
     assert not sim.imported.incomplete
-    assert sim.pars.solver == 'ode'
+    assert str(sim.pars.solver) == 'ode' # ss.solvers.ode(substeps=1), one RK4 step a day
     res = sim.run().results.sample_2pop
     tr = sim.diseases[0].graph.transitions.S_to_E
     assert tr.contact, 'Expected the force of infection to be read as exposure to I'

@@ -7,6 +7,7 @@ import pytest
 import numpy as np
 import pandas as pd
 import sciris as sc
+import starsim as ss
 import paths
 from starsim.converters.odin import load_odin
 
@@ -73,7 +74,7 @@ def test_odin_examples():
     ex = lf / 'docs' / 'models' / 'odin' / 'stochastic_sir_arrays'
     sim = load_odin(ex / 'original' / 'discrete_stochastic_sir_arrays.R', stop=100, **kw)
     assert 'n_runs=100' in sc.strjoin(sim.imported.choices)
-    res = sim.new(verbose=0).run(n_runs=500).results[sim.pars.diseases[0].name]
+    res = ss.parallel(sim.new(verbose=0), n_runs=500).results[sim.pars.diseases[0].name]
     ref = tools.read_results(ex)
     for state in 'SIR':
         vals = res[state].values
@@ -84,7 +85,7 @@ def test_odin_examples():
     # Ages from flows between levels, and a delay as a fixed dwell time; the delay's history is listed
     ex = lf / 'docs' / 'models' / 'odin' / 'seir_array'
     sim = load_odin(ex / 'original' / 'seir_array_odin.R', stop=365, **kw)
-    assert '.stratify(age=[0, 1, 5, 15, 30]' in sim.imported.code
+    assert '.stratify(age={0: ' in sim.imported.code and ', 30: ' in sim.imported.code # The age groups and their shares
     assert [name for name,why in sim.imported.incomplete] == ['lag_inf (history)']
     code = sim.imported.code.replace('    init', f'    history = ss.unborn >> I @ ss.timeseries({{0: ss.perday({np.exp(-14/(365*50))}), 14: 0}}),\n    init', 1)
     ns = {}

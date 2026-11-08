@@ -13,8 +13,8 @@ seir = ss.Disease(
     recovery  = I >> R @ ss.prob(1/3),
     init_n    = dict(E=1),
 )
-sim = ss.Sim(seir, total_pop=10_000, stop=50, solver='binomial', substeps=1)
+sim = ss.Sim(seir, total_pop=10_000, stop=50, solver=ss.solvers.binomial(substeps=1))
 
 if __name__ == '__main__':
-    msim = sim.run(n_runs=50)
+    msim = ss.parallel(sim, n_runs=50)
     msim.plot()

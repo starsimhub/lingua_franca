@@ -26,7 +26,7 @@ def added():
     for start,stop in zip(edges[:-1], edges[1:]):
         total = sum(np.array(r) for a,b,r in cuts if a <= start < b) # Over 1 in the original would be capped at 1
         cut = ss.by(age=1 - total)
-        mods += [ss.modify(rel, multiply=cut, start=start, stop=stop) for rel in [model.seirv.rel_sus, model.seirv.rel_trans]]
+        mods += [ss.modify(rel, multiply=cut, when=ss.schedule(start=start, stop=stop)) for rel in [model.seirv.rel_sus, model.seirv.rel_trans]]
     return model.baseline.new(interventions=mods)
 
 

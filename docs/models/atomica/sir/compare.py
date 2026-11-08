@@ -22,5 +22,5 @@ if __name__ == '__main__':
         diff = np.abs(ours - theirs).max()
         print(f'{state:5s} at the end {ours[-1]:8.2f} (original {theirs[-1]:8.2f}); largest difference {diff:.3g} people')
         assert diff < tolerance, f'{state} differs by {diff:.3g} people'
-    smooth = sim.new(verbose=0, integrator='rk4', substeps=None).run().results.sir
+    smooth = sim.new(verbose=0, solver='ode').run().results.sir
     print(f'with the default integrator, inf at the end is {smooth.inf[-1]:.1f}: the yearly Euler step is part of the original model')

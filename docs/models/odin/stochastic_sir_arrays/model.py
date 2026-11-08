@@ -12,8 +12,8 @@ sir = ss.Disease(
     recovery  = I >> R @ 0.1,
     init_n    = dict(I=ss.by(run=[1]*n_groups)),
 )
-sir.stratify(run=list(map(str, range(n_groups))), kind='space') # kind='space', or else the groups would mix as one population
-sim = ss.Sim(sir, total_pop=1001*n_groups, stop=100, solver='binomial', substeps=1) # One draw a step, as in the original
+sir.stratify(run=ss.levels(list(map(str, range(n_groups))), kind='space')) # kind='space', or else the groups would mix as one population
+sim = ss.Sim(sir, total_pop=1001*n_groups, stop=100, solver=ss.solvers.binomial(substeps=1)) # One draw a step, as in the original
 
 if __name__ == '__main__':
     sim.run()

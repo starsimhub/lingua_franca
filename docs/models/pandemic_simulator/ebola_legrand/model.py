@@ -32,7 +32,7 @@ ebola = ss.Disease(
     name      = 'ebola',
 )
 measures = [
-    ss.modify(ebola.pars[name], multiply=factor, start='1995-05-04', name=name)
+    ss.modify(ebola.pars[name], multiply=factor, when=ss.schedule(start='1995-05-04'), name=name)
     for name,factor in [('betaI', 0.88), ('betaH', 0), ('betaF', 0)]
 ]
 sim = ss.Sim(ebola, interventions=measures, total_pop=200_000, start='1995-01-06', stop='1996-01-06', dt=ss.days(1), solver='ode', verbose=0)

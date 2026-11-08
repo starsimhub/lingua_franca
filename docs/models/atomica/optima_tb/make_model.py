@@ -68,6 +68,8 @@ def rewrite(code):
             for kw in getattr(call, 'keywords', []):
                 if kw.arg == 'split':
                     kw.value.elts = [ast.Constant(1/len(kw.value.elts)) for _ in kw.value.elts]
+            if isinstance(call, ast.Call) and ast.unparse(call.func) == 'ss.levels' and call.args and isinstance(call.args[0], ast.Dict): # stratify(population=ss.levels({pop: share, ...}, ...))
+                call.args[0].values = [ast.Constant(1/len(call.args[0].values)) for _ in call.args[0].values]
         lines.append(ast.unparse(node))
     return '"""\nThe structure of the Optima TB model, imported from Atomica, with default values and no data: see make_model.py\n"""\n' + '\n'.join(lines) + '\n'
 

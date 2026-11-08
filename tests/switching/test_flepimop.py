@@ -70,7 +70,7 @@ def test_flepimop_import(tmp_path):
     sim = load_config(tmp_path)
     assert not sim.imported.incomplete and sim.new().init().diseases[0].pars.Ro.prior is not None, 'The drawn Ro should be imported with its distribution as its prior'
     sim.run()
-    assert sim.pars.solver == 'ode'
+    assert str(sim.pars.solver) == 'ode' # ss.solvers.ode(substeps=1), one RK4 step a day
     hosp = sim.diseases[0].results.incidHosp
     for place in places:
         assert hosp.select(subpop=place).values.max() > 0, f'Expected hospitalizations in {place}'

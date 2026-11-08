@@ -36,7 +36,7 @@ def make_measles(d, beta=ss.perday(1.75), away=0.01, report=0.005):
     deaths      = ss.death(rate=ss.peryear(0.007))
     cases       = ss.outcome(report*onset)
     measles = ss.Disease(infection, importation, onset, recovery, births, vaccinated, deaths, cases, init=dict(R=1 - 1/14), name='measles')
-    measles.stratify(district=ss.geo.geography(names=d.names, populations=d.popsize, lat=d.lat, lon=d.lon), mobility=ss.geo.Mobility(ss.geo.gravity(distance_power=1.5), kind='visit', away=away))
+    measles.stratify(district=ss.levels(ss.geo.geography(names=d.names, populations=d.popsize, lat=d.lat, lon=d.lon), mobility=ss.geo.gravity(distance_power=1.5, kind='visit', away=away)))
     return measles
 
 
@@ -60,7 +60,7 @@ def test_measles_metapop_fit():
     sim = make_sim(make_measles(d, beta=beta, away=away, report=report), d)
     gof = lambda sim: np.mean((monthly(sim) - data)**2)
     start = gof(sim.new().run())
-    fit = sim.fit(loss=gof, method='optuna', n_trials=10)
+    fit = sim.fit(loss=gof, method=ss.fit.method('optuna', n_trials=10))
     assert gof(fit.sim.new().run()) < start, 'The fit should improve the loss'
     return fit
 
@@ -70,7 +70,7 @@ def test_measles_metapop_routine():
     ppl = ss.People(10_000, age_data=np.array([np.arange(80), np.exp(-0.035*np.arange(80))]).T)
     S, I, R = ss.states(3)
     sir = ss.Disease(S >> I @ ss.perday(0.1)*I, I >> R @ ss.days(8), ss.birth(S, rate=ss.peryear(0.03)), init=dict(I=0.001), name='sir')
-    ri = ss.vaccinate(ss.Vaccine(efficacy=0.85), coverage=0.833, at_age=ss.months(9), name='routine') # laser-measles: MCV1 274 days after birth
+    ri = ss.vaccinate(ss.Vaccine(efficacy=0.85), coverage=0.833, who=ss.at_age(ss.months(9)), name='routine') # laser-measles: MCV1 274 days after birth
     sim = ss.Sim(sir, people=ppl, interventions=ri, start='2021-01-01', stop='2022-01-01', unit='day', **kw).run()
     delivered = sim.results.routine.delivered.values
     assert delivered[:7].sum() < 0.01*len(ppl), f'Routine at 9 months gave {delivered[:7].sum():.0f} doses in the first week (the spec\'s spelling gives {ref_first_day:.0%} of everyone)'
@@ -85,7 +85,7 @@ def test_measles_metapop_memory(monkeypatch):
     ppl = ss.People(1)
     eligible = (ppl.age >= 0.75) & (ppl.age < 5) & measles.S & measles.district.isin([d.names[i] for i in northern])
     mcv = ss.Vaccine(efficacy=0.85, leaky=False) # All-or-nothing, as laser-measles models it; a move from S to R needs no extra dimension
-    sia = ss.vaccinate(mcv, at=['2011-06-01'], coverage=0.8, where=eligible)
+    sia = ss.vaccinate(mcv, when=['2011-06-01'], coverage=0.8, who=eligible)
     sim = make_sim(measles, d, interventions=sia, stratify=dict(age=[0, 0.75, 5, 15]))
     scale = len(d.names)/full_districts*730/full_days # The memory for results by group is scaled down with the model (two years), so this run keeps them as the full one would (N24)
     monkeypatch.setattr(ss.solvers.Engine, 'group_bytes', ss.solvers.Engine.group_bytes*scale)

@@ -10,6 +10,7 @@ the peak of the number infectious and its day, and the number infected over the 
 import os
 import sys
 import numpy as np
+import starsim as ss
 
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(here)))
@@ -29,7 +30,7 @@ def check(name, infectious, infected, suffix=''):
 
 
 if __name__ == '__main__':
-    res = [run.results.flu for run in sim.run(n_runs=20).sims]
+    res = [run.results.flu for run in ss.parallel(sim, n_runs=20).sims]
     check('All', np.mean([r.I.values for r in res], axis=0), np.mean([r.infection.values.sum() for r in res]))
     for state in places.names:
         check(state, np.mean([r.I.select(patch=state).values for r in res], axis=0), np.mean([r.infection.select(patch=state).values.sum() for r in res]), suffix=f'_{state}')

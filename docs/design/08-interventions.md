@@ -122,14 +122,14 @@ Every delivery has three parts, each optional: **what** is delivered (`what=`, a
 | `when=` | Means |
 |---|---|
 | nothing | routine: each person is offered it once in each spell of being eligible, at its first step |
-| a time or a list of them: `'2025-02-01'`, `[2021, 2025]`, or with no calendar `ss.days(10)` | rounds at those times (`ss.days(10)` is day 10, not every 10 days) |
+| a time or a list of them: `'2025-02-01'`, `[2021, 2025]`, or `ss.days(10)` | rounds at those times (`ss.days(10)` is 10 days after the start, not every 10 days) |
 | `ss.schedule(every=ss.years(1), start=2021, stop=2030)` | rounds this far apart, between `start` and `stop` |
 | `ss.schedule(start=2025, stop=2030)` | routine between those times |
 | an event: `sir.infection`, `screening.positive`, `anc_visit`, or a path (`'sir.infection'`) | a trigger: the people it happened to ([events](#events)), who must also be eligible |
 | `ss.on(event, delay=ss.months(3))` | a trigger, delivered that long after the event |
 | a function of the date: `lambda now: now.month == 1` | the steps on which it is true |
 
-`ss.schedule(at=None, every=None, start=None, stop=None)` is the full form of a time: `at=` (also the first argument) is the times, or a function of the date; `every=` how often; `start=` and `stop=` the period. A time is given as the times of a time series are ([below](#changes-at-given-times)). Events combine: `when=a | b` is anyone either happened to, each person once, and `when=a & b` anyone both happened to on the same step; an event joined to a condition with `&` (`when=preg.delivery & hiv_rdt.positive.ever`) is those it happened to who meet the condition, which joins `who=`. Each keyword means one thing: an event in `who=` raises an error that points to `when=`, and a condition on people in `when=` one that points to `who=`. An event joined to a condition with `|` raises too, since it is neither.
+`ss.schedule(at=None, every=None, start=None, stop=None)` is the full form of a time: `at=` (also the first argument) is the times, or a function of the date; `every=` how often; `start=` and `stop=` the period. `ss.schedule(ss.weeks(1))`, a lone duration by position, raises, asking for `every=` or `at=`; `ss.schedule()` with no arguments is due at every step. `start=` and `stop=` on a delivery or event itself (`ss.vaccinate(..., start=2005, stop=2010)`) are shorthand for `when=ss.schedule(start=, stop=)`, and go with any `when=`, limiting an event's trigger to the window (`ss.screen(test, when=onset, start=2001, stop=2010)`, Starsim 3's `on=onset, start=2001`); a window given both ways raises (restored 2026-11-07). A time is given as the times of a time series are ([below](#changes-at-given-times)). Events combine: `when=a | b` is anyone either happened to, each person once, and `when=a & b` anyone both happened to on the same step; an event joined to a condition with `&` (`when=preg.delivery & hiv_rdt.positive.ever`) is those it happened to who meet the condition, which joins `who=`. Each keyword means one thing: an event in `who=` raises an error that points to `when=`, and a condition on people in `when=` one that points to `who=`. An event joined to a condition with `|` raises too, since it is neither.
 
 ### Delivery keywords
 
@@ -146,7 +146,7 @@ Every delivery has three parts, each optional: **what** is delivered (`what=`, a
 | `skip_reached_within=` | skip the people this delivery reached less than this long ago (agents only), e.g. `ss.years(1)` for a re-screening interval |
 | `disease=` | the disease the product acts on (default: the only one; for a step with no product, the disease of its trigger, or the first). A list, or a disease whose strains have courses of their own (HP7), delivers it for each: a vaccine's efficacy against each disease, a test detecting each one's infected (or each one's state of a name, `outcomes=dict(high=dict(cin=0.9))`), the worst result over them per person, and a cure of each one's infected; as if its values were keyed by disease, which they then are. A list is agents only (decided 2026-10-20); a product keyed by the diseases itself (`ss.Vaccine(efficacy=dict(hpv16=0.9, hpv18=0.9))`, `ss.Treatment(cure={ng.cure: 0.95, ct.cure: 0.95})`, or a test's `sensitivity=` by their states, whose diseases are then tracked jointly) has a compartmental form. A disease written as code (PL2) is a `disease=` too, as agents: a test detects its `infected`, a cure calls its `clear_infection(uids)`, and a vaccine scales its `rel_sus` and `rel_trans`; a missing part raises naming it |
 
-Each old keyword (`where=`, `on=`, `at=`, `every=`, `start=`, `stop=`, `delay=`, `at_age=`, `move=`, `product=`, `priority=`, `queue=`, `eligibility=`) raises a `TypeError` naming what replaces it.
+Each old keyword (`where=`, `on=`, `at=`, `every=`, `delay=`, `at_age=`, `move=`, `product=`, `priority=`, `queue=`, `eligibility=`) raises a `TypeError` naming what replaces it.
 
 ```python
 ss.vaccinate(bcg, who=ss.person.age < 5, coverage=0.7, when=[2021, 2025])                                  # two campaign rounds
@@ -272,19 +272,19 @@ The simplest time-varying intervention is a modifier whose amount is a time seri
 ```python
 ss.modify(sir.pars.beta, multiply=ss.timeseries({'2020-03-15': 0.5, '2020-06-01': 1.0}), when=ss.schedule(start='2020-03-15'))
 ss.modify('school.pars.n_contacts', multiply=ss.timeseries({2020.2: 0.2, 2020.6: 1.0}), when=ss.schedule(start=2020.2))
-ss.modify(sir.pars.beta, set=ss.timeseries({ss.days(30): 0.02, ss.days(60): 0.05}), when=ss.schedule(start=ss.days(30)))   # a sim with no calendar
+ss.modify(sir.pars.beta, set=ss.timeseries({ss.days(30): 0.02, ss.days(60): 0.05}), start=ss.days(30))   # 30 and 60 days after the start
 ```
 
 - The target is any quantity `ss.modify` accepts.
-- The times are points on the sim's axis, which its `start` decides ([02-types.md](02-types.md)). In a sim with a calendar they are dates (`'2020-03-15'`) or calendar years (a bare number, from 1800 on), and a duration is an error that suggests a date or `sim.pars.start + ss.days(30)`; in a sim with no calendar they are durations from 0 (`ss.days(30)` is day 30) or numbers in the sim's unit. A duration in a unit other than the sim's or the module's warns. The same holds for a delivery's `when=`, `ss.schedule()`, and `sim.run(until=)`. A time outside the sim raises a `ValueError`; so does a `start` or a round of a delivery, while a `stop` after the end means it never stops.
+- The times are points on the sim's axis, which its `start` decides ([02-types.md](02-types.md)). In a sim with a calendar they are dates (`'2020-03-15'`) or calendar years (a bare number, from 1800 on); in a sim with no calendar they are numbers in the sim's unit. A duration is that long after the sim's start (`ss.days(30)`), as in Starsim 3; in a sim with no calendar that is day 30 from 0. A duration in a unit other than the sim's or the module's warns. The same holds for a delivery's `when=`, `ss.schedule()`, and `sim.run(until=)`. A time outside the sim raises a `ValueError`; so does a `start` or a round of a delivery, while a `stop` after the end means it never stops.
 - `multiply=` gives multipliers relative to the baseline value (not to the previous entry); `set=` gives absolute values.
 - Each value holds from its time until the next (`interpolation='step'`, the default for a time series); a `start` at the first time keeps the baseline before it.
 
-It is an ordinary modifier ([07-effects.md](07-effects.md)): it combines with other modifiers by the same rule, appears in `what_modifies()`, and takes `who=`, `when=`, and `until=`. Starsim 3's `ss.change(target, at=[...], by=[...])` (and `to=`) was a shorthand for it, removed in v4 since it was no shorter; `ss.converters.migrate` rewrites it.
+It is an ordinary modifier ([07-effects.md](07-effects.md)): it combines with other modifiers by the same rule, appears in `what_modifies()`, and takes `who=`, `when=` (or `start=` and `stop=`), and `until=`. Starsim 3's `ss.change(target, at=[...], by=[...])` (and `to=`) was a shorthand for it, removed in v4 since it was no shorter; `ss.converters.migrate` rewrites it.
 
 ## Triggers
 
-"When" is `when=`, on time alone, for a delivery and for `ss.modify`: times, `ss.schedule()` (a window with only `start=` and `stop=`), or a function of the date (`lambda now: now.month in [6, 7, 8]`); a delivery's may also be an event. A condition on the state of the epidemic is `who=`: a condition on the population (`sir.I.n > 1000`), or a function of the sim returning `True` or `False`:
+"When" is `when=`, on time alone, for a delivery and for `ss.modify`: times, `ss.schedule()` (a window with only `start=` and `stop=`, also given as `start=` and `stop=` themselves), or a function of the date (`lambda now: now.month in [6, 7, 8]`); a delivery's may also be an event. A condition on the state of the epidemic is `who=`: a condition on the population (`sir.I.n > 1000`), or a function of the sim returning `True` or `False` (one that reads only the time raises, pointing to `start=` and `stop=`):
 
 ```python
 S, I, R = ss.states('S I R')
@@ -296,7 +296,7 @@ def many_cases(sim):
     return new[max(0, sim.ti - 7):sim.ti].sum() > 100  # the last seven completed steps
 
 closures = ss.modify('school.pars.n_contacts', multiply=0.2, who=many_cases)
-sim = ss.Sim(sir, networks=[home, school], interventions=closures, n_agents=2000, stop=ss.days(100)).run()
+sim = ss.Sim(sir, networks=[home, school], interventions=closures, n_agents=2000, dur=ss.days(100)).run()
 ```
 
 A policy with a release takes `until=`, so that it doesn't switch on and off around one threshold: `ss.modify(beta, multiply=0.5, who=I.n >= 2000, until=I.n <= 1000)` is on from when `who=` holds until `until=` does, for each place or group on its own, under every solver.
@@ -326,8 +326,10 @@ class SchoolClosure(ss.Intervention):
 
 closure = SchoolClosure(name='closure')
 effect  = ss.modify('school.pars.n_contacts', multiply=0.2, who=lambda sim: sim.interventions.closure.closed)
-sim     = ss.Sim(sir, networks=[home, school], interventions=[closure, effect], n_agents=2000, stop=ss.days(100)).run()
+sim     = ss.Sim(sir, networks=[home, school], interventions=[closure, effect], n_agents=2000, dur=ss.days(100)).run()
 ```
+
+An intervention written as code takes `who=` too (Starsim 3's `eligibility=`, which raises naming it): a condition on people, a state by its path, or a function of the sim (and of the intervention, as `self`) returning UIDs or a mask, read as a delivery's is. Its `check_eligibility()`, kept from Starsim 3 (restored 2026-11-07), returns the UIDs of those alive it holds for (everyone alive with no `who=`), for use in `step()`, and can be overridden.
 
 The class decides and remembers; the modifier applies the effect, so the base contact rate is never overwritten and comes back when `closed` is cleared ([07-effects.md](07-effects.md#plain-code-in-step)). Whether a function of the sim as `who=` should exist at all, given how little it can say safely, is open ([19-open-questions.md](19-open-questions.md)).
 
@@ -379,7 +381,7 @@ Conditions, coverage functions, and `who=` functions are tried on what the solve
 - **`min_duration=` on a trigger.** `until=` with a duration is that minimum; other rules with memory are a `step()`.
 - **An outcome and a testing intervention both producing cases.** If the model has tests, the tests produce the cases.
 - **`days=` as a time keyword.** `when=` and a time series take dates, years, or durations.
-- **Several keywords for when** (`at=`, `every=`, `start=`, `stop=`, `on=`, `delay=`) and for who (`where=`, `at_age=`, `eligibility=`). One `when=`, told apart by type, with `ss.schedule()` and `ss.on()` for the full forms; one `who=`.
+- **Several keywords for when** (`at=`, `every=`, `on=`, `delay=`) and for who (`where=`, `at_age=`, `eligibility=`). One `when=`, told apart by type, with `ss.schedule()` and `ss.on()` for the full forms; one `who=`. `start=` and `stop=` stay, as shorthand for a window (`when=ss.schedule(start=, stop=)`), and with an event as `when=` limit its trigger to the window (restored 2026-11-07).
 - **`ss.change(at=, by=, to=)`**, a shorthand for `ss.modify` of a time series. It was no shorter, and was a second name for one idea.
 - **Follow-ups nested in a test (`on_positive=`, `on_negative=`).** A cascade is not a tree: a trigger can be the union of several events, one result feeds several steps, and memory carries a result forward. Steps are peers, triggered by events.
 - **`who >> what` as the spelling of a step** (`screening.ascus >> ss.screen(hpv_dna)`), by analogy with `S >> I`. Keywords (`when=`, and the product as the first argument) say the same without parentheses around a trigger of several parts.

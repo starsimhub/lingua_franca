@@ -10,6 +10,7 @@ infectious, its day, and the number recovered at the end.
 import os
 import sys
 import numpy as np
+import starsim as ss
 
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(here)))
@@ -28,7 +29,7 @@ def check(name, ours, theirs):
 
 
 if __name__ == '__main__':
-    runs = sim.run(n_runs=40).sims
+    runs = ss.parallel(sim, n_runs=40).sims
     res = [run.results.sirs for run in runs if run.results.sirs.I.values.max() >= 1000] # The runs in which the epidemic took off
     print(f'The epidemic took off in {len(res)} of {len(runs)} runs')
     check('Arizona', np.mean([r.I.values for r in res], axis=0), ref['I'])

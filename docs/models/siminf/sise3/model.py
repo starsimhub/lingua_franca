@@ -46,7 +46,7 @@ sise3 = ss.Disease(
     init_n      = {key:ss.by(herd=u0[key].values) for key in ['I_1', 'S_2', 'S_3']}, # The rest in S_1
 )
 size = u0[['S_1', 'I_1', 'S_2', 'S_3']].sum(axis=1)
-sise3.stratify(herd=list(u0.node.astype(str)), kind='space', fractions=size/size.sum(), states=[S_1, I_1, S_2, I_2, S_3, I_3, phi], mobility=ss.geo.Mobility(data=register))
+sise3.stratify(herd=ss.levels(dict(zip(u0.node.astype(str), size/size.sum())), kind='space', states=[S_1, I_1, S_2, I_2, S_3, I_3, phi], mobility=ss.geo.register(register)))
 sim = ss.Sim(sise3, total_pop=size.sum(), solver='gillespie', unit='day', start=0, stop=1460)
 
 if __name__ == '__main__':

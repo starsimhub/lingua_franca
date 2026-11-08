@@ -65,12 +65,13 @@ def make_tb(ages=True, data=None):
     detect_max = ss.par(1.5, bounds=[0.2, 4])
     S, E, L, I, T, R = ss.states('S E L I T R')
     tb = ss.Disease(infection=S >> E @ beta*I, reinfection_L=L >> E @ beta*0.21*I, reinfection_R=R >> E @ beta*0.21*I,
-                    stabilisation=E >> L @ 2.0, early_activation=E >> I @ 0.2, late_activation=L >> I @ 0.002, self_recovery=I >> R @ 0.2,
+                    stabilisation=E >> L @ 2.0, early_activation=E >> I @ 0.2*(ss.by(age=[3, 1.5, 1, 1, 1, 1]) if ages else 1), late_activation=L >> I @ 0.002, self_recovery=I >> R @ 0.2,
                     detection=I >> T @ detect_max*scaleup, treatment_end=T >> R @ 2.0, tb_death=ss.death(I, rate=0.2),
                     death=ss.death(rate=1/70), birth=ss.birth(S, rate=0.02), init_n=dict(I=1000), name='tb')
     if ages:
-        tb.stratify(age=[0, 5, 15, 35, 50, 70], fractions=[1/6]*6, adjust={'early_activation': [3, 1.5, 1, 1, 1, 1], 'rel_trans': [0.1, 0.2, 1, 1, 1, 1]})
-    return ss.Sim(tb, networks=ss.contacts(mixing) if ages else None, total_pop=1e6, start=1950, stop=2025, unit='year', data=data, verbose=0)
+        tb.stratify(age={a: 1/6 for a in [0, 5, 15, 35, 50, 70]})
+    rel_trans = ss.modify(tb.rel_trans, multiply=ss.by(age=[0.1, 0.2, 1, 1, 1, 1])) if ages else None
+    return ss.Sim(tb, networks=ss.contacts(mixing) if ages else None, connectors=rel_trans, total_pop=1e6, start=1950, stop=2025, unit='year', data=data, verbose=0)
 
 
 def notifications():
@@ -126,7 +127,7 @@ def test_summer2_nuts():
     in_jax, from_sim = jax_logdensity(runner, np.array([10.2, 1.53]))
     assert np.isclose(in_jax, from_sim, rtol=1e-6), f'The JAX log-density ({in_jax:.6g}) differs from the sim\'s ({from_sim:.6g})'
     with ss.options.context(warnings='error'): # Falling back to Python in the loop is a failure here
-        fit = sim.fit(method='nuts', likelihood=lik, warmup=10, draws=10, chains=2, verbose=0) # About 15 s with JAX's cache warm
+        fit = sim.fit(method=ss.fit.method('nuts', warmup=10, draws=10, chains=2), likelihood=lik, verbose=0) # About 15 s with JAX's cache warm
     assert fit.diagnostics.divergences == 0, f'{fit.diagnostics.divergences} draws diverged'
     assert np.isclose(fit.pars.detect_max, 1.5, rtol=0.05) and np.isclose(fit.pars.beta, 10, rtol=0.05)
     return fit

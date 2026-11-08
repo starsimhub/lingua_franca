@@ -39,10 +39,10 @@ def make_polio(sia=False):
         init_n      = dict(I=ss.by(patch=[5, 0, 0, 0, 0])),
         name        = 'seir',
     )
-    seir.stratify(patch=patches, kind='space', fractions=N0/N0.sum())
+    seir.stratify(patch=ss.levels(dict(zip(patches, N0/N0.sum())), kind='space'))
     if sia: # camdl's transfer(S -> V), in each patch on its own days
-        sia = [ss.vaccinate(move=seir.S >> seir.V, at=days, coverage=ss.by(patch=[0.8*(q == p) for q in patches]), name=f'sia_{p}') for p, days in sia_days.items()]
-    return ss.Sim(seir, networks=ss.contacts(np.diag(R0*gamma) + kappa*W, dims='patch'), interventions=sia or None,
+        sia = [ss.vaccinate(seir.S >> seir.V, when=days, coverage=ss.by(patch=[0.8*(q == p) for q in patches]), name=f'sia_{p}') for p, days in sia_days.items()]
+    return ss.Sim(seir, networks=ss.contacts(patch=np.diag(R0*gamma) + kappa*W), interventions=sia or None,
                   total_pop=N0.sum(), unit='day', stop=3*365, solver='ode', verbose=0)
 
 

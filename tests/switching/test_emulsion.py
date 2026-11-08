@@ -57,9 +57,9 @@ def test_emulsion_quickstart():
     NG, G = ss.states('NG G')
     farrowing = ss.Transition(G, NG, dur=ss.constant(ss.days(240)))
     J, A = ss.states('J A')
-    growth = ss.Disease(maturity=ss.Transition(J, A, rate=ss.perday(1e9), where=ppl.age >= adult_age/365), newborns=ss.birth(J, on=farrowing), default_state='J')
+    growth = ss.Disease(maturity=ss.Transition(J, A, rate=ss.perday(1e9), who=ppl.age >= adult_age/365), newborns=ss.birth(J, when=farrowing), default_state='J')
     S, E, I, R, Q, M = ss.states('S E I R Q M')
-    newborns = ss.birth(M, on=farrowing)
+    newborns = ss.birth(M, when=farrowing)
     quarantine = ss.par(ss.timeseries({'2021-01-01': 0, '2021-04-01': 1, '2021-09-02': 0, '2022-04-01': 1, '2022-09-02': 0}))
     health = ss.Disease(
         infection   = S >> E @ ss.perday(0.1)*I.n/(S + E + I + R + Q + M).n,
@@ -74,18 +74,18 @@ def test_emulsion_quickstart():
         M_deaths    = ss.Transition(M, ss.dead, rate=ss.perday(0.002)*(M.time_in < ss.days(adult_age))), # EMULSION's escape
         E_deaths    = ss.Transition(E, ss.dead, rate=ss.perday(0.004)*(E.time_in < ss.days(10))),
         newborns    = newborns,
-        vertical    = ss.Transition(M, [I, M], on=newborns, where=ss.mother(E | I | Q, include_born=True), p=[0.3, 0.7]), # EMULSION's produce_offspring: (J, NG, I) with chance 0.3 from an infected mother
+        vertical    = ss.Transition(M, {I: 0.3, M: None}, when=newborns, who=ss.mother(E | I | Q, include_born=True)), # EMULSION's produce_offspring: (J, NG, I) with chance 0.3 from an infected mother
         init_n      = dict(I=10),
     )
     life = ss.Disease(
-        conception = ss.Transition(NG, G, rate=ss.perday(0.05), min_stay=ss.days(90), where=growth.A),
+        conception = ss.Transition(NG, G, rate=ss.perday(0.05), min_stay=ss.days(90), who=growth.A),
         farrowing  = farrowing,
-        abortion   = ss.Transition(G, NG, rate=ss.perday(-np.log(0.8)/240), where=health.I),
-        newborns   = ss.birth(NG, on=farrowing),
+        abortion   = ss.Transition(G, NG, rate=ss.perday(-np.log(0.8)/240), who=health.I),
+        newborns   = ss.birth(NG, when=farrowing),
         default_state = 'NG',
     )
-    sim = ss.Sim([growth, life, health], people=ppl, unit='day', dt=dt, start='2021-01-01', stop=ss.days(735), aging=True, solver='abm', verbose=0)
-    check_quickstart(sim.run(n_runs=n_runs))
+    sim = ss.Sim([growth, life, health], people=ppl, unit='day', dt=dt, start='2021-01-01', dur=ss.days(735), aging=True, solver='abm', verbose=0)
+    check_quickstart(ss.parallel(sim, n_runs=n_runs))
 
 
 def make_metapop(staged=False):
@@ -95,16 +95,16 @@ def make_metapop(staged=False):
         S, I, R = ss.states(3)
         N = S + I + R
         sir = ss.Disease(infection=S >> I @ ss.perday(0.5)*I.n/N.n, recovery=I >> R @ ss.perday(0.1), births=ss.birth(S, rate=ss.by(stage=[0, 2*b])),
-                         deaths=ss.death(rate=b*N.n/K), maturation=ss.transfer(stage=('J', 'A'), rate=ss.perday(1/20)), init_n=dict(I=ss.by(pop=[10] + [0]*9)), name='sir')
-        sir.stratify(stage=['J', 'A'], fractions=[1, 0])
+                         deaths=ss.death(rate=b*N.n/K), maturation=ss.transfer(dict(stage=('J', 'A')), rate=ss.perday(1/20)), init_n=dict(I=ss.by(pop=[10] + [0]*9)), name='sir')
+        sir.stratify(stage={'J': 1, 'A': 0})
     else: # The two machines crossed by hand into six states
         SJ, IJ, RJ, SA, IA, RA = ss.states(6)
         N, I = SJ + IJ + RJ + SA + IA + RA, IJ + IA
         sir = ss.Disease(infection_J=SJ >> IJ @ ss.perday(0.5)*I.n/N.n, infection_A=SA >> IA @ ss.perday(0.5)*I.n/N.n, recovery_J=IJ >> RJ @ ss.perday(0.1),
                          recovery_A=IA >> RA @ ss.perday(0.1), mature_S=SJ >> SA @ ss.perday(1/20), mature_I=IJ >> IA @ ss.perday(1/20), mature_R=RJ >> RA @ ss.perday(1/20),
                          births=ss.unborn >> SJ @ 2*b*(SA + IA + RA).n, deaths=ss.death(rate=b*N.n/K), init_n=dict(IJ=ss.by(pop=[10] + [0]*9)), default_state='SJ', name='sir')
-    sir.stratify(pop=[f'p{i}' for i in range(10)], kind='space')
-    return ss.Sim(sir, solver='binomial', substeps=1, unit='day', start='2018-01-01', stop=ss.days(100), total_pop=1000, verbose=0).run(n_runs=20) # Whole days, as EMULSION takes them
+    sir.stratify(pop=ss.levels([f'p{i}' for i in range(10)], kind='space'))
+    return ss.parallel(ss.Sim(sir, solver=ss.solvers.binomial(substeps=1), unit='day', start='2018-01-01', dur=ss.days(100), total_pop=1000, verbose=0), n_runs=20) # Whole days, as EMULSION takes them
 
 
 def check_metapop(counts):
@@ -133,7 +133,7 @@ def test_emulsion_import():
     sc.heading('Testing importing EMULSION\'s quickstart and matching its published output')
     sim = ss.import_from(paths.root/'docs/models/emulsion/quickstart/original/quickstart.yaml', format='emulsion', verbose=False)
     assert not sim.imported.incomplete, f'{len(sim.imported.incomplete)} parts of the model were not translated'
-    check_quickstart(sim.new(verbose=0).run(n_runs=n_runs), age='age_group', health='health_state')
+    check_quickstart(ss.parallel(sim.new(verbose=0), n_runs=n_runs), age='age_group', health='health_state')
 
 
 if __name__ == '__main__':

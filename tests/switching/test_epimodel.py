@@ -45,7 +45,7 @@ def test_epimodel_risk_groups():
     for seed in range(2):
         net = ss.DegreeNet(n_contacts=ss.by(risk=[0.4, 1.6]), match=dict(risk=0.8), dur=50) # Targets 320 edges, 320 high-risk ends, 256 within group
         sim = ss.Sim(make_sis(), networks=net, n_agents=1000, stop=300, rand_seed=seed, verbose=0)
-        sim.stratify(risk=['low', 'high'], fractions=[0.8, 0.2])
+        sim.stratify(risk={'low': 0.8, 'high': 0.2})
         prevs.append(prev_by_group(sim.run()))
     low, high = np.mean(prevs, axis=0)
     assert abs(low - ref_prev['low']) < ref_tol and abs(high - ref_prev['high']) < ref_tol, f'Prevalence by risk group {low:.1%}/{high:.1%}, not near EpiModel\'s 20.7%/77.4%'
@@ -57,7 +57,7 @@ def test_epimodel_fit():
     data = pd.DataFrame(dict(t=[50, 62, 75, 87, 100], prevalence=ref_target))
     net = lambda: ss.DegreeNet(n_contacts=0.7, concurrency=0.22, max_contacts=3, dur=50)
     sim = ss.Sim(make_sis(beta=ss.par(ss.prob(0.64), bounds=[0.05, 0.95])), networks=net(), n_agents=300, stop=100, data=data, verbose=0)
-    fit = sim.fit(n_trials=40, n_runs=4, rand_seed=1, verbose=0) # Optuna's first 10 trials are random draws, so it needs more to settle; one run of 300 agents has a spread of about 8 points, so each trial takes the mean of 4
+    fit = sim.fit(method=ss.fit.method('optuna', n_trials=40, n_runs=4), rand_seed=1, verbose=0) # Optuna's first 10 trials are random draws, so it needs more to settle; one run of 300 agents has a spread of about 8 points, so each trial takes the mean of 4
     reruns = [fit.sim.new(networks=net(), rand_seed=100+i).run().results.sis.prevalence[50:].mean() for i in range(20)] # The mean of 5 runs has a spread of about 3.6 points at this size
     prev = np.mean(reruns)
     assert abs(prev - ref_target) < 0.06, f'Fresh runs at the fitted beta give a prevalence of {prev:.1%}, not the {ref_target:.0%} it was fitted to' # Within 6 points: with 4 runs per trial, a fit on 300 agents gave 27% to 31% over seeds (with 1, 27% to 38%; 2026-10-26)
@@ -77,7 +77,7 @@ def test_epimodel_from_r(tmp_path):
         sis <- ss$Disease(infection = ss$Transition(S, I, rate = ss$prob(0.64) * I), recovery = ss$Transition(I, S, rate = ss$prob(0.05)), init_n = list(I = 10L), name = "sis") # A list: dict() would take the variable I as its key
         net <- ss$DegreeNet(n_contacts = ss$by(risk = c(0.4, 1.6)), match = dict(risk = 0.8), dur = 50L)
         sim <- ss$Sim(sis, networks = net, n_agents = 1000L, stop = 300L, verbose = 0L)
-        sim$stratify(risk = c("low", "high"), fractions = c(0.8, 0.2))
+        sim$stratify(risk = list(low = 0.8, high = 0.2))
         sim$run()
         n_I <- py_to_r(sim$results$sis$I$strata)[151:301, ]
         n_S <- py_to_r(sim$results$sis$S$strata)[151:301, ]

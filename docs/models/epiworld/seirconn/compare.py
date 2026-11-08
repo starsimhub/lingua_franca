@@ -30,7 +30,7 @@ days = [10, 20, 30, 40, 50]
 
 def runs(sim, n=n_runs):
     """ The count of each state in each run, as an array of runs by days, by state """
-    res = ss.parallel(sim.new(verbose=0), n_runs=n, parallel=False).results.seir
+    res = ss.parallel(sim.new(verbose=0), n_runs=n, workers=1).results.seir
     return {k:np.asarray(res[k].values) for k in states}
 
 

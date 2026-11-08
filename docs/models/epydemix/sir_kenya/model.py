@@ -16,10 +16,10 @@ sir = ss.Disease(
     recovery  = ss.Transition(I, R, rate=0.1),
     init_n    = dict(I=10),
 )
-sir.stratify(age=[0, 5, 20, 50, 65], fractions=data['Nk'])
+sir.stratify(age=dict(zip([0, 5, 20, 50, 65], data['Nk'])))
 sim = ss.Sim(sir, networks=ss.contacts(matrix), total_pop=sum(data['Nk']), start='2019-12-01', stop='2020-04-02', # To the end of 1 April
-             solver='binomial', substeps=1, aging=False) # Whole days, as epydemix takes them
+             solver=ss.solvers.binomial(substeps=1), aging=False) # Whole days, as epydemix takes them
 
 if __name__ == '__main__':
-    msim = sim.run(n_runs=100)
+    msim = ss.parallel(sim, n_runs=100)
     msim.plot()

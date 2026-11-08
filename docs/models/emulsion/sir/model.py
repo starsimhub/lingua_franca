@@ -10,9 +10,9 @@ sir = ss.Disease(
     init_n    = dict(I=1),
     name      = 'sir',
 )
-compartment = ss.Sim(sir, total_pop=100, stop=ss.days(100), solver='binomial', substeps=1) # Whole days, as EMULSION takes them
+compartment = ss.Sim(sir, total_pop=100, stop=ss.days(100), solver=ss.solvers.binomial(substeps=1)) # Whole days, as EMULSION takes them
 ibm         = ss.Sim(sir, total_pop=100, stop=ss.days(100), solver='abm')
 
 if __name__ == '__main__':
-    msim = ss.parallel(compartment=compartment, ibm=ibm, n_runs=20, workers=2)
+    msim = ss.parallel(dict(compartment=compartment, ibm=ibm), n_runs=20, workers=2)
     msim.plot()

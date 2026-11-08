@@ -36,22 +36,22 @@ S, E, I, R, D0, D1, D2, D3, Dead = ss.states('S E I R D0 D1 D2 D3 Dead')
 covid = ss.Disease(
     infection = ss.Transition(S, E, rate=beta * I),
     onset     = E >> I @ ss.perday(1/4),
-    outcome   = ss.Transition(I, [D0, R], rate=mu, p=ss.by(age=IFR)), # Death with the IFR
+    outcome   = ss.Transition(I, {D0: ss.by(age=IFR), R: None}, rate=mu), # Death with the IFR
     stage1    = D0 >> D1 @ 4/Delta,
     stage2    = D1 >> D2 @ 4/Delta,
     stage3    = D2 >> D3 @ 4/Delta,
     deaths    = D3 >> Dead @ 4/Delta,
     init_n    = dict(E=I0/2, I=I0/2),
 )
-covid.stratify(age=[0, 10, 20, 30, 40, 50, 60, 70, 80], fractions=data['Nk'])
+covid.stratify(age=dict(zip([0, 10, 20, 30, 40, 50, 60, 70, 80], data['Nk'])))
 sim = ss.Sim(covid, networks=ss.contacts(matrix), total_pop=sum(data['Nk']), data=deaths, unit='day',
-             start='2020-02-23', stop='2020-05-31', solver='binomial', substeps=1, aging=False) # The calibration period
+             start='2020-02-23', stop='2020-05-31', solver=ss.solvers.binomial(substeps=1), aging=False) # The calibration period
 reopening = dict(moderate=1.3, high=1.5) # Contacts from 1 June, relative to their level on 31 May
-reopening = {k:ss.modify(covid.infection, multiply=v, start='2020-06-01') for k,v in reopening.items()}
+reopening = {k:ss.modify(covid.infection, multiply=v, when=ss.schedule(start='2020-06-01')) for k,v in reopening.items()}
 scenarios = dict(persistence=None, **reopening)
 
 if __name__ == '__main__':
-    fit = sim.fit(method='abc-smc', particles=200, generations=5) # To weekly deaths to 31 May
+    fit = sim.fit(method=ss.fit.method('abc-smc', samples=200, generations=5)) # To weekly deaths to 31 May
     fit.plot()
-    msim = fit.project(scenarios, n=100, stop='2020-08-03') # To the end of 2 August
+    msim = fit.project(scenarios, n_runs=100, stop='2020-08-03') # To the end of 2 August
     msim.plot()

@@ -48,7 +48,7 @@ def make_seir(fitted=False):
     infection = S >> E @ beta * I
     cases = ss.outcome(rho * infection, likelihood=ss.nbinom(n=20)) # Compared with weekly data by its total over each week
     seir = ss.Disease(infection, E >> I @ ss.perday(0.2), I >> R @ gamma, cases, init_n=dict(I=ss.by(age=[10, 0, 0, 0])), name='seir')
-    seir.stratify(age=ages, fractions=pop/pop.sum())
+    seir.stratify(age=dict(zip(ages, pop/pop.sum())))
     data = pd.DataFrame(dict(time=7*np.arange(1, 41), cases=ref_cases)) if fitted else None
     return ss.Sim(seir, networks=ss.contacts(m, ages=ages), total_pop=pop.sum(), unit='day', dt=0.25, stop=280 if fitted else 365,
                   solver='binomial', aging=False, data=data, verbose=0)
@@ -59,7 +59,7 @@ def test_odin_import(tmp_path):
     path = tmp_path/'age_seir.R'
     path.write_text(odin_model)
     sim = ss.import_from(path, format='odin', pars=dict(S0=pop - [10, 0, 0, 0], I0=[10, 0, 0, 0], m=m), stop=365)
-    final_R = np.asarray(sim.run(n_runs=20).results.age_seir.R.values)[:, -1].mean()
+    final_R = np.asarray(ss.parallel(sim, n_runs=20).results.age_seir.R.values)[:, -1].mean()
     assert np.isclose(final_R, ref_final_R, rtol=0.03), f'Imported model: mean final R {final_R:,.0f}, odin {ref_final_R:,}'
     return sim
 
@@ -79,9 +79,9 @@ def test_odin_filter():
     sc.heading('Timing the particle filter that PMCMC uses, per particle-step')
     sim = make_seir(fitted=True).init()
     pf = ss.fit.ParticleFilter(sim)
-    pf(n_particles=10, seed=0) # Compile
+    pf(n_particles=10, rand_seed=0) # Compile
     n = 50
-    seconds, loglik = timing.timed(lambda: pf(n_particles=n, seed=1))
+    seconds, loglik = timing.timed(lambda: pf(n_particles=n, rand_seed=1))
     step_us = seconds/(n*sim.t.npts)*1e6
     assert np.isfinite(loglik)
     timing.check(step_us, v4_step_us, 'Filter per particle-step', unit='µs', other=(ref_step_us, 'dust'))
@@ -107,7 +107,7 @@ def test_odin_delay():
         init_n    = dict(I=1),
         name      = 'seir',
     )
-    seir.stratify(age=[0, 1, 5, 15, 30], fractions=split)
+    seir.stratify(age=dict(zip([0, 1, 5, 15, 30], split)))
     sim = ss.Sim(seir, total_pop=1e7, unit='day', stop=365, verbose=0).init()
     sim.run()
     res = sim.results.seir

@@ -28,8 +28,8 @@ flu = ss.Disease(
     init_n    = dict(I=ss.by(patch={'FL': 10_000})),
     name      = 'flu',
 )
-flu.stratify(patch=places, mobility=ss.geo.Mobility(matrix=travel))
-sim = ss.Sim(flu, start='2015-01-01', stop=ss.days(150), solver='tau', verbose=0)
+flu.stratify(patch=ss.levels(places, mobility=ss.geo.Mobility(matrix=travel)))
+sim = ss.Sim(flu, start='2015-01-01', dur=ss.days(150), solver='tau', verbose=0)
 
 if __name__ == '__main__':
     sim.run()

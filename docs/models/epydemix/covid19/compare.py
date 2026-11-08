@@ -47,7 +47,7 @@ def show(label, ours, key):
 
 def fixed_runs(scenario):
     """ Runs of a scenario at the fixed values, which are the model's defaults """
-    return ss.parallel(model.sim.new(verbose=0, interventions=model.reopening.get(scenario), stop=end), n_runs=n_runs, parallel=False).results.covid
+    return ss.parallel(model.sim.new(verbose=0, interventions=model.reopening.get(scenario), stop=end), n_runs=n_runs, workers=1).results.covid
 
 
 if __name__ == '__main__':
@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     abc = data['abc']
     print(f'\nABC-SMC to the weekly deaths up to 31 May, as in the original: {abc["particles"]} particles for {abc["generations"]} generations')
-    fit = model.sim.new(verbose=0).fit(method='abc-smc', particles=abc['particles'], generations=abc['generations'], rand_seed=1, verbose=0)
+    fit = model.sim.new(verbose=0).fit(method=ss.fit.method('abc-smc', samples=abc['particles'], generations=abc['generations']), rand_seed=1, verbose=0)
     for par,name in dict(R0='R0', Delta='Delta', I0='I0', seasonality_min='smin').items():
         row = table.loc[f'posterior_{par}']
         vals = fit.samples[name]
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     print('Projections from the posterior (mean of 100 draws, in both):')
     draws = fit.samples.sample(n=100, replace=len(fit.samples) < 100, random_state=1)[list(fit.table['par'])]
     sims = [fit.sim.new(label=k, pars=dict(fit.pars), interventions=model.reopening.get(k), stop=end, verbose=0) for k in scenarios]
-    msim = ss.parallel(*sims, priors=draws, parallel=False) # What fit.project() does, one at a time
+    msim = ss.parallel(*sims, priors=draws, workers=1) # What fit.project() does, one at a time
     for i,scenario in enumerate(scenarios):
         ours = weekly(np.array([s.results.covid.deaths.values for s in msim.sims if s.label == scenario]), times).mean(axis=0)
         show(f'  {scenario}: weekly deaths', ours, f'abc_{scenario}_deaths')

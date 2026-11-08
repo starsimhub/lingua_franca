@@ -22,7 +22,7 @@ seir = ss.Disease(
     history   = ss.unborn >> I @ ss.timeseries({0: ss.perday(surv), 14: 0}), # Workaround: see README
     init_n    = dict(I=1),
 )
-seir.stratify(age=[0, 1, 5, 15, 30], fractions=split)
+seir.stratify(age=dict(zip([0, 1, 5, 15, 30], split)))
 sim = ss.Sim(seir, total_pop=1e7, unit='day', stop=365)
 
 if __name__ == '__main__':

@@ -19,7 +19,7 @@ from model import sim, data
 ref = tools.read_results(here)
 
 if __name__ == '__main__':
-    res = ss.parallel(sim.new(verbose=0), n_runs=100, parallel=False).results.sir
+    res = ss.parallel(sim.new(verbose=0), n_runs=100, workers=1).results.sir
     total = sum(data['Nk'])
     for group in data['groups'] + ['total']:
         ours = (res.I if group == 'total' else res.I.select(age=group)).mean().values

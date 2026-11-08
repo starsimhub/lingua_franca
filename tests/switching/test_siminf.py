@@ -52,7 +52,7 @@ def test_siminf_ldata():
     S, I, R = ss.states('S I R')
     sir = ss.Disease(infection=ss.Transition(S, I, rate=ss.perday(ss.by(herd=b)) * I), recovery=ss.Transition(I, R, rate=ss.perday(0.01)),
                      init_n=dict(I=ss.by(herd=[1] + [0]*(n_herds - 1))), name='sir')
-    sir.stratify(herd=np.arange(n_herds).astype(str), kind='space', mobility=ss.geo.Mobility(data=make_register(n_herds, 365)))
+    sir.stratify(herd=ss.levels(list(np.arange(n_herds).astype(str)), kind='space', mobility=ss.geo.register(make_register(n_herds, 365))))
     sim = ss.Sim(sir, solver='gillespie', unit='day', start=0, stop=365, total_pop=50*n_herds, verbose=0).run()
     herds = (np.asarray(sim.results.sir.I.strata)[-1] > 0).sum()
     assert herds > 10, f'Expected the register to carry infection to many herds, but {herds} are infected at the end'
@@ -62,9 +62,9 @@ def test_siminf_ldata():
 def test_siminf_filter():
     sc.heading('Timing the particle filter for PMCMC, per particle run')
     pf = ss.fit.ParticleFilter(make_pmcmc().init(), likelihood=dict(I=ss.poisson()))
-    pf(10, seed=0) # Compile
+    pf(10, rand_seed=0) # Compile
     n = 50
-    seconds, loglik = timing.timed(lambda: pf(n, seed=1))
+    seconds, loglik = timing.timed(lambda: pf(n, rand_seed=1))
     ms_per_run = seconds/n*1e3
     assert np.isfinite(loglik)
     timing.check(ms_per_run, v4_ms_per_run, 'Filter per particle run', unit='ms', other=(ref_ms_per_run, 'SimInf'))
@@ -100,7 +100,7 @@ def make_herds(u0, register, stop, **kwargs):
     sir = ss.Disease(infection=ss.Transition(S, I, rate=ss.perday(0.16) * I), recovery=ss.Transition(I, R, rate=ss.perday(0.01)),
                      init_n=dict(I=ss.by(herd=u0.I.values)), name='sir')
     size = u0[['S', 'I', 'R']].sum(axis=1)
-    sir.stratify(herd=list(u0.node.astype(str)), kind='space', fractions=size/size.sum(), mobility=ss.geo.Mobility(data=register))
+    sir.stratify(herd=ss.levels(dict(zip(u0.node.astype(str), size/size.sum())), kind='space', mobility=ss.geo.register(register)))
     return ss.Sim(sir, solver='gillespie', unit='day', start=0, stop=stop, total_pop=size.sum(), verbose=0, **kwargs)
 
 

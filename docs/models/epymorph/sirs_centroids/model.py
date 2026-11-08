@@ -18,8 +18,8 @@ commuting = ss.geo.Mobility(matrix=0.15*(1/3)*kernel/kernel.sum(axis=1, keepdims
 
 S, I, R = ss.states('S I R')
 sirs = ss.Disease(infection=S >> I @ 0.4*I, recovery=I >> R @ ss.days(4), waning=R >> S @ ss.days(200), init_n=dict(I=ss.by(patch={'Maricopa, AZ': 5})), name='sirs')
-sirs.stratify(patch=places, mobility=commuting)
-sim = ss.Sim(sirs, start='2022-01-01', stop=ss.days(190), solver='tau', verbose=0)
+sirs.stratify(patch=ss.levels(places, mobility=commuting))
+sim = ss.Sim(sirs, start='2022-01-01', dur=ss.days(190), solver='tau', verbose=0)
 
 if __name__ == '__main__':
     sim.run()

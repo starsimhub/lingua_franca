@@ -19,15 +19,15 @@ S, I, R = ss.states('S I R')
 sir = ss.Disease(
     infection = S >> I @ 0.5*contacts*I,
     recovery  = I >> R @ ss.prob(1/4),
-    enhanced  = ss.Transition(I, R, rate=ss.prob(0.5), where=vaccine.held), # The vaccine's chance
+    enhanced  = ss.Transition(I, R, rate=ss.prob(0.5), who=vaccine.held), # The vaccine's chance
     init_n    = dict(I=100), # 50 of each
     strains   = strains,
 )
-vaccination   = ss.vaccinate(vaccine, coverage=0.5, at=0)
-isolation     = ss.modify(contacts, set=2, start=11, stop=21) # The original's day 10, from day 11
-advertisement = ss.modify(contacts, set=1.5, start=21)
+vaccination   = ss.vaccinate(vaccine, coverage=0.5, when=0)
+isolation     = ss.modify(contacts, set=2, when=ss.schedule(start=11, stop=21)) # The original's day 10, from day 11
+advertisement = ss.modify(contacts, set=1.5, when=ss.schedule(start=21))
 sim = ss.Sim(sir, interventions=[vaccination, isolation, advertisement], total_pop=50_000, stop=50,
-             solver='binomial', substeps=1)
+             solver=ss.solvers.binomial(substeps=1))
 
 if __name__ == '__main__':
     sim.run()

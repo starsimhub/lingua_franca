@@ -66,7 +66,7 @@ def test_atomica_import(demo):
 def test_atomica_calibrate():
     sc.heading('Testing calibrating an imported workbook to its databook prevalence')
     sim = load('sir')
-    sim.describe(output=True) # Every rate as it was read from the workbook
+    print(sim.describe()) # Every rate as it was read from the workbook
     data = pd.DataFrame(dict(year=np.arange(2000, 2019), ch_prev=ref_prev))
     sim = sim.new(pars=dict(transpercontact=ss.par(0.008, bounds=[0.0008, 0.024]), recrate=ss.par(5.0, bounds=[0.5, 15])))
     fit = sim.fit(data=data, verbose=0)
@@ -83,7 +83,7 @@ def test_atomica_optimize():
     base = sim.new().run()
     assert np.isclose(at_year(base, 'vs', 2030), ref_vs_baseline, rtol=1e-6), 'The programs at current spending should give Atomica\'s baseline'
     total = sum(ref_alloc.values())
-    best = ss.fit.optimize(sim, total=total, start=2020, maximize='all_vs', at=2030)
+    best = sim.optimize(ss.fit.maximize('all_vs', at=2030), total=total, start=2020)
     assert set(best.alloc) == set(ref_alloc) and np.isclose(sum(best.alloc.values()), total), 'The allocation should cover every program and spend the total'
     assert best.value >= ref_vs_optimized*0.999, f'Optimized viral suppression {best.value:n} should be at least Atomica\'s {ref_vs_optimized:n}'
     return best

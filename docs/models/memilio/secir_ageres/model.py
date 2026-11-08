@@ -15,9 +15,9 @@ risk = 0.35 - 0.1*np.cos(np.pi*excess) # So symptomatic people infect more: from
 secir = ss.Disease(
     infection = S >> E @ beta * contacts * (0.7 * INS + risk * ISy),
     onset     = E >> INS @ ss.days(3.2),
-    symptoms  = ss.Transition(INS, [ISy, R], dur=ss.days(2), p=[0.91, 0.09]),
-    severe    = ss.Transition(ISy, [ISev, R], dur=ss.days(5.8), p=[0.2, 0.8]),
-    critical  = ss.Transition(ISev, [ICr, R], dur=ss.days(9.5), p=[0.25, 0.75]),
+    symptoms  = ss.Transition(INS, {ISy: 0.91, R: None}, dur=ss.days(2)),
+    severe    = ss.Transition(ISy, {ISev: 0.2, R: None}, dur=ss.days(5.8)),
+    critical  = ss.Transition(ISev, {ICr: 0.25, R: None}, dur=ss.days(9.5)),
     recovery  = ss.Transition(ICr, R, dur=ss.days(7.1), p=0.7),
     death     = ss.Transition(ICr, ss.dead, dur=ss.days(7.1), p=0.3),
     init_n    = dict(E=100, INS=50, ISy=50, ISev=20, ICr=10, R=10),

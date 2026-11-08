@@ -18,19 +18,19 @@ seirv = ss.Disease(S, E, I, R, V, # V is reached only by the vaccination
     recovery  = I >> R @ ss.days(7),
     init_n    = dict(I=1e-6*sum(N)),
 )
-seirv.stratify(age=[0, 20, 40], fractions=N)
+seirv.stratify(age=dict(zip([0, 20, 40], np.array(N)/sum(N))))
 
 
 def contacts(start, stop, reduction):
     """ Fewer contacts for each age group, as epidemics' intervention(type='contacts'): both as the infected and as the infectious """
     cut = ss.by(age=1 - np.array(reduction))
-    return [ss.modify(rel, multiply=cut, start=start, stop=stop) for rel in [seirv.rel_sus, seirv.rel_trans]]
+    return [ss.modify(rel, multiply=cut, when=ss.schedule(start=start, stop=stop)) for rel in [seirv.rel_sus, seirv.rel_trans]]
 
 
 schools    = contacts(50, 120, [0.1, 0.01, 0.01])
 workplaces = contacts(65, 90, [0.01, 0.2, 0.2])
 reopening  = contacts(120, 180, [0.05, 0.01, 0.01]) # Schools partly reopened
-vaccinate  = ss.Delivery(move=S >> V, capacity=ss.perday(0.001*N[2]), who=ss.person.age >= 40, start=120, stop=220) # 0.1% of the group a day
+vaccinate  = ss.Delivery(S >> V, capacity=ss.perday(0.001*N[2]), who=ss.person.age >= 40, when=ss.schedule(start=120, stop=220)) # 0.1% of the group a day
 
 baseline = ss.Sim(seirv, networks=ss.contacts(matrix), total_pop=sum(N), unit='day', stop=365)
 sim = baseline.new(interventions=schools + workplaces + reopening)

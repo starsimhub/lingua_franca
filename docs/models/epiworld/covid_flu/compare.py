@@ -29,7 +29,7 @@ series = {'S':'Susceptible', 'I':'Infected', 'R':'Recovered', 'covid':'Infected 
 
 def runs(sim, n=n_runs):
     """ The count in each series in each run, as an array of runs by days, by series """
-    res = ss.parallel(sim.new(verbose=0), n_runs=n, parallel=False).results.sir
+    res = ss.parallel(sim.new(verbose=0), n_runs=n, workers=1).results.sir
     out = {k:np.asarray(res[k].values) for k in 'SIR'}
     for strain in ['covid', 'flu']:
         out[strain] = np.asarray(res.I.select(strain=strain).values)

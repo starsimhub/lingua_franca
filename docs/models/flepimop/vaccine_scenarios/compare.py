@@ -66,7 +66,7 @@ def summary(arr):
 def same_draws():
     """ Each scenario, run with the values the original drew for it """
     sims = [sim.new(label=row.scenario, pars=dict(Ro=row.Ro, p_case=row.p_case), interventions=scenarios[row.scenario], verbose=0) for row in ref_draws.itertuples()]
-    msim = ss.parallel(sims, parallel=False)
+    msim = ss.parallel(sims, workers=1)
     print('With the values the original drew: the largest difference in the mean, 5%, and 95% of each series, as a share of its largest value')
     for scen in scenarios:
         series = ours([s for s in msim.sims if s.label == scen])
@@ -82,7 +82,7 @@ def same_draws():
 
 def own_draws(n_runs=100):
     """ Each scenario, run with values Starsim draws, against the original's ten runs """
-    msim = ss.parallel([sim.new(label=name, interventions=mods, verbose=0) for name,mods in scenarios.items()], n_runs=n_runs, priors=True, parallel=False)
+    msim = ss.parallel([sim.new(label=name, interventions=mods, verbose=0) for name,mods in scenarios.items()], n_runs=n_runs, priors=True, workers=1)
     print(f'\nWith {n_runs} runs of each scenario, drawn by Starsim (the original has 10): the peak of the mean, 5%, and 95% series, and the deaths')
     for scen in scenarios:
         series = ours([s for s in msim.sims if s.label == scen])

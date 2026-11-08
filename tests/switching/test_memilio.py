@@ -56,9 +56,9 @@ def make_secir(d, beta=None, damping=True):
     secir = ss.Disease(
         infection = S >> E @ beta * contacts * (INS + 0.2*ISy),
         onset     = ss.Transition(E, INS, dur=D(P['tE'])),
-        symptoms  = ss.Transition(INS, [ISy, R], dur=D(P['tINS']), p=[A(1 - np.array(P['mu_RINS'])), A(P['mu_RINS'])]),
-        severe    = ss.Transition(ISy, [ISev, R], dur=D(P['tISy']), p=[A(P['mu_ISev']), A(1 - np.array(P['mu_ISev']))]),
-        critical  = ss.Transition(ISev, [ICr, R], dur=D(P['tISev']), p=[A(P['mu_ICr']), A(1 - np.array(P['mu_ICr']))]),
+        symptoms  = ss.Transition(INS, {ISy: A(1 - np.array(P['mu_RINS'])), R: None}, dur=D(P['tINS'])),
+        severe    = ss.Transition(ISy, {ISev: A(P['mu_ISev']), R: None}, dur=D(P['tISy'])),
+        critical  = ss.Transition(ISev, {ICr: A(P['mu_ICr']), R: None}, dur=D(P['tISev'])),
         recovery  = ss.Transition(ICr, R, dur=D(P['tICr']), p=A(1 - np.array(P['mu_D']))),
         death     = ss.Transition(ICr, ss.dead, dur=D(P['tICr']), p=A(P['mu_D'])),
         init_n    = dict(E=ss.by(np.outer(np.full(6, 50), d.seeds), dims=['age', 'patch'])),
@@ -69,8 +69,8 @@ def make_secir(d, beta=None, damping=True):
 
 def stratify(target, d):
     """ Ages, and counties with MEmilio's commuters away half the day """
-    target.stratify(age=ages, fractions=split)
-    target.stratify(patch=ss.geo.geography(names=d.names, populations=d.popsize, x=d.x, y=d.y), mobility=ss.geo.Mobility(matrix=0.5*d.M, kind='commute'))
+    target.stratify(age=dict(zip(ages, split)))
+    target.stratify(patch=ss.levels(ss.geo.geography(names=d.names, populations=d.popsize, x=d.x, y=d.y), mobility=ss.geo.Mobility(0.5*d.M, kind='commute')))
     return target
 
 
@@ -111,7 +111,7 @@ def test_memilio_npi():
     beta = ss.par(ss.by(age=P['beta']))
     secir = stratify(make_secir(d, beta=beta, damping=False), d)
     incidence = secir.symptoms.incidence(over=ss.days(7), by='patch') # A week's new symptomatic cases in each county, per person
-    npi = ss.modify(beta, multiply=0.6, where=incidence > 200e-5, hold=ss.days(14))
+    npi = ss.modify(beta, multiply=0.6, who=incidence > 200e-5, until=ss.days(14))
     sims = [make_sim(d, secir, interventions=ints).run() for ints in [None, npi]]
     ratio = sims[1].results.secir.ISy.values.max()/sims[0].results.secir.ISy.values.max()
     assert abs(ratio - ref_npi_ratio) < 0.1, f'Local NPIs cut the peak to {ratio:.0%} of baseline, against {ref_npi_ratio:.0%} with the hand-written rule'

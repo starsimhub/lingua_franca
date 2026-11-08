@@ -25,14 +25,14 @@ NG, G = ss.states('NG G')
 J, A = ss.states('J A')
 S, E, I, R, Q, M = ss.states('S E I R Q M')
 farrowing = ss.Transition(G, NG, dur=ss.constant(ss.days(240)))
-newborns  = ss.birth(M, on=farrowing) # One for each farrowing, in every module
+newborns  = ss.birth(M, when=farrowing) # One for each farrowing, in every module
 
 # Uniform up to adult_age, plus the step EMULSION ages them by before its first test, in years
 ppl = ss.People(100, age_data=ss.uniform(low=dt/365, high=(adult_age + dt)/365))
 # Workaround for "as soon as": a very high rate
 growth = ss.Disease(
-    maturity = ss.Transition(J, A, rate=ss.perday(1e9), where=ppl.age >= adult_age/365),
-    newborns = ss.birth(J, on=farrowing),
+    maturity = ss.Transition(J, A, rate=ss.perday(1e9), who=ppl.age >= adult_age/365),
+    newborns = ss.birth(J, when=farrowing),
     default_state = 'J',
     name     = 'growth',
 )
@@ -52,21 +52,21 @@ health = ss.Disease(
     M_deaths    = ss.Transition(M, ss.dead, rate=ss.perday(0.002)*(M.time_in < whole(adult_age))), # EMULSION's escape
     E_deaths    = ss.Transition(E, ss.dead, rate=ss.perday(0.004)*(E.time_in < whole(10))),
     newborns    = newborns,
-    vertical    = ss.Transition(M, [I, M], p=[0.3, 0.7], on=newborns, where=ss.mother(E | I | Q, include_born=True)), # EMULSION's produce_offspring
+    vertical    = ss.Transition(M, {I: 0.3, M: None}, when=newborns, who=ss.mother(E | I | Q, include_born=True)), # EMULSION's produce_offspring
     init_n      = dict(I=10),
     name        = 'health',
 )
 
 abortion = -np.log(1 - 0.2)/240 # Per day, for infectious mothers only: a 20% chance over a gestation
 life = Life(
-    conception = ss.Transition(NG, G, rate=ss.perday(0.05), min_stay=whole(90), where=growth.A),
+    conception = ss.Transition(NG, G, rate=ss.perday(0.05), min_stay=whole(90), who=growth.A),
     farrowing  = farrowing,
-    abortion   = ss.Transition(G, NG, rate=ss.perday(abortion), where=health.I),
-    newborns   = ss.birth(NG, on=farrowing),
+    abortion   = ss.Transition(G, NG, rate=ss.perday(abortion), who=health.I),
+    newborns   = ss.birth(NG, when=farrowing),
     default_state = 'NG',
     name       = 'life',
 )
-sim = ss.Sim([life, growth, health], people=ppl, unit='day', dt=dt, start='2021-01-01', stop=ss.days(735), aging=True, solver='abm')
+sim = ss.Sim([life, growth, health], people=ppl, unit='day', dt=dt, start='2021-01-01', dur=ss.days(735), aging=True, solver='abm')
 
 if __name__ == '__main__':
     sim.run()

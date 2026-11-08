@@ -20,7 +20,7 @@ sir = ss.Disease(
     inf_death  = inf >> dead @ infdeath,
     init_n     = dict(sus=700, inf=285.71429, rec=14.28571),
 )
-sim = ss.Sim(sir, total_pop=1000, start=2000, stop=2023, integrator='euler', substeps=1) # Atomica takes one Euler step a year
+sim = ss.Sim(sir, total_pop=1000, start=2000, stop=2023, solver=ss.solvers.ode(integrator='euler', substeps=1)) # Atomica takes one Euler step a year
 
 if __name__ == '__main__':
     sim.run()

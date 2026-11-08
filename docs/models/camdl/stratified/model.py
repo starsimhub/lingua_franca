@@ -16,9 +16,9 @@ seir = ss.Disease(
     name      = 'seir',
 )
 seir.stratify(age=[0, 5, 50]) # Children, adults, and elders, who age at 1/5 and 1/45 a year
-seir.stratify(patch=['north', 'south'], kind='space', fractions=pop, mobility=ss.geo.Mobility(matrix=[[0, 0.01], [0.01, 0]], kind='migrate'))
-vaccinate = ss.vaccinate(move=seir.S >> seir.R, at=[20], coverage=0.6, where=ss.person.age < 5)
+seir.stratify(patch=ss.levels(['north', 'south'], kind='space', fractions=pop, mobility=ss.geo.Mobility(matrix=[[0, 0.01], [0.01, 0]], kind='migrate')))
+vaccinate = ss.vaccinate(seir.S >> seir.R, when=[20], coverage=0.6, who=ss.person.age < 5)
 sim = ss.Sim(seir, networks=ss.contacts(contacts), total_pop=13_510, unit='day', stop=150, aging=True)
 
 if __name__ == '__main__':
-    ss.parallel(novax=sim, vax=sim.new(interventions=vaccinate)).plot()
+    ss.parallel(dict(novax=sim, vax=sim.new(interventions=vaccinate))).plot()
