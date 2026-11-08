@@ -123,7 +123,7 @@ def test_summer2_nuts():
     sc.heading('summer2: NUTS on the JAX path, with detection a fitted maximum times a scale-up')
     sim = make_tb(ages=False, data=notifications())
     runner = sim.new().init()
-    assert runner.kernel_only(), 'Expected the sim to run whole in the kernels'
+    assert runner._kernel_reason() is None, 'Expected the sim to run whole in the kernels'
     in_jax, from_sim = jax_logdensity(runner, np.array([10.2, 1.53]))
     assert np.isclose(in_jax, from_sim, rtol=1e-6), f'The JAX log-density ({in_jax:.6g}) differs from the sim\'s ({from_sim:.6g})'
     with ss.options.context(warnings='error'): # Falling back to Python in the loop is a failure here

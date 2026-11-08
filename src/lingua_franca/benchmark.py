@@ -190,7 +190,7 @@ def worker(name, kernel, rebuilds):
 
     if kernel.startswith('jax') and 'code' not in run: # Without a slow first run if JAX does not apply
         built[0].init()
-        reason = built[0].kernel_reason()
+        reason = built[0]._kernel_reason()
         use, why = (False, reason) if reason else forced(built[0])
         if not use:
             print('TIMING ' + json.dumps(dict(skipped=why)))

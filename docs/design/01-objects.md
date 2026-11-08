@@ -348,7 +348,7 @@ Every module implements `describe()`, and `sim.describe()` covers the whole sim.
 10. the notes given at `init()`;
 11. the sim's unit and where it came from, and the loop as a schedule: one line per group of modules in the order they run, with how often each runs (`every day: sir, random network; every year: births, deaths`). The fully unrolled list stays available as `sim.loop` ([10-execution.md](10-execution.md)).
 
-How the model is run, which is about the solver rather than the model (`plan: sir: as compiled code, the whole run in one call`), and each rate and dwell time per step are shown only with `describe(verbose=True)`.
+How the model is run, which is about the solver rather than the model (`plan: sir: as compiled code, the whole run in one call`), and each rate and dwell time per step are shown at the end of `sim.describe()`.
 
 Under a solver that takes whole steps (agents and the chain binomial), a model with transmission also gets two `timing` lines: an infection is dated at the end of its step, and a state's count includes the step people enter it ([02-types.md](02-types.md)). The solvers that follow the rates within a step (the ODE, Gillespie, tau-leaping) do not show them.
 

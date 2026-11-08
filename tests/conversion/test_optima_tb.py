@@ -41,7 +41,7 @@ def test_no_data():
 def test_run():
     sc.heading('Running the model')
     sim = make_sim().init()
-    assert sim.kernel_reason() is None, 'The whole run should be taken in one call to the kernels'
+    assert sim._kernel_reason() is None, 'The whole run should be taken in one call to the kernels'
     sim.run()
     results = sim.results.flatten()
     assert all(np.isfinite(np.array(res)).all() for res in results.values())
