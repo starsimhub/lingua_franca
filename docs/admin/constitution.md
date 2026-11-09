@@ -8,7 +8,7 @@ This document provides the foundational guidance for how v4 should be built. Pri
 
 1. **Simplicity:** It should be easy and intuitive to write and modify disease models in the supported forms (compartmental, stochastic compartmental, metapopulation, ABM). "Simple" means for users who are epidemiologists, not engineers. Code ported from v3 to v4 should become simpler, as should (most) models from other frameworks ported into v4.
 2. **Performance:** The models should be as fast as possible; as close as is feasible to the speed of custom compiled code.
-3. **Flexibility:** All major disease modeling features should be expressible in v4 (which is not to say every feature has to be *implemented*, just that it has to be possible and intuitive to implement).
+3. **Flexibility:** All major disease modeling features should be expressible in v4 (which is not to say every feature has to be *implemented*, just that it has to be possible and intuitive to implement; it's better to be extensible than comprehensive).
 4. **Correctness:** The machinery should be correct and validated. However, (over-)correctness should not come at a cost to simplicity or performance, e.g. Euler steps, float32, and other approximations are (usually) fine.
 
 ## Secondary principles

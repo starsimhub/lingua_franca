@@ -64,7 +64,7 @@ For each **simple** corpus model (marked below), every solver is run and compare
 | Exact identities | Constant-rate decay under `ode` matches the exponential to 1e-5; a fixed branch share is `p` (exactly under `ode`, within 0.01 under `binomial` and `abm`) | `test_contracts.py::test_identities` |
 | Destinations | The flow to each destination of a transition with several sums to its total, by group too, under every solver; deaths by age along one destination agree with the ODE within 3 standard errors over 20 runs of `binomial`, `gillespie`, and `abm` | `test_results.py::test_destinations`, `test_contracts.py::test_destinations` |
 | Competing exits | Reordering three equal competing exits leaves a third leaving by each, under every solver (including tau-leaping) | `test_contracts.py::test_exit_order` |
-| Stochastic agreement | The mean over time of each state, averaged over a few runs of `binomial`, `gillespie`, and `abm`, is within 5% of the ODE's (wider for some models, each with its reason); a small state is compared with a tenth of the largest | `test_contracts.py::test_solvers_agree` (the simple models; every compartmental corpus model with `STARSIM_SLOW=1`) |
+| Stochastic agreement | The mean over time of each state, averaged over a few runs of `binomial`, `gillespie`, and `abm`, is within 5% of the ODE's (wider for some models, each with its reason); a small state is compared with a tenth of the largest | `test_contracts.py::test_solvers_agree` (the simple models; every compartmental corpus model with `pytest -m slow`) |
 | Time in state | A branch probability given the time in the state (an exponential dwell of mean 1 and `p = 1 - exp(-P.time_in)`, so half go each way) within 3 standard errors under `abm`, and a compartmental solver refuses it (`CapabilityError`, and `auto` runs agents); a hazard that grows with it, against a death rate, clears the exact share within 0.01; the agents' expression and a function reading `hpv.P.time_in[uids]` give the same run | `test_transitions.py::test_given_dwell` |
 | Convergence in `dt` | The difference between a stepped solver and the ODE shrinks with `dt`, and `sim.check_dt()` reports it | `test_transitions.py::test_time_values` (one model) |
 | Backend equivalence | A stepped run and a whole run in the kernels draw the same numbers; so do a run stopped and continued, and a run with another sim run in between | `test_contracts.py::test_streams`, `test_streams_across_sims` |
@@ -98,7 +98,7 @@ Tested in part by `test_transitions.py::test_auto` and `test_solvers`, `test_ker
 - Under `'auto'`, the first kind of function leaves the model an ODE and the second makes it agent-based, with the function named in the printed reason.
 - The same three checks for a lazy condition (`eligible = (ppl.age > 65) & ~sir.vaccinated`). A function of the sim that compares ages with a number that is not a bin edge runs in a compartmental model without complaint (each group has the age of its midpoint); the lazy form is checked.
 
-Tested by `test_transitions.py::test_functions` and `test_auto`, `test_deliveries.py::test_conditions`, and the `custom` corpus model in `test_contracts.py::test_solvers_agree` (with `STARSIM_SLOW=1`).
+Tested by `test_transitions.py::test_functions` and `test_auto`, `test_deliveries.py::test_conditions`, and the `custom` corpus model in `test_contracts.py::test_solvers_agree` (with `pytest -m slow`).
 
 ### 6. The ordered loop
 
@@ -156,7 +156,7 @@ Each error, warning, and note SHOULD have a minimal example that triggers it, wi
 
 ### 12. Calibration
 
-- On a corpus model with data simulated from known values, each fitting method recovers them: posterior methods cover the truth, and optimizers recover it within a tolerance, with `converged` true (simulation-based calibration, `test_contracts_inference.py::test_sbc`; longer runs with `STARSIM_SLOW=1`).
+- On a corpus model with data simulated from known values, each fitting method recovers them: posterior methods cover the truth, and optimizers recover it within a tolerance, with `converged` true (simulation-based calibration, `test_contracts_inference.py::test_sbc`; longer runs with `pytest -m slow`).
 - The JAX log-density equals `sim.loglik()` at three parameter points, to 1e-8, for every corpus model with data; the particle filter's estimate is within its Monte Carlo error of the likelihood and peaks at the same parameter as direct runs (`test_contracts_inference.py::test_jax_loglik`, `test_particle_filter`).
 - The printed output names the fitting method and the reason.
 - For an ODE run, the gradient of the results with respect to each parameter, from automatic differentiation, agrees with a finite-difference gradient (`test_gradients.py::test_gradient`).
@@ -188,7 +188,7 @@ Not one of the claims, but checked: `test_baselines.py::test_performance_guard` 
 
 ## The corpus
 
-The models are the functions of `tests/corpus.py`, each returning an unrun sim sized to run in seconds, with the solver as a keyword (`corpus.sir(solver='binomial')`); the file also has a small model of each standard pattern of the users in the switching review. Models marked **simple** are used for the solver-agreement test in suite 3 by default; the others with `STARSIM_SLOW=1`.
+The models are the functions of `tests/corpus.py`, each returning an unrun sim sized to run in seconds, with the solver as a keyword (`corpus.sir(solver='binomial')`); the file also has a small model of each standard pattern of the users in the switching review. Models marked **simple** are used for the solver-agreement test in suite 3 by default; the others with `pytest -m slow`.
 
 | # | Model | What it tests |
 |---|---|---|

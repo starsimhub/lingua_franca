@@ -426,8 +426,8 @@ The work from [the review's plan](../review_oct17/implementation.md), by phase. 
 
 - [x] The model corpus, `tests/corpus.py`: the 18 conformance models and five of the users' patterns, each a function that returns a sim. The older test files keep their own models.
 - [x] The spec's code runs (`tests/test_spec.py`): every block in `design/00` to `09`, file by file, with fragments marked `<!-- fragment -->` and the known library failures listed in the test, which fails when one is fixed.
-- [x] The likelihoods match the run, and simulation-based calibration for each method (`tests/test_contracts_inference.py`; longer runs with `STARSIM_SLOW=1`).
-- [x] Streams, agreement between solvers (the simple models by default, the whole corpus with `STARSIM_SLOW=1`), the order of competing exits, conservation, exact identities, and the guesses `describe()` marks (`tests/test_contracts.py`).
+- [x] The likelihoods match the run, and simulation-based calibration for each method (`tests/test_contracts_inference.py`; longer runs with `pytest -m slow`).
+- [x] Streams, agreement between solvers (the simple models by default, the whole corpus with `pytest -m slow`), the order of competing exits, conservation, exact identities, and the guesses `describe()` marks (`tests/test_contracts.py`).
 - [x] The thirteen switching demos (`tests/switching/`, run with `pytest switching`): 19 tests pass and 31 are expected failures, each naming what blocks it.
 
 ### Phase 3: the silent wrong answers
