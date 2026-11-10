@@ -1,0 +1,13 @@
+---
+title: "Dev history"
+page-layout: full
+toc: false
+authorship:
+  human: 0
+  ai: 100
+  note: Written by AI
+---
+
+How Starsim and the design docs have changed, from their git history. Time runs down the page. Each column is one file (Starsim) or one section (design docs). A column is gray while it exists and turns green when edited, as wide as the share of it that changed, then fades back to gray. Hover for details; use the menu to switch between Starsim and the design docs. [Open full screen](dev_history/index.html).
+
+<iframe src="dev_history/index.html" style="width: 100%; height: 85vh; border: 1px solid #ddd;" title="Dev history"></iframe>

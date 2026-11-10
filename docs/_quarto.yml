@@ -1,6 +1,9 @@
 project:
   type: website
   output-dir: _site
+  resources: # The dev history page shows this standalone page in an iframe
+    - webapp/dev_history/index.html
+    - webapp/dev_history/*_data.js
   render: # Quarto skips a README.md in a subfolder unless it is named, so each model is listed here and in the sidebar
     - index.qmd
     - approaches/
@@ -48,6 +51,7 @@ project:
     - benchmark/README.md
     - webapp/
     - webapp/README.md
+    - webapp/history.qmd
     - admin/implementation.md
     - costing/
     - costing/README.md
@@ -77,10 +81,8 @@ website:
         text: Models
       - href: webapp/index.qmd
         text: Compare
-      - href: admin/implementation.md
-        text: Status
-      - href: costing/README.md
-        text: Cost modeling
+      - href: webapp/history.qmd
+        text: Dev history
     tools:
       - icon: github
         href: https://github.com/starsimhub/lingua_franca
@@ -149,6 +151,17 @@ website:
             - best-practices/results-and-observation.md
             - best-practices/stochasticity-and-reproducibility.md
             - best-practices/calibration.md
+        - section: Cost modeling
+          href: costing/README.md
+          contents:
+            - costing/metrics.md
+            - costing/hiv-and-optimization.md
+            - costing/malaria-and-ntds.md
+            - costing/tb-and-vaccines.md
+            - costing/cancer-ncd-and-health-systems.md
+            - costing/cea-software.md
+            - costing/pandemics-and-frameworks.md
+            - costing/spec.md
 
     - id: design
       title: Design
@@ -223,19 +236,6 @@ website:
         - models/summer2/sir-age-location/README.md
         - models/summer2/seir-age-clinical/README.md
 
-    - id: costing
-      title: Cost modeling
-      contents:
-        - href: costing/README.md
-          text: "**Summary**"
-        - costing/metrics.md
-        - costing/hiv-and-optimization.md
-        - costing/malaria-and-ntds.md
-        - costing/tb-and-vaccines.md
-        - costing/cancer-ncd-and-health-systems.md
-        - costing/cea-software.md
-        - costing/pandemics-and-frameworks.md
-        - costing/spec.md
 
 format:
   html:

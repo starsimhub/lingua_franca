@@ -22,3 +22,5 @@ This section draws on the [framework reviews](../approaches/README.md) to take a
 - **Keep what Starsim already gets right.** Its time types, per-distribution random number streams, common random numbers, agent architecture, and single module abstraction stay. See [time-and-units](time-and-units.md), [stochasticity-and-reproducibility](stochasticity-and-reproducibility.md), and [agent-based](agent-based.md).
 
 The [reading guide](README.md) says how each document is laid out and lists them all.
+
+A separate review, [cost modeling](../costing/README.md), looks at how disease models handle costs and health economic outcomes such as DALYs.

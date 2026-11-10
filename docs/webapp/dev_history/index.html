@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Starsim git history</title>
+<style>
+  body { margin: 0; font: 13px system-ui, sans-serif; color: #222; background: #fff; }
+  header { padding: 8px 12px; border-bottom: 1px solid #ddd; }
+  header h1 { font-size: 16px; margin: 0 8px 0 0; display: inline; }
+  header .note { color: #666; }
+  .controls { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
+  .controls label { white-space: nowrap; }
+  .controls input[type=number] { width: 4.5em; }
+  #scroll { overflow: auto; height: calc(100vh - var(--header-h, 80px)); }
+  #grid { display: grid; width: max-content; }
+  #corner { position: sticky; top: 0; left: 0; z-index: 3; background: #fff; }
+  #head { position: sticky; top: 0; z-index: 2; background: #fff; }
+  #axis { position: sticky; left: 0; z-index: 2; background: #fff; }
+  #tip { position: fixed; pointer-events: none; background: #fff; border: 1px solid #aaa; border-radius: 4px; padding: 6px 8px; max-width: 480px; box-shadow: 0 2px 6px rgba(0,0,0,.15); display: none; z-index: 10; }
+  #tip .path { font-weight: 600; font-family: ui-monospace, monospace; }
+  #tip .c { font-family: ui-monospace, monospace; color: #555; }
+  #tip ul { margin: 4px 0 0; padding-left: 16px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; vertical-align: -1px; margin-right: 3px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title"></h1><span class="note" id="note"></span>
+  <div class="controls">
+    <label>Show <select id="dataset"><option value="starsim">Starsim code (by file)</option><option value="design">Design docs (by section)</option></select></label>
+    <label>Half-life <input type="number" id="halflife" min="0.05" step="any"> days</label>
+    <label>Row = <select id="bin"></select></label>
+    <label>Row height <input type="number" id="rowpx" min="1" max="20" step="1"> px</label>
+    <label>Column width (mean) <input type="number" id="colpx" min="3" max="40" step="1"> px</label>
+    <label>Order <select id="order"><option value="start">first appearance</option><option value="group">folder, then first appearance</option><option value="name">name</option></select></label>
+    <label><input type="checkbox" id="hide"> hide removed</label>
+    <label><input type="checkbox" id="size"> width ∝ length</label>
+    <label><input type="checkbox" id="flip"> newest at top</label>
+    <span class="note"><span class="swatch" style="background:#2e9e44"></span>recently changed (width = share of the file changed, decaying) <span class="swatch" style="background:#dcdcdc"></span>exists</span>
+  </div>
+</header>
+<div id="scroll"><div id="grid">
+  <canvas id="corner"></canvas><canvas id="head"></canvas>
+  <canvas id="axis"></canvas><canvas id="main"></canvas>
+</div></div>
+<div id="tip"></div>
+
+<script src="starsim_data.js"></script>
+<script src="design_data.js"></script>
+<script>
+'use strict';
+const GREEN = '#2e9e44', GRAY = '#dcdcdc', MARK = '#c0392b';
+const DEFAULTS = {
+  starsim: { halflife: 14, bin: 86400, rowpx: 3, colpx: 10, order: 'start', bins: [[43200, '12 hours'], [86400, '1 day'], [604800, '1 week']] },
+  design: { halflife: 1, bin: 3600*3, rowpx: 3, colpx: 6, order: 'name', bins: [[3600, '1 hour'], [3600*3, '3 hours'], [3600*6, '6 hours'], [86400, '1 day']] },
+};
+const HEAD_H = 170, AXIS_W = 150, LABEL_W = 70;
+const $ = id => document.getElementById(id);
+const ctl = ['halflife', 'bin', 'rowpx', 'colpx', 'order', 'hide', 'size', 'flip'];
+let state = null; // the computed layout, used for hovering
+
+function setDataset(name) {
+  const d = DEFAULTS[name];
+  $('dataset').value = name;
+  $('bin').innerHTML = d.bins.map(([s, l]) => `<option value="${s}">${l}</option>`).join('');
+  for (const k of ['halflife', 'bin', 'rowpx', 'colpx', 'order']) $(k).value = d[k];
+  $('order').options[1].text = name === 'design' ? 'doc, then first appearance' : 'folder, then first appearance';
+  draw();
+}
+
+function setupCanvas(c, w, h) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 30000 / Math.max(w, h, 1));
+  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  c.style.width = w + 'px'; c.style.height = h + 'px';
+  const g = c.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return g;
+}
+
+function groupColor(i) { return `hsl(${(i * 137.5) % 360}, 45%, 75%)`; }
+
+function draw() {
+  const name = $('dataset').value, data = window.GITVIZ[name];
+  const halflife = Math.max(0.01, +$('halflife').value), bin = +$('bin').value;
+  const rowpx = Math.max(1, +$('rowpx').value), colpx = Math.max(3, +$('colpx').value);
+  const flip = $('flip').checked, sizeMode = $('size').checked;
+  $('title').textContent = data.title;
+  $('note').textContent = `${data.note}. ${data.columns.length} ${data.unit}s, ${data.commits.length} commits.`;
+  document.documentElement.style.setProperty('--header-h', document.querySelector('header').offsetHeight + 'px');
+
+  // Columns
+  let cols = data.columns.slice();
+  if ($('hide').checked) cols = cols.filter(c => c.alive);
+  const groups = [...new Set(data.columns.map(c => c.group))].sort();
+  const order = $('order').value;
+  if (order === 'group') cols.sort((a, b) => a.group.localeCompare(b.group) || a.start - b.start);
+  else if (order === 'name') cols.sort((a, b) => (data.unit === 'section' ? a.group.localeCompare(b.group) || data.columns.indexOf(a) - data.columns.indexOf(b) : a.name.localeCompare(b.name)));
+  else cols.sort((a, b) => a.start - b.start || a.name.localeCompare(b.name));
+
+  // Time bins
+  const tmin = Math.min(...cols.map(c => c.start)), tmax = Math.max(...data.commits.map(c => c[1]));
+  const t0 = Math.floor(tmin / bin) * bin, nb = Math.floor((tmax - t0) / bin) + 1;
+  const decay = Math.pow(0.5, bin / (halflife * 86400));
+  const rowOf = b => flip ? nb - 1 - b : b;
+
+  // Column widths: all equal, or (width ∝ length) proportional to each file's longest length, averaging the column width
+  const longest = cols.map(c => Math.max(1, ...c.events.map(e => e[3])));
+  const meanLongest = longest.reduce((a, b) => a + b, 0) / Math.max(1, cols.length);
+  const widths = cols.map((c, i) => sizeMode ? Math.max(1, colpx * longest[i] / meanLongest) : colpx);
+  const xs = [];
+  let w = 0;
+  for (const cw of widths) { xs.push(w); w += cw; }
+  const inner = widths.map(cw => cw >= 3 ? cw - 1 : cw); // one pixel gap between columns, if there's room
+
+  // Heat (decayed share changed) and length per column per bin
+  const heats = [], sizes = [], total = new Float32Array(nb);
+  cols.forEach((c, i) => {
+    const add = new Float32Array(nb), size = new Float32Array(nb);
+    const floor = 1 / inner[i]; // every edit shows as at least one pixel
+    for (const e of c.events) add[Math.floor((e[0] - t0) / bin)] += Math.max(e[1], floor);
+    const heat = new Float32Array(nb);
+    let h = 0, s = 0, k = 0;
+    const evs = c.events;
+    for (let b = 0; b < nb; b++) {
+      h = h * decay + add[b];
+      heat[b] = h;
+      total[b] += Math.min(h, 1);
+      while (k < evs.length && evs[k][0] < t0 + (b + 1) * bin) s = evs[k++][3];
+      size[b] = s;
+    }
+    heats.push(heat); sizes.push(size);
+  });
+
+  // Main canvas
+  const h = nb * rowpx;
+  const g = setupCanvas($('main'), w, h);
+  g.clearRect(0, 0, w, h);
+  cols.forEach((c, i) => {
+    const x = xs[i], W = inner[i], b0 = Math.floor((c.start - t0) / bin), b1 = c.end == null ? nb - 1 : Math.floor((c.end - t0) / bin);
+    const heat = heats[i], size = sizes[i];
+    for (let b = b0; b <= b1; b++) {
+      const bw = sizeMode ? Math.max(1, W * size[b] / longest[i]) : W;
+      const y = rowOf(b) * rowpx;
+      g.fillStyle = GRAY;
+      g.fillRect(x + (W - bw) / 2, y, bw, rowpx);
+      const gw = Math.min(heat[b], 1) * bw;
+      if (gw > 0.05) {
+        g.fillStyle = GREEN;
+        g.fillRect(x + (W - gw) / 2, y, gw, rowpx);
+      }
+    }
+  });
+  g.strokeStyle = MARK; g.setLineDash([4, 3]); g.lineWidth = 1;
+  for (const [t] of data.marks) {
+    const y = rowOf(Math.floor((t - t0) / bin)) * rowpx + 0.5;
+    g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke();
+  }
+
+  // Header: group strip and rotated labels
+  const hg = setupCanvas($('head'), w, HEAD_H);
+  hg.clearRect(0, 0, w, HEAD_H);
+  // Labels sit over their columns; when columns are too narrow, they spread out with a leader line to their column
+  const spacing = Math.min(colpx, 10, w / Math.max(1, cols.length));
+  hg.font = `${Math.min(11, spacing + 1)}px system-ui, sans-serif`;
+  const centers = cols.map((c, i) => xs[i] + widths[i] / 2);
+  const lx = centers.slice();
+  for (let i = 1; i < lx.length; i++) lx[i] = Math.max(lx[i], lx[i - 1] + spacing);
+  for (let i = lx.length - 1; i >= 0; i--) lx[i] = Math.min(lx[i], (i + 1 < lx.length ? lx[i + 1] : w + spacing / 2) - spacing);
+  const moved = lx.some((x, i) => Math.abs(x - centers[i]) > 0.5);
+  const base = moved ? HEAD_H - 30 : HEAD_H - 11;
+  hg.strokeStyle = '#bbb'; hg.lineWidth = 0.5;
+  cols.forEach((c, i) => {
+    hg.fillStyle = groupColor(groups.indexOf(c.group));
+    hg.fillRect(xs[i], HEAD_H - 8, widths[i], 8);
+    if (moved) { hg.beginPath(); hg.moveTo(lx[i], base + 2); hg.lineTo(centers[i], HEAD_H - 8); hg.stroke(); }
+    hg.save();
+    hg.translate(lx[i] + 3, base);
+    hg.rotate(-Math.PI / 2);
+    hg.fillStyle = c.alive ? '#222' : '#999';
+    const label = data.unit === 'section' ? c.name : c.name.split('/').pop();
+    hg.fillText(label.length > 30 ? label.slice(0, 29) + '…' : label, 0, 0);
+    hg.restore();
+  });
+
+  // Corner: group legend
+  const cg = setupCanvas($('corner'), AXIS_W, HEAD_H);
+  cg.clearRect(0, 0, AXIS_W, HEAD_H);
+  cg.font = '11px system-ui, sans-serif';
+  const shown = groups.filter(gr => cols.some(c => c.group === gr));
+  const per = Math.max(1, Math.floor((HEAD_H - 20) / 12));
+  shown.slice(0, per).forEach((gr, k) => {
+    cg.fillStyle = groupColor(groups.indexOf(gr)); cg.fillRect(4, 4 + k * 12, 9, 9);
+    cg.fillStyle = '#333'; cg.fillText(gr || '(top level)', 17, 12 + k * 12);
+  });
+  if (shown.length > per) { cg.fillStyle = '#777'; cg.fillText(`+${shown.length - per} more`, 17, 12 + per * 12); }
+  cg.fillStyle = '#777'; cg.fillText('activity', LABEL_W + 4, HEAD_H - 4);
+
+  // Axis: dates, marks, and total activity
+  const ag = setupCanvas($('axis'), AXIS_W, h);
+  ag.clearRect(0, 0, AXIS_W, h);
+  ag.font = '11px system-ui, sans-serif'; ag.textBaseline = 'middle';
+  const span = tmax - t0, day = 86400;
+  const pxPerDay = rowpx * day / bin;
+  const tickDays = pxPerDay >= 12 ? 1 : pxPerDay >= 2 ? 7 : null; // else monthly
+  const ticks = [];
+  const d = new Date(t0 * 1000); d.setHours(0, 0, 0, 0);
+  if (tickDays) { while (d.getTime() / 1000 <= tmax) { if (d.getTime() / 1000 >= t0) ticks.push(new Date(d)); d.setDate(d.getDate() + tickDays); } }
+  else { d.setDate(1); while (d.getTime() / 1000 <= tmax) { if (d.getTime() / 1000 >= t0) ticks.push(new Date(d)); d.setMonth(d.getMonth() + 1); } }
+  ag.strokeStyle = '#bbb';
+  for (const tk of ticks) {
+    const y = rowOf(Math.floor((tk.getTime() / 1000 - t0) / bin)) * rowpx;
+    const major = tickDays ? tk.getDate() <= tickDays : tk.getMonth() === 0;
+    ag.beginPath(); ag.moveTo(LABEL_W - (major ? 10 : 5), y + 0.5); ag.lineTo(LABEL_W, y + 0.5); ag.stroke();
+    const label = tickDays ? tk.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + (tk.getMonth() === 0 && tk.getDate() <= tickDays ? ` ${tk.getFullYear()}` : '')
+      : (tk.getMonth() === 0 ? String(tk.getFullYear()) : tk.toLocaleDateString('en-US', { month: 'short' }));
+    ag.fillStyle = major ? '#222' : '#777';
+    if (major || pxPerDay * (tickDays || 30) >= 14) ag.fillText(label, 4, y);
+  }
+  const tmaxTotal = Math.max(1, ...total);
+  ag.fillStyle = '#7fbf8c';
+  for (let b = 0; b < nb; b++) ag.fillRect(LABEL_W + 2, rowOf(b) * rowpx, (AXIS_W - LABEL_W - 6) * total[b] / tmaxTotal, rowpx);
+  ag.fillStyle = MARK; ag.textAlign = 'right';
+  let lastY = -Infinity;
+  for (const [t, label] of (flip ? data.marks.slice().reverse() : data.marks)) {
+    const y = rowOf(Math.floor((t - t0) / bin)) * rowpx;
+    const ly = Math.max(y - 6, lastY + 11); // keep nearby labels from overlapping
+    lastY = ly;
+    ag.fillText(label, AXIS_W - 4, ly);
+    ag.fillRect(LABEL_W, y, AXIS_W - LABEL_W, 1);
+  }
+  ag.textAlign = 'left';
+
+  $('grid').style.gridTemplateColumns = `${AXIS_W}px ${w}px`;
+  $('grid').style.gridTemplateRows = `${HEAD_H}px ${h}px`;
+  state = { data, cols, heats, t0, bin, nb, rowpx, xs, widths, flip };
+}
+
+function pct(x) { return x > 0 && x < 0.01 ? (x * 100).toFixed(1) + '%' : Math.round(x * 100) + '%'; }
+function esc(s) { return String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch])); }
+function fmt(t, withTime) { const d = new Date(t * 1000); return withTime ? d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : d.toLocaleDateString('en-US', { dateStyle: 'medium' }); }
+
+function hover(ev) {
+  if (!state) return;
+  const r = $('main').getBoundingClientRect();
+  const x = ev.clientX - r.left;
+  let i = state.xs.length - 1;
+  while (i > 0 && state.xs[i] > x) i--;
+  if (x > state.xs[i] + state.widths[i]) i = -1;
+  const row = Math.floor((ev.clientY - r.top) / state.rowpx);
+  const tip = $('tip');
+  if (i < 0 || i >= state.cols.length || row < 0 || row >= state.nb) { tip.style.display = 'none'; return; }
+  const b = state.flip ? state.nb - 1 - row : row, c = state.cols[i];
+  const ta = state.t0 + b * state.bin, tb = ta + state.bin;
+  const withTime = state.bin < 86400;
+  const evs = c.events.filter(e => e[0] >= ta && e[0] < tb);
+  const prior = c.events.filter(e => e[0] < tb);
+  const path = prior.length ? c.paths[prior[prior.length - 1][4]] : c.paths[0];
+  let html = `<div class="path">${esc(path)}</div>`;
+  if (c.paths.length > 1) html += `<div class="c">also: ${c.paths.filter(p => p !== path).map(esc).join(', ')}</div>`;
+  html += `<div>${fmt(ta, withTime)}${state.bin > 86400 ? ' – ' + fmt(tb - 1) : ''} · recent change ${pct(Math.min(1, state.heats[i][b]))}`;
+  if (prior.length) html += ` · ${prior[prior.length - 1][3]} lines`;
+  html += '</div>';
+  if (evs.length) {
+    html += '<ul>' + evs.slice(0, 10).map(e => { const cm = state.data.commits[e[2]]; return `<li><span class="c">${cm[0]}</span> ${pct(e[1])} · ${esc(cm[2])}: ${esc(cm[3])}</li>`; }).join('') + '</ul>';
+    if (evs.length > 10) html += `<div class="c">and ${evs.length - 10} more</div>`;
+  }
+  tip.innerHTML = html;
+  tip.style.display = 'block';
+  const tx = ev.clientX + 14, ty = ev.clientY + 14;
+  tip.style.left = Math.min(tx, window.innerWidth - tip.offsetWidth - 8) + 'px';
+  tip.style.top = Math.min(ty, window.innerHeight - tip.offsetHeight - 8) + 'px';
+}
+
+$('dataset').addEventListener('change', () => { setDataset($('dataset').value); location.hash = $('dataset').value; });
+for (const k of ctl) $(k).addEventListener('change', draw);
+$('main').addEventListener('mousemove', hover);
+$('main').addEventListener('mouseleave', () => { $('tip').style.display = 'none'; });
+window.addEventListener('resize', () => document.documentElement.style.setProperty('--header-h', document.querySelector('header').offsetHeight + 'px'));
+setDataset(location.hash.slice(1) in DEFAULTS ? location.hash.slice(1) : 'starsim');
+</script>
+</body>
+</html>
