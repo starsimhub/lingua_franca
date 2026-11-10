@@ -15,11 +15,11 @@ This is EpiModel's wave 3 example. `model.py` is the Starsim version, and `compa
 
 | Measure | Original | Starsim | |
 |---|---|---|---|
-| Lines of model code | 405 | 58 | About 10 lines are the one remaining workaround (who is indicated for PrEP) |
-| One run | first 46 s, rerun 45 s | first 2.4 s, rerun 2 s (Numba) | With no intervention. The rerun of the original is the mean of 10 runs, and its first run adds estimating the two networks (netest), which is done once |
+| Lines of model code | 405 | 56 | About 10 lines are the one remaining workaround (who is indicated for PrEP) |
+| One run | first 44 s, rerun 43 s | first 2.3 s, rerun 2 s (Rust) | With no intervention. The rerun of the original is the mean of 10 runs, and its first run adds estimating the two networks (netest), which is done once |
 | Results | | | **Agree within the noise of the runs in three scenarios; with no intervention, the epidemic is larger, as before** (tolerance: 2.5 percentage points for prevalence, 2 for the care cascade and PrEP; below) |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 | Scenario | Cumulative infections | Final prevalence | Incidence per 100 person-years (second half) | Diagnosed, on ART, suppressed (second half) | PrEP among the HIV-negative |
 |---|---|---|---|---|---|

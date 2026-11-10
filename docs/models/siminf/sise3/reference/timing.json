@@ -1,7 +1,7 @@
 {
-  "first": 0.294,
-  "rerun": 0.09,
-  "what": "first: SISe3() building the model, and its first run(model), of 1,600 nodes for 1,460 days on one thread, with R started, SimInf loaded, and the 783,773 events read. rerun: run(model) on the same model",
+  "first": 0.281,
+  "rerun": 0.089,
+  "product": "first: SISe3() building the model, and its first run(model), of 1,600 nodes for 1,460 days on one thread, with R started, SimInf loaded, and the 783,773 events read. rerun: run(model) on the same model",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

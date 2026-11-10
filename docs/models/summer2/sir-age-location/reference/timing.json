@@ -1,7 +1,7 @@
 {
-  "first": 0.80903,
+  "first": 0.77695,
   "rerun": 0.00022,
-  "what": "first: building the model, compiling it with JAX, and running it once, in a fresh process, with summer2 and JAX already imported. rerun: model.run() on that same compiled model",
+  "product": "first: building the model, compiling it with JAX, and running it once, in a fresh process, with summer2 and JAX already imported. rerun: model.run() on that same compiled model",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

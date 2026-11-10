@@ -16,10 +16,10 @@ COVID-19 as an SEIR among 10,000 agents for 50 days, in which everyone can meet 
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 12 | 8 | |
-| One run | first 0.0056 s, rerun 0.0027 s | first 0.0092 s, rerun 0.00018 s (Rust) | One run of 50 days. The original's first run includes building the model; Starsim's runs the agents as counts (see below), which is why it is faster |
+| One run | first 0.0034 s, rerun 0.0025 s | first 0.009 s, rerun 0.00021 s (Rust) | One run of 50 days. The original's first run includes building the model; Starsim's runs the agents as counts (see below), which is why it is faster |
 | Results | | | **Agree** (within three standard errors; mean of 1,000 runs each): 398 ± 17 recovered on day 50, against 394, and the infection dies out by day 50 in 22.6% of runs, against 20.8%. Every state agrees on days 10 to 50, and the 95% quantile of the recovered on day 50 is 1,601 against 1,403, 2.1 standard errors apart |
 
-Measured on 3 November 2026 with Starsim 4.0.0rc2 (the `v4` branch, commit `d0107e93`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

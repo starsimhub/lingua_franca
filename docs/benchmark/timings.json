@@ -3,8 +3,8 @@
     "atomica/hiv_dyn": {
       "kernels": {
         "rust": {
-          "first": 0.03758325905073434,
-          "rerun": 0.00034193298779428005
+          "first": 0.03248634698684327,
+          "rerun": 0.0004052720032632351
         },
         "numba": {
           "first": 0.10210478806402534,
@@ -23,13 +23,13 @@
         }
       },
       "fastest": "rust",
-      "load": 2.287109375
+      "load": 1.8232421875
     },
     "atomica/sir": {
       "kernels": {
         "rust": {
-          "first": 0.009697447065263987,
-          "rerun": 0.00016622396651655436
+          "first": 0.010344826005166396,
+          "rerun": 0.00020708100055344403
         },
         "numba": {
           "first": 0.0750721690710634,
@@ -47,13 +47,13 @@
         }
       },
       "fastest": "rust",
-      "load": 2.0009765625
+      "load": 1.8232421875
     },
     "camdl/sir": {
       "kernels": {
         "rust": {
-          "first": 0.009465434006415308,
-          "rerun": 0.00021660304628312588
+          "first": 0.009914560010656714,
+          "rerun": 0.0002511870115995407
         },
         "numba": {
           "first": 0.07575198099948466,
@@ -71,13 +71,13 @@
         }
       },
       "fastest": "rust",
-      "load": 1.77880859375
+      "load": 1.80029296875
     },
     "camdl/stratified": {
       "kernels": {
         "rust": {
-          "first": 0.018000070936977863,
-          "rerun": 0.00046274601481854916
+          "first": 0.014273718988988549,
+          "rerun": 0.000679898977978155
         },
         "numba": {
           "first": 0.18136162997689098,
@@ -96,7 +96,7 @@
         }
       },
       "fastest": "rust",
-      "load": 1.65869140625
+      "load": 1.80029296875
     },
     "emulsion/quickstart": {
       "kernels": {
@@ -107,22 +107,22 @@
           "skipped": "it runs as agents"
         },
         "rust": {
-          "first": 0.20966079807840288,
-          "rerun": 0.21217425307258964
+          "first": 0.22886700299568474,
+          "rerun": 0.2220438700169325
         },
         "numba": {
-          "first": 0.34965406707488,
-          "rerun": 0.21281549299601465
+          "first": 0.33196049800608307,
+          "rerun": 0.21828088501933962
         }
       },
-      "fastest": "rust",
-      "load": 1.55908203125
+      "fastest": "numba",
+      "load": 1.73583984375
     },
     "emulsion/sir": {
       "kernels": {
         "rust": {
-          "first": 0.0077827840577811,
-          "rerun": 0.0001800860045477748
+          "first": 0.008549228019546717,
+          "rerun": 0.00020166501053608954
         },
         "numba": {
           "first": 0.07034700398799032,
@@ -137,14 +137,13 @@
         }
       },
       "fastest": "rust",
-      "load": 3.4404296875
+      "load": 2.15380859375
     },
     "epidemics/seasonal_scenarios": {
       "kernels": {
         "rust": {
-          "first": 0.0739268409088254,
-          "rerun": 0.046826148056425154,
-          "rebuild": 0.07369152992032468
+          "first": 0.02072490399586968,
+          "rerun": 0.0014588379999622703
         },
         "numba": {
           "first": 0.3104567200643942,
@@ -163,7 +162,7 @@
         }
       },
       "fastest": "rust",
-      "load": 5.4306640625
+      "load": 2.15380859375
     },
     "epidemics/seirv": {
       "kernels": {
@@ -178,9 +177,8 @@
           "rebuild": 0.013735616928897798
         },
         "jax": {
-          "first": 0.8424185800831765,
-          "rerun": 0.0009800889529287815,
-          "rebuild": 0.010814410052262247
+          "first": 0.5857849619933404,
+          "rerun": 0.0011044499988202006
         },
         "jax-gpu": {
           "first": 2.528730269987136,
@@ -189,7 +187,7 @@
         }
       },
       "fastest": "jax",
-      "load": 4.3759765625
+      "load": 1.60595703125
     },
     "epimodel/hiv": {
       "kernels": {
@@ -200,16 +198,16 @@
           "skipped": "it runs as agents"
         },
         "rust": {
-          "first": 2.2416722810594365,
-          "rerun": 1.9995372419944033
+          "first": 2.296398695994867,
+          "rerun": 2.023407000990119
         },
         "numba": {
-          "first": 2.4361125429859385,
-          "rerun": 1.9936008249642327
+          "first": 2.3940766120213084,
+          "rerun": 2.027868381002918
         }
       },
-      "fastest": "numba",
-      "load": 3.4404296875
+      "fastest": "rust",
+      "load": 2.06103515625
     },
     "epimodel/sis-network": {
       "kernels": {
@@ -220,8 +218,8 @@
           "skipped": "it runs as agents"
         },
         "rust": {
-          "first": 0.5220038030529395,
-          "rerun": 0.3188919300446287
+          "first": 0.569873174012173,
+          "rerun": 0.29914630998973735
         },
         "numba": {
           "first": 0.6302359310211614,
@@ -230,19 +228,17 @@
         }
       },
       "fastest": "rust",
-      "load": 2.31005859375
+      "load": 1.564453125
     },
     "epipack/siarx_tracing": {
       "kernels": {
         "rust": {
-          "first": 1.2792691229842603,
-          "rerun": 1.1416221599793062,
-          "rebuild": 1.152617763960734
+          "first": 0.5424076250055805,
+          "rerun": 0.5038120149984024
         },
         "numba": {
-          "first": 7.639974407968111,
-          "rerun": 1.17083871003706,
-          "rebuild": 1.1127848270116374
+          "first": 0.643587069993373,
+          "rerun": 0.51615226699505
         },
         "jax": {
           "skipped": "it runs as agents"
@@ -252,14 +248,13 @@
         }
       },
       "fastest": "rust",
-      "load": 2.40576171875
+      "load": 1.41064453125
     },
     "epipack/sirs": {
       "kernels": {
         "rust": {
-          "first": 0.012882594019174576,
-          "rerun": 0.00021961599122732878,
-          "rebuild": 0.007591120898723602
+          "first": 0.008474084985209629,
+          "rerun": 0.0002527449978515506
         },
         "numba": {
           "first": 0.17524864908773452,
@@ -278,57 +273,53 @@
         }
       },
       "fastest": "rust",
-      "load": 2.40576171875
+      "load": 1.41064453125
     },
     "epiworld/covid_flu": {
       "kernels": {
         "rust": {
-          "first": 0.017338608973659575,
-          "rerun": 0.0012016399996355176,
-          "rebuild": 0.015130192041397095
+          "first": 0.017542078014230356,
+          "rerun": 0.00046782399294897914
         },
         "numba": {
-          "first": 0.18375170894432813,
-          "rerun": 0.0015154610155150294,
-          "rebuild": 0.015220431960187852
+          "first": 144.98727651502122,
+          "rerun": 0.0007141389942262322
         },
         "jax": {
-          "skipped": "kernels: JAX does not run solver=\"binomial\""
+          "skipped": "AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?"
         },
         "jax-gpu": {
-          "skipped": "kernels: JAX does not run solver=\"binomial\""
+          "skipped": "AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?"
         }
       },
       "fastest": "rust",
-      "load": 1.9814453125
+      "load": 1.2587890625
     },
     "epiworld/seirconn": {
       "kernels": {
         "rust": {
-          "first": 0.009156754007562995,
-          "rerun": 0.00018459407147020102,
-          "rebuild": 0.0073956099804490805
+          "first": 0.008971497998572886,
+          "rerun": 0.00021440398995764554
         },
         "numba": {
-          "first": 0.1730485720327124,
-          "rerun": 0.0003799370024353266,
-          "rebuild": 0.007551579969003797
+          "first": 0.16204048099461943,
+          "rerun": 0.00040951999835669994
         },
         "jax": {
-          "skipped": "kernels: JAX does not run solver=\"binomial\""
+          "skipped": "AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?"
         },
         "jax-gpu": {
-          "skipped": "kernels: JAX does not run solver=\"binomial\""
+          "skipped": "AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?"
         }
       },
       "fastest": "rust",
-      "load": 2.27734375
+      "load": 2.474609375
     },
     "epydemix/covid19": {
       "kernels": {
         "rust": {
-          "first": 0.02410567202605307,
-          "rerun": 0.0011712820269167423
+          "first": 0.02314760599983856,
+          "rerun": 0.0012373919889796525
         },
         "numba": {
           "first": 0.10761806298978627,
@@ -347,13 +338,13 @@
         }
       },
       "fastest": "rust",
-      "load": 1.94384765625
+      "load": 2.474609375
     },
     "epydemix/sir_kenya": {
       "kernels": {
         "rust": {
-          "first": 0.009730216930620372,
-          "rerun": 0.00029795989394187927
+          "first": 0.011145938013214618,
+          "rerun": 0.0003370070189703256
         },
         "numba": {
           "first": 0.19309336802689359,
@@ -368,57 +359,53 @@
         }
       },
       "fastest": "rust",
-      "load": 1.94580078125
+      "load": 2.5498046875
     },
     "epymorph/pei_humidity": {
       "kernels": {
         "rust": {
-          "first": 0.0674941330216825,
-          "rerun": 0.0018938030116260052,
-          "rebuild": 0.0650077749742195
+          "first": 0.06955083899083547,
+          "rerun": 0.0020109119941480458
         },
         "numba": {
-          "first": 0.22340291598811746,
-          "rerun": 0.0026720589958131313,
-          "rebuild": 0.06599648098926991
+          "first": 0.22238490299787372,
+          "rerun": 0.0030350240122061223
         },
         "jax": {
-          "skipped": "kernels: JAX does not run solver=\"tau\""
+          "skipped": "AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?"
         },
         "jax-gpu": {
-          "skipped": "kernels: JAX does not run solver=\"tau\""
+          "skipped": "AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?"
         }
       },
       "fastest": "rust",
-      "load": 2.33056640625
+      "load": 2.5498046875
     },
     "epymorph/sirs_centroids": {
       "kernels": {
         "rust": {
-          "first": 0.01566583605017513,
-          "rerun": 0.003912469022907317,
-          "rebuild": 0.013758025947026908
+          "first": 0.015851049014599994,
+          "rerun": 0.003971211990574375
         },
         "numba": {
-          "first": 0.17449820996262133,
-          "rerun": 0.006020762957632542,
-          "rebuild": 0.0156184519873932
+          "first": 0.1648177999886684,
+          "rerun": 0.006065883993869647
         },
         "jax": {
-          "skipped": "kernels: JAX does not run solver=\"tau\""
+          "skipped": "AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?"
         },
         "jax-gpu": {
-          "skipped": "kernels: JAX does not run solver=\"tau\""
+          "skipped": "AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?"
         }
       },
       "fastest": "rust",
-      "load": 2.33056640625
+      "load": 2.2021484375
     },
     "flepimop/seir_2pop": {
       "kernels": {
         "rust": {
-          "first": 0.011464147944934666,
-          "rerun": 0.00036014895886182785
+          "first": 0.012674881989369169,
+          "rerun": 0.00038486099219881
         },
         "numba": {
           "first": 0.08200381800998002,
@@ -436,21 +423,21 @@
         }
       },
       "fastest": "rust",
-      "load": 2.8583984375
+      "load": 2.2021484375
     },
     "flepimop/vaccine_scenarios": {
       "kernels": {
         "rust": {
-          "first": 0.5476044269744307,
-          "rerun": 0.34996536700055003
+          "first": 0.6139151910028886,
+          "rerun": 0.3340198480000254
         },
         "numba": {
-          "first": 0.6852045289706439,
-          "rerun": 0.3500420569907874
+          "first": 0.7703474599984474,
+          "rerun": 0.3294019470049534
         },
         "jax": {
-          "first": 1.188426316017285,
-          "rerun": 0.34690651192795485
+          "first": 1.1347921479900833,
+          "rerun": 0.3336741399834864
         },
         "jax-gpu": {
           "first": 3.171652026940137,
@@ -458,8 +445,8 @@
           "rebuild": 0.6684680670732632
         }
       },
-      "fastest": "jax",
-      "load": 2.8583984375
+      "fastest": "numba",
+      "load": 1.55712890625
     },
     "laser/england_wales": {
       "kernels": {
@@ -470,8 +457,8 @@
           "skipped": "it runs as agents"
         },
         "rust": {
-          "first": 11.949433724978007,
-          "rerun": 11.916341860080138
+          "first": 103.4137588700105,
+          "rerun": 104.38708924598177
         },
         "numba": {
           "first": 13.118159579928033,
@@ -479,7 +466,7 @@
         }
       },
       "fastest": "rust",
-      "load": 3.1533203125
+      "load": 2.4501953125
     },
     "laser/hub_spoke_seir": {
       "kernels": {
@@ -490,22 +477,22 @@
           "skipped": "it runs as agents"
         },
         "rust": {
-          "first": 0.6242328779771924,
-          "rerun": 0.6178463160758838
+          "first": 0.6252420920063742,
+          "rerun": 0.631376620993251
         },
         "numba": {
-          "first": 0.7537439379375428,
-          "rerun": 0.6357490579830483
+          "first": 0.7174569199851248,
+          "rerun": 0.6146751370106358
         }
       },
-      "fastest": "rust",
-      "load": 3.1533203125
+      "fastest": "numba",
+      "load": 3.75439453125
     },
     "measles_metapop/seir_districts": {
       "kernels": {
         "rust": {
-          "first": 0.4438195279799402,
-          "rerun": 0.40758972300682217
+          "first": 0.4359476779936813,
+          "rerun": 0.3944639879919123
         },
         "numba": {
           "first": 0.6919362570624799,
@@ -520,13 +507,13 @@
         }
       },
       "fastest": "rust",
-      "load": 3.49658203125
+      "load": 3.75439453125
     },
     "memilio/secir": {
       "kernels": {
         "rust": {
-          "first": 0.013674313086085021,
-          "rerun": 0.00037126289680600166
+          "first": 0.013128691993188113,
+          "rerun": 0.0004748940118588507
         },
         "numba": {
           "first": 0.08318794704973698,
@@ -544,13 +531,13 @@
         }
       },
       "fastest": "rust",
-      "load": 3.49658203125
+      "load": 3.501953125
     },
     "memilio/secir_ageres": {
       "kernels": {
         "rust": {
-          "first": 0.01897646998986602,
-          "rerun": 0.0004852920537814498
+          "first": 0.019201507995603606,
+          "rerun": 0.0006693709874525666
         },
         "numba": {
           "first": 0.08659354201517999,
@@ -569,13 +556,13 @@
         }
       },
       "fastest": "rust",
-      "load": 3.02294921875
+      "load": 3.30126953125
     },
     "odin/seir_array": {
       "kernels": {
         "rust": {
-          "first": 0.019174598972313106,
-          "rerun": 0.0029263440519571304
+          "first": 0.018612101004691795,
+          "rerun": 0.003232939023291692
         },
         "numba": {
           "first": 0.08590900502167642,
@@ -594,13 +581,13 @@
         }
       },
       "fastest": "rust",
-      "load": 2.86083984375
+      "load": 3.11669921875
     },
     "odin/stochastic_sir_arrays": {
       "kernels": {
         "rust": {
-          "first": 0.014692609081976116,
-          "rerun": 0.0008539960253983736
+          "first": 0.012816886999644339,
+          "rerun": 0.0009112819971051067
         },
         "numba": {
           "first": 0.3335403579985723,
@@ -615,13 +602,13 @@
         }
       },
       "fastest": "rust",
-      "load": 2.71142578125
+      "load": 2.94677734375
     },
     "pandemic_simulator/ebola_legrand": {
       "kernels": {
         "rust": {
-          "first": 0.02071503596380353,
-          "rerun": 0.001442519947886467
+          "first": 0.019992464978713542,
+          "rerun": 0.001058516005286947
         },
         "numba": {
           "first": 0.09591364907100797,
@@ -633,13 +620,13 @@
         }
       },
       "fastest": "rust",
-      "load": 2.458984375
+      "load": 2.794921875
     },
     "pandemic_simulator/sir_reactive": {
       "kernels": {
         "rust": {
-          "first": 0.009391810046508908,
-          "rerun": 0.00033617904409766197
+          "first": 0.010176957992371172,
+          "rerun": 0.00037577099283225834
         },
         "numba": {
           "first": 0.07540777302347124,
@@ -651,7 +638,7 @@
         }
       },
       "fastest": "rust",
-      "load": 2.4619140625
+      "load": 2.5185546875
     },
     "siminf/sir_herds": {
       "kernels": {
@@ -662,8 +649,8 @@
           "skipped": "kernels: JAX does not run solver=\"gillespie\""
         },
         "rust": {
-          "first": 0.2629864950431511,
-          "rerun": 0.14040924701839685
+          "first": 0.2681625530240126,
+          "rerun": 0.1446239439828787
         },
         "numba": {
           "first": 0.5304577479837462,
@@ -672,7 +659,7 @@
         }
       },
       "fastest": "rust",
-      "load": 2.4619140625
+      "load": 2.2841796875
     },
     "siminf/sise3": {
       "kernels": {
@@ -683,8 +670,8 @@
           "skipped": "kernels: JAX does not run solver=\"gillespie\""
         },
         "rust": {
-          "first": 0.84904130094219,
-          "rerun": 0.52391110395547
+          "first": 0.756913124001585,
+          "rerun": 0.5073827219894156
         },
         "numba": {
           "first": 1.5607711599441245,
@@ -693,13 +680,13 @@
         }
       },
       "fastest": "rust",
-      "load": 2.1376953125
+      "load": 1.9990234375
     },
     "summer2/seir-age-clinical": {
       "kernels": {
         "rust": {
-          "first": 0.01659959997050464,
-          "rerun": 0.0004775619599968195
+          "first": 0.014411040989216417,
+          "rerun": 0.0005325340025592595
         },
         "numba": {
           "first": 0.07642049295827746,
@@ -718,13 +705,13 @@
         }
       },
       "fastest": "rust",
-      "load": 2.41357421875
+      "load": 1.943359375
     },
     "summer2/sir-age-location": {
       "kernels": {
         "rust": {
-          "first": 0.0107578159077093,
-          "rerun": 0.0003444269532337785
+          "first": 0.01233651998336427,
+          "rerun": 0.0004264970193617046
         },
         "numba": {
           "first": 0.07949111401103437,
@@ -742,13 +729,13 @@
         }
       },
       "fastest": "rust",
-      "load": 2.41357421875
+      "load": 1.8720703125
     }
   },
-  "date": "2026-11-03",
+  "date": "2026-11-09",
   "starsim": {
-    "version": "4.0.0rc2",
-    "commit": "d0107e93"
+    "version": "4.0.0rc3",
+    "commit": "be38b9f6"
   },
   "kernels": [
     "rust",
@@ -760,38 +747,46 @@
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
   "numba_compile": 315.2358750810381,
   "suite": {
-    "date": "2026-11-02",
-    "seconds": 935.2,
+    "date": "2026-11-09",
+    "seconds": 1773.1,
     "stages": {
-      "compare": 268.9,
-      "timing": 664.4
+      "compare": 713.0,
+      "timing": 1058.3
     },
     "models": {
-      "atomica/hiv_dyn": 14.9,
-      "atomica/sir": 14.4,
-      "camdl/sir": 24.1,
-      "camdl/stratified": 9.5,
-      "emulsion/quickstart": 56.4,
-      "emulsion/sir": 28.0,
-      "epimodel/hiv": 81.8,
-      "epimodel/sis-network": 89.5,
-      "epydemix/covid19": 80.2,
-      "epydemix/sir_kenya": 20.2,
-      "flepimop/seir_2pop": 32.7,
-      "flepimop/vaccine_scenarios": 96.0,
-      "laser/england_wales": 88.8,
-      "laser/hub_spoke_seir": 34.9,
-      "measles_metapop/seir_districts": 38.8,
-      "memilio/secir": 11.9,
-      "memilio/secir_ageres": 6.2,
-      "odin/seir_array": 7.2,
-      "odin/stochastic_sir_arrays": 13.9,
-      "pandemic_simulator/ebola_legrand": 10.2,
-      "pandemic_simulator/sir_reactive": 9.9,
-      "siminf/sir_herds": 44.0,
-      "siminf/sise3": 54.3,
-      "summer2/seir-age-clinical": 36.8,
-      "summer2/sir-age-location": 28.5
+      "atomica/hiv_dyn": 13.4,
+      "atomica/sir": 8.4,
+      "camdl/sir": 20.8,
+      "camdl/stratified": 8.4,
+      "emulsion/quickstart": 66.8,
+      "emulsion/sir": 28.2,
+      "epidemics/seasonal_scenarios": 6.1,
+      "epidemics/seirv": 2.8,
+      "epimodel/hiv": 90.9,
+      "epimodel/sis-network": 93.4,
+      "epipack/siarx_tracing": 146.4,
+      "epipack/sirs": 144.9,
+      "epiworld/covid_flu": 159.3,
+      "epiworld/seirconn": 20.1,
+      "epydemix/covid19": 68.0,
+      "epydemix/sir_kenya": 19.0,
+      "epymorph/pei_humidity": 20.1,
+      "epymorph/sirs_centroids": 21.4,
+      "flepimop/seir_2pop": 52.2,
+      "flepimop/vaccine_scenarios": 78.5,
+      "laser/england_wales": 427.9,
+      "laser/hub_spoke_seir": 34.7,
+      "measles_metapop/seir_districts": 37.1,
+      "memilio/secir": 5.5,
+      "memilio/secir_ageres": 5.2,
+      "odin/seir_array": 6.1,
+      "odin/stochastic_sir_arrays": 12.7,
+      "pandemic_simulator/ebola_legrand": 9.7,
+      "pandemic_simulator/sir_reactive": 8.8,
+      "siminf/sir_herds": 41.9,
+      "siminf/sise3": 53.2,
+      "summer2/seir-age-clinical": 38.0,
+      "summer2/sir-age-location": 21.3
     }
   },
   "survey": "2026-11-03"

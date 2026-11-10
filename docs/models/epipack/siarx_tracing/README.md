@@ -16,12 +16,12 @@ The example of contact tracing in epipack's tutorial on networks: an SIARX model
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 61 | 16 | The original's lines include the 2 added to run the tutorial's code blocks as one script. In Starsim the deterministic model reuses the transitions of the stochastic one, with one transition added |
-| One run | first 0.95 s, rerun 0.52 s | first 1.3 s, rerun 1.1 s (Rust) | Each is one run on the network with tracing, for 40 days, with results. Starsim's rerun makes the network of 250,000 edges again, and epipack's reuses it. Well mixed, a run takes 0.89 s in the original and 4 s in Starsim; the deterministic model, to day 100, 0.16 s and 0.00032 s |
+| One run | first 0.87 s, rerun 0.48 s | first 0.54 s, rerun 0.5 s (Rust) | Each is one run on the network with tracing, for 40 days, with results. Starsim's rerun makes the network of 250,000 edges again, and epipack's reuses it. Well mixed, a run takes 0.89 s in the original and 4 s in Starsim; the deterministic model, to day 100, 0.16 s and 0.00032 s |
 | Results, deterministic | 2,941.6 in `S` and 2,921.6 in `X` on day 40 | 2,941.6 and 2,921.6 | **Agree** to 2e-6 of the population on every day to day 100 |
 | Results, on the network (mean of 100 runs) | 3,423 in `S` and 2,792 in `X` on day 40 | | **Agree** to 1.2e-2 of the population on every day, with steps of 0.1 days against epipack's continuous time. The largest difference is in `S` as it falls fastest, about three times the standard error of the difference of the two means |
 | Results, well mixed (mean of 100 runs) | 2,955 in `S` and 2,919 in `X` on day 40 | | **Agree** to 1.2e-2 of the population on every day, as on the network |
 
-Measured on 3 November 2026 with Starsim 4.0.0rc2 (the `v4` branch, commit `d0107e93`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

@@ -1,7 +1,7 @@
 {
-  "first": 9.09593,
-  "rerun": 8.87483,
-  "what": "flepimop simulate config_sample_2pop.yml, as one command, which is the only way to run it: the first run is the first call, and the rerun is the same command again, the best of as many as fit in the time allowed. Both include starting Python and compiling the integrator with Numba, which is nearly all of the time and is done again on every run",
+  "first": 7.96964,
+  "rerun": 7.74278,
+  "product": "flepimop simulate config_sample_2pop.yml, as one command, which is the only way to run it: the first run is the first call, and the rerun is the same command again, the best of as many as fit in the time allowed. Both include starting Python and compiling the integrator with Numba, which is nearly all of the time and is done again on every run",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

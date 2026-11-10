@@ -16,11 +16,11 @@ An SEIR epidemic with disease deaths in 1,000 people over 20 time units, stratif
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 134 (55 for the model alone) | 16 | The original builds and runs the model seven times to request its outputs one group at a time. In Starsim every output but one is there without being asked for, by selecting groups of a result (the proportion in hospital is a division in `compare.py`) |
-| One ODE run | first 3 s, rerun 0.00029 s | first 0.017 s, rerun 0.00048 s (Rust) | Neither time counts importing. The original's first run is all seven models, each built and compiled with JAX, as it takes all seven to get its outputs (`reference/timing.json` of the example gives the first alone); Starsim's is one model with all its results. The original's rerun is the last of the seven, with four outputs |
+| One ODE run | first 2.8 s, rerun 0.00029 s | first 0.014 s, rerun 0.00053 s (Rust) | Neither time counts importing. The original's first run is all seven models, each built and compiled with JAX, as it takes all seven to get its outputs (`reference/timing.json` of the example gives the first alone); Starsim's is one model with all its results. The original's rerun is the last of the seven, with four outputs |
 | Results, ODE | | | Every compartment within 0.0006 people of 1,000; every derived output within 0.006% of its peak. From the same start, the stratified model and the same model written as four states (`as_states()` in `compare.py`) agree to 2e-14 people |
 | Results, other solvers | | | At time 20 the mean of 100 stochastic runs has 542 ± 9 recovered and of 100 agent-based runs 547 ± 10, against 580 in the ODE, since the epidemic is still under way and runs take off at different times. No run died out. By time 100 they end with 848 recovered, as does the ODE (847) |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 The derived outputs are compared after converting them to summer2's conventions: a flow is divided by the step to give a rate, and is compared with the original's value at the end of the step. The original's cumulative deaths are 10 times the deaths (it sums rates without multiplying by the step; see the example's README), so they are compared with 10 times Starsim's.
 

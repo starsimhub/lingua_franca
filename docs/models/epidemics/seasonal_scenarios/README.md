@@ -16,12 +16,12 @@ The default SEIR-V of epidemics' "Get started" vignette (the UK in three age gro
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 76 | 24 | Both count their data: 16 of the original's lines make the contact matrix and demography from the survey, and 2 of Starsim's give them as numbers |
-| One run | first 0.07 s, rerun 0.011 s | first 0.074 s, rerun 0.047 s (Rust) | The scenario with the interventions: the vignette's call of `model_default()` that makes `data_npi`, which includes checking its inputs and making its table of results. Starsim is 5 times slower, because of its modifiers (finding 3); with none, a run takes 1.1 ms. The vaccination scenario takes 147 ms (finding 4) |
+| One run | first 0.05 s, rerun 0.009 s | first 0.021 s, rerun 0.0015 s (Rust) | The scenario with the interventions: the vignette's call of `model_default()` that makes `data_npi`, which includes checking its inputs and making its table of results. Starsim is 5 times slower, because of its modifiers (finding 3); with none, a run takes 1.1 ms. The vaccination scenario takes 147 ms (finding 4) |
 | Results, baseline | | | **Agree** to 9.2e-4 of each state's largest value, in total and in each age group, on every day. `I` peaks at 2,377,511 on day 275 (original 2,378,561 on day 275). The difference is the original's: it gives odin the seasonal factor at whole days, and odin interpolates linearly between them. With the same interpolation and steps of a quarter of a day, Starsim agrees to 1e-4 in total. `compare.py` allows 1e-3 |
 | Results, with the interventions | Peak 1,374,393 on day 279; 8,364,644 recovered by day 365 | Peak 1,383,754 on day 279; 8,424,253 recovered | **Agree** to 8.6e-3 of each state's largest value. The difference is how overlapping cuts combine: epidemics adds them and Starsim multiplies them (finding 1). With the cuts added by hand, Starsim agrees to 1.6e-3, and its peak is 1,374,560. `compare.py` allows 1e-2 |
 | Results, with vaccination | Peak 1,699,837 on day 276; 2,943,844 vaccinated | Peak 1,697,573 on day 276; 2,943,843 vaccinated | **Agree** to 1.4e-3 of each state's largest value. `compare.py` allows 2e-3 |
 
-Measured on 3 November 2026 with Starsim 4.0.0rc2 (the `v4` branch, commit `d0107e93`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

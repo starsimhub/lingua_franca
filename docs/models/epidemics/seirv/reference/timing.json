@@ -1,7 +1,7 @@
 {
-  "first": 0.04408,
-  "rerun": 0.01536,
-  "what": "first is the call of model_default() in the vignette (checking the inputs, running the compiled odin model for 600 days, and making its table of results), in a fresh R session with epidemics loaded; rerun is the best of 3 more of the same call. Neither includes starting R or loading the package",
+  "first": 0.02032,
+  "rerun": 0.00898,
+  "product": "first is the call of model_default() in the vignette (checking the inputs, running the compiled odin model for 600 days, and making its table of results), in a fresh R session with epidemics loaded; rerun is the best of 3 more of the same call. Neither includes starting R or loading the package",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

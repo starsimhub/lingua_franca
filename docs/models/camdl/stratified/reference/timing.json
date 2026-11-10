@@ -1,7 +1,7 @@
 {
-  "first": 0.02276,
-  "rerun": 0.01342,
-  "what": "camdl simulate --backend ode, as one command each time: camdl has no way to rerun a model in the same process. First: with an empty cache, so it compiles the model. Rerun: the same command again, with the model cached",
+  "first": 0.01987,
+  "rerun": 0.01244,
+  "product": "camdl simulate --backend ode, as one command each time: camdl has no way to rerun a model in the same process. First: with an empty cache, so it compiles the model. Rerun: the same command again, with the model cached",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

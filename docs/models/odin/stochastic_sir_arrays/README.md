@@ -16,10 +16,10 @@ A closed, stochastic SIR epidemic in discrete time, with every variable an array
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 27 | 11 | |
-| 100 runs | first 0.73 s, rerun 0.00097 s | first 0.015 s, rerun 0.00085 s (Rust) | Each of the original's runs holds 100 replicates in its arrays. The Starsim times are for one run of 100 replicates, held as places that nobody moves between, which is the form of the original. As 100 separate runs (`ss.parallel(sim, n_runs=100)` in one process), a rerun takes 0.013 s. The original's first run includes compiling C code |
+| 100 runs | first 0.65 s, rerun 0.00095 s | first 0.013 s, rerun 0.00091 s (Rust) | Each of the original's runs holds 100 replicates in its arrays. The Starsim times are for one run of 100 replicates, held as places that nobody moves between, which is the form of the original. As 100 separate runs (`ss.parallel(sim, n_runs=100)` in one process), a rerun takes 0.013 s. The original's first run includes compiling C code |
 | Results | | | **Agree.** The mean of 20,000 replicates is within 6.1 people of 1,001 at every time, against the original's 20,000 replicates; 44.8% die out. `compare.py` allows 12 people, three standard errors of the difference |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

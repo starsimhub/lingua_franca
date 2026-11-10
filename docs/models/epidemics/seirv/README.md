@@ -16,10 +16,10 @@ The model of epidemics' "Get started" vignette: the package's default model (`mo
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 36 | 12 | Both count their data: 16 of the original's lines make the contact matrix and demography from the survey, and 2 of Starsim's give them as numbers |
-| One run | first 0.044 s, rerun 0.015 s | first 0.84 s, rerun 0.00098 s (JAX) | The vignette's one call of `model_default()`, which includes checking its inputs and making its table of results; the odin model was compiled when the package was installed. Starsim's first run includes building the sim |
+| One run | first 0.02 s, rerun 0.009 s | first 0.59 s, rerun 0.0011 s (JAX) | The vignette's one call of `model_default()`, which includes checking its inputs and making its table of results; the odin model was compiled when the package was installed. Starsim's first run includes building the sim |
 | Results | | | **Agree** to 1.4e-7 of each state's largest value, in total and in each age group, on every day. `I` peaks at 1,231,054 on day 369 in both, and 23,438,153 people are infected in both. `compare.py` allows 1e-6 |
 
-Measured on 3 November 2026 with Starsim 4.0.0rc2 (the `v4` branch, commit `d0107e93`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

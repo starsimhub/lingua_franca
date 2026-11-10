@@ -1,7 +1,7 @@
 {
-  "first": 0.81983,
-  "rerun": 0.82122,
-  "what": "mm.Sim(districts).run(), with the data already loaded. The model has no separate rerun, so first and rerun are the same: each builds the sim and runs it",
+  "first": 0.81504,
+  "rerun": 0.81267,
+  "product": "mm.Sim(districts).run(), with the data already loaded. The model has no separate rerun, so first and rerun are the same: each builds the sim and runs it",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

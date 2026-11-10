@@ -1,7 +1,7 @@
 {
-  "first": 0.00081,
+  "first": 0.00077,
   "rerun": 6e-05,
-  "what": "first is one call of the example's run_ode_secir_ageres_simulation(), with its plot off, which builds the model, runs it (36 adaptive time points), and prints and sums the result, not counting starting Python or importing; rerun is the best of 100 more calls of simulate() on the same model",
+  "product": "first is one call of the example's run_ode_secir_ageres_simulation(), with its plot off, which builds the model, runs it (36 adaptive time points), and prints and sums the result, not counting starting Python or importing; rerun is the best of 100 more calls of simulate() on the same model",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

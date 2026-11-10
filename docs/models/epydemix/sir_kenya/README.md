@@ -15,11 +15,11 @@ A stochastic SIR epidemic in the population of Kenya (55.9 million people in fiv
 
 | Measure | Original | Starsim | |
 |---|---|---|---|
-| Lines of model code | 7 | 14 | Not counting the loading of the data would be 12. The original has the model predefined and the population bundled |
-| One stochastic run | first 0.0071 s, rerun 0.0066 s | first 0.0097 s, rerun 0.0003 s (Rust) | In process, without imports or loading the data. Both are the time of one run, with the 100 runs of the original taking about 0.6 s |
+| Lines of model code | 7 | 15 | Not counting the loading of the data would be 12. The original has the model predefined and the population bundled |
+| One stochastic run | first 0.007 s, rerun 0.0065 s | first 0.011 s, rerun 0.00034 s (Rust) | In process, without imports or loading the data. Both are the time of one run, with the 100 runs of the original taking about 0.6 s |
 | Results | | | **Agree** (peaks within 1%, a day apart at most, final size within 0.1 of a percentage point): the mean of 100 runs peaks 0.4% higher than the original, a day sooner, and the final size is the same (99.63%). On any one day the difference is up to 6% of the peak, since the rise is a day ahead (see the findings) |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

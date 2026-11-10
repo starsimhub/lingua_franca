@@ -16,10 +16,10 @@ Atomica's SIR demo (`at.demo('sir')`): one population of 1,000 adults moving bet
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 62 | 16 | The original is counted as rows of its two spreadsheets, plus three lines of Python. A spreadsheet row is easier for a non-programmer to fill in than a line of code, so these counts compare unlike things |
-| One run | first 0.11 s, rerun 0.0022 s | first 0.0097 s, rerun 0.00017 s (Rust) | The original's first run includes reading the spreadsheets, and its rerun is `Project.run_sim()` on the loaded project |
+| One run | first 0.11 s, rerun 0.0022 s | first 0.01 s, rerun 0.00021 s (Rust) | The original's first run includes reading the spreadsheets, and its rerun is `Project.run_sim()` on the loaded project |
 | Results | | | Every compartment identical, to rounding error |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

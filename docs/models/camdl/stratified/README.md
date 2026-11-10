@@ -16,11 +16,11 @@ An SEIR in 13,510 people in two patches over 150 days, in camdl's own language. 
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 47 | 16 | Long lines count twice |
-| One ODE run | first 0.023 s, rerun 0.013 s | first 0.018 s, rerun 0.00046 s (Rust) | The original is timed as a whole command (camdl has no way to rerun a model in the same process), and its first run includes building the model; Starsim's is in Python, without the import |
+| One ODE run | first 0.02 s, rerun 0.012 s | first 0.014 s, rerun 0.00068 s (Rust) | The original is timed as a whole command (camdl has no way to rerun a model in the same process), and its first run includes building the model; Starsim's is in Python, without the import |
 | Results, ODE | | | **Agree.** The infectious in every cell within 0.4%, with and without vaccination (`compare.py` asks for 0.5%, since camdl writes whole numbers, which matters in the smallest cells), and the totals of `S`, `E`, and `R` within 0.1%, apart from the day of the vaccination (finding below) |
 | Results, stochastic | | | **Agree in size, not quite in timing.** The peak in every cell is within 2%, but with a step of a day the south's epidemic rises about a day sooner, so the mean of 200 runs differs by up to 7% of the peak on the way up (`compare.py` asks for 2% and 8%). The gap is about the two chain-binomial schemes at a coarse step: on 14 October it shrank from 7% to 2% with a quarter-day step |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

@@ -1,7 +1,7 @@
 {
-  "first": 0.0367,
-  "rerun": 0.0319,
-  "what": "simulate_wrapper(): one stochastic run of the 99 days of the calibration period, as the calibration evaluates it, in process, with the model already defined. The first run is the first call, and the rerun the best of 5 calls after the calibration (the reduced ABC-SMC, 20 particles for 2 generations, takes 2 s)",
+  "first": 0.03365,
+  "rerun": 0.03406,
+  "product": "simulate_wrapper(): one stochastic run of the 99 days of the calibration period, as the calibration evaluates it, in process, with the model already defined. The first run is the first call, and the rerun the best of 5 calls after the calibration (the reduced ABC-SMC, 20 particles for 2 generations, takes 2 s)",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

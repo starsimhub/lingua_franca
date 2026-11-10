@@ -1,7 +1,7 @@
 {
-  "first": 0.95461,
-  "rerun": 0.51558,
-  "what": "first: making the network and the model, and simulating it on the network with contact tracing for 40 days, in a fresh process, with epipack and networkx already imported. rerun: the best of the simulations on the network of all the runs, each of a model already built on its network. Not timed here: the run well mixed (well_mixed_rerun) and the deterministic model (ode_rerun), which run.log gives",
+  "first": 0.87409,
+  "rerun": 0.47804,
+  "product": "first: making the network and the model, and simulating it on the network with contact tracing for 40 days, in a fresh process, with epipack and networkx already imported. rerun: the best of the simulations on the network of all the runs, each of a model already built on its network. Not timed here: the run well mixed (well_mixed_rerun) and the deterministic model (ode_rerun), which run.log gives",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

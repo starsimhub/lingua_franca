@@ -16,12 +16,12 @@ The SIRS of epipack's README, its first example: infection at 2.5 a day, recover
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 37 | 8 | The original is two scripts, 12 lines for the well-mixed model and 25 for the network, without the plotting. In Starsim they are one disease and three sims |
-| One run | first 0.06 s, rerun 0.057 s | first 0.013 s, rerun 0.00022 s (Rust) | Each is the ODE integrated to day 40, with results; the original's at the README's 1,000 times. A Gillespie run takes 0.024 s in the original and 0.00072 s in Starsim. On the network a run is slower in Starsim: 5.2 s again, against 3.3 s (3.9 s for the first run, which makes the network), with 1,600 steps of 0.025 days; see the findings |
+| One run | first 0.054 s, rerun 0.052 s | first 0.0085 s, rerun 0.00025 s (Rust) | Each is the ODE integrated to day 40, with results; the original's at the README's 1,000 times. A Gillespie run takes 0.024 s in the original and 0.00072 s in Starsim. On the network a run is slower in Starsim: 5.2 s again, against 3.3 s (3.9 s for the first run, which makes the network), with 1,600 steps of 0.025 days; see the findings |
 | Results, ODE | 411.87 in `S` on day 40 | 411.87 | **Agree** to 6.5e-6 of the population on every day, with a daily RK4 step against epipack's adaptive solver |
 | Results, Gillespie (mean of 1,000 runs) | 526 in `S` on day 40, with 5% to 95% of runs from 344 to 920 | | **Agree** to 5.6e-3 of the population on every day, within the error of a mean of 1,000 runs |
 | Results, on the network (mean of 100 runs) | A peak of 2,228 in `I` on day 3, and 4,399 in `S` on day 40 | | **Agree** to 2.1e-2 of the population on every day, with steps of 0.025 days against epipack's continuous time. The largest difference is in the first days, when the epidemic doubles in about 10 hours |
 
-Measured on 3 November 2026 with Starsim 4.0.0rc2 (the `v4` branch, commit `d0107e93`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

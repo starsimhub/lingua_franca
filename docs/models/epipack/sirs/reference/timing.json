@@ -1,7 +1,7 @@
 {
-  "first": 0.05971,
-  "rerun": 0.05674,
-  "what": "first: building the model and integrating it (integrate() at the 1,000 times of the original), in a fresh process, with epipack already imported. rerun: integrating it again. Not timed here: a Gillespie run (simulate(), timed as gillespie_rerun) and a run on the network (network_first, which includes making the network, and network_rerun), which run.log gives",
+  "first": 0.05402,
+  "rerun": 0.05191,
+  "product": "first: building the model and integrating it (integrate() at the 1,000 times of the original), in a fresh process, with epipack already imported. rerun: integrating it again. Not timed here: a Gillespie run (simulate(), timed as gillespie_rerun) and a run on the network (network_first, which includes making the network, and network_rerun), which run.log gives",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

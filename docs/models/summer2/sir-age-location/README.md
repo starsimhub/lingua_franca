@@ -16,11 +16,11 @@ An SIR epidemic with disease deaths in 1,000 people over 20 time units, stratifi
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 35 | 12 | One Starsim line is over 100 characters, so counts twice |
-| One ODE run | first 0.81 s, rerun 0.00022 s | first 0.011 s, rerun 0.00034 s (Rust) | Neither time counts importing. The original's first run builds and compiles the model with JAX, which takes much longer than Starsim's; its rerun, once compiled, is faster |
+| One ODE run | first 0.78 s, rerun 0.00022 s | first 0.012 s, rerun 0.00043 s (Rust) | Neither time counts importing. The original's first run builds and compiles the model with JAX, which takes much longer than Starsim's; its rerun, once compiled, is faster |
 | Results, ODE | | | Every compartment within 0.08 people of 1,000 |
 | Results, other solvers | | | The stochastic and agent-based runs give the same number recovered as the ODE, to within 1% (mean of 100 runs) |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

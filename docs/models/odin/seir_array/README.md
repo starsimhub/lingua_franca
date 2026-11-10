@@ -15,12 +15,12 @@ This is odin's wave 3 example. `model.py` is the Starsim version, and `compare.p
 
 | Measure | Original | Starsim | |
 |---|---|---|---|
-| Lines of model code | 53 | 17 | No line is over 100 characters |
-| One run | first 0.83 s, rerun 0.0014 s | first 0.019 s, rerun 0.0029 s (Rust) | The original's first run is mostly compiling the C code. Its run of the delay and Starsim's conveyor are both quick |
+| Lines of model code | 53 | 18 | No line is over 100 characters |
+| One run | first 0.71 s, rerun 0.0014 s | first 0.019 s, rerun 0.0032 s (Rust) | The original's first run is mostly compiling the C code. Its run of the delay and Starsim's conveyor are both quick |
 | Results, in total | | | **Agree.** `S`, `E`, `I`, and `R` within 0.23%, 0.36%, 0.25%, and 0.15% of their largest values on every day (a quarter of that with a step of half a day), and `I` peaks at 6.19 million on day 125, as in the original. It needs the workaround of finding 1: without it the epidemic peaks 15 days late. `compare.py` allows 0.5% |
 | Results, by age | | | **Agree, except in the youngest group,** where `E`, `I`, and `R` differ by up to 15%, 5%, and 8%. The original's delay does not let the latent age (finding 2); Starsim's does. `compare.py` allows 1% in the other groups |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

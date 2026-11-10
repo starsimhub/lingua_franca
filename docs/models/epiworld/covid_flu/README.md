@@ -15,11 +15,11 @@ COVID-19 and flu spreading at the same time among 50,000 agents for 50 days, in 
 
 | Measure | Original | Starsim | |
 |---|---|---|---|
-| Lines of model code | 29 | 20 | |
-| One run | first 0.08 s, rerun 0.076 s | first 0.017 s, rerun 0.0012 s (Rust) | One run of 50 days. The original's first run includes building the model; Starsim's runs the agents as counts, as for [seirconn](../seirconn) |
+| Lines of model code | 29 | 21 | |
+| One run | first 0.069 s, rerun 0.067 s | first 0.018 s, rerun 0.00047 s (Rust) | One run of 50 days. The original's first run includes building the model; Starsim's runs the agents as counts, as for [seirconn](../seirconn) |
 | Results | | | **Agree while few are infected, and within 5% after** (mean of 1,000 runs each): on days 1 to 5 every mean agrees within three standard errors (725 infected on day 5, against 721). Later the epidemic is larger, as expected from the original's chance of infection (see below): it peaks on day 11 in both, at 9,296 against 8,899 (+4.5%), the flu peaks on day 9 at 162 against 155, and 26,855 have recovered on day 50, against 26,509 (+1.3%) |
 
-Measured on 3 November 2026 with Starsim 4.0.0rc2 (the `v4` branch, commit `d0107e93`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

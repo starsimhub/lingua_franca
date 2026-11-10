@@ -16,12 +16,12 @@ The framework's declarative teaching example, `example_parameter_uncertainty_dec
 | Measure | Original | Starsim | |
 |---|---|---|---|
 | Lines of model code | 99 | 8 | Most of the original's lines are the declaration that also serves the web form and model card, which the Starsim version doesn't have |
-| One run | first 0.23 s, rerun 0.0045 s | first 0.0094 s, rerun 0.00034 s (Rust) | Each is one run with the measure, and includes results. A first run excludes imports; the original's includes compiling with JAX, and Starsim's uses kernels already compiled. A condition on a count is part of the rate, so the whole run is in the kernels, and JAX can run it too |
+| One run | first 0.23 s, rerun 0.0046 s | first 0.01 s, rerun 0.00038 s (Rust) | Each is one run with the measure, and includes results. A first run excludes imports; the original's includes compiling with JAX, and Starsim's uses kernels already compiled. A condition on a count is part of the rate, so the whole run is in the kernels, and JAX can run it too |
 | Results, without the measure | | | **Agree** to 1.2e-5 of the population on every day (6 people in `I`), with a daily RK4 step against an adaptive solver |
 | Results, with the measure | Peak 198,528 on day 59; 860,705 infections | Peak 198,578 on day 59; 860,644 infections | **Agree** to 1.7e-3 of the population. The difference is when the threshold is noticed: Starsim reads it at each stage of its daily step, and the original within its adaptive step |
 | Results, 20 draws (median at each time) | 23.9% to 16.5% at the peak, 7 days later, and about 938,000 to 844,000 infections, in one run; the guide on interventions gives 25% to 19%, and 939,000 to 865,000 | About 25% to 18%, 8 days later, and 940,000 to 857,000 infections, with 200 draws | **Consistent**: inside the original's 95% band on every day. The original's draws have no seed, so two of its runs differ by this much |
 
-Measured on 2 November 2026 with Starsim 4.0.0rc1 (the `v4` branch, commit `5a43500f`), on a 20-core Linux machine.
+Measured on 9 November 2026 with Starsim 4.0.0rc3 (the `v4` branch, commit `be38b9f6`), on a 20-core Linux machine.
 
 ## What was declared and what was not
 

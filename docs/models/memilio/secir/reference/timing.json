@@ -1,7 +1,7 @@
 {
-  "first": 0.00046,
+  "first": 0.00041,
   "rerun": 2e-05,
-  "what": "first is one call of the example's run_ode_secir_simulation(), with its plot off, up to the end of interpolating the result: building the model and running it (51 adaptive time points), not counting starting Python, importing, or drawing the plot; rerun is the best of 100 more calls of simulate() on the same model",
+  "product": "first is one call of the example's run_ode_secir_simulation(), with its plot off, up to the end of interpolating the result: building the model and running it (51 adaptive time points), not counting starting Python, importing, or drawing the plot; rerun is the best of 100 more calls of simulate() on the same model",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

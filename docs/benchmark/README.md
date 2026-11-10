@@ -9,7 +9,7 @@ authorship:
 
 `lingua_franca benchmark` regenerates every number in the table on the home page. It checks each translation against its original, times the two in turn, and writes the lines and times into each translation's table.
 
-**Last full run:** 16 minutes on 2 November 2026 (compare 4.5, timing 11.1). The slowest model, `flepimop/vaccine_scenarios`, took 96 s.
+**Last full run:** 30 minutes on 9 November 2026 (compare 11.9, timing 17.6). The slowest model, `laser/england_wales`, took 428 s.
 
 ## How long it takes
 

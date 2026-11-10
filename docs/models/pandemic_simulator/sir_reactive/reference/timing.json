@@ -1,7 +1,7 @@
 {
-  "first": 0.2338,
-  "rerun": 0.00453,
-  "what": "first: validating the config, building the model, compiling with JAX, and running it once with the measure, in a fresh process, with JAX and the framework already imported. rerun: the same model run again, already compiled. Both include its results, and neither the two worker processes of its main script, which runs the model with and without the measure",
+  "first": 0.22566,
+  "rerun": 0.00465,
+  "product": "first: validating the config, building the model, compiling with JAX, and running it once with the measure, in a fresh process, with JAX and the framework already imported. rerun: the same model run again, already compiled. Both include its results, and neither the two worker processes of its main script, which runs the model with and without the measure",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

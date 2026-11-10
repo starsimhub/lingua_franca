@@ -23,6 +23,8 @@ its original and then Starsim, in fresh processes, under the kernels listed for 
 kernels.yaml, and each time is the best of them. The scorecard says whether each
 model meets the north star: a model fails on lines if Starsim has more than the original,
 and on a time if Starsim is more than 2x slower and more than 1 s slower (`--out` saves it).
+It also says, for each framework, whether Starsim is faster, slower, or about the same: within
+2x, or within 0.1 s for a first run or 1 ms for a rerun.
 A full run records how long the whole
 suite and each model took, in timings.json and docs/benchmark/README.md.
 
@@ -59,6 +61,8 @@ limit = 120 # Seconds for one model over all the stages, over which it is report
 timeout = 900 # Seconds for any one command
 ratio_limit = 2 # A time fails if Starsim is more than this many times slower...
 diff_limit = 1 # ...and more than this many seconds slower
+same_ratio = 2 # Two times are about the same if within this factor of each other...
+same_diff = dict(first=0.1, rerun=0.001) # ...or within this many seconds: a first run is waited for once, a rerun is repeated thousands of times in a fit
 max_load = 10 # A load average over this pauses the run before the next model, which is checked again after `pause` seconds
 pause = 300
 data = folder / 'timings.json'
@@ -67,7 +71,7 @@ readme = folder / 'README.md'
 
 runs = { # What one run is, where it is not the variable `sim` in the model file
     'emulsion/sir': dict(sim='compartment'), # The original timed is the compartmental one
-    'flepimop/vaccine_scenarios': dict(code='ss.parallel(runs(n_runs=2, verbose=0), parallel=False)'), # The original timed is 3 scenarios of 2 runs
+    'flepimop/vaccine_scenarios': dict(code='ss.parallel(runs(n_runs=2, verbose=0), workers=1)'), # The original timed is 3 scenarios of 2 runs
 }
 
 
@@ -190,7 +194,8 @@ def worker(name, kernel, rebuilds):
 
     if kernel.startswith('jax') and 'code' not in run: # Without a slow first run if JAX does not apply
         built[0].init()
-        reason = built[0]._kernel_reason()
+        reason = getattr(built[0], '_kernel_reason', None) or built[0].kernel_reason # Public up to Starsim 4.0.0rc3
+        reason = reason()
         use, why = (False, reason) if reason else forced(built[0])
         if not use:
             print('TIMING ' + json.dumps(dict(skipped=why)))
@@ -269,8 +274,8 @@ def compile_time(env):
 
 
 def listed_kernels(name):
-    """ The kernel sets to time a model with """
-    return sc.loadyaml(kernel_file)[name]
+    """ The kernel sets to time a model with: those listed for it, or every set for a model not yet listed """
+    return sc.loadyaml(kernel_file).get(name, kernels)
 
 
 def pretty_time(value):
@@ -414,11 +419,30 @@ def original_lines(name):
     return int(re.search(r'\d[\d,]*', row).group().replace(',', ''))
 
 
+def verdict(ours, theirs, key):
+    """ Whether Starsim's time is faster, slower, or about the same as the original's, for a first run or a rerun """
+    if max(ours, theirs) <= same_ratio*min(ours, theirs) or abs(ours - theirs) <= same_diff[key]:
+        return 'about the same'
+    return 'faster' if ours < theirs else 'slower'
+
+
+def describe(verdicts):
+    """ The verdicts for one framework's models in words, e.g. "faster in both" or "faster in sir; slower in sise3" """
+    groups = {}
+    for model,val in verdicts.items():
+        groups.setdefault(val, []).append(model)
+    if len(groups) == 1:
+        val = next(iter(groups))
+        return val + {1:'', 2:' in both'}.get(len(verdicts), ' in all')
+    return ', '.join(f"{val} in {' and '.join(models)}" for val,models in groups.items())
+
+
 def scorecard(names):
     """ Markdown for each model against the north star: its lines and times against the original's, with a summary of what fails """
     info = load_data()
     rows = ['| Model | Lines: original | Lines: Starsim | First run (s): original | First run (s): Starsim | Rerun (s): original | Rerun (s): Starsim | Fails on |', '|---|---|---|---|---|---|---|---|']
     failures = dict(lines=[], first=[], rerun=[])
+    speeds = {} # Verdicts by framework, then first or rerun, then model
     measured = 0
     for name in names:
         ours, theirs = count_lines(model_file(name)), original_lines(name)
@@ -430,15 +454,19 @@ def scorecard(names):
         cells = []
         for key in ['first', 'rerun']:
             cells += [seconds(original[key]) if key in original else '–', seconds(best[key]) if key in best else '–']
-            if key in original and key in best and best[key] > ratio_limit*original[key] and best[key] - original[key] > diff_limit:
-                fails.append(key)
+            if key in original and key in best:
+                framework, model = name.split('/')
+                speeds.setdefault(framework, dict(first={}, rerun={}))[key][model] = verdict(best[key], original[key], key)
+                if best[key] > ratio_limit*original[key] and best[key] - original[key] > diff_limit:
+                    fails.append(key)
         measured += bool(best)
         for key in fails:
             failures[key].append(name)
         rows.append(f"| {name} | {theirs} | {ours} | {' | '.join(cells)} | {', '.join(fails) or '–'} |")
     n = dict(lines=len(names), first=measured, rerun=measured)
     summary = [f"- {key.capitalize()}: {n[key] - len(val)} of {n[key]} pass" + (f": failing {', '.join(val)}" if val else '') for key,val in failures.items()]
-    return '\n'.join(rows + [''] + summary) + '\n'
+    speed = [f"- {framework}: first run {describe(val['first'])}; rerun {describe(val['rerun'])}" for framework,val in speeds.items()]
+    return '\n'.join(rows + [''] + summary + ['', "Starsim's speed against the original's:", ''] + speed) + '\n'
 
 
 def main(args=None):

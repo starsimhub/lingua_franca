@@ -1,7 +1,7 @@
 {
-  "first": 0.22527,
-  "rerun": 0.13017,
-  "what": "first: building the RUME (with the ADRIOs replaced by the data bundled for the example) and running it once, in a process with epymorph already imported. rerun: the same RUME run again, by a new BasicSimulator, as the notebook runs it. Both are a single run of 150 days in 6 states, with two tau steps a day; the reference results are 3 more runs",
+  "first": 0.21386,
+  "rerun": 0.12805,
+  "product": "first: building the RUME (with the ADRIOs replaced by the data bundled for the example) and running it once, in a process with epymorph already imported. rerun: the same RUME run again, by a new BasicSimulator, as the notebook runs it. Both are a single run of 150 days in 6 states, with two tau steps a day; the reference results are 3 more runs",
   "machine": "x86_64",
   "cpus": 20,
   "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39"

@@ -1,131 +1,131 @@
 model,kernels,first,rerun,rebuild,fastest,skipped
-atomica/hiv_dyn,rust,0.03758325905073434,0.00034193298779428005,,True,
+atomica/hiv_dyn,rust,0.03248634698684327,0.0004052720032632351,,True,
 atomica/hiv_dyn,numba,0.10210478806402534,0.002326256944797933,0.034102466073818505,False,
 atomica/hiv_dyn,jax,0.5779202380217612,0.002335913013666868,0.03299768490251154,False,
 atomica/hiv_dyn,jax-gpu,2.190330156008713,0.003865964012220502,0.03560245898552239,False,
-atomica/sir,rust,0.009697447065263987,0.00016622396651655436,,True,
+atomica/sir,rust,0.010344826005166396,0.00020708100055344403,,True,
 atomica/sir,numba,0.0750721690710634,0.0009640590287744999,0.008453391958028078,False,
 atomica/sir,jax,0.45855503098573536,0.0003974359715357423,,False,
 atomica/sir,jax-gpu,0.9147864830447361,0.001959027023985982,0.010227917926385999,False,
-camdl/sir,rust,0.009465434006415308,0.00021660304628312588,,True,
+camdl/sir,rust,0.009914560010656714,0.0002511870115995407,,True,
 camdl/sir,numba,0.07575198099948466,0.0009293439798057079,0.008146803011186421,False,
 camdl/sir,jax,0.5433492970187217,0.0004443189827725291,,False,
 camdl/sir,jax-gpu,1.2898949920199811,0.00775907002389431,0.01596422807779163,False,
-camdl/stratified,rust,0.018000070936977863,0.00046274601481854916,,True,
+camdl/stratified,rust,0.014273718988988549,0.000679898977978155,,True,
 camdl/stratified,numba,0.18136162997689098,0.0036731649888679385,0.019526331103406847,False,
 camdl/stratified,jax,1.8101642159745097,0.0023041879758238792,0.015884210937656462,False,
 camdl/stratified,jax-gpu,2.801857208018191,0.03380674496293068,0.04384383908472955,False,
 emulsion/quickstart,jax,,,,False,it runs as agents
 emulsion/quickstart,jax-gpu,,,,False,it runs as agents
-emulsion/quickstart,rust,0.20966079807840288,0.21217425307258964,,True,
-emulsion/quickstart,numba,0.34965406707488,0.21281549299601465,,False,
-emulsion/sir,rust,0.0077827840577811,0.0001800860045477748,,True,
+emulsion/quickstart,rust,0.22886700299568474,0.2220438700169325,,False,
+emulsion/quickstart,numba,0.33196049800608307,0.21828088501933962,,True,
+emulsion/sir,rust,0.008549228019546717,0.00020166501053608954,,True,
 emulsion/sir,numba,0.07034700398799032,0.0007736460538581014,0.0066965470323339105,False,
 emulsion/sir,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
 emulsion/sir,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
-epidemics/seasonal_scenarios,rust,0.0739268409088254,0.046826148056425154,0.07369152992032468,True,
+epidemics/seasonal_scenarios,rust,0.02072490399586968,0.0014588379999622703,,True,
 epidemics/seasonal_scenarios,numba,0.3104567200643942,0.051533923018723726,0.07537254295311868,False,
 epidemics/seasonal_scenarios,jax,1.1822506999596953,0.05162931000813842,0.07521504594478756,False,
 epidemics/seasonal_scenarios,jax-gpu,3.4756831049453467,0.1136508530471474,0.1379183609969914,False,
 epidemics/seirv,rust,0.029892702936194837,0.001284247962757945,0.012405916000716388,False,
 epidemics/seirv,numba,0.3068767070071772,0.0020533549832180142,0.013735616928897798,False,
-epidemics/seirv,jax,0.8424185800831765,0.0009800889529287815,0.010814410052262247,True,
+epidemics/seirv,jax,0.5857849619933404,0.0011044499988202006,,True,
 epidemics/seirv,jax-gpu,2.528730269987136,0.0618626739596948,0.073961331974715,False,
 epimodel/hiv,jax,,,,False,it runs as agents
 epimodel/hiv,jax-gpu,,,,False,it runs as agents
-epimodel/hiv,rust,2.2416722810594365,1.9995372419944033,,False,
-epimodel/hiv,numba,2.4361125429859385,1.9936008249642327,,True,
+epimodel/hiv,rust,2.296398695994867,2.023407000990119,,True,
+epimodel/hiv,numba,2.3940766120213084,2.027868381002918,,False,
 epimodel/sis-network,jax,,,,False,it runs as agents
 epimodel/sis-network,jax-gpu,,,,False,it runs as agents
-epimodel/sis-network,rust,0.5220038030529395,0.3188919300446287,,True,
+epimodel/sis-network,rust,0.569873174012173,0.29914630998973735,,True,
 epimodel/sis-network,numba,0.6302359310211614,0.3653656669193879,0.36242819495964795,False,
-epipack/siarx_tracing,rust,1.2792691229842603,1.1416221599793062,1.152617763960734,True,
-epipack/siarx_tracing,numba,7.639974407968111,1.17083871003706,1.1127848270116374,False,
+epipack/siarx_tracing,rust,0.5424076250055805,0.5038120149984024,,True,
+epipack/siarx_tracing,numba,0.643587069993373,0.51615226699505,,False,
 epipack/siarx_tracing,jax,,,,False,it runs as agents
 epipack/siarx_tracing,jax-gpu,,,,False,it runs as agents
-epipack/sirs,rust,0.012882594019174576,0.00021961599122732878,0.007591120898723602,True,
+epipack/sirs,rust,0.008474084985209629,0.0002527449978515506,,True,
 epipack/sirs,numba,0.17524864908773452,0.0004001050256192684,0.007672821986488998,False,
 epipack/sirs,jax,0.994019704987295,0.0004629578907042742,0.007241403101943433,False,
 epipack/sirs,jax-gpu,2.444558774936013,0.006328604998998344,0.014576239977031946,False,
-epiworld/covid_flu,rust,0.017338608973659575,0.0012016399996355176,0.015130192041397095,True,
-epiworld/covid_flu,numba,0.18375170894432813,0.0015154610155150294,0.015220431960187852,False,
-epiworld/covid_flu,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
-epiworld/covid_flu,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
-epiworld/seirconn,rust,0.009156754007562995,0.00018459407147020102,0.0073956099804490805,True,
-epiworld/seirconn,numba,0.1730485720327124,0.0003799370024353266,0.007551579969003797,False,
-epiworld/seirconn,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
-epiworld/seirconn,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
-epydemix/covid19,rust,0.02410567202605307,0.0011712820269167423,,True,
+epiworld/covid_flu,rust,0.017542078014230356,0.00046782399294897914,,True,
+epiworld/covid_flu,numba,144.98727651502122,0.0007141389942262322,,False,
+epiworld/covid_flu,jax,,,,False,AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?
+epiworld/covid_flu,jax-gpu,,,,False,AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?
+epiworld/seirconn,rust,0.008971497998572886,0.00021440398995764554,,True,
+epiworld/seirconn,numba,0.16204048099461943,0.00040951999835669994,,False,
+epiworld/seirconn,jax,,,,False,AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?
+epiworld/seirconn,jax-gpu,,,,False,AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?
+epydemix/covid19,rust,0.02314760599983856,0.0012373919889796525,,True,
 epydemix/covid19,numba,0.10761806298978627,0.0027460280107334256,0.02715338603593409,False,
 epydemix/covid19,jax,0.145061902992893,0.0027725619729608297,0.02751532895490527,False,
 epydemix/covid19,jax-gpu,0.1381763750105165,0.002599567989818752,0.026795884012244642,False,
-epydemix/sir_kenya,rust,0.009730216930620372,0.00029795989394187927,,True,
+epydemix/sir_kenya,rust,0.011145938013214618,0.0003370070189703256,,True,
 epydemix/sir_kenya,numba,0.19309336802689359,0.0026382309733889997,0.020265383005607873,False,
 epydemix/sir_kenya,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
 epydemix/sir_kenya,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
-epymorph/pei_humidity,rust,0.0674941330216825,0.0018938030116260052,0.0650077749742195,True,
-epymorph/pei_humidity,numba,0.22340291598811746,0.0026720589958131313,0.06599648098926991,False,
-epymorph/pei_humidity,jax,,,,False,"kernels: JAX does not run solver=""tau"""
-epymorph/pei_humidity,jax-gpu,,,,False,"kernels: JAX does not run solver=""tau"""
-epymorph/sirs_centroids,rust,0.01566583605017513,0.003912469022907317,0.013758025947026908,True,
-epymorph/sirs_centroids,numba,0.17449820996262133,0.006020762957632542,0.0156184519873932,False,
-epymorph/sirs_centroids,jax,,,,False,"kernels: JAX does not run solver=""tau"""
-epymorph/sirs_centroids,jax-gpu,,,,False,"kernels: JAX does not run solver=""tau"""
-flepimop/seir_2pop,rust,0.011464147944934666,0.00036014895886182785,,True,
+epymorph/pei_humidity,rust,0.06955083899083547,0.0020109119941480458,,True,
+epymorph/pei_humidity,numba,0.22238490299787372,0.0030350240122061223,,False,
+epymorph/pei_humidity,jax,,,,False,AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?
+epymorph/pei_humidity,jax-gpu,,,,False,AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?
+epymorph/sirs_centroids,rust,0.015851049014599994,0.003971211990574375,,True,
+epymorph/sirs_centroids,numba,0.1648177999886684,0.006065883993869647,,False,
+epymorph/sirs_centroids,jax,,,,False,AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?
+epymorph/sirs_centroids,jax-gpu,,,,False,AttributeError: 'Sim' object has no attribute '_kernel_reason'. Did you mean: 'kernel_reason'?
+flepimop/seir_2pop,rust,0.012674881989369169,0.00038486099219881,,True,
 flepimop/seir_2pop,numba,0.08200381800998002,0.001236798008903861,0.010366181028075516,False,
 flepimop/seir_2pop,jax,0.6805178830400109,0.0004988099681213498,,False,
 flepimop/seir_2pop,jax-gpu,2.1521470110164955,0.00948202598374337,0.018951882957480848,False,
-flepimop/vaccine_scenarios,rust,0.5476044269744307,0.34996536700055003,,False,
-flepimop/vaccine_scenarios,numba,0.6852045289706439,0.3500420569907874,,False,
-flepimop/vaccine_scenarios,jax,1.188426316017285,0.34690651192795485,,True,
+flepimop/vaccine_scenarios,rust,0.6139151910028886,0.3340198480000254,,False,
+flepimop/vaccine_scenarios,numba,0.7703474599984474,0.3294019470049534,,True,
+flepimop/vaccine_scenarios,jax,1.1347921479900833,0.3336741399834864,,False,
 flepimop/vaccine_scenarios,jax-gpu,3.171652026940137,0.6653797560138628,0.6684680670732632,False,
 laser/england_wales,jax,,,,False,it runs as agents
 laser/england_wales,jax-gpu,,,,False,it runs as agents
-laser/england_wales,rust,11.949433724978007,11.916341860080138,,True,
+laser/england_wales,rust,103.4137588700105,104.38708924598177,,True,
 laser/england_wales,numba,13.118159579928033,13.366685385000892,,False,
 laser/hub_spoke_seir,jax,,,,False,it runs as agents
 laser/hub_spoke_seir,jax-gpu,,,,False,it runs as agents
-laser/hub_spoke_seir,rust,0.6242328779771924,0.6178463160758838,,True,
-laser/hub_spoke_seir,numba,0.7537439379375428,0.6357490579830483,,False,
-measles_metapop/seir_districts,rust,0.4438195279799402,0.40758972300682217,,True,
+laser/hub_spoke_seir,rust,0.6252420920063742,0.631376620993251,,False,
+laser/hub_spoke_seir,numba,0.7174569199851248,0.6146751370106358,,True,
+measles_metapop/seir_districts,rust,0.4359476779936813,0.3944639879919123,,True,
 measles_metapop/seir_districts,numba,0.6919362570624799,0.5576883930480108,0.5758360610343516,False,
 measles_metapop/seir_districts,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
 measles_metapop/seir_districts,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
-memilio/secir,rust,0.013674313086085021,0.00037126289680600166,,True,
+memilio/secir,rust,0.013128691993188113,0.0004748940118588507,,True,
 memilio/secir,numba,0.08318794704973698,0.0015519090229645371,0.012437628931365907,False,
 memilio/secir,jax,0.5651530480245128,0.0006212510634213686,,False,
 memilio/secir,jax-gpu,1.0008763959631324,0.012196657015010715,0.02312514593359083,False,
-memilio/secir_ageres,rust,0.01897646998986602,0.0004852920537814498,,True,
+memilio/secir_ageres,rust,0.019201507995603606,0.0006693709874525666,,True,
 memilio/secir_ageres,numba,0.08659354201517999,0.0014616689877584577,0.018290938925929368,False,
 memilio/secir_ageres,jax,1.0002029679017141,0.002103567006997764,0.018369028926827013,False,
 memilio/secir_ageres,jax-gpu,2.348100894014351,0.01084295695181936,0.02842327393591404,False,
-odin/seir_array,rust,0.019174598972313106,0.0029263440519571304,,True,
+odin/seir_array,rust,0.018612101004691795,0.003232939023291692,,True,
 odin/seir_array,numba,0.08590900502167642,0.005603002035059035,0.024180534994229674,False,
 odin/seir_array,jax,1.8797797480365261,0.02276363701093942,0.04944030800834298,False,
 odin/seir_array,jax-gpu,4.568051479989663,0.09747026290278882,0.11485863605048507,False,
-odin/stochastic_sir_arrays,rust,0.014692609081976116,0.0008539960253983736,,True,
+odin/stochastic_sir_arrays,rust,0.012816886999644339,0.0009112819971051067,,True,
 odin/stochastic_sir_arrays,numba,0.3335403579985723,0.018677616026252508,0.01896928297355771,False,
 odin/stochastic_sir_arrays,jax,,,,False,"kernels: JAX does not run solver=""binomial"""
 odin/stochastic_sir_arrays,jax-gpu,,,,False,"kernels: JAX does not run solver=""binomial"""
-pandemic_simulator/ebola_legrand,rust,0.02071503596380353,0.001442519947886467,,True,
+pandemic_simulator/ebola_legrand,rust,0.019992464978713542,0.001058516005286947,,True,
 pandemic_simulator/ebola_legrand,numba,0.09591364907100797,0.0022652490297332406,,False,
 pandemic_simulator/ebola_legrand,jax,0.7776841269806027,0.0017017220379784703,,False,
-pandemic_simulator/sir_reactive,rust,0.009391810046508908,0.00033617904409766197,,True,
+pandemic_simulator/sir_reactive,rust,0.010176957992371172,0.00037577099283225834,,True,
 pandemic_simulator/sir_reactive,numba,0.07540777302347124,0.0008592259837314487,,False,
 pandemic_simulator/sir_reactive,jax,0.8427153889788315,0.0005304119549691677,,False,
 siminf/sir_herds,jax,,,,False,"kernels: JAX does not run solver=""gillespie"""
 siminf/sir_herds,jax-gpu,,,,False,"kernels: JAX does not run solver=""gillespie"""
-siminf/sir_herds,rust,0.2629864950431511,0.14040924701839685,,True,
+siminf/sir_herds,rust,0.2681625530240126,0.1446239439828787,,True,
 siminf/sir_herds,numba,0.5304577479837462,0.30760494095738977,0.41417734406422824,False,
 siminf/sise3,jax,,,,False,"kernels: JAX does not run solver=""gillespie"""
 siminf/sise3,jax-gpu,,,,False,"kernels: JAX does not run solver=""gillespie"""
-siminf/sise3,rust,0.84904130094219,0.52391110395547,,True,
+siminf/sise3,rust,0.756913124001585,0.5073827219894156,,True,
 siminf/sise3,numba,1.5607711599441245,1.2211501449346542,1.4589005489833653,False,
-summer2/seir-age-clinical,rust,0.01659959997050464,0.0004775619599968195,,True,
+summer2/seir-age-clinical,rust,0.014411040989216417,0.0005325340025592595,,True,
 summer2/seir-age-clinical,numba,0.07642049295827746,0.0013271300122141838,0.01100868103094399,False,
 summer2/seir-age-clinical,jax,0.9928610380738974,0.0022707199677824974,0.01259474502876401,False,
 summer2/seir-age-clinical,jax-gpu,2.3637491629924625,0.022146616014651954,0.03347395604941994,False,
-summer2/sir-age-location,rust,0.0107578159077093,0.0003444269532337785,,True,
+summer2/sir-age-location,rust,0.01233651998336427,0.0004264970193617046,,True,
 summer2/sir-age-location,numba,0.07949111401103437,0.0011871689930558205,0.010598122025839984,False,
 summer2/sir-age-location,jax,0.5472949629183859,0.000555624021217227,,False,
 summer2/sir-age-location,jax-gpu,2.662411659024656,0.01806482404936105,0.02682683093007654,False,
