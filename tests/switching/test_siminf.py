@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import sciris as sc
 import starsim as ss
-import starsim.fit
+import starsim.internals.fitting
 import paths
 import timing
 
@@ -61,7 +61,7 @@ def test_siminf_ldata():
 
 def test_siminf_filter():
     sc.heading('Timing the particle filter for PMCMC, per particle run')
-    pf = ss.fit.ParticleFilter(make_pmcmc().init(), likelihood=dict(I=ss.poisson()))
+    pf = ss.fitting.ParticleFilter(make_pmcmc().init(), likelihood=dict(I=ss.poisson()))
     pf(10, rand_seed=0) # Compile
     n = 50
     seconds, loglik = timing.timed(lambda: pf(n, rand_seed=1))

@@ -68,7 +68,7 @@ Some fields reject DALYs altogether (schistosomiasis modelers use heavy-infectio
 The building blocks exist in several places ([details](pandemics-and-frameworks.md#the-starsim-family)):
 
 - Starsim v4 has a per-delivery `cost=` on `ss.Vaccine`, `ss.Treatment`, and `ss.Diagnostic`, tallied as a `cost` result by stratum in both agent-based and compartmental runs.
-- Its library adds `ssl.Costs` (per-event and fixed costs), `ssl.DALYs`, `ssl.ICER`, and `ssl.discount()`, and `ss.fit.optimize()` allocates budgets ([how to use them](https://starsim.org/v4/user_guide/interventions_costs.html)).
+- Its library adds `ssl.Costs` (per-event and fixed costs), `ssl.DALYs`, `ssl.ICER`, and `ssl.discount()`, and `ss.fitting.optimize()` allocates budgets ([how to use them](https://starsim.org/v4/user_guide/interventions_costs.html)).
 - STIsim's `logistics` module has products with unit costs, finite supplies, and cost attribution across shared stock.
 - HPVsim has an incidence-based `dalys` analyzer.
 

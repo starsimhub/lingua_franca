@@ -10,7 +10,7 @@ import pandas as pd
 import pytest
 import sciris as sc
 import starsim as ss
-import starsim.fit
+import starsim.internals.fitting
 
 ref_peak = 0.5446 # switching/epydemix.md, "The second week" §1: epydemix's peak share infected in the Kenya tutorial (v4: 0.5448)
 ref_peak_day = 40 # Same section: epydemix's day of the peak (v4: 39)
@@ -78,7 +78,7 @@ def test_epydemix_filter():
     sim = make_seasonal(data=weekly_data())
     loglik = {}
     for b in [0.4, true_b, 0.6]:
-        filt = ss.fit.ParticleFilter(sim.new(pars=dict(b=b), rand_seed=0).init(), likelihood=dict(infection=ss.poisson())) # The filter starts from the sim as initialized
+        filt = ss.fitting.ParticleFilter(sim.new(pars=dict(b=b), rand_seed=0).init(), likelihood=dict(infection=ss.poisson())) # The filter starts from the sim as initialized
         loglik[b] = filt(n_particles=100, rand_seed=0)
     assert max(loglik, key=loglik.get) == true_b, f'Expected the filter to peak at b = {true_b}: {loglik}'
     return loglik
@@ -87,7 +87,7 @@ def test_epydemix_filter():
 def test_epydemix_posterior_projection():
     sc.heading('epydemix: a posterior with no likelihood, then projections from it')
     sim = make_seasonal(data=weekly_data())
-    fit = sim.fit(method=ss.fit.method('abc-smc', samples=50, generations=3), verbose=0) # A distance (wmape), no likelihood
+    fit = sim.fit(method=ss.fitting.method('abc-smc', samples=50, generations=3), verbose=0) # A distance (wmape), no likelihood
     lo, hi = np.quantile(fit.samples.b, [0.025, 0.975])
     assert lo <= true_b <= hi, f'Expected the posterior of b ({lo:.3f} to {hi:.3f}) to cover {true_b}'
     vaccine = ss.vaccinate(ss.Vaccine(efficacy=0.9), capacity=ss.perday(20_000), when=ss.schedule(start='2020-04-01'))

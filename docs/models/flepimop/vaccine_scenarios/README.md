@@ -30,7 +30,7 @@ Declared: the five states and five transitions (the vaccination and waning rates
 
 ## Findings
 
-1. **Fixed: parameter uncertainty in forward runs.** flepiMoP draws `Ro` (and an outcome's probability) from a distribution once for each run. `ss.parallel(..., n_runs=10, priors=True)` now does this, and `ss.fit.prior_draws()` gives the draws.
+1. **Fixed: parameter uncertainty in forward runs.** flepiMoP draws `Ro` (and an outcome's probability) from a distribution once for each run. `ss.parallel(..., n_runs=10, priors=True)` now does this, and `ss.fitting.prior_draws()` gives the draws.
 2. **Fixed: truncated normal.** `ss.truncnorm(loc=, scale=, low=, high=)` is flepiMoP's usual way of writing an uncertain parameter, and replaces SciPy's here.
 3. **A `MultiSim` given to `ss.parallel()` loses its options** (a bug, new). `ss.parallel(ss.MultiSim(sims, n_runs=2, priors=True))` runs each sim once, without any warning, rather than giving an error or the runs asked for.
 4. **Fixed: outcomes are kept by group.** Every outcome now agrees by province, including their delays and durations.

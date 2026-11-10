@@ -134,7 +134,7 @@ Everything spatial is in the submodule `ss.geo`.
 
 `ss.Result`, `ss.Timeline`, `ss.Rate`, `ss.TimePar`, all Starsim's. Users rarely construct these. The base classes and machinery behind them are in their submodules (`ss.modules.Base`, `ss.loop.Loop`, `ss.sim.SimPars`, `ss.parameters.Pars`).
 
-Fitting is the submodule `ss.fit`, which `import starsim` does not import (its first use does), so its names are not listed here: `ss.fit.Fit`, what `sim.fit()` returns (called `fit` below), `ss.fit.compare_models` (fit and compare by out-of-sample prediction), `ss.fit.method` (a fitting method with its settings, for `sim.fit(method=)`), and `ss.fit.maximize` and `ss.fit.minimize` (the goal of `sim.optimize()`, which reallocates spending between programs: `sim.optimize(ss.fit.maximize('all_vs', at=2030))`). (Starsim 3's `ss.Calibration` is removed.)
+Fitting is the submodule `ss.fitting`, which `import starsim` does not import (its first use does), so its names are not listed here: `ss.fitting.Fit`, what `sim.fit()` returns (called `fit` below), `ss.fitting.compare_models` (fit and compare by out-of-sample prediction), `ss.fitting.method` (a fitting method with its settings, for `sim.fit(method=)`), and `ss.fitting.maximize` and `ss.fitting.minimize` (the goal of `sim.optimize()`, which reallocates spending between programs: `sim.optimize(ss.fitting.maximize('all_vs', at=2030))`). (Starsim 3's `ss.Calibration` is removed.)
 
 ### Methods and attributes
 
@@ -151,7 +151,7 @@ Fitting is the submodule `ss.fit`, which `import starsim` does not import (its f
 | A result of an `ss.MultiSim`, which has a run dimension | **`quantiles`** `values` |
 | An `ss.MultiSim`, which is what `ss.parallel` returns | `run` `plot` `summarize` `to_df` `results` **`diff`** |
 | `fit` | **`sim`** `pars` `plot` `summarize` `to_df` **`project`** **`samples`** |
-| What `ss.fit.compare_models` returns | **`fits`** `plot` `summarize` `to_df` |
+| What `ss.fitting.compare_models` returns | **`fits`** `plot` `summarize` `to_df` |
 
 The split is deliberate: `describe`, `diagram`, `equations` are about the model (each returns text that shows itself at a prompt or in a notebook, and is printed with `print()` in a script); `plot`, `summarize`, `to_df` are about results, as in Starsim. `values` is Starsim's name for the array behind a result; on a MultiSim result it is the full runs-by-time array. `.n` is the number in a state in each place (`(w*I).n` with each person counted by `w`, and `.n_infectious` by their infectiousness; a condition has `.n` too, `(hiv.L | hiv.A).n`), and `.total` in the whole population; `.frac` is the share; `.time_in` is the time each person has spent in it (in `p=` and rates out of it). On a transition with several destinations, `.X` is the flow to its destination `X` (`cin.X`, read `res.cin.X`), not a new name. Reading `sir.rel_sus` gives the base value; `sir.current_value('rel_sus')` gives it with the active modifiers applied (agents only). `msim.check_runs()` is deferred and not listed.
 
@@ -192,10 +192,10 @@ Keywords are not listed above, but they are vocabulary too, so the main sets are
 | `ss.contacts` | a matrix, a country, a number, or a matrix by dimension as a keyword (`risk=M`); `ages` `dims` `name` `study` `layer` `unit` |
 | `ss.RandomNet` | `n_contacts` (the same for everyone; a distribution gives the shape) `dur` (in the sim's unit when a bare number; one step by default) `who` `memory` |
 | Networks | `sides` (and `net.directions`, which follow from them; `between` on `ss.SexualNet`); `who` for who takes part |
-| `sim.fit` | `pars` `data` `weights` `likelihood` (a distribution for every series, a dict by series, or `False`) `loss` `penalty` `method` (a name, `ss.fit.method(name, **settings)`, or a list) `rand_seed` |
-| `ss.fit.method` | the name, and the method's own settings (e.g. `n_trials`, `draws`, `chains`, `particles`, `samples`, `n_runs`, `reseed`, `require_jax`, `workers`) |
-| `sim.optimize` | `goal` (`ss.fit.maximize(result, at=)` or `ss.fit.minimize(...)`) `total` `start` `spend` `bounds` `target` |
-| `ss.fit.compare_models` | `data` `holdout` `folds` |
+| `sim.fit` | `pars` `data` `weights` `likelihood` (a distribution for every series, a dict by series, or `False`) `loss` `penalty` `method` (a name, `ss.fitting.method(name, **settings)`, or a list) `rand_seed` |
+| `ss.fitting.method` | the name, and the method's own settings (e.g. `n_trials`, `draws`, `chains`, `particles`, `samples`, `n_runs`, `reseed`, `require_jax`, `workers`) |
+| `sim.optimize` | `goal` (`ss.fitting.maximize(result, at=)` or `ss.fitting.minimize(...)`) `total` `start` `spend` `bounds` `target` |
+| `ss.fitting.compare_models` | `data` `holdout` `folds` |
 
 ## Slots and their types
 
@@ -296,7 +296,7 @@ Since the review of October 2026, these names went, or were promised and never b
 | `.base` on a modifiable array | Reading the array gives the base value | `sir.rel_sus` for the base, `sir.current_value('rel_sus')` for the value with modifiers applied |
 | `ss.rate`, `ss.time_prob`, `ss.rate_prob` | Starsim 2 names, deprecated in Starsim 3 (Starsim's other time names are kept) | `ss.peryear(x)`, `ss.probperyear(x)` |
 | `solver='sde'`, `'stochastic'`, `'ctmc'` | One solver per method | `'gillespie'` (exact), `'tau'` (tau-leaping), `'binomial'` |
-| `ss.Calibration` as the result of a fit | `sim.fit()` returns an `ss.fit.Fit` | `ss.fit.Fit` (Starsim 3's `ss.Calibration` is removed) |
+| `ss.Calibration` as the result of a fit | `sim.fit()` returns an `ss.fitting.Fit` | `ss.fitting.Fit` (Starsim 3's `ss.Calibration` is removed) |
 | `sim.to_spec()`, `sim.to_code()`, `sim.hash()`, `ss.diff()` (removed 2026-10-27) | The model is its code: there is nothing to translate a sim back into, and two models are compared by their results or a text diff | The script, `describe()`, and `ss.save('run.sim', sim)`; an import gives code (`sim.imported.code`) |
 | `msim.reduce()`, `msim.mean()`, `msim.median()`, `ss.MultiResult`, `ss.multi_run()` | A MultiSim is its results, with a run dimension | `msim.results.sir.I.quantiles()` (and `.median()`, `.mean()`); `ss.parallel(pars=...)` |
 | `ss.outcome(every=)`, `annualize()` | Resampling belongs to a result | `result.resample('year')` |
@@ -348,7 +348,7 @@ The API review of November 7, 2026 gave each idea one word across the API, and m
 | `rate=` as people per unit time on `ss.immigration`; `ss.birth(n=)`; `ss.Pregnancy(embryos_per_pregnancy=)`; `init_prev=` above 1 as a number of people | `rate=` is per person and `n=` a number of people everywhere else | `ss.immigration(n=)`; `children=`; `init_n=` |
 | `ss.Pregnancy(preterm_threshold=, very_preterm_threshold=, rel_preterm=, rel_preterm_age=)` | Four keywords for one option | `preterm=ss.preterm(threshold=, very_threshold=, rel=, by_age=)`. (`maternal_death_rate=`, the hazard while pregnant, and `p_maternal_death=`, Starsim 3's chance at delivery, were merged into one `maternal_death=` and restored 2026-11-07, since they are two events; `maternal_death=` raises, naming them) |
 | `stratify(fractions=, adjust=, where=)` mixed with dimensions | Options and dimensions in one call | Levels as a dict of shares; `ss.levels()`; `ss.by()` in the rate |
-| `sim.fit()`'s method settings (`n_runs=`, `reseed=`, `require_jax=`, `n_trials=`, ...); ABC-SMC's `particles=`; `fit.mismatch`; `ss.fit.optimize()`; `df=`, `seed=` | Settings of one method among another's; a name with two meanings | `ss.fit.method(name, ...)`; `samples=`; `fit.objective`; `sim.optimize(ss.fit.maximize(...))`; `data=`, `rand_seed=` |
+| `sim.fit()`'s method settings (`n_runs=`, `reseed=`, `require_jax=`, `n_trials=`, ...); ABC-SMC's `particles=`; `fit.mismatch`; `ss.fitting.optimize()`; `df=`, `seed=` | Settings of one method among another's; a name with two meanings | `ss.fitting.method(name, ...)`; `samples=`; `fit.objective`; `sim.optimize(ss.fitting.maximize(...))`; `data=`, `rand_seed=` |
 | `output=` on `describe()` and `equations()`; `sim.summary`, `msim.compare()`, `msim.brief()` | Two ways to read each summary | Text that shows itself; `sim.summarize()`, `msim.summarize(each=True)`, `print(msim)` |
 | `ss.datedur` at the top level; `ss.date('2020.5')` | Identical to `ss.months()`; ambiguous | `ss.months()`, `ss.years()`; `ss.date(2020.5)` or `ss.date('2020-05')` |
 | `ss.options.num_threads` (which meant BLAS's in one release candidate and Starsim's in another) | The name said neither | `ss.options.blas_threads` (`STARSIM_BLAS_THREADS`) and `ss.options.threads` (`STARSIM_THREADS`); `num_threads` raises naming both |

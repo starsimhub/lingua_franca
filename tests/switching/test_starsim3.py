@@ -54,13 +54,13 @@ def test_starsim3_fit():
     truth = ss.Sim(diseases=ss.SIS(beta=ss.peryear(0.2), dur_inf=ss.years(10)), rand_seed=1, **kw()).run() # Starsim 3's dur_inf, in years: ss.SIS's default is now 10 days
     data = truth.to_df()[['time', 'sis_prevalence']].iloc[1:].rename(columns=dict(time='t', sis_prevalence='sis.prevalence'))
     sis = ss.SIS(beta=ss.par(ss.peryear(0.1), bounds=[0.05, 1]), dur_inf=ss.years(10))
-    fit = ss.Sim(diseases=sis, data=data, **kw()).fit(method=ss.fit.method('optuna', n_trials=10), rand_seed=1)
+    fit = ss.Sim(diseases=sis, data=data, **kw()).fit(method=ss.fitting.method('optuna', n_trials=10), rand_seed=1)
     beta = fit.pars.beta.value
     assert np.isclose(beta, 0.2, rtol=0.3), f'The fitted beta, {beta:.3f}, should be near the true 0.2'
 
     # The same for the SIS written as code: bounds on a parameter of a module written as code are fitted too
     agents = ssl.AgentSIS(name='sis', beta=ss.par(ss.peryear(0.1), bounds=[0.05, 1]), waning=ss.peryear(1e6))
-    fit = ss.Sim(diseases=agents, data=data, **kw()).fit(method=ss.fit.method('optuna', n_trials=10), rand_seed=1)
+    fit = ss.Sim(diseases=agents, data=data, **kw()).fit(method=ss.fitting.method('optuna', n_trials=10), rand_seed=1)
     beta = fit.pars.beta.value
     assert np.isclose(beta, 0.2, rtol=0.3), f'The fitted beta of the SIS written as code, {beta:.3f}, should be near the true 0.2'
     return fit

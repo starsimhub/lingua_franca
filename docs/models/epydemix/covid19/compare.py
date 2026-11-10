@@ -69,7 +69,7 @@ if __name__ == '__main__':
 
     abc = data['abc']
     print(f'\nABC-SMC to the weekly deaths up to 31 May, as in the original: {abc["particles"]} particles for {abc["generations"]} generations')
-    fit = model.sim.new(verbose=0).fit(method=ss.fit.method('abc-smc', samples=abc['particles'], generations=abc['generations']), rand_seed=1, verbose=0)
+    fit = model.sim.new(verbose=0).fit(method=ss.fitting.method('abc-smc', samples=abc['particles'], generations=abc['generations']), rand_seed=1, verbose=0)
     for par,name in dict(R0='R0', Delta='Delta', I0='I0', seasonality_min='smin').items():
         row = table.loc[f'posterior_{par}']
         vals = fit.samples[name]

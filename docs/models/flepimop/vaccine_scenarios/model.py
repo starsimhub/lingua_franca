@@ -40,7 +40,7 @@ scenarios = dict(no_vax=pess_vax + opt_vax, pess_vax=pess_vax, opt_vax=opt_vax)
 
 def runs(n_runs=10, **kwargs):
     """ Every scenario, once with each of n_runs draws from the priors """
-    draws = ss.fit.prior_draws(sim, n_runs, rand_seed=1)
+    draws = ss.fitting.prior_draws(sim, n_runs, rand_seed=1)
     return [sim.new(label=name, pars=dict(Ro=r, p_case=p), interventions=mods, **kwargs)
             for name,mods in scenarios.items() for r,p in zip(draws['Ro'], draws['p_case'])]
 

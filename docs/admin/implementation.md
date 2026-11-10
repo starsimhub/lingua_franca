@@ -267,7 +267,7 @@ The nine build steps from [models/README.md](../models/README.md).
 - [x] `sim.check_dt()`
 - [x] Numba kernels for the compartmental solvers (`starsim/kernels.py`): the flows and rate expressions are flattened into arrays once, and one kernel, the same for every model, takes a step of `rk4`, `euler`, or `binomial`. Falls back to Python where a rate is a function of the sim
 - [x] A whole run in one call to the kernel, when the sim is nothing but compartments (no interventions, modifiers, transfers, or inserted functions); used by `sim.run()` without being asked
-- [x] `sim.restart(pars=, rand_seed=)`: run a built sim again without building it again; used by `ss.fit()`
+- [x] `sim.restart(pars=, rand_seed=)`: run a built sim again without building it again; used by `ss.fitting()`
 - [x] `sim.run(n_runs=)` as one call to the kernel for all the runs, when the sim is nothing but compartments
 - [x] Values that vary in time are tabulated once for a sim, and kept when it is restarted
 - [x] The kernel step as one function of loops over single numbers (a step of a three-compartment ODE takes 1.4 µs, from 8.5: passing the program to a Numba function costs about 0.4 µs each time)

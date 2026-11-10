@@ -134,7 +134,7 @@ Interventions:
   notes:
     starsim: the product and delivery split; eligibility as a function of the sim; routine versus campaign delivery; screening, triage, and treatment as modules
     emod: efficacy kept separate from waning; efficacy by acquisition, transmission, and mortality; capacity; deliveries triggered by events that others can listen for
-    atomica: a unit cost on each intervention; programs that move parameters by spending, and reallocating a budget between them (ss.fit.optimize)
+    atomica: a unit cost on each intervention; programs that move parameters by spending, and reallocating a budget between them (ss.fitting.optimize)
     epihiper: triggers (close schools when cases pass a threshold)
     memilio: dampings on contacts; measures switched on by incidence in each place
     epimodel: the scenario table shape behind ss.change

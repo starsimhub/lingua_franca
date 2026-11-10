@@ -12,7 +12,7 @@ import pandas as pd
 import pytest
 import sciris as sc
 import starsim as ss
-import starsim.fit
+import starsim.internals.fitting
 import paths
 
 ref_n_I = {1990: 3150.376, 2010: 1527.021, 2025: 1477.900} # switching/summer2.md, "The second week" §1: summer2's active TB (all ages) from tb_summer2.py
@@ -88,7 +88,7 @@ def jax_logdensity(sim, x):
     with jax.enable_x64(True):
         in_jax = float(density(jax.numpy.asarray(x)))
     set_pars(x)
-    from_sim = ss.fit.loglik(sim.run(), likelihood=lik) + sum(ss.fit.logprior(p, v) for p,v in zip(fitted.values(), x))
+    from_sim = ss.fitting.loglik(sim.run(), likelihood=lik) + sum(ss.fitting.logprior(p, v) for p,v in zip(fitted.values(), x))
     return in_jax, from_sim
 
 
@@ -127,7 +127,7 @@ def test_summer2_nuts():
     in_jax, from_sim = jax_logdensity(runner, np.array([10.2, 1.53]))
     assert np.isclose(in_jax, from_sim, rtol=1e-6), f'The JAX log-density ({in_jax:.6g}) differs from the sim\'s ({from_sim:.6g})'
     with ss.options.context(warnings='error'): # Falling back to Python in the loop is a failure here
-        fit = sim.fit(method=ss.fit.method('nuts', warmup=10, draws=10, chains=2), likelihood=lik, verbose=0) # About 15 s with JAX's cache warm
+        fit = sim.fit(method=ss.fitting.method('nuts', warmup=10, draws=10, chains=2), likelihood=lik, verbose=0) # About 15 s with JAX's cache warm
     assert fit.diagnostics.divergences == 0, f'{fit.diagnostics.divergences} draws diverged'
     assert np.isclose(fit.pars.detect_max, 1.5, rtol=0.05) and np.isclose(fit.pars.beta, 10, rtol=0.05)
     return fit

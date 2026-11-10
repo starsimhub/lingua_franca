@@ -29,7 +29,7 @@ epymorph, MEmilio                                                          (sim.
 ## Import
 
 ```python
-sim = ss.import_from('model.xml',  format='sbml') # ss.converters is imported when first used, as ss.fit is
+sim = ss.import_from('model.xml',  format='sbml') # ss.converters is imported when first used, as ss.fitting is
 sim = ss.import_from('model.yaml', format='emulsion')
 sim = ss.import_from('config.yml', format='flepimop')
 sim = ss.import_from('framework.xlsx', format='atomica', databook='databook.xlsx')

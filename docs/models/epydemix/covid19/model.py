@@ -51,7 +51,7 @@ reopening = {k:ss.modify(covid.infection, multiply=v, when=ss.schedule(start='20
 scenarios = dict(persistence=None, **reopening)
 
 if __name__ == '__main__':
-    fit = sim.fit(method=ss.fit.method('abc-smc', samples=200, generations=5)) # To weekly deaths to 31 May
+    fit = sim.fit(method=ss.fitting.method('abc-smc', samples=200, generations=5)) # To weekly deaths to 31 May
     fit.plot()
     msim = fit.project(scenarios, n_runs=100, stop='2020-08-03') # To the end of 2 August
     msim.plot()

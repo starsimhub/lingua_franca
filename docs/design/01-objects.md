@@ -45,8 +45,8 @@ ss.Result                   a named time series, with a dimension per stratifica
 
 | | Examples |
 |---|---|
-| CamelCase | `ss.Sim`, `ss.MultiSim`, `ss.People`, `ss.Module`, `ss.Disease`, `ss.Network`, `ss.RandomNet`, `ss.MixingPool`, `ss.geo.Mobility`, `ss.Intervention`, `ss.Connector`, `ss.Analyzer`, `ss.Event`, `ss.Delivery`, `ss.fit.Fit`; the two graph classes `ss.State` and `ss.Transition`; the products `ss.Vaccine`, `ss.Diagnostic`, `ss.Treatment` |
-| lowercase | time (`ss.days`, `ss.perday`), distributions (`ss.normal`, `ss.lognormal`), `ss.par`, `ss.states`, `ss.unborn`, `ss.dead`, `ss.outside`, `ss.birth`, `ss.death`, `ss.migration`, `ss.transfer`, `ss.modify`, `ss.outcome`, `ss.by`, `ss.timeseries`, `ss.seasonal`, `ss.schedule`, `ss.on`, `ss.capacity`; deliveries `ss.vaccinate`, `ss.screen`, `ss.treat`; solvers `ss.solvers.ode`, `ss.solvers.abm`, ...; loaders `ss.population`, `ss.contacts`, `ss.data`; functions `ss.parallel`, `ss.fit.compare_models` |
+| CamelCase | `ss.Sim`, `ss.MultiSim`, `ss.People`, `ss.Module`, `ss.Disease`, `ss.Network`, `ss.RandomNet`, `ss.MixingPool`, `ss.geo.Mobility`, `ss.Intervention`, `ss.Connector`, `ss.Analyzer`, `ss.Event`, `ss.Delivery`, `ss.fitting.Fit`; the two graph classes `ss.State` and `ss.Transition`; the products `ss.Vaccine`, `ss.Diagnostic`, `ss.Treatment` |
+| lowercase | time (`ss.days`, `ss.perday`), distributions (`ss.normal`, `ss.lognormal`), `ss.par`, `ss.states`, `ss.unborn`, `ss.dead`, `ss.outside`, `ss.birth`, `ss.death`, `ss.migration`, `ss.transfer`, `ss.modify`, `ss.outcome`, `ss.by`, `ss.timeseries`, `ss.seasonal`, `ss.schedule`, `ss.on`, `ss.capacity`; deliveries `ss.vaccinate`, `ss.screen`, `ss.treat`; solvers `ss.solvers.ode`, `ss.solvers.abm`, ...; loaders `ss.population`, `ss.contacts`, `ss.data`; functions `ss.parallel`, `ss.fitting.compare_models` |
 
 Methods that describe the model are `describe()`, `diagram()`, and `equations()`. Methods about results keep their Starsim names: `plot()`, `summarize()`, `to_df()`.
 

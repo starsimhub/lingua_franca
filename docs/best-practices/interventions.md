@@ -91,7 +91,7 @@ The aim is to get eligibility that reads like the `individual` version, can be s
 - **A separate rule language** (EpiHiper's variables/sets/triggers/operations). What it can express is the richest in the review; the tradeoff is length, at 200 lines of JSON for one Friday.
 - **Edge-level eligibility** (EpiHiper's edge predicates). Networks are enough: to change school contacts, modify the school network.
 - **Interventions that are inactive unless a scenario enables them** (camdl). Baselines usually contain real interventions; each scenario lists what it contains.
-- **Budget optimization in v1** (Atomica, PyRoss). Do not rule it out; do not build it yet. (Since built for programs with spending, `ss.fit.optimize()`, to match Atomica; optimal control is still out.)
+- **Budget optimization in v1** (Atomica, PyRoss). Do not rule it out; do not build it yet. (Since built for programs with spending, `ss.fitting.optimize()`, to match Atomica; optimal control is still out.)
 
 ## Open questions
 

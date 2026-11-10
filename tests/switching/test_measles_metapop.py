@@ -60,7 +60,7 @@ def test_measles_metapop_fit():
     sim = make_sim(make_measles(d, beta=beta, away=away, report=report), d)
     gof = lambda sim: np.mean((monthly(sim) - data)**2)
     start = gof(sim.new().run())
-    fit = sim.fit(loss=gof, method=ss.fit.method('optuna', n_trials=10))
+    fit = sim.fit(loss=gof, method=ss.fitting.method('optuna', n_trials=10))
     assert gof(fit.sim.new().run()) < start, 'The fit should improve the loss'
     return fit
 
