@@ -137,7 +137,7 @@ A dwell-time distribution becomes stages. A distribution on `beta` or `rel_sus` 
 ### B6. Stratification details
 
 - **Cross-immunity** is one mechanism, `ss.immunity(due_to=...)`, for strains in shared states and with courses of their own (`ss.Strains(immunity=)`). Between two unrelated diseases it is an `ss.modify`. (Resolved; S7.4, 2026-10-22.)
-- **Strains with courses of their own under the compartmental solvers.** As agents they are exact. Under the compartmental solvers, strains that do not affect each other run side by side; strains that affect each other (`immunity=`, a shared state) need agents (decided 2026-10-20: the coupling from the members' shares, marked `approximations`, was built and removed), and the crossing is the exact form for explicit `ss.modify(..., who=)` between members. Products over a family (`disease=` a family, `ss.by(<family>=...)` in `efficacy=`) come with it.
+- **Strains with courses of their own under the compartmental solvers.** As agents they are exact. Under the compartmental solvers, strains that do not affect each other run side by side; strains that affect each other (`immunity=`, a shared state) need agents (decided 2026-10-20: the coupling from the members' shares, marked `approximations`, was built and removed), and joint states are the exact form for explicit `ss.modify(..., who=)` between members. Products over a family (`disease=` a family, `ss.by(<family>=...)` in `efficacy=`) come with it.
 - **The exact compartmental form of a strain dimension with partial immunity**: a history of the strains had (`2^k` levels). Until it is built, a compartmental solver raises for it.
 - **Stratifying only some transitions**, not just some states. It may be a sign the model wanted two transitions.
 
