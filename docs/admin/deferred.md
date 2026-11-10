@@ -373,6 +373,14 @@ Issues #1575–#1591; the plan and decisions are in `ssv4/working/nov09-dank.md`
 - *Done (2026-11-09: it restarts the sim).* **`ss.fit.ParticleFilter` on a sim already run**: without a restart it silently gave a wrong estimate.
 - **Continuing kept runs past a delivery** (#1579): `fit.project()` runs each draw from the start, with a warning, when a delivery is due before the last data point, since the kept runs carry no delivery tallies (and a scenario's delivery there would be left out). It would take keeping the tallies (`tally[:, :ti]`) with each kept run, in the particle filter's path and ABC's, and checking that a scenario's deliveries before `ti` match the fit's. M.
 
+## From the STIsim HIV and ART port (PR #1573, 2026-11-10)
+
+The review and decisions are in `ssv4/working/nov09-rs.md`.
+
+- **Those who die in another module stay under its modifiers for the step.** When a module's transition sends someone to `ss.dead`, its states end at once, so a module stepping later in the same step sees that module's `who=` modifiers as lifted (e.g. ART's `multiply=0` on HIV's death): a stopped exit falls due, the person has two claims to one death, and `People.resolve_causes()` picks a cause at random (26 of 107 deaths mislabelled in an all-on-ART cohort). Only the cause is wrong; the counts are right. The PR's fix (keep a modifier on people dying this step if it applied when last worked out) was dropped (decision 10 (b)): it patched step order inside every agent-run modifier and missed someone who starts being modified and dies in the same step. The general fix is to keep the states of the dying (or what `who=` sees of them) until deaths are resolved at the end of the step. Hazard-weighted causes (MG8 above) would not fix it. M.
+- **Rescaled exits land on alternate steps.** After a modifier changes the speed of a scheduled exit, `rescale_exits()` rescales whole-step exit times and rounds them up, so neighbouring steps map to every other step: with `multiply=0.5` from day 5 (10-day dwell, 200k agents), the exits per step are `12158, 0, 11140, 0, 9895, 0, ...`. Totals are right, but daily flows show a sawtooth. Present before PR #1573 too, at the other parity. Needs the fractional exit time kept, or stochastic rounding. S–M.
+- **A module that takes another module's timestep.** STIsim's ART sets `self.t.dt` from HIV's in `init_pre()`; there is no API for it yet. S.
+
 ## Won't do
 
 Work that was looked at and decided against, with why, so that it is not proposed again without a new reason.
