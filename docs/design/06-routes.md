@@ -71,7 +71,7 @@ On a network that keeps individual contacts, the same quantities apply per edge.
 
 ```
 h[d]      = −ln(1 − p[d])                         the hazard per act, for the edge's direction d (from u's side to v's)
-M[e]      = Π_k (1 − s_k · (1 − m_k))             the modifiers of the transmission on this route (s_k = 1 without share=)
+M[e]      = Π_k (1 − s_k · (1 − m_k))             the modifiers of the transmission on this route (s_k = 1 without frac=)
 hazard[e] = w[e] · a[e] · h[d] · w_s · rel_trans[u] · rel_sus[v] · M[e]     (w_s the weight of u's state in the rate, 0.5 for A in beta * (I + 0.5 * A))
 p[e]      = 1 − exp(−hazard[e] · dt)            (= 1 − (1 − p[d])^(a[e]·dt) when nothing else applies)
 p[v]      = 1 − Π_e (1 − p[e])                    over all edges into v

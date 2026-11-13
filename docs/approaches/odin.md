@@ -18,7 +18,7 @@ authorship:
 | **Docs** | <https://mrc-ide.github.io/odin2>, the [odin & monty book](https://mrc-ide.github.io/odin-monty/) |
 | **Paper** | dust: [10.12688/wellcomeopenres.16466.2](https://doi.org/10.12688/wellcomeopenres.16466.2) |
 | **Ecosystem** | odin (DSL) → dust (parallel simulation engine) → monty (Monte Carlo inference); ~5 current packages |
-| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/odin.html) |
+| **Moving to Starsim** | [Conversion guide](../models/odin/index.qmd) |
 
 ## What it's for
 

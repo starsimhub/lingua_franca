@@ -1,6 +1,6 @@
 # A lingua franca for epi modeling
 
-**Version:** 4.0.0rc3 | **Date:** 2026-11-09 | **Status:** [Prerelease](https://pypi.org/project/starsim/#history)
+**Version:** 4.0.0rc4 | **Date:** 2026-11-12 | **Status:** [Prerelease](https://pypi.org/project/starsim/#history)
 
 ## Introduction
 

@@ -18,7 +18,7 @@ authorship:
 | **Docs** | <https://atomica.tools/docs> |
 | **Paper** | None of its own; Optima TB, which runs on it: Goscé et al. (2021), *PLOS Comp Biol* 17(9): e1009255, [10.1371/journal.pcbi.1009255](https://doi.org/10.1371/journal.pcbi.1009255) |
 | **Ecosystem** | Atomica / Optima (Burnet Institute; Optima Consortium for Decision Science) |
-| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/atomica.html) |
+| **Moving to Starsim** | [Conversion guide](../models/atomica/index.qmd) |
 
 ## What it's for
 

@@ -11,7 +11,7 @@ Distillation of the modeling landscape into best practices for each type of mode
 
 ## Purpose
 
-Where `approaches` describes what frameworks do, this folder takes a position on what they *should* do. Each document argues for one way of expressing a modeling concept, drawing on how existing frameworks handle it. This project owes those frameworks most of its ideas. How to use the result is in the [Starsim docs](https://starsim.org/v4/user_guide.html), and how Starsim compares with other frameworks is on its [modeling landscape page](https://starsim.org/v4/user_guide/library_landscape.html).
+Where `approaches` describes what frameworks do, this folder takes a position on what they *should* do. Each document argues for one way of expressing a modeling concept, drawing on how existing frameworks handle it. This project owes those frameworks most of its ideas. How to use the result is in the [Starsim docs](https://starsim.org/v4/user_guide.html), and how Starsim compares with other frameworks is in the [comparison with other frameworks](../models/comparison.qmd).
 
 The test for every recommendation is the project's north star: **a model should never be easier to write without the lingua franca than with it.** Concretely, each main framework's own examples should be implementable here in no more lines of model code than the original (the hard target), and in about the same time (a time fails only if it is both more than twice as slow and more than 1 s slower, on the first run or the best of five). Where the original calls a built-in written for one situation, the lines inside that built-in count as part of the original; see [principles.md](principles.md).
 

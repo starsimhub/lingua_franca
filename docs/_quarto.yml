@@ -15,6 +15,21 @@ project:
     - models/index.qmd
     - models/README.md
     - models/environments.md
+    - models/comparison.qmd
+    - models/atomica/index.qmd
+    - models/camdl/index.qmd
+    - models/emulsion/index.qmd
+    - models/epimodel/index.qmd
+    - models/epipack/index.qmd
+    - models/epydemix/index.qmd
+    - models/epymorph/index.qmd
+    - models/flepimop/index.qmd
+    - models/laser/index.qmd
+    - models/memilio/index.qmd
+    - models/numpy/index.qmd
+    - models/odin/index.qmd
+    - models/siminf/index.qmd
+    - models/summer2/index.qmd
     - models/atomica/sir/README.md
     - models/atomica/hiv_dyn/README.md
     - models/camdl/sir/README.md
@@ -202,39 +217,90 @@ website:
           text: The benchmark
         - href: models/environments.md
           text: Environments
-        - models/atomica/sir/README.md
-        - models/atomica/hiv_dyn/README.md
-        - models/camdl/sir/README.md
-        - models/camdl/stratified/README.md
-        - models/emulsion/sir/README.md
-        - models/emulsion/quickstart/README.md
-        - models/epidemics/seirv/README.md
-        - models/epidemics/seasonal_scenarios/README.md
-        - models/epimodel/sis-network/README.md
-        - models/epimodel/hiv/README.md
-        - models/epipack/sirs/README.md
-        - models/epipack/siarx_tracing/README.md
-        - models/epiworld/seirconn/README.md
-        - models/epiworld/covid_flu/README.md
-        - models/epydemix/sir_kenya/README.md
-        - models/epydemix/covid19/README.md
-        - models/epymorph/sirs_centroids/README.md
-        - models/epymorph/pei_humidity/README.md
-        - models/flepimop/seir_2pop/README.md
-        - models/flepimop/vaccine_scenarios/README.md
-        - models/measles_metapop/seir_districts/README.md
-        - models/laser/hub_spoke_seir/README.md
-        - models/laser/england_wales/README.md
-        - models/memilio/secir/README.md
-        - models/memilio/secir_ageres/README.md
-        - models/odin/stochastic_sir_arrays/README.md
-        - models/odin/seir_array/README.md
-        - models/pandemic_simulator/ebola_legrand/README.md
-        - models/pandemic_simulator/sir_reactive/README.md
-        - models/siminf/sir_herds/README.md
-        - models/siminf/sise3/README.md
-        - models/summer2/sir-age-location/README.md
-        - models/summer2/seir-age-clinical/README.md
+        - href: models/comparison.qmd
+          text: Comparison with other frameworks
+        - section: "Atomica"
+          href: models/atomica/index.qmd
+          contents:
+            - models/atomica/sir/README.md
+            - models/atomica/hiv_dyn/README.md
+        - section: "camdl"
+          href: models/camdl/index.qmd
+          contents:
+            - models/camdl/sir/README.md
+            - models/camdl/stratified/README.md
+        - section: "EMULSION"
+          href: models/emulsion/index.qmd
+          contents:
+            - models/emulsion/sir/README.md
+            - models/emulsion/quickstart/README.md
+        - section: "epidemics"
+          contents:
+            - models/epidemics/seirv/README.md
+            - models/epidemics/seasonal_scenarios/README.md
+        - section: "EpiModel"
+          href: models/epimodel/index.qmd
+          contents:
+            - models/epimodel/sis-network/README.md
+            - models/epimodel/hiv/README.md
+        - section: "epipack"
+          href: models/epipack/index.qmd
+          contents:
+            - models/epipack/sirs/README.md
+            - models/epipack/siarx_tracing/README.md
+        - section: "epiworld"
+          contents:
+            - models/epiworld/seirconn/README.md
+            - models/epiworld/covid_flu/README.md
+        - section: "epydemix"
+          href: models/epydemix/index.qmd
+          contents:
+            - models/epydemix/sir_kenya/README.md
+            - models/epydemix/covid19/README.md
+        - section: "epymorph"
+          href: models/epymorph/index.qmd
+          contents:
+            - models/epymorph/sirs_centroids/README.md
+            - models/epymorph/pei_humidity/README.md
+        - section: "flepiMoP"
+          href: models/flepimop/index.qmd
+          contents:
+            - models/flepimop/seir_2pop/README.md
+            - models/flepimop/vaccine_scenarios/README.md
+        - section: "Measles metapopulation"
+          contents:
+            - models/measles_metapop/seir_districts/README.md
+        - section: "LASER"
+          href: models/laser/index.qmd
+          contents:
+            - models/laser/hub_spoke_seir/README.md
+            - models/laser/england_wales/README.md
+        - section: "MEmilio"
+          href: models/memilio/index.qmd
+          contents:
+            - models/memilio/secir/README.md
+            - models/memilio/secir_ageres/README.md
+        - href: models/numpy/index.qmd
+          text: NumPy
+        - section: "odin"
+          href: models/odin/index.qmd
+          contents:
+            - models/odin/stochastic_sir_arrays/README.md
+            - models/odin/seir_array/README.md
+        - section: "Pandemic Simulator"
+          contents:
+            - models/pandemic_simulator/ebola_legrand/README.md
+            - models/pandemic_simulator/sir_reactive/README.md
+        - section: "SimInf"
+          href: models/siminf/index.qmd
+          contents:
+            - models/siminf/sir_herds/README.md
+            - models/siminf/sise3/README.md
+        - section: "summer2"
+          href: models/summer2/index.qmd
+          contents:
+            - models/summer2/sir-age-location/README.md
+            - models/summer2/seir-age-clinical/README.md
 
 
 format:

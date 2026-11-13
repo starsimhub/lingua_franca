@@ -185,7 +185,7 @@ The question is not whether someone has done a cost-effectiveness analysis with 
 
 **Starsim v3 (latest release, 3.7.2)** has no cost or DALY code. A search of [`starsim/`](https://github.com/starsimhub/starsim/tree/main/starsim) for cost, DALY, QALY, YLL, and YLD finds only comments about computational cost. Costing in Starsim-based projects has been done with custom analyzers.
 
-**Starsim v4 (the [`v4` branch](https://github.com/starsimhub/starsim/tree/v4), in development)** adds a per-delivery `cost` to every product. `ss.Vaccine`, `ss.Treatment`, and `ss.Diagnostic` all accept `cost=`, and the delivery interventions (`ss.vaccinate()`, `ss.treat()`, `ss.screen()`) add a `cost` result when their product has one. Its library adds `ssl.Costs`, `ssl.DALYs`, `ssl.ICER`, and `ssl.discount()`; the docs show [how to use them](https://starsim.org/v4/user_guide/interventions_costs.html). From [`starsim/products.py`](https://github.com/starsimhub/starsim/blob/v4/starsim/products.py) (the `ss.Diagnostic` docstring):
+**Starsim v4 (the [`v4` branch](https://github.com/starsimhub/starsim/tree/v4), in development)** adds a per-delivery `cost` to every product. `ss.Vaccine`, `ss.Treatment`, and `ss.Diagnostic` all accept `cost=`, and the delivery interventions (`ss.vaccinate()`, `ss.treat()`, `ss.screen()`) add a `cost` result when their product has one. Its library adds `ssl.Costs`, `ssl.DALYs`, `ssl.ICER`, and `ssl.discount()`; the docs show [how to use them](https://starsim.org/v4/user_guide/library_econ.html). From [`starsim/products.py`](https://github.com/starsimhub/starsim/blob/v4/starsim/products.py) (the `ss.Diagnostic` docstring):
 
 ````python
         cost (float): the cost of each delivery

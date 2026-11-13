@@ -18,7 +18,7 @@ authorship:
 | **Docs** | <https://www.epimodel.org/>, <https://epimodel.github.io/EpiModel/> |
 | **Paper** | Jenness, Goodreau & Morris (2018), *JSS* 84(8), [10.18637/jss.v084.i08](https://doi.org/10.18637/jss.v084.i08) |
 | **Ecosystem** | statnet (`ergm`, `network`, `networkDynamic`, `tergm`, `networkLite`) below it; EpiModelHIV, EpiModelCOVID, EpiModelHPC, EpiModel Gallery above it |
-| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/epimodel.html) |
+| **Moving to Starsim** | [Conversion guide](../models/epimodel/index.qmd) |
 
 ## What it's for
 

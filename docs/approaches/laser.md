@@ -19,7 +19,7 @@ authorship:
 | **Paper** | — |
 | **Ecosystem** | `laser-core` plus disease packages: `laser-polio`, `laser-measles` |
 | **Note** | Not in the landscape database; included because it is an IDM framework whose design point differs materially from Starsim's |
-| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/laser.html) |
+| **Moving to Starsim** | [Conversion guide](../models/laser/index.qmd) |
 
 ## What it's for
 

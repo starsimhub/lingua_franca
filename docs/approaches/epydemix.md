@@ -18,7 +18,7 @@ authorship:
 | **Docs** | <https://epydemix.readthedocs.io/>, <https://www.epydemix.org/> |
 | **Paper** | Gozzi et al. (2025), *PLOS Comp Biol* 21(11): e1013735, [10.1371/journal.pcbi.1013735](https://doi.org/10.1371/journal.pcbi.1013735) |
 | **Ecosystem** | Epistorm: `epydemix-data` (400+ locations of population and contact matrices), plus dashboard and forecast applications |
-| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/epydemix.html) |
+| **Moving to Starsim** | [Conversion guide](../models/epydemix/index.qmd) |
 
 ## What it's for
 

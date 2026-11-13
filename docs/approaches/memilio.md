@@ -18,7 +18,7 @@ authorship:
 | **Docs** | <https://memilio.readthedocs.io/> |
 | **Paper** | Bicker et al. (2026), [arXiv:2602.11381](https://doi.org/10.48550/arXiv.2602.11381), plus a paper per model family |
 | **Ecosystem** | DLR / Forschungszentrum Jülich; `memilio-simulation`, `memilio-epidata`, `memilio-generation`, `memilio-surrogatemodel` |
-| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/memilio.html) |
+| **Moving to Starsim** | [Conversion guide](../models/memilio/index.qmd) |
 
 ## What it's for
 

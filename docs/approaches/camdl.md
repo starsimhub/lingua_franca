@@ -17,7 +17,7 @@ authorship:
 | **Code** | <https://github.com/vsbuffalo/camdl> |
 | **Docs** | Ships offline: `camdl docs <topic>`; `docs/camdl-language-spec.md` |
 | **Paper** | — (alpha) |
-| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/camdl.html) |
+| **Moving to Starsim** | [Conversion guide](../models/camdl/index.qmd) |
 
 ## What it's for
 

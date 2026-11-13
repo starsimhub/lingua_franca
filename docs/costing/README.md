@@ -9,7 +9,7 @@ authorship:
 
 A review of how disease models do cost, financial, and economic modeling, and how they compute health economic outcomes such as DALYs and QALYs.
 
-> **Note:** This is an early-stage review of how others do this, and it owes a great deal to the models it covers. It is not part of the design. Starsim v4 includes a small costing layer, described in the docs under [Costs](https://starsim.org/v4/user_guide/interventions_costs.html); the larger proposal in [spec.md](spec.md) has not been decided.
+> **Note:** This is an early-stage review of how others do this, and it owes a great deal to the models it covers. It is not part of the design. Starsim v4 includes a small costing layer, described in the docs under [Costs](https://starsim.org/v4/user_guide/library_econ.html); the larger proposal in [spec.md](spec.md) has not been decided.
 
 ## Purpose
 
@@ -68,7 +68,7 @@ Some fields reject DALYs altogether (schistosomiasis modelers use heavy-infectio
 The building blocks exist in several places ([details](pandemics-and-frameworks.md#the-starsim-family)):
 
 - Starsim v4 has a per-delivery `cost=` on `ss.Vaccine`, `ss.Treatment`, and `ss.Diagnostic`, tallied as a `cost` result by stratum in both agent-based and compartmental runs.
-- Its library adds `ssl.Costs` (per-event and fixed costs), `ssl.DALYs`, `ssl.ICER`, and `ssl.discount()`, and `ss.fitting.optimize()` allocates budgets ([how to use them](https://starsim.org/v4/user_guide/interventions_costs.html)).
+- Its library adds `ssl.Costs` (per-event and fixed costs), `ssl.DALYs`, `ssl.ICER`, and `ssl.discount()`, and `ss.fitting.optimize()` allocates budgets ([how to use them](https://starsim.org/v4/user_guide/library_econ.html)).
 - STIsim's `logistics` module has products with unit costs, finite supplies, and cost attribution across shared stock.
 - HPVsim has an incidence-based `dalys` analyzer.
 

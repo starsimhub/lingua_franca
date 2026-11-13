@@ -11,7 +11,7 @@ A proposed specification for costs and health economic outcomes in Starsim v4: w
 
 > **Note:** This is a proposal drawn from the review in this folder. It is not part of the [design](../design/README.md), and nothing here has been decided. It is written in the design's style (MUST, SHOULD, and MAY where a requirement is real; code against `import starsim as ss`) so that it can be moved there if accepted.
 >
-> **What exists today.** Starsim v4 has `cost=` on products, and a smaller version of this idea in its library: `ssl.Costs` (costs per event and fixed costs), `ssl.DALYs`, `ssl.ICER`, and `ssl.discount()`, shown in [Costs](https://starsim.org/v4/user_guide/interventions_costs.html). None of `ss.Economics`, `ss.dalys`, `ss.qalys`, `sims.cea()`, or `draws=` exists; parameter draws today are `ss.parallel(..., priors=True)`. The code below is a sketch of what could come next, and only its use of existing names has been checked against v4.
+> **What exists today.** Starsim v4 has `cost=` on products, and a smaller version of this idea in its library: `ssl.Costs` (costs per event and fixed costs), `ssl.DALYs`, `ssl.ICER`, and `ssl.discount()`, shown in [Costs](https://starsim.org/v4/user_guide/library_econ.html). None of `ss.Economics`, `ss.dalys`, `ss.qalys`, `sims.cea()`, or `draws=` exists; parameter draws today are `ss.parallel(..., priors=True)`. The code below is a sketch of what could come next, and only its use of existing names has been checked against v4.
 
 Justified by the review in this folder: [README.md](README.md) for the main findings, [metrics.md](metrics.md) for definitions and formulas, and [cea-software.md](cea-software.md#cross-cutting-patterns) for the API patterns.
 

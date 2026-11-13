@@ -127,7 +127,7 @@ Interactions and effects:
     memilio: a minimum stay once a measure is on, which became hold=
     epydemix: dated contact reductions
     other: Mesa (order of activation as a modeling decision)
-    new: one-line ss.modify over any named quantity; reading the base and current_value() for the value used; share= and route= for protection used in some acts; refusing at build time what nothing reads; diseases tracked jointly when a condition crosses them
+    new: one-line ss.modify over any named quantity; reading the base and current_value() for the value used; frac= and route= for protection used in some acts; refusing at build time what nothing reads; diseases tracked jointly when a condition crosses them
 
 Interventions:
   shares: {starsim: 33, emod: 17, atomica: 8, epihiper: 5, memilio: 3, epimodel: 3, flepimop: 2, camdl: 2, epydemix: 2, individual: 2, tlo: 3, other: 6, new: 14}

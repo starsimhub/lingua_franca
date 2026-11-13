@@ -142,7 +142,7 @@ Fitting is the submodule `ss.fitting`, which `import starsim` does not import (i
 |---|---|
 | A model (`ss.Disease`, any module) | **`describe`** **`diagram`** **`equations`** **`transitions`** **`states`** **`strats`** **`add_callback`** **`stratify`** `copy` `pars` **`R0`** |
 | A state or a sum of states | **`n`** **`n_infectious`** **`frac`** **`total`** **`time_in`** **`progress`** **`enter`** **`exit`** |
-| A product that people hold (`ss.Vaccine`, `ss.Treatment`) | **`held_share`** |
+| A product that people hold (`ss.Vaccine`, `ss.Treatment`) | **`held_frac`** |
 | A transition | **`to`** **`incidence`** **`uids`** **`ever`** **`n_times`** **`since`** |
 | A modifiable quantity (`sir.rel_sus`, a parameter) | **`current_value()`** |
 | `ss.Sim` | `init` `run` (`until=`, `verbose=`) `plot` `summarize` `to_df` `loop` `results` **`describe`** **`stratify`** `to_json` **`fit`** **`optimize`** **`sensitivity`** **`check_dt`** **`what_modifies`** **`new`** **`restart`** **`gradient`** **`to_synthetic_data`** |
@@ -177,7 +177,7 @@ Keywords are not listed above, but they are vocabulary too, so the main sets are
 | `stratify` (on a model or a sim) | dimensions only, any number, each its levels (a dict of shares) or `ss.levels(levels, states=, who=, kind=, mobility=, fractions=)`; `inplace` |
 | `ss.Strains` | the strains (names, a dict of values by strain, or diseases), `shared` `immunity` `max_strains` `transmit` `fractions` `name` `label`, and values by parameter |
 | `ss.immunity` | `due_to` `protection` `combine` |
-| `ss.modify` | `multiply` `add` `set` `efficacy` `share` `network` `who` `when` (`ss.schedule(start=, stop=)`, or a function of the date) `until` (a condition, or a duration to hold) `name` |
+| `ss.modify` | `multiply` `add` `set` `efficacy` `frac` `network` `who` `when` (`ss.schedule(start=, stop=)`, or a function of the date) `until` (a condition, or a duration to hold) `name` |
 | `ss.Event` | what happens (a move, a counter, or nothing, a visit) first; `who` `when` `n` `p` `strain` `increment` `name` `label` |
 | Deliveries (`ss.Delivery`, `ss.vaccinate`, `ss.screen`, `ss.treat`) | the product (or a move) first; `who` (who is eligible: a condition on people or on the population, a function of the sim, `ss.at_age()`, joined with `&`) `when` (nothing for routine; a time or a list of times; an event; `ss.on(event, delay=)`; a function of the date; or `ss.schedule()`) `coverage` `capacity` (a number, a rate, or `ss.capacity(n, priority=, queue=)`) `strain` `increment` `trace` `skip_reached_within` `disease` |
 | `ss.schedule` | `at` (times, or a function of the date; also by position, except a lone duration) `every` `start` `stop`; none for every step |
@@ -214,7 +214,7 @@ A bare number in any of these slots takes the slot's type and the sim's unit ([0
 | `init_prev=` | a share of people, up to 1 (above 1 raises, pointing to `init_n=`) | `ss.Disease` |
 | `n_contacts=` | a mean: a count of contacts, the same for everyone (`ss.RandomNet`, `ss.MixingPool`, a matrix of `ss.networks.MixingPools`, `ssl.HybridNet`'s layers), or a target or a size that is a Poisson mean (`ss.DegreeNet`, `ss.SexualNet`, `ssl.ClusterNet(cluster_size=)`); a distribution gives the shape | networks, mixing pools |
 | `acts=` | on lasting partnerships, an error (it would be acts per step): give a frequency, e.g. `ss.freqperweek(2)` (or a rate) | `ss.SexualNet`, `ss.DegreeNet` |
-| `share=` | the share of acts (or contacts) a modifier acts on | `ss.modify` |
+| `frac=` | the fraction of acts (or contacts) a modifier acts on | `ss.modify` |
 | `coverage=` | a fraction of the eligible people | deliveries, `ss.transfer` |
 | `capacity=` | a number per round (or step), or a rate per unit time (required for routine delivery); `ss.capacity(n, priority=, queue=)` for a priority or a queue | deliveries |
 | `efficacy=`, `sensitivity=`, `specificity=` | a probability | products; `efficacy=` also on `ss.modify` (`multiply=1 - efficacy`) |

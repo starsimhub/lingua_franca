@@ -17,7 +17,7 @@ authorship:
 | **Code** | <https://forgemia.inra.fr/dynamo/software/emulsion-public> |
 | **Docs** | Ships with the repository; quickstart and feature model libraries |
 | **Paper** | Picault et al. (2019), *PLOS Comp Biol* 15(9): e1007342, [10.1371/journal.pcbi.1007342](https://doi.org/10.1371/journal.pcbi.1007342) |
-| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/emulsion.html) |
+| **Moving to Starsim** | [Conversion guide](../models/emulsion/index.qmd) |
 
 ## What it's for
 

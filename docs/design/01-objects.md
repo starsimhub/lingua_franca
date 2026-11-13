@@ -305,12 +305,12 @@ Every module has the same lifecycle, and it is Starsim's:
 |---|---|---|
 | Build (`sim.init()`) | `init_pre(sim)`, `init_results()`, `init_post()` | resolve defaults, allocate state and results, set initial conditions |
 | Each step | `start_step()` | start the step (e.g. move the random number streams on) |
-| Each step | `record_stocks()` | record the results that are the state at the start of the step (e.g. the count of a state), before any module's step |
+| Each step | `record_states()` | record the results that are the state at the start of the step (e.g. the count of a state), before any module's step |
 | Each step, diseases written as code | `step_state()` | progress people between states, before networks and interventions |
 | Each step | `step()` | read the current state and change it; a declared disease takes all of its transitions here |
 | Each step, at a birth | `on_birth(parents, children)` | set up the newborns (e.g. traits from their parents), wherever they are born (`ss.Births`, `ss.Pregnancy`, a declared birth); a module that needs nothing doesn't define it |
 | Each step | `on_death(uids)` | react to the people who died or left this step, once each has one cause (`people.cause_of_death`); a disease takes them out of its states. Not called in a step with no deaths |
-| Each step | `record_flows()` | record the results about what happened in the step (e.g. doses, births, new infections), at its end; a module that defines `update_results()` is refused (a `TypeError`) |
+| Each step | `record_events()` | record the results about what happened in the step (e.g. doses, births, new infections), at its end; a module that defines `update_results()` is refused (a `TypeError`) |
 | Each step | `finish_step()` | tidy up |
 | End | `finalize()` | finalize results |
 

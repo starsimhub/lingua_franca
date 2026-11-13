@@ -17,7 +17,7 @@ authorship:
 | **Code** | <https://github.com/stewid/SimInf> |
 | **Docs** | <https://CRAN.R-project.org/package=SimInf> |
 | **Paper** | [10.18637/jss.v091.i12](https://doi.org/10.18637/jss.v091.i12) |
-| **Moving to Starsim** | [Conversion guide](https://starsim.org/v4/user_guide/conversion/siminf.html) |
+| **Moving to Starsim** | [Conversion guide](../models/siminf/index.qmd) |
 
 ## What it's for
 

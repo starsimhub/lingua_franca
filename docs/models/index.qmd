@@ -15,7 +15,7 @@ A model should never be easier to write without the lingua franca than with it. 
 - **No more lines of model code**, not counting imports, comments, blank lines, and plotting.
 - **No more time for a rerun**, measured on the same machine: running the same model again once it is set up, as in a parameter scan or a calibration. First-run times are shown as well, but don't count toward the mark. A first run includes setup that happens once, so a small model can take tens of milliseconds even when its reruns are much faster.
 
-Results should also agree, within a stated tolerance. Missing any of these doesn't fail the translation: it is a gap, written up with the model for the [design](../design/index.qmd) to address. Times are not always like for like: some originals can only be timed as a whole command, and each model's notes say where that is the case.
+Results should also agree, within a stated tolerance. Missing any of these doesn't fail the translation: it is a gap, written up with the model for the [design](../design/index.qmd) to address. Times are not always like for like: some originals can only be timed as a whole command, and each model's notes say where that is the case. For modelers who use one of these frameworks, the [comparison with other frameworks](comparison.qmd) sums up how Starsim compares with each, and links to a page for each with a model written both ways.
 
 ## Where each model stands
 
