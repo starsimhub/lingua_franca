@@ -17,16 +17,31 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # As frameworks.yml's kernels job, whose cached kernels this shares
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4 # Starsim v4, which the model pages run
+        with:
+          repository: starsimhub/starsim
+          ref: v4
+          path: .starsim
+      - id: kernels # The same path and key as frameworks.yml, so the two workflows share one cache
+        uses: actions/cache@v4
+        with:
+          path: .starsim/starsim/solvers/backends/_rs.abi3.so
+          key: kernels-${{ runner.os }}-${{ hashFiles('.starsim/starsim/solvers/rust/**') }}
+      - name: Build Starsim's Rust kernels
+        if: steps.kernels.outputs.cache-hit != 'true'
+        run: .starsim/starsim/solvers/rust/build # Rust is installed on GitHub's runners
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Install Starsim v4, which the model pages run
-        run: pip install sciris jupyter --group starsim
+      - name: Install Starsim
+        run: pip install sciris jupyter -e .starsim
         env:
-          CARGO: 'false' # The examples run on Numba's kernels, so skip compiling Rust's
+          CARGO: 'false' # Use the kernels built above, rather than compiling them again
+      - name: Check the kernels are compiled
+        run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; print(ss.kernels.compile_status().summary)"
       - uses: sciris/quarto-cli/.github/actions/setup@main
       - name: Install quartopydoc's Quarto extensions (the authorship badge)
         working-directory: docs

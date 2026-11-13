@@ -49,19 +49,20 @@ jobs:
         with:
           repository: ${{ env.STARSIM_REPO }}
           ref: ${{ env.STARSIM_REF }}
+          path: .starsim # Where site.yml checks it out too, so the two workflows share one cache of the kernels
       - id: cache
         uses: actions/cache@v4
         with:
-          path: starsim/solvers/backends/_rs.abi3.so
-          key: kernels-${{ runner.os }}-${{ hashFiles('starsim/solvers/rust/**') }}
+          path: .starsim/starsim/solvers/backends/_rs.abi3.so
+          key: kernels-${{ runner.os }}-${{ hashFiles('.starsim/starsim/solvers/rust/**') }}
       - name: Build the Rust kernels
         if: steps.cache.outputs.cache-hit != 'true'
-        working-directory: starsim/solvers/rust
-        run: ./build # Rust is installed on GitHub's runners
+        run: .starsim/starsim/solvers/rust/build # Rust is installed on GitHub's runners
       - uses: actions/upload-artifact@v4
         with:
           name: kernels
-          path: starsim/solvers/backends/_rs.abi3.so
+          path: .starsim/starsim/solvers/backends/_rs.abi3.so
+          include-hidden-files: true # Else a path under .starsim is skipped
           if-no-files-found: error
           retention-days: 1
 
