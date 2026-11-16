@@ -100,22 +100,23 @@ Protection that is lost from one stage to the next at random times gives the sam
 ## Delivery
 
 ```python
-ss.Event(what, who=None, when=None, n=None, p=None, strain=None, increment=None)        # something that happens to people: a move, a counter, or a visit
-ss.Delivery(what, who=None, when=None, coverage=None, capacity=None, strain=None,       # an event that delivers a product (or a move)
+ss.Event(what, who=None, when=None, n=None, p=None, rate=None, strain=None, increment=None)  # something that happens to people: a move, a counter, or a visit
+ss.Delivery(what, who=None, when=None, coverage=None, rate=None, capacity=None, strain=None,  # an event that delivers a product (or a move)
             increment=None, trace=None, skip_reached_within=None, disease=None)
 ss.vaccinate(vaccine, ...), ss.screen(diagnostic, ...), ss.treat(treatment, ...)        # subclasses of ss.Delivery for each kind of product
 ```
 
-Every delivery has three parts, each optional: **what** is delivered (`what=`, also the first argument: a product, or a move as for `ss.Event`), **who** is eligible (`who=`), and **when** (`when=`). With no product, `ss.Delivery(who=...)` is a step people attend (a visit). In the common case of a product given by one delivery, the delivery takes the product's own keywords and makes it (`ss.vaccinate(efficacy=0.9, coverage=0.8, when='2025-02-01')`); a product given by several deliveries is made once and passed to each. `ss.Event` says how many it reaches as `ss.move()` does, with `n=` (at most this many each time) and `p=` (the chance for each person eligible); `ss.Delivery` says the same in the words of services, `coverage=` and `capacity=`, and adds what only interventions need (a product, `trace=`, `skip_reached_within=`, `disease=`, and `ss.capacity()`). Internally they are one class.
+Every delivery has three parts, each optional: **what** is delivered (`what=`, also the first argument: a product, or a move as for `ss.Event`), **who** is eligible (`who=`), and **when** (`when=`). With no product, `ss.Delivery(who=...)` is a step people attend (a visit). In the common case of a product given by one delivery, the delivery takes the product's own keywords and makes it (`ss.vaccinate(efficacy=0.9, coverage=0.8, when='2025-02-01')`); a product given by several deliveries is made once and passed to each. `ss.Event` says how many it reaches as `ss.move()` does, with `n=` (at most this many each time) and `p=` (the chance for each person eligible); `ss.Delivery` says the same in the words of services, `coverage=` and `capacity=`, and adds what only interventions need (a product, `trace=`, `skip_reached_within=`, `disease=`, and `ss.capacity()`). `ss.Delivery` is a subclass of `ss.Event` that adds the machinery only a delivery of a product needs; the methods of both are private machinery.
 
 **`who=`** is who is eligible, and only that:
 
 | `who=` | Means |
 |---|---|
 | a condition on people: `ss.person.age < 5`, `~diagnosed`, a state by its path (`'sir.I'`) | the people who meet it |
-| a condition on the population: `sir.I.n > 1000` | everyone or no one, decided at each step; joined to one on people with `&` |
 | `ss.at_age(ss.months(9))` | people as they reach an age, joined to other conditions with `&` (`ss.at_age(ss.months(9)) & ss.person.female`) |
 | a function of the sim | who is eligible: UIDs, a mask, or `True` or `False` for everyone ([below](#who-as-a-function)) |
+
+A condition on the population in `who=` raises a `TypeError` pointing to `when=`, alone or joined with `&` to a condition on people (the error shows the split: `who=(ss.person.age < 5), when=(sir.I.n > 10)`); joined with `|` or `~`, it raises pointing to a function of the sim. This holds for every `who=`: deliveries and events, `ss.modify`, transitions, `ss.move()`, and interventions written as code.
 
 **`when=`** is when, told apart by type:
 
@@ -126,10 +127,15 @@ Every delivery has three parts, each optional: **what** is delivered (`what=`, a
 | `ss.schedule(every=ss.years(1), start=2021, stop=2030)` | rounds this far apart, between `start` and `stop` |
 | `ss.schedule(start=2025, stop=2030)` | routine between those times |
 | an event: `sir.infection`, `screening.positive`, `anc_visit`, or a path (`'sir.infection'`) | a trigger: the people it happened to ([events](#events)), who must also be eligible |
-| `ss.on(event, delay=ss.months(3))` | a trigger, delivered that long after the event |
+| `ss.on(event, delay=ss.months(3))` | a trigger, delivered that long after the event; `ss.on(event, delay=...) & (sir.I.n > 1000)` checks the condition when it acts |
 | a function of the date: `lambda now: now.month == 1` | the steps on which it is true |
+| a condition on the population: `sir.I.n > 1000`, `sir.I.frac > 0.02` | routinely, while it holds (decided for everyone at once); joined to an event with `&` (`when=screening.positive & (sir.I.n > 1000)`), on the event while it holds |
+| `ss.schedule(every=ss.years(1)) & (sir.I.n > 1000)` | the schedule's rounds while the condition holds; with only `start=` and `stop=`, routine in the window while it holds; times are `ss.schedule([2025, 2030]) & (...)` |
+| `ss.schedule(every=ss.years(1)) \| (sir.I.n > 1000)` | a round at each scheduled time, and one at each step the condition holds |
+| `screening.positive \| (sir.I.n > 1000)` | those the event happened to, and everyone eligible at each step the condition holds |
+| `ss.schedule(every=ss.years(1)) \| screening.positive` | a round at each scheduled time, and those the event happened to |
 
-`ss.schedule(at=None, every=None, start=None, stop=None)` is the full form of a time: `at=` (also the first argument) is the times, or a function of the date; `every=` how often; `start=` and `stop=` the period. `ss.schedule(ss.weeks(1))`, a lone duration by position, raises, asking for `every=` or `at=`; `ss.schedule()` with no arguments is due at every step. `start=` and `stop=` on a delivery or event itself (`ss.vaccinate(..., start=2005, stop=2010)`) are shorthand for `when=ss.schedule(start=, stop=)`, and go with any `when=`, limiting an event's trigger to the window (`ss.screen(test, when=onset, start=2001, stop=2010)`, Starsim 3's `on=onset, start=2001`); a window given both ways raises (restored 2026-11-07). A time is given as the times of a time series are ([below](#changes-at-given-times)). Events combine: `when=a | b` is anyone either happened to, each person once, and `when=a & b` anyone both happened to on the same step; an event joined to a condition with `&` (`when=preg.delivery & hiv_rdt.positive.ever`) is those it happened to who meet the condition, which joins `who=`. Each keyword means one thing: an event in `who=` raises an error that points to `when=`, and a condition on people in `when=` one that points to `who=`. An event joined to a condition with `|` raises too, since it is neither.
+`ss.schedule(at=None, every=None, start=None, stop=None)` is the full form of a time: `at=` (also the first argument) is the times, or a function of the date; `every=` how often; `start=` and `stop=` the period. `ss.schedule(ss.weeks(1))`, a lone duration by position, raises, asking for `every=` or `at=`; `ss.schedule()` with no arguments is due at every step. `start=` and `stop=` on a delivery or event itself (`ss.vaccinate(..., start=2005, stop=2010)`) are shorthand for `when=ss.schedule(start=, stop=)`, and go with any `when=`, limiting an event's trigger to the window (`ss.screen(test, when=onset, start=2001, stop=2010)`, Starsim 3's `on=onset, start=2001`); a window given both ways raises (restored 2026-11-07). A time is given as the times of a time series are ([below](#changes-at-given-times)). Events combine: `when=a | b` is anyone either happened to, each person once, and `when=a & b` anyone both happened to on the same step; an event joined to a condition with `&` (`when=preg.delivery & hiv_rdt.positive.ever`) is those it happened to who meet the condition, which joins `who=`. Each keyword means one thing: an event in `who=` raises an error that points to `when=`, and a condition on people in `when=` one that points to `who=`. An event joined to a condition on people with `|` raises too, since it is neither. In `when=`, `&` is both and `|` either, and a start and stop bound every part; `(schedule | c1) & c2` gates the whole. Python reads `&` and `|` before `>`, so a condition joined to a schedule needs parentheses (`ss.schedule(...) & sir.I.n > 1000` raises, saying so). A schedule joined to another schedule or to a condition on people, a window joined with `|`, times joined to a condition (`[2025] & (...)`, which points to `ss.schedule([2025]) & (...)`), and `(schedule & c1) | c2` raise.
 
 ### Delivery keywords
 
@@ -138,7 +144,8 @@ Every delivery has three parts, each optional: **what** is delivered (`what=`, a
 | `what=` | what is delivered: a product (the first argument), or instead a move between two states for the people reached, written with the states, e.g. `S >> V` (a one-off campaign), or from any of several (`U + B + W >> B`, which restarts the time in `B` of those already there), or with their paths (`'sir.S >> sir.V'`, or `'S >> V'` for the one disease that has them); a level of a stratification (`dict(vaccinated=True)`, or a pair, `dict(risk=('low', 'high'))`); or a change of strains (`DS >> RIF`, [05](05-dimensions.md#strains)); the module is the one that has the states; with `capacity=`, a move seeds a number of people on a schedule |
 | `who=` | who is eligible (above) |
 | `when=` | when it is delivered (above). With `ss.on(event, delay=)`, the time from the trigger to delivery (HP26): a duration, or a distribution of durations, drawn per person. The people triggered receive it then if they still meet `who=`, and `coverage=` applies then; someone waiting is not triggered again. Agents only, since who is waiting, and since when, is each person's own (decided 2026-10-20). On `ss.screen` it is the step's delay; the time from a test to its result is the test's (`ss.Diagnostic(result_delay=)`). A delivery on a date happens at the start of the step from that time point, and is counted in that row |
-| `coverage=` | the fraction of eligible people reached (`p=` on `ss.Event`) |
+| `coverage=` | the fraction of eligible people reached in each round (or step, on events) (`p=` on `ss.Event`); a typed rate raises, pointing to `rate=` |
+| `rate=` | instead of `coverage=`, the rate at which eligible people are reached (a typed rate or probability per time, e.g. `ss.peryear(0.5)`), over each step or round; routine delivery offers it at every step |
 | `capacity=` | the number that can be delivered (`n=` on `ss.Event`), or `ss.capacity(n, priority=, queue=)`, which also says who is served first (a condition, a list of them, or a score such as `-hiv.cd4`) and whether the rest wait (`queue=True`, or at most a duration; agents only) |
 | `strain=` | with a move into a state where people carry a strain, the strain they arrive with |
 | `increment=` | instead of a product, a counter that goes up for those reached |
@@ -156,7 +163,7 @@ ss.vaccinate(bcg, who=ss.at_age(ss.months(9)), coverage=0.9, when=ss.schedule(st
 
 **Rounds and routine delivery.** With times or `every=`, delivery happens in rounds, and in each round every eligible person is offered the product once. With no `when=`, or only a `start` and `stop`, delivery is routine: each person is offered the product once in each spell of being eligible, at its first step, and the record that they were offered it is a property of people named `offered_<delivery>`. Routine versus campaign is therefore a keyword, not a class. `ss.at_age()` is given as people reach the age: on its first step, the people already past it (as agents, older by more than a step; in a compartmental run, everyone in an age group at or above it) are recorded as offered it, so `who=ss.at_age(ss.months(9))` vaccinates children as they turn 9 months and not everyone older on the first day; it takes no `when=` but a start and stop. A condition on age is not read this way: `who=ss.person.age >= 0.75` is ordinary routine delivery, which reaches everyone that old on the first step. A catch-up of those already older is a campaign round.
 
-**`coverage=` versus `capacity=`.** These are different specifications and both are common.
+**`coverage=` versus `capacity=`.** These are different specifications and both are common. A rate of being reached is `rate=`, not `coverage=`.
 
 - `coverage=0.7` is a fraction of the eligible people. It accepts everything a parameter accepts, including `ss.by(age=[...])`, a time series, and a function of the sim returning one probability per person.
 - `capacity=50_000` is a number available: a bare number is per round for campaigns (or per step for delivery on events), and a rate (`ss.peryear(50_000)`) is per unit time. Routine delivery has no rounds, so a bare number there raises, asking for a rate. It may be a time series or a function of the sim. It is a total, so `ss.by(...)` raises, saying to make one delivery for each stratum with its own capacity (a capacity per stratum, e.g. per district, is not yet a keyword). When fewer are available than eligible people who would receive one, recipients are chosen by `ss.capacity(priority=)`, or else at random among them, and delivery stops when the capacity is used up ("while stocks last").
@@ -284,7 +291,7 @@ It is an ordinary modifier ([07-effects.md](07-effects.md)): it combines with ot
 
 ## Triggers
 
-"When" is `when=`, on time alone, for a delivery and for `ss.modify`: times, `ss.schedule()` (a window with only `start=` and `stop=`, also given as `start=` and `stop=` themselves), or a function of the date (`lambda now: now.month in [6, 7, 8]`); a delivery's may also be an event. A condition on the state of the epidemic is `who=`: a condition on the population (`sir.I.n > 1000`), or a function of the sim returning `True` or `False` (one that reads only the time raises, pointing to `start=` and `stop=`):
+"When" is `when=`, for a delivery and for `ss.modify`: times, `ss.schedule()` (a window with only `start=` and `stop=`, also given as `start=` and `stop=` themselves), a function of the date (`lambda now: now.month in [6, 7, 8]`), or a condition on the population (`sir.I.n > 1000`), while it holds; a delivery's may also be an event. Another condition on the state of the epidemic is `who=`, a function of the sim returning `True` or `False` (one that reads only the time raises, pointing to `start=` and `stop=`):
 
 ```python
 S, I, R = ss.states('S I R')
@@ -299,7 +306,7 @@ closures = ss.modify('school.pars.n_contacts', multiply=0.2, who=many_cases)
 sim = ss.Sim(sir, networks=[home, school], interventions=closures, n_agents=2000, dur=ss.days(100)).run()
 ```
 
-A policy with a release takes `until=`, so that it doesn't switch on and off around one threshold: `ss.modify(beta, multiply=0.5, who=I.n >= 2000, until=I.n <= 1000)` is on from when `who=` holds until `until=` does, for each place or group on its own, under every solver.
+A policy with a release takes `until=`, so that it doesn't switch on and off around one threshold: `ss.modify(beta, multiply=0.5, when=I.n >= 2000, until=I.n <= 1000)` is on from when `when=` holds until `until=` does, for each place or group on its own, under every solver.
 
 - The function is called each step, at the intervention's place in the loop, and can read anything in the sim, including the stocks of this step and the flows of the steps before it. Results are read as in Starsim: storage is preallocated for the whole run, and during a step `sim.ti` is the step's own index, where its results go; its stocks (the state at its start) are recorded before any module's step, so are `[sim.ti]`, and its flows at its end, so the flows so far are `[:sim.ti]` ([10-execution.md](10-execution.md)). A shorter spelling for "the steps so far" would be a convenience and is not specified ([19-open-questions.md](19-open-questions.md)).
 - It can read any result, including an outcome ([09-results.md](09-results.md)): `who=lambda sim: sim.results.sir.n_hosp[sim.ti] > 500` acts on hospital occupancy without hospitalization being a state.
@@ -329,7 +336,7 @@ effect  = ss.modify('school.pars.n_contacts', multiply=0.2, who=lambda sim: sim.
 sim     = ss.Sim(sir, networks=[home, school], interventions=[closure, effect], n_agents=2000, dur=ss.days(100)).run()
 ```
 
-An intervention written as code takes `who=` too (Starsim 3's `eligibility=`, which raises naming it): a condition on people, a state by its path, or a function of the sim (and of the intervention, as `self`) returning UIDs or a mask, read as a delivery's is. Its `check_eligibility()`, kept from Starsim 3 (restored 2026-11-07), returns the UIDs of those alive it holds for (everyone alive with no `who=`), for use in `step()`, and can be overridden.
+An intervention written as code takes `who=` too (Starsim 3's `eligibility=`, which raises naming it): a condition on people, a state by its path, or a function of the sim (and of the intervention, as `self`) returning UIDs or a mask, read as a delivery's is. It takes `when=` too: a condition on the population, an `ss.schedule()`, or both joined with `&` or `|`, on whose steps `check_eligibility()` returns nobody when it does not hold. Its `check_eligibility()`, kept from Starsim 3 (restored 2026-11-07), returns the UIDs of those alive it holds for (everyone alive with no `who=`), for use in `step()`, and can be overridden.
 
 The class decides and remembers; the modifier applies the effect, so the base contact rate is never overwritten and comes back when `closed` is cleared ([07-effects.md](07-effects.md#plain-code-in-step)). Whether a function of the sim as `who=` should exist at all, given how little it can say safely, is open ([19-open-questions.md](19-open-questions.md)).
 

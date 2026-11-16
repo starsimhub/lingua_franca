@@ -77,6 +77,8 @@ Starsim's rules, summarized:
 
 Here "rate" is any of `per`, `prob` (with a time unit), and `freq`. Both errors name the two types.
 
+Comparing a duration with a bare number is strict, since a number has no unit: `==` is false and `<`, `>`, `<=` and `>=` raise a `TypeError` (`ss.days(5) < 10`), except with 0, which is the same in every unit (`dur > 0`). Durations compare with each other by value (`ss.years(1) == ss.days(365)`). A rate equals a bare number only when both are zero.
+
 The slot a result lands in is checked too. A rate multiplied by a duration is a plain number, and putting one in a `rate=` slot or after `@` is a mistake, so a `TypeError` points at it:
 
 ```text
@@ -103,7 +105,7 @@ A bare number after `@` is a rate, never a duration, because "at" reads as "at r
 
 A slot that can be filled in more than one way (`ss.Transition` takes `dur=` or `rate=`) is decided by which keyword was used, never by the value. The slots and their types are listed in [17-vocabulary.md](17-vocabulary.md).
 
-A typed value (`ss.perday(0.05)`) keeps its own unit and is converted to the sim's. A bare number takes the sim's unit.
+A typed value (`ss.perday(0.05)`) keeps its own unit and is converted to the sim's. A bare number takes the sim's unit. A rate or duration of zero needs no unit (`beta=0`) wherever a typed value is expected.
 
 ### The sim's unit
 

@@ -41,7 +41,7 @@ jobs:
         env:
           CARGO: 'false' # Use the kernels built above, rather than compiling them again
       - name: Check the kernels are compiled
-        run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; print(ss.kernels.compile_status().summary)"
+        run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; ss.compile(check=True)"
       - uses: sciris/quarto-cli/.github/actions/setup@main
       - name: Install quartopydoc's Quarto extensions (the authorship badge)
         working-directory: docs

@@ -167,14 +167,13 @@ def worker(name, kernel, rebuilds):
     import starsim as ss # Not timed
     import importlib.util
     used = []
-    if kernel.startswith('jax'): # JAX is chosen by each sim rather than by an option
-        choose = ss.solvers.choose_engine
+    if kernel.startswith('jax'): # JAX is chosen by ss.options.backend = 'jax' (set by kernel_env()); record whether it was used
+        choose = ss.solvers.choose_backend
         def forced(sim):
-            sim.jax = True
             use, why = choose(sim)
             used.append((use, why))
             return use, why
-        ss.solvers.choose_engine = forced
+        ss.solvers.choose_backend = forced
     path = model_file(name)
     os.chdir(path.parent)
     sys.path.insert(0, str(path.parent))
@@ -194,7 +193,7 @@ def worker(name, kernel, rebuilds):
 
     if kernel.startswith('jax') and 'code' not in run: # Without a slow first run if JAX does not apply
         built[0].init()
-        reason = getattr(built[0], '_kernel_reason', None) or built[0].kernel_reason # Public up to Starsim 4.0.0rc3
+        reason = getattr(built[0], '_compiled_reason', None) or getattr(built[0], '_kernel_reason', None) or built[0].kernel_reason # _kernel_reason before the backend renames, public up to Starsim 4.0.0rc3
         reason = reason()
         use, why = (False, reason) if reason else forced(built[0])
         if not use:
@@ -215,12 +214,12 @@ def worker(name, kernel, rebuilds):
 
 
 def kernel_env(kernel):
-    """ The environment variables for a kernel set; JAX runs use the default kernels for anything it leaves to them """
+    """ The environment variables for a kernel set; JAX runs use the default kernels for anything it leaves to them, and STARSIM_JAX_PLATFORM says where JAX runs (Starsim sets JAX_PLATFORMS from it, so without it JAX on a GPU would run on the CPU) """
     if kernel == 'jax':
-        return dict(JAX_PLATFORMS='cpu')
+        return dict(STARSIM_BACKEND='jax', STARSIM_JAX_PLATFORM='cpu', JAX_PLATFORMS='cpu')
     elif kernel == 'jax-gpu':
-        return dict(JAX_PLATFORMS='cuda,cpu', XLA_PYTHON_CLIENT_PREALLOCATE='false')
-    return dict(STARSIM_KERNELS=kernel)
+        return dict(STARSIM_BACKEND='jax', STARSIM_JAX_PLATFORM='cuda,cpu', JAX_PLATFORMS='cuda,cpu', XLA_PYTHON_CLIENT_PREALLOCATE='false')
+    return dict(STARSIM_BACKEND=kernel)
 
 
 def run_worker(name, kernel, env, rebuilds=False):
@@ -268,7 +267,7 @@ def compile_time(env):
     """ How long Numba takes to compile the kernels, once per install: a single first run can pay this if there is no Rust """
     with tempfile.TemporaryDirectory() as tmp:
         code = 'import time, starsim as ss; start = time.perf_counter(); ss.compile(); print("SECONDS", time.perf_counter() - start)'
-        ok, text = command([sys.executable, '-c', code], env=dict(env, STARSIM_KERNELS='numba', NUMBA_CACHE_DIR=tmp))
+        ok, text = command([sys.executable, '-c', code], env=dict(env, STARSIM_BACKEND='numba', NUMBA_CACHE_DIR=tmp))
     found = re.search(r'SECONDS ([\d.]+)', text)
     return float(found.group(1)) if ok and found else None
 

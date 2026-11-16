@@ -268,7 +268,7 @@ Looked at whether v4 should support modeling paradigms beyond the ODE, chain-bin
 - **A declared disease on a network overriding `net_beta()`** ignores it silently; should it raise?
 - **Unusable parameter values on a declared disease** (`dur_inf=dict(...)`) fail late, with a raw `TypeError`; one check when the graph is built.
 - **Other Starsim 3 guards** remain: `infect(self)` in `__init_subclass__()`, `_infection_methods`, and the text in `check_betas()`.
-- **`ss.Births` and `ss.Deaths` as thin constructors** (decision 8) aren't reachable yet: they need `parent` and mothers' ages on declared births, a declared rate by year, sex, and age, the `cbr` and `cmr` results, and a replacement for the `make_p_death()` and `get_births()` hooks that seven downstream classes override. A declared per-agent death rate from the UN table ended 3.5% below `ss.Deaths` in one run; rechecked on 2026-10-31 with `ss.Deaths`' own table and period lookup, it is within 0.3% (the original setup is lost).
+- **`ss.Births` and `ss.Deaths` as thin constructors** (decision 8) aren't reachable yet: they need `parent` and mothers' ages on declared births, a declared rate by year, sex, and age, the `cbr` and `cmr` results of the module (the sim's own `birth`, `death`, `cbr`, and `cmr` count every form since 2026-11-15), and a replacement for the `make_p_death()` and `get_births()` hooks that seven downstream classes override. A declared per-agent death rate from the UN table ended 3.5% below `ss.Deaths` in one run; rechecked on 2026-10-31 with `ss.Deaths`' own table and period lookup, it is within 0.3% (the original setup is lost).
 - **A matrix of distributions in `ss.MixingPools`** still makes a pool for each pair of groups, each with a state, so a newborn takes a draw for each pair (#738: about 2× slower to run than a matrix of numbers at 16 groups with births, and 6× slower to build). A matrix of numbers no longer does. If someone needs Poisson contacts at 16 groups, draw one value per person per destination group, not per pair.
 - **`ss.MixingPools`** stays: `rsvsim.RSVMixingPools` subclasses it, and typhoid, rotasim, tb_acf, and jhu-collab use it.
 - **Stepped runs under 15 µs:** 24 µs now. A prepared kernel handle might save about 4, and compiled result expressions about 3. Spans would help only modules on coarser timelines.
@@ -296,7 +296,6 @@ Looked at whether v4 should support modeling paradigms beyond the ODE, chain-bin
 - **`ss.diff_sims(die=True)`** raises on different values, not on keys that differ (`debugtools.py:457`), so a baseline test passes with stale keys.
 - **A declared HPV genotype** costs about 2.5 ms a step against 0.75 ms coded, so the HPVsim port is about 1.5× a coded model with the same network: flat Python in `send()`, `fire()`, `enter()`, and `schedule()`, and `Arr.grow()` over about twice the arrays. M.
 - **`BoolState.time`** is O(N) per read; give it a form for some agents. S.
-- **`docs/design/12-backends.md`** still describes the chain binomial in JAX.
 
 ## From the Pandemic Simulator review (2026-11-02)
 
@@ -414,3 +413,7 @@ Work that was looked at and decided against, with why, so that it is not propose
 - **A delay's history.** Starting a state with a fixed delay spread over its slots (as odin's `delay()` backfills its first days) would remove the extra inflow the odin vignette uses; it waits for a spelling.
 - **Stays on transmissions, stays out of a state that splits on entry, and `ss.update` in diseases tracked jointly.** Each raises a `CapabilityError` today.
 - **Exact exports of a delay.** SBML and odin exports write a conveyor as stages of one step each; odin's own `delay()` would be exact.
+
+## From the Nov 13 simplification review (2026-11-13)
+
+- **Starting near the steady state.** `init=ss.equilibrium()` on a declared disease would run its ODE until it settles and start from those fractions (by stratum, if stratified); `ss.Sim(burn_in=ss.years(20))` would run any model for a while and discard those results, for coded diseases and for network structure the ODE ignores. Cliff: worth doing but complex, so deferred.

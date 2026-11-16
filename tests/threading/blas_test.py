@@ -130,7 +130,7 @@ def describe():
     """ What is being tested """
     import threadpoolctl
     info = dict(platform=platform.platform(), machine=platform.machine(), processor=platform.processor(), cpus=os.cpu_count(), python=platform.python_version(),
-                numpy=np.__version__, scipy=scipy.__version__, numba=__import__('numba').__version__, starsim=ss.__version__, kernels=ss.kernels.compile_status().engine)
+                numpy=np.__version__, scipy=scipy.__version__, numba=__import__('numba').__version__, starsim=ss.__version__, kernels=ss.solvers.backends.kernels.compile_status().backend)
     if sys.platform == 'linux':
         for line in pathlib.Path('/proc/cpuinfo').read_text().splitlines():
             if line.startswith('model name'):

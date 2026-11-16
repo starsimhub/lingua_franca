@@ -36,7 +36,7 @@ env:
   UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.uv-python # The Python of each environment, cached with it
   R_VERSION: 4.6.1
   STAGES: ${{ inputs.starsim_repo && 'compare' || 'compare timing' }} # Timing takes as long again, and runs the originals, so only for this repo's own runs
-  STARSIM_KERNELS: rust # An error if the kernels are missing or stale, rather than falling back to Numba's
+  STARSIM_BACKEND: rust # An error if the Rust backend is missing or stale, rather than falling back to Numba
 
 jobs:
 
@@ -113,7 +113,7 @@ jobs:
         env:
           CARGO: 'false' # Use the kernels built above, rather than compiling them again: they are optional, so a failed cargo is not an error
       - name: Check the kernels are compiled
-        run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; print(ss.kernels.compile_status().summary)"
+        run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; ss.compile(check=True)"
 
       - name: Install what the framework needs from the system
         if: matrix.apt

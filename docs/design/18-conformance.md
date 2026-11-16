@@ -80,9 +80,9 @@ For every approximation in [12-backends.md](12-backends.md#the-standard-approxim
 - under `solver='auto'`, an approximation of the mixing is never made: the model runs as agents, and the printed reason names the piece that made it agent-based;
 - under `solver='auto'`, a dwell time that is not exponential or Erlang is the one exception: the model stays an ODE with fitted Erlang stages, and one note names the transition, the number of stages, and the mean and standard deviation kept;
 - under an explicit solver, the run completes and prints one line naming the piece and what it was approximated by;
-- with `approximations='allow'`, the same run prints nothing, and the note is still kept in `sim.notes`;
-- with an explicit solver and `approximations='error'`, the same request raises `ss.CapabilityError` naming the piece and the approximation that would have been used;
-- with `solver='auto'` and `approximations='error'`, the dwell-time model runs as agents, where the dwell time is sampled directly;
+- with `ss.options.approximations='allow'`, the same run prints nothing, and the note is still kept in `sim.notes`;
+- with an explicit solver and `ss.options.approximations='error'`, the same request raises `ss.CapabilityError` naming the piece and the approximation that would have been used;
+- with `solver='auto'` and `ss.options.approximations='error'`, the dwell-time model runs as agents, where the dwell time is sampled directly;
 - with `verbose=0` nothing is printed, and the note is still kept in `sim.notes`;
 - `sim.describe()` shows `approx` for that ingredient, before anything is run;
 - a distribution on `beta` or `rel_sus` runs as agents under `'auto'`, and under an explicit `solver='ode'` uses the mean and says so.
@@ -146,7 +146,7 @@ Every default the library guessed appears in `describe()`, marked `[guessed]` wi
 ### 10. Reproducibility
 
 - The same model, settings, and seed give identical results on repeated runs on the same machine and library versions, in serial and in parallel (`test_baselines.py`, `test_run.py`).
-- Adding an unrelated module (an analyzer, or a disease that shares no states) does not change another module's draws, whether the run is whole or stepped; two identical modules with different names have streams of their own (`test_contracts.py::test_streams`).
+- Adding an unrelated module (an analyzer, or a disease that shares no states) does not change another module's draws, whether the run is whole or stepped; two identical modules of one kind have streams of their own (`test_contracts.py::test_streams`), and renaming the variable a module is assigned to does not change its draws (`test_randomness.py::test_names_keep_crn`).
 - With common random numbers, which are keyed on each agent's slot and nothing else, the variance of the difference between a baseline and an intervention scenario is lower than with `ss.options.crn = False` for small perturbations; the pairing weakens once trajectories diverge (`test_randomness.py` checks the streams and `ss.options.crn`; `test_contracts.py::test_crn_pairing` checks, for a declared disease as agents, that the pairing makes the variance of the difference well below that of independent runs. Against `ss.options.crn = False` it is not yet shown: for a declared disease, plain streams keep the scenarios in step too, and over 30 seeds of a small change the two variances were about the same).
 - A sim is one run. `ss.parallel(sim, n_runs=100)` and `ss.MultiSim(sim, n_runs=100).run()` give runs of the base sim with different seeds, and a result has a run dimension (`.values` is runs by time, `.quantiles()` summarizes across runs) (`test_run.py`, `test_results.py`).
 
@@ -195,13 +195,13 @@ The models are the functions of `tests/corpus.py`, each returning an unrun sim s
 | 1 | **SIR**, with no unit anywhere (simple); its spellings and a class are in `test_forms` | Form equivalence; every solver; time in timesteps when nothing has a unit |
 | 2 | **SEIR**, in the operator form (simple) | The source of infection, in the rate |
 | 3 | **SIR with an Erlang dwell time**, `ss.erlang(mean=10, k=3)` (simple) | Sub-stages, exact in every solver |
-| 4 | **SIR with a lognormal dwell time** | `'auto'` keeps it an ODE with fitted Erlang stages and prints a note; `solver='ode'` prints the stage approximation; `approximations='allow'` silences it; `solver='ode'` with `approximations='error'` raises `CapabilityError`; `'auto'` with `approximations='error'`, and `solver='abm'`, sample the dwell time directly; the difference is recorded |
+| 4 | **SIR with a lognormal dwell time** | `'auto'` keeps it an ODE with fitted Erlang stages and prints a note; `solver='ode'` prints the stage approximation; `ss.options.approximations='allow'` silences it; `solver='ode'` with `ss.options.approximations='error'` raises `CapabilityError`; `'auto'` with `ss.options.approximations='error'`, and `solver='abm'`, sample the dwell time directly; the difference is recorded |
 | 5 | **A branching model** with per-branch dwell times and a competing death hazard (simple) | Split on entry versus competing hazards |
 | 6 | **An age-stratified SIR with a real contact matrix** (simple) | `stratify` in place and on the sim, `ss.contacts`, aging, a contact matrix aggregated to the model's age groups; `inplace=False` leaves the original untouched |
 | 7 | **A model on patches with gravity mobility**, and the same patches with no mobility | Space as a stratification; commuting as a share of time |
 | 8 | **Vaccination as a stratification plus a transfer** | The disease never mentions vaccination; coverage delivers `f`; capacity is a total |
 | 9 | **Two diseases with `ss.modify` in both directions** (HIV and syphilis) | Mutual dependence; combination rules; base and effective values; `what_modifies()` |
-| 10 | **A sexual-network model** (`ss.SexualNet`) | `'auto'` runs it as agents; `solver='ode'` uses the partner-change model, with a note, and `approximations='error'` raises `CapabilityError` |
+| 10 | **A sexual-network model** (`ss.SexualNet`) | `'auto'` runs it as agents; `solver='ode'` uses the partner-change model, with a note, and `ss.options.approximations='error'` raises `CapabilityError` |
 | 11 | **Cholera**: one disease whose states include a water reservoir `W` | Counts in rates; `W` declared a count (`ss.State(people=False)`); inflow from `ss.outside` and outflow to `ss.dead`; `'auto'` gives an ODE; adding `n_agents=` makes people agents while the water stays a count; `beta * W` raises a `ValueError` |
 | 12 | **A vector-borne model** (Ross-Macdonald malaria): humans and mosquitoes as states of one disease | Two populations coupled by counts; a seasonal inflow; humans as agents with mosquitoes as three counts; mosquito states left out of `total_pop` and of an age stratification, and split by species with `states=` |
 | 13 | **Screening with follow-up treatment** | The within-step chain: a treatment triggered by the test's outcome (`when=screen.positive`), run after it in the same step; moving a module with `sim.loop.insert` |
