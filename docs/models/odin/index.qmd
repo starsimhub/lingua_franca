@@ -81,7 +81,7 @@ msim.plot()
 The final number recovered, over the 20 runs (odin's mean over 1,000 runs is 532,176):
 
 ```{python}
-msim.summarize().loc[['seir_R']]
+msim.summarize().loc[['seir.R']]
 ```
 
 The same file can also be imported. `ss.import_from()` reads odin's language directly, without R or odin, and turns the arrays coupled by the contact matrix into an age stratification with `ss.contacts()`:

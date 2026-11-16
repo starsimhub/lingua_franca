@@ -117,7 +117,7 @@ Then projections from the posterior, without and with vaccination from 1 April, 
 ```{python}
 vaccination = ss.vaccinate(efficacy=0.9, start='2020-04-01', capacity=ss.perday(20_000))
 proj = fit.project({'No vaccination': None, 'Vaccination': vaccination}, n_runs=20, restart=True) # One run per posterior draw, each from the start, since vaccination begins before the last data point
-proj.summarize().loc['sir_infection'] # Total infections in each scenario, over the draws
+proj.summarize().loc['sir.infection'] # Total infections in each scenario, over the draws
 ```
 
 `proj.to_df(quantiles=[0.05, 0.5, 0.95])` gives the projections as a long table of quantiles at each time, by scenario, as epydemix's are.
