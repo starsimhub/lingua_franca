@@ -16,7 +16,7 @@ ref = tools.read_results(here)
 places = dict(central_city='Central City', town_1='Town 1', interim_1a='Interim 1A', town_3='Town 3')
 
 
-n_runs = 6 # Each agent stands for ten people, so the 100 at the start are 10 agents, and the day of the peak in one run depends a good deal on chance
+n_runs = 20 # As many as the original. Each agent stands for ten people, so the 100 at the start are 10 agents, and the day of the peak in one run depends a good deal on chance (town 3: a spread of about 15 days between runs)
 tol_recovered, tol_peak, tol_day = 0.02, 0.15, 10 # Share recovered and height of the peak in each place, and the day of the peak
 
 
