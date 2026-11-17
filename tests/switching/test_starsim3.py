@@ -69,7 +69,7 @@ def test_starsim3_fit():
 def test_starsim3_port():
     sc.heading('Starsim 3: the same SIS redeclared, with the beta dict ported as the migration guide says')
     guide = sc.loadtext(sc.path(ss.__file__).parent.parent/'docs/migration/v3_v4.md')
-    assert "beta={'random': ss.prob(0.05, 'month')}" in guide # Bare numbers in a beta dict were probabilities per step in Starsim 3; the migration guide (which the migrate-starsim3 skill points to) carries the rule
+    assert "beta={'randomnet': ss.prob(0.05, 'month')}" in guide # Bare numbers in a beta dict were probabilities per step in Starsim 3; the migration guide (which the migrate-starsim3 skill points to) carries the rule
     S, I = ss.states('S I')
     sis = ss.Disease(infection=ss.Transition(S, I, rate=dict(randomnet=ss.prob(0.05, 'month')) * I), recovery=ss.Transition(I, S, dur=ss.years(1)), init_prev=0.01, name='sis')
     sim = ss.Sim(sis, dt=ss.years(1/12), rand_seed=1, **kw()).run()

@@ -193,8 +193,8 @@ def worker(name, kernel, rebuilds):
 
     if kernel.startswith('jax') and 'code' not in run: # Without a slow first run if JAX does not apply
         built[0].init()
-        reason = getattr(built[0], '_compiled_reason', None) or getattr(built[0], '_kernel_reason', None) or built[0].kernel_reason # _kernel_reason before the backend renames, public up to Starsim 4.0.0rc3
-        reason = reason()
+        why_not = getattr(ss.solvers, 'why_not', None)
+        reason = why_not(built[0], 'compiled') if why_not else built[0].kernel_reason() # sim.kernel_reason() up to Starsim 4.0.0rc3
         use, why = (False, reason) if reason else forced(built[0])
         if not use:
             print('TIMING ' + json.dumps(dict(skipped=why)))

@@ -5,6 +5,7 @@ import ast
 import runpy
 import numpy as np
 import sciris as sc
+import starsim as ss
 import paths
 import timing
 
@@ -41,7 +42,7 @@ def test_no_data():
 def test_run():
     sc.heading('Running the model')
     sim = make_sim().init()
-    assert sim._compiled_reason() is None, 'The whole run should be taken in one call to the kernels'
+    assert ss.solvers.why_not(sim, 'compiled') is None, 'The whole run should be taken in one call to the kernels'
     sim.run()
     results = sim.results.flatten()
     assert all(np.isfinite(np.array(res)).all() for res in results.values())
