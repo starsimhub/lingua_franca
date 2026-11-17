@@ -16,7 +16,8 @@ ref = tools.read_results(here)
 places = dict(central_city='Central City', town_1='Town 1', interim_1a='Interim 1A', town_3='Town 3')
 
 
-n_runs = 20 # As many as the original. Each agent stands for ten people, so the 100 at the start are 10 agents, and the day of the peak in one run depends a good deal on chance (town 3: a spread of about 15 days between runs)
+n_agents = 1_750_000 # One agent per person, as in the original. In model.py each agent stands for ten people, and then the epidemic reaches each place later: a place far from Town 1 is first infected when enough force has reached it to infect one agent, which is ten people, not one (Town 3 peaks about 10 days late, and Interim 1A about 7)
+n_runs = 5 # At this size, the peak in Town 3 varies by about 5 days between runs
 tol_recovered, tol_peak, tol_day = 0.02, 0.15, 10 # Share recovered and height of the peak in each place, and the day of the peak
 
 
@@ -38,7 +39,7 @@ def report(label, results):
 
 
 if __name__ == '__main__':
-    abm = [sim.new(rand_seed=seed, verbose=0).run().results.seir for seed in range(n_runs)]
-    report(f'As agents ({sim.pars.n_agents:,} agents, the mean of {n_runs} runs; the original, the mean of 20):', abm)
+    abm = [sim.new(n_agents=n_agents, rand_seed=seed, verbose=0).run().results.seir for seed in range(n_runs)]
+    report(f'As agents ({n_agents:,} agents, the mean of {n_runs} runs; the original, the mean of 20):', abm)
     ode = sim.new(n_agents=None, solver='ode', verbose=0).run().results.seir
     report('As an ODE, with the durations as Erlang stages:', [ode])
