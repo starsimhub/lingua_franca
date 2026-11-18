@@ -32,7 +32,8 @@ def flow(values):
 
 def start():
     """ The number in I at the start, by age and clinical status """
-    return sim.new(verbose=0).init().diseases.seir.I.values.reshape(len(ages), len(clinical))
+    seir = sim.new(verbose=0).init().diseases.seir
+    return seir.y[seir.I.rows].sum(axis=0).reshape(len(ages), len(clinical))
 
 
 def as_states():
