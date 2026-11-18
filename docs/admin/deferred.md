@@ -417,3 +417,7 @@ Work that was looked at and decided against, with why, so that it is not propose
 ## From the Nov 13 simplification review (2026-11-13)
 
 - **Starting near the steady state.** `init=ss.equilibrium()` on a declared disease would run its ODE until it settles and start from those fractions (by stratum, if stratified); `ss.Sim(burn_in=ss.years(20))` would run any model for a while and discard those results, for coded diseases and for network structure the ODE ignores. Cliff: worth doing but complex, so deferred.
+
+## From the Nov 17 Zen review (2026-11-17)
+
+- **One rule for tables of rates by year.** The same table labeled 2000 and 2010 gives a different 2005 value in each module. `ss.Births` and `ss.Deaths` hold each row until the next label (`period_year()`), which is right for data by period, such as the UN's 5-year labels and life tables ("2010" is 2010 to 2014); only a named place's UN rates, estimates for single years every ten years, are interpolated (`yearly_rows()`), and `note_sparse()` notes a user's table more than 5 years apart. `ss.Pregnancy` interpolates every fertility table to single years (`standardize_fertility_data()`) and reads the nearest year. Interpolating births and deaths too costs nothing (it is done once at init) but breaks the period rule that `test_period_rates` and `test_lifetable_deaths` pin. The consistent fix is probably the other way: fertility holding period data as births and deaths do, interpolating only estimates for single years. Cliff: leave for now.
