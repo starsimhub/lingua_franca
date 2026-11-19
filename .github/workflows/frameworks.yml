@@ -85,7 +85,7 @@ jobs:
           - {name: LASER,         envs: laser,      tests: switching/test_laser.py, models: laser/}
           - {name: MEmilio,       envs: memilio,    tests: conversion/test_memilio.py switching/test_memilio.py, models: memilio/}
           - {name: odin and SBML, envs: odin sbml,  tests: conversion/test_odin.py conversion/test_export.py switching/test_odin.py, models: odin/, r: true}
-          - {name: SimInf,        envs: siminf,     tests: conversion/test_siminf.py switching/test_siminf.py, models: siminf/, r: true, apt: libgsl-dev}
+          - {name: SimInf,        envs: siminf,     tests: conversion/test_siminf.py switching/test_siminf.py, models: siminf/, r: true, apt: libgsl-dev, apt_run: libgsl27 libgslcblas0}
           - {name: Starsim 3,     tests: switching/test_starsim3.py}
           - {name: summer2,       envs: summer2,    tests: conversion/test_summer2.py switching/test_summer2.py, models: summer2/}
     steps:
@@ -115,9 +115,26 @@ jobs:
       - name: Check the kernels are compiled
         run: python -c "import starsim as ss; assert ss.solvers.backends.rust.on; ss.compile(check=True)"
 
+      - name: Find the recipe
+        if: matrix.envs
+        id: recipe
+        run: echo "key=$(lingua_franca envs key ${{ matrix.envs }})" >> "$GITHUB_OUTPUT"
+      - id: cache
+        if: matrix.envs
+        uses: actions/cache@v4
+        with:
+          path: |
+            _envs
+            !_envs/camdl/src/rust/target
+            !_envs/camdl/src/ocaml/_build
+            .uv-python
+          key: envs-${{ runner.os }}-r${{ matrix.r && env.R_VERSION }}-${{ steps.recipe.outputs.key }}
       - name: Install what the framework needs from the system
-        if: matrix.apt
-        run: sudo apt-get update && sudo apt-get install -y ${{ matrix.apt }}
+        if: matrix.apt || matrix.r
+        run: | # To build the environment, its headers (apt); once built (cached), only the libraries it links to that the runner lacks (apt_run)
+          if [ "${{ steps.cache.outputs.cache-hit }}" = true ]; then pkgs="${{ matrix.apt_run }}"; else pkgs="${{ matrix.apt }}"; fi
+          if [ "${{ matrix.r }}" = true ]; then pkgs="$pkgs libopenblas0-pthread"; fi # R's BLAS, which setup-r would install
+          [ -z "${pkgs// }" ] || sudo apt-get install -y --no-install-recommends $pkgs || (sudo apt-get update && sudo apt-get install -y --no-install-recommends $pkgs) # Updating the package lists only if needed, since it is slow
       - name: Make R's folder writable, for its cache
         if: matrix.r
         run: sudo mkdir -p /opt/R && sudo chown $USER /opt/R
@@ -133,26 +150,10 @@ jobs:
           r-version: ${{ env.R_VERSION }}
       - name: Use the cached R
         if: matrix.r && steps.rcache.outputs.cache-hit == 'true'
-        run: | # The libraries R's .deb needs (not the tools for R CMD check that setup-r also installs)
-          pkgs="libopenblas-dev libbz2-dev liblzma-dev libdeflate-dev libtirpc-dev"
-          sudo apt-get install -y --no-install-recommends $pkgs || (sudo apt-get update && sudo apt-get install -y --no-install-recommends $pkgs)
+        run: |
           sudo ln -sf /opt/R/${{ env.R_VERSION }}/bin/R /usr/local/bin/R
           sudo ln -sf /opt/R/${{ env.R_VERSION }}/bin/Rscript /usr/local/bin/Rscript
           Rscript -e 'cat(R.version.string, "\n")' # Fails here if R cannot start
-      - name: Find the recipe
-        if: matrix.envs
-        id: recipe
-        run: echo "key=$(lingua_franca envs key ${{ matrix.envs }})" >> "$GITHUB_OUTPUT"
-      - id: cache
-        if: matrix.envs
-        uses: actions/cache@v4
-        with:
-          path: |
-            _envs
-            !_envs/camdl/src/rust/target
-            !_envs/camdl/src/ocaml/_build
-            .uv-python
-          key: envs-${{ runner.os }}-r${{ matrix.r && env.R_VERSION }}-${{ steps.recipe.outputs.key }}
       - uses: ocaml/setup-ocaml@v3
         if: matrix.ocaml && steps.cache.outputs.cache-hit != 'true'
         with:
