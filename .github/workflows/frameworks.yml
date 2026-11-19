@@ -133,10 +133,12 @@ jobs:
           r-version: ${{ env.R_VERSION }}
       - name: Use the cached R
         if: matrix.r && steps.rcache.outputs.cache-hit == 'true'
-        run: |
+        run: | # The libraries R's .deb needs (not the tools for R CMD check that setup-r also installs)
+          pkgs="libopenblas-dev libbz2-dev liblzma-dev libdeflate-dev libtirpc-dev"
+          sudo apt-get install -y --no-install-recommends $pkgs || (sudo apt-get update && sudo apt-get install -y --no-install-recommends $pkgs)
           sudo ln -sf /opt/R/${{ env.R_VERSION }}/bin/R /usr/local/bin/R
           sudo ln -sf /opt/R/${{ env.R_VERSION }}/bin/Rscript /usr/local/bin/Rscript
-          R --version | head -1
+          Rscript -e 'cat(R.version.string, "\n")' # Fails here if R cannot start
       - name: Find the recipe
         if: matrix.envs
         id: recipe
