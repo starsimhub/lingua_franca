@@ -133,7 +133,7 @@ There is a class hierarchy under `ss.TimePar`:
 
 Separating *rate*, *probability*, and *frequency* is unusual and worth keeping. `0.1` per year could mean any of the three, each converts to a per-step quantity by a different formula (`1 - exp(-r·dt)`, `1 - (1-p)^dt`, `r·dt`), and mixing them up is a common and quiet error. In Starsim, the value does its own conversion: `beta.to_prob(dt)`.
 
-Durations and rates compose with dates: `ss.date` subclasses `pd.Timestamp`, so a sim can run on real calendar dates, and `ss.datedur` handles the month-length problem that pure float-year arithmetic gets wrong. A `Timeline` gives the same time as `tvec`, `tivec` (indices), `timevec`, `yearvec` (float years), `datevec` (dates), and `relvec` (relative). That is a lot of parallel forms, but output can be had in whatever form the data use.
+Durations and rates compose with dates: `ss.date` subclasses `pd.Timestamp`, so a sim can run on real calendar dates, and `ss.datedur` handles the month-length problem that pure float-year arithmetic gets wrong. A `Timeline` gives the same time as `tvec`, `timevec`, `yearvec` (float years), and `datevec` (dates). That is several parallel forms, but output can be had in whatever form the data use.
 
 **Per-module time steps.** Each module has its own `Timeline`, so a within-host progression module can run at `dt = 1 day` while a demographic module runs at `dt = 1 year` in the same sim. The `Loop` interleaves them by absolute time. We found nothing else in the landscape that does this, and it is good evidence that a lingua franca should not assume one global `dt`.
 
@@ -157,7 +157,7 @@ This works well, and it also has limits: sampling without replacement, joint dra
 Transmission goes through a route (`ss.networks.Route`), of which there are two families:
 
 - **`ss.Network`**: a list of edges, regenerated or updated each step. Built-ins include random, maternal, and sexual networks, with more in `starsim.library`. Transmission goes through the edges, works out a probability for each from `beta`, `rel_trans`, and `rel_sus`, and draws.
-- **`ss.MixingPool` / `ss.MixingPools`**: an aggregate force of infection between groups of agents, with a contact matrix. This is the metapopulation and age-contact-matrix form, and it uses the same transmission path (each route's `compute_transmission()`).
+- **`ss.MixingPool` / `ss.MixingPools`**: an aggregate force of infection between groups of agents, with a contact matrix. This is the metapopulation and age-contact-matrix form: pools give each person a hazard, for declared and coded diseases alike.
 
 Because both are routes, the *same disease module* can run as a network ABM or as a mixing-matrix metapopulation model without editing the disease. This was a partial version of the paradigm independence this project wanted. It was partial because the disease was still written as agent code, so the compartmental limit came from a homogeneous population and not from solving equations.
 

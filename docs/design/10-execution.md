@@ -41,7 +41,7 @@ The loop calls these functions, in this order, at every step. This is the order 
 | 8 | interventions | `step()` | Deliveries, products, parameter changes |
 | 9 | diseases | `step()` | Every declared transition: those that are not contact-mediated (progression, branching, `ss.transfer`, disease deaths), then transmission |
 | 10 | people | `step_die()` | Requested deaths take effect (see [Removals](#removals-are-deferred)) |
-| 11 | people, then every module | `record_events()` | Flows: transitions, deaths, deliveries, declared results and `ss.outcome`s for this step |
+| 11 | people, then every module | `record_events()` | Flows: transitions, deaths, deliveries, and `ss.outcome`s for this step (and results by group); declared sums and ratios are worked out once the run ends or pauses |
 | 12 | analyzers | `step()` | Analyzers read the finished step; the people they see are as at the next time point |
 | 13 | every module, people, sim | `finish_step()` | Remove dead agents |
 

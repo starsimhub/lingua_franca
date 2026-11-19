@@ -185,7 +185,7 @@ A dwell-time distribution becomes stages. A distribution on `beta` or `rel_sus` 
 
 ### B13. Time
 
-- **Can the Timeline be simpler?** Three views seem irreducible: the step index, time in the sim's own unit, and the calendar date. The proposal is to keep those three and make the rest (`yearvec`, `relvec`, `tvec`) conversions on request, `sim.t.to('year')`. Whether that is a real simplification or only moves the names needs trying in Starsim.
+- **Can the Timeline be simpler?** Three views seem irreducible: the step index, time in the sim's own unit, and the calendar date. The proposal is to keep those three and make the rest (`yearvec`, `tvec`) conversions on request, `sim.t.to('year')`. Whether that is a real simplification or only moves the names needs trying in Starsim.
 - **A unitless model that later gets a unit.** Giving the sim dates gives it a unit, and the bare numbers that were per step become per day. The note says so; whether a note is enough is open.
 
 ### Open questions from best-practices
