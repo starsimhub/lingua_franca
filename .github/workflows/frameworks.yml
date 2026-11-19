@@ -139,7 +139,7 @@ jobs:
         run: sudo mkdir -p /opt/R && sudo chown $USER /opt/R
       - id: rcache # R itself, which setup-r takes about 40 s to install
         if: matrix.r
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: /opt/R
           key: r-${{ runner.os }}-${{ env.R_VERSION }}-blas # With its BLAS and LAPACK (below), so that it needs nothing from apt
@@ -149,7 +149,13 @@ jobs:
           r-version: ${{ env.R_VERSION }}
       - name: Keep R's BLAS and LAPACK with it, for its cache
         if: matrix.r && steps.rcache.outputs.cache-hit != 'true'
-        run: cp -L /usr/lib/x86_64-linux-gnu/libblas.so.3 /usr/lib/x86_64-linux-gnu/liblapack.so.3 /opt/R/${{ env.R_VERSION }}/lib/R/lib/ # R puts its lib folder on the library path
+        run: sudo cp -L /usr/lib/x86_64-linux-gnu/{libblas.so.3,liblapack.so.3,libopenblas.so.0} /opt/R/${{ env.R_VERSION }}/lib/R/lib/ # R puts its lib folder on the library path; sudo, since setup-r installs R as root
+      - name: Save R
+        if: matrix.r && steps.rcache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4 # Now, rather than at the end, so that it is saved even if a later step fails
+        with:
+          path: /opt/R
+          key: ${{ steps.rcache.outputs.cache-primary-key }}
       - name: Use the cached R
         if: matrix.r && steps.rcache.outputs.cache-hit == 'true'
         run: |
